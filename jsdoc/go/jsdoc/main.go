@@ -3,7 +3,9 @@ package main
 
 import (
 	"flag"
+	"io/fs"
 	"net/http"
+	"path/filepath"
 
 	"go.skia.org/infra/go/common"
 	"go.skia.org/infra/go/httputils"
@@ -23,11 +25,15 @@ func main() {
 		"jsdocserver",
 		common.PrometheusOpt(promPort),
 	)
-	r := http.NewServeMux()
-	r.Handle("/{$}", http.RedirectHandler("/index.html", http.StatusMovedPermanently))
-	r.Handle("/*", http.HandlerFunc(httputils.MakeResourceHandler(*resourcesDir)))
 
-	h := httputils.LoggingGzipRequestResponse(r)
+	filepath.WalkDir(*resourcesDir, func(path string, d fs.DirEntry, err error) error {
+		sklog.Infof("path: %s", path)
+		return nil
+	})
+
+	h := httputils.LoggingGzipRequestResponse(
+		http.FileServer(
+			http.Dir(*resourcesDir)))
 	if !*local {
 		h = httputils.HealthzAndHTTPS(h)
 	}
