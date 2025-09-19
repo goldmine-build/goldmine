@@ -9,7 +9,6 @@ go_library(
         "//go/common",
         "//go/httputils",
         "//go/sklog",
-        "@com_github_go_chi_chi_v5//:chi",
     ],
 )
 

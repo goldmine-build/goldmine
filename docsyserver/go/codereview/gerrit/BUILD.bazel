@@ -24,8 +24,8 @@ go_test(
     deps = [
         "//docsyserver/go/codereview",
         "//go/gerrit",
-        "//go/gerrit/mocks",
         "//go/testutils",
         "@com_github_stretchr_testify//require",
+        "@org_skia_go_infra//go/gerrit/mocks:go_default_library",
     ],
 )

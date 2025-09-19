@@ -5,7 +5,6 @@ import (
 	"flag"
 	"net/http"
 
-	"github.com/go-chi/chi/v5"
 	"go.skia.org/infra/go/common"
 	"go.skia.org/infra/go/httputils"
 	"go.skia.org/infra/go/sklog"
@@ -24,7 +23,7 @@ func main() {
 		"jsdocserver",
 		common.PrometheusOpt(promPort),
 	)
-	r := chi.NewRouter()
+	r := http.NewServeMux()
 	r.Handle("/*", http.HandlerFunc(httputils.MakeResourceHandler(*resourcesDir)))
 	r.Handle("/", http.RedirectHandler("/main.html", http.StatusMovedPermanently))
 

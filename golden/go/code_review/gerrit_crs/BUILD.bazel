@@ -22,12 +22,12 @@ go_test(
     embed = [":gerrit_crs"],
     deps = [
         "//go/gerrit",
-        "//go/gerrit/mocks",
         "//go/skerr",
         "//go/testutils",
         "//go/vcsinfo",
         "//golden/go/code_review",
         "@com_github_stretchr_testify//assert",
         "@com_github_stretchr_testify//require",
+        "@org_skia_go_infra//go/gerrit/mocks:go_default_library",
     ],
 )
