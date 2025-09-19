@@ -15,7 +15,7 @@ var (
 	local        = flag.Bool("local", false, "Running locally if true. As opposed to in production.")
 	port         = flag.String("port", ":8000", "HTTP service address (e.g., ':8000')")
 	promPort     = flag.String("prom_port", ":20000", "Metrics service address (e.g., ':10110')")
-	resourcesDir = flag.String("resources_dir", "/usr/local/share/jsdoc/", "Root directory of resources to serve.")
+	resourcesDir = flag.String("resources_dir", "/usr/local/share/jsdoc/dist", "Root directory of resources to serve.")
 )
 
 func main() {
@@ -24,8 +24,8 @@ func main() {
 		common.PrometheusOpt(promPort),
 	)
 	r := http.NewServeMux()
+	r.Handle("/{$}", http.RedirectHandler("/index.html", http.StatusMovedPermanently))
 	r.Handle("/*", http.HandlerFunc(httputils.MakeResourceHandler(*resourcesDir)))
-	r.Handle("/", http.RedirectHandler("/main.html", http.StatusMovedPermanently))
 
 	h := httputils.LoggingGzipRequestResponse(r)
 	if !*local {

@@ -1,7 +1,7 @@
 load("//infra-sk:index.bzl", "sk_page")
 
 sk_page(
-    name = "main",
+    name = "index",
     html_file = "index.html",
     sass_deps = [
     ],
