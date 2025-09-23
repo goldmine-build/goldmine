@@ -8,12 +8,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/now"
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/perf/go/ctrace2"
-	"go.skia.org/infra/perf/go/dataframe"
-	"go.skia.org/infra/perf/go/kmeans"
-	"go.skia.org/infra/perf/go/types"
+	"go.goldmine.build/go/now"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/perf/go/ctrace2"
+	"go.goldmine.build/perf/go/dataframe"
+	"go.goldmine.build/perf/go/kmeans"
+	"go.goldmine.build/perf/go/types"
 )
 
 func TestNewClusterSummary_RecordsTheTimeTheClusterSummaryWasCreated_Success(t *testing.T) {

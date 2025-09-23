@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/spf13/cobra"
-	"go.skia.org/infra/gold-client/go/goldclient"
+	"go.goldmine.build/gold-client/go/goldclient"
 )
 
 // whoamiEnv provides the environment for the whoami command.

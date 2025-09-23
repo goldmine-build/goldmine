@@ -9,7 +9,7 @@
 // address, which can be used for audit logging. The application running behind
 // auth-proxy should then use:
 //
-//	https://pkg.go.dev/go.skia.org/infra/go/alogin/proxylogin
+//	https://pkg.go.dev/go.goldmine.build/go/alogin/proxylogin
 //
 // When using --cria_group this application should be run using work-load
 // identity with a service account that as read access to CRIA, such as:
@@ -41,18 +41,18 @@ import (
 	"sync"
 	"time"
 
-	"go.skia.org/infra/go/allowed"
-	"go.skia.org/infra/go/cleanup"
-	"go.skia.org/infra/go/common"
-	"go.skia.org/infra/go/httputils"
-	"go.skia.org/infra/go/metrics2"
-	"go.skia.org/infra/go/roles"
-	"go.skia.org/infra/go/secret"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/kube/go/authproxy/auth"
-	"go.skia.org/infra/kube/go/authproxy/mockedauth"
-	"go.skia.org/infra/kube/go/authproxy/protoheader"
+	"go.goldmine.build/go/allowed"
+	"go.goldmine.build/go/cleanup"
+	"go.goldmine.build/go/common"
+	"go.goldmine.build/go/httputils"
+	"go.goldmine.build/go/metrics2"
+	"go.goldmine.build/go/roles"
+	"go.goldmine.build/go/secret"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/kube/go/authproxy/auth"
+	"go.goldmine.build/kube/go/authproxy/mockedauth"
+	"go.goldmine.build/kube/go/authproxy/protoheader"
 	"golang.org/x/net/http2"
 	"golang.org/x/oauth2/google"
 )

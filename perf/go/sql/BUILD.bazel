@@ -7,7 +7,7 @@ go_library(
         "schema.go",
         "tables.go",
     ],
-    importpath = "go.skia.org/infra/perf/go/sql",
+    importpath = "go.goldmine.build/perf/go/sql",
     visibility = ["//visibility:public"],
     deps = [
         "//perf/go/alerts/sqlalertstore/schema",

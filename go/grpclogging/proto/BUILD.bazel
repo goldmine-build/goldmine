@@ -6,7 +6,7 @@ go_library(
         "generate.go",
         "log.pb.go",
     ],
-    importpath = "go.skia.org/infra/go/grpclogging/proto",
+    importpath = "go.goldmine.build/go/grpclogging/proto",
     visibility = ["//visibility:public"],
     deps = [
         "@org_golang_google_protobuf//reflect/protoreflect",

@@ -13,9 +13,9 @@ import (
 	"regexp"
 	"strconv"
 
-	"go.skia.org/infra/go/git"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/git"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/util"
 )
 
 const (

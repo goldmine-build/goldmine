@@ -9,7 +9,7 @@ import (
 	"time"
 
 	mock "github.com/stretchr/testify/mock"
-	"go.skia.org/infra/go/vcsinfo"
+	"go.goldmine.build/go/vcsinfo"
 )
 
 // NewVCS creates a new instance of VCS. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

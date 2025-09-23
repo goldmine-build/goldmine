@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "gerrit",
     srcs = ["gerrit.go"],
-    importpath = "go.skia.org/infra/perf/go/trybot/ingester/gerrit",
+    importpath = "go.goldmine.build/perf/go/trybot/ingester/gerrit",
     visibility = ["//visibility:public"],
     deps = [
         "//go/metrics2",

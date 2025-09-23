@@ -10,7 +10,7 @@ go_library(
         "setup-win.ps1",
         "third_party/node/setup_6.x",
     ],
-    importpath = "go.skia.org/infra/go/gce/swarming/instance_types",
+    importpath = "go.goldmine.build/go/gce/swarming/instance_types",
     visibility = ["//visibility:public"],
     deps = [
         "//go/auth",

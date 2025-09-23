@@ -12,7 +12,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/util"
 )
 
 func TestBasic(t *testing.T) {

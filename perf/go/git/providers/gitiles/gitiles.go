@@ -7,13 +7,13 @@ import (
 	"net/http"
 	"time"
 
-	"go.skia.org/infra/go/git"
-	"go.skia.org/infra/go/gitiles"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/vcsinfo"
-	"go.skia.org/infra/perf/go/config"
-	"go.skia.org/infra/perf/go/git/provider"
+	"go.goldmine.build/go/git"
+	"go.goldmine.build/go/gitiles"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/vcsinfo"
+	"go.goldmine.build/perf/go/config"
+	"go.goldmine.build/perf/go/git/provider"
 )
 
 const (

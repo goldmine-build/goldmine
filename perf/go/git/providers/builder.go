@@ -4,14 +4,14 @@ package providers
 import (
 	"context"
 
-	"go.skia.org/infra/go/auth"
-	"go.skia.org/infra/go/httputils"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/util"
-	"go.skia.org/infra/perf/go/config"
-	"go.skia.org/infra/perf/go/git/provider"
-	"go.skia.org/infra/perf/go/git/providers/git_checkout"
-	"go.skia.org/infra/perf/go/git/providers/gitiles"
+	"go.goldmine.build/go/auth"
+	"go.goldmine.build/go/httputils"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/util"
+	"go.goldmine.build/perf/go/config"
+	"go.goldmine.build/perf/go/git/provider"
+	"go.goldmine.build/perf/go/git/providers/git_checkout"
+	"go.goldmine.build/perf/go/git/providers/gitiles"
 	"golang.org/x/oauth2/google"
 )
 

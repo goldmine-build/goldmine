@@ -11,17 +11,17 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/now"
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/go/query"
-	"go.skia.org/infra/go/vec32"
-	"go.skia.org/infra/perf/go/config"
-	"go.skia.org/infra/perf/go/git"
-	"go.skia.org/infra/perf/go/git/gittest"
-	"go.skia.org/infra/perf/go/git/provider"
-	"go.skia.org/infra/perf/go/sql/sqltest"
-	"go.skia.org/infra/perf/go/tracestore"
-	"go.skia.org/infra/perf/go/types"
+	"go.goldmine.build/go/now"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/go/query"
+	"go.goldmine.build/go/vec32"
+	"go.goldmine.build/perf/go/config"
+	"go.goldmine.build/perf/go/git"
+	"go.goldmine.build/perf/go/git/gittest"
+	"go.goldmine.build/perf/go/git/provider"
+	"go.goldmine.build/perf/go/sql/sqltest"
+	"go.goldmine.build/perf/go/tracestore"
+	"go.goldmine.build/perf/go/types"
 )
 
 const (

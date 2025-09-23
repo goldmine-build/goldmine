@@ -8,7 +8,7 @@ go_library(
         "task_name_schema.go",
         "task_name_schema_gen.go",
     ],
-    importpath = "go.skia.org/infra/go/taskname",
+    importpath = "go.goldmine.build/go/taskname",
     visibility = ["//visibility:public"],
     deps = ["@com_github_stretchr_testify//mock"],
 )

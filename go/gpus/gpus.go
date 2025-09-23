@@ -7,7 +7,7 @@ import (
 	"regexp"
 	"strings"
 
-	"go.skia.org/infra/go/util_generics"
+	"go.goldmine.build/go/util_generics"
 )
 
 type VendorID string

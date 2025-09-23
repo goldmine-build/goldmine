@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 
 	"github.com/blakesmith/ar"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/util"
 )
 
 func main() {

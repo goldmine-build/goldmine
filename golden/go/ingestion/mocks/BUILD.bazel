@@ -8,7 +8,7 @@ go_library(
         "Source.go",
         "Store.go",
     ],
-    importpath = "go.skia.org/infra/golden/go/ingestion/mocks",
+    importpath = "go.goldmine.build/golden/go/ingestion/mocks",
     visibility = ["//visibility:public"],
     deps = ["@com_github_stretchr_testify//mock"],
 )

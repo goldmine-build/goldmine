@@ -18,17 +18,17 @@ import (
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/option"
 
-	"go.skia.org/infra/codesize/go/bloaty"
-	"go.skia.org/infra/codesize/go/codesizeserver/rpc"
-	"go.skia.org/infra/codesize/go/store"
-	"go.skia.org/infra/go/baseapp"
-	"go.skia.org/infra/go/fileutil"
-	"go.skia.org/infra/go/gcs/gcsclient"
-	"go.skia.org/infra/go/httputils"
-	"go.skia.org/infra/go/now"
-	"go.skia.org/infra/go/pubsub/sub"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
+	"go.goldmine.build/codesize/go/bloaty"
+	"go.goldmine.build/codesize/go/codesizeserver/rpc"
+	"go.goldmine.build/codesize/go/store"
+	"go.goldmine.build/go/baseapp"
+	"go.goldmine.build/go/fileutil"
+	"go.goldmine.build/go/gcs/gcsclient"
+	"go.goldmine.build/go/httputils"
+	"go.goldmine.build/go/now"
+	"go.goldmine.build/go/pubsub/sub"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
 )
 
 const (

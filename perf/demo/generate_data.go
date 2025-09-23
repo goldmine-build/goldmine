@@ -10,8 +10,8 @@ import (
 	"path"
 	"runtime"
 
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/perf/go/ingest/format"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/perf/go/ingest/format"
 )
 
 func main() {

@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_binary", "go_library")
 go_library(
     name = "android_hashlookup_lib",
     srcs = ["main.go"],
-    importpath = "go.skia.org/infra/go/android_hashlookup",
+    importpath = "go.goldmine.build/go/android_hashlookup",
     visibility = ["//visibility:private"],
     deps = [
         "//go/androidbuild",

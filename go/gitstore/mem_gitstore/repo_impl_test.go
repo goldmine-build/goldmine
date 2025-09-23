@@ -5,12 +5,12 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/git"
-	"go.skia.org/infra/go/git/repograph"
-	repograph_shared_tests "go.skia.org/infra/go/git/repograph/shared_tests"
-	git_testutils "go.skia.org/infra/go/git/testutils"
-	"go.skia.org/infra/go/gitstore"
-	"go.skia.org/infra/go/vcsinfo"
+	"go.goldmine.build/go/git"
+	"go.goldmine.build/go/git/repograph"
+	repograph_shared_tests "go.goldmine.build/go/git/repograph/shared_tests"
+	git_testutils "go.goldmine.build/go/git/testutils"
+	"go.goldmine.build/go/gitstore"
+	"go.goldmine.build/go/vcsinfo"
 )
 
 // gitstoreRefresher is an implementation of repograph_shared_tests.RepoImplRefresher

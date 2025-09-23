@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"go.skia.org/infra/go/issuetracker/v1"
+	"go.goldmine.build/go/issuetracker/v1"
 )
 
 // NpmDB is the interface implemented by all DB clients.

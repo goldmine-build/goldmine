@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "audits",
     srcs = ["audit.go"],
-    importpath = "go.skia.org/infra/npm-audit-mirror/go/audits",
+    importpath = "go.goldmine.build/npm-audit-mirror/go/audits",
     visibility = ["//visibility:public"],
     deps = [
         "//go/executil",

@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"io"
 
-	"go.skia.org/infra/go/sklog"
+	"go.goldmine.build/go/sklog"
 	"golang.org/x/oauth2/google"
 )
 

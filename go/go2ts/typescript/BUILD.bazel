@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "typescript",
     srcs = ["typescript.go"],
-    importpath = "go.skia.org/infra/go/go2ts/typescript",
+    importpath = "go.goldmine.build/go/go2ts/typescript",
     visibility = ["//visibility:public"],
 )
 

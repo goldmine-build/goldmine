@@ -7,7 +7,7 @@ go_library(
         "helpers.go",
         "web.go",
     ],
-    importpath = "go.skia.org/infra/golden/go/web",
+    importpath = "go.goldmine.build/golden/go/web",
     visibility = ["//visibility:public"],
     deps = [
         "//go/alogin",

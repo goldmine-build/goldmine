@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_binary", "go_library")
 go_library(
     name = "api_lib",
     srcs = ["main.go"],
-    importpath = "go.skia.org/infra/api/go/api",
+    importpath = "go.goldmine.build/api/go/api",
     visibility = ["//visibility:private"],
     deps = [
         "//go/common",

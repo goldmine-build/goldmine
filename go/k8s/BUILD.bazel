@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "k8s",
     srcs = ["k8s.go"],
-    importpath = "go.skia.org/infra/go/k8s",
+    importpath = "go.goldmine.build/go/k8s",
     visibility = ["//visibility:public"],
     deps = [
         "//go/kube/clusterconfig",

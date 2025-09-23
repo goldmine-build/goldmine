@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 
-	"go.skia.org/infra/go/emulators/gcp_emulator"
+	"go.goldmine.build/go/emulators/gcp_emulator"
 )
 
 func TestPeriodic(t *testing.T) {

@@ -9,8 +9,8 @@ import (
 	"time"
 
 	mock "github.com/stretchr/testify/mock"
-	"go.skia.org/infra/perf/go/git/provider"
-	"go.skia.org/infra/perf/go/types"
+	"go.goldmine.build/perf/go/git/provider"
+	"go.goldmine.build/perf/go/types"
 )
 
 // NewGit creates a new instance of Git. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

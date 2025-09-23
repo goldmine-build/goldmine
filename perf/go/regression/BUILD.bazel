@@ -10,7 +10,7 @@ go_library(
         "stepfit.go",
         "types.go",
     ],
-    importpath = "go.skia.org/infra/perf/go/regression",
+    importpath = "go.goldmine.build/perf/go/regression",
     visibility = ["//visibility:public"],
     deps = [
         "//go/metrics2",

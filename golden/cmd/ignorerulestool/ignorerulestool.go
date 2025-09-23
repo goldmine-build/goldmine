@@ -5,10 +5,10 @@ import (
 	"flag"
 
 	"github.com/jackc/pgx/v4/pgxpool"
-	"go.skia.org/infra/golden/go/ignore/sqlignorestore"
+	"go.goldmine.build/golden/go/ignore/sqlignorestore"
 
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/golden/go/sql"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/golden/go/sql"
 )
 
 func main() {

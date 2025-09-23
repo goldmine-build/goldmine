@@ -13,11 +13,11 @@ import (
 	"github.com/bazelbuild/bazel-gazelle/label"
 	"github.com/bazelbuild/bazel-gazelle/language"
 	"github.com/bazelbuild/bazel-gazelle/rule"
-	"go.skia.org/infra/bazel/gazelle/frontend/common"
-	"go.skia.org/infra/bazel/gazelle/frontend/configurer"
-	"go.skia.org/infra/bazel/gazelle/frontend/parsers"
-	"go.skia.org/infra/bazel/gazelle/frontend/resolver"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/bazel/gazelle/frontend/common"
+	"go.goldmine.build/bazel/gazelle/frontend/configurer"
+	"go.goldmine.build/bazel/gazelle/frontend/parsers"
+	"go.goldmine.build/bazel/gazelle/frontend/resolver"
+	"go.goldmine.build/go/util"
 )
 
 // Language implements the language.Language interface.

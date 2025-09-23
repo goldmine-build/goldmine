@@ -4,7 +4,7 @@ package nooplogging
 import (
 	"os"
 
-	"go.skia.org/infra/go/sklog/sklogimpl"
+	"go.goldmine.build/go/sklog/sklogimpl"
 )
 
 type nooplog struct {

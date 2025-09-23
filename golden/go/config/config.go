@@ -5,9 +5,9 @@ import (
 	"reflect"
 
 	"github.com/flynn/json5"
-	"go.skia.org/infra/go/config"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/config"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/util"
 )
 
 // The Common struct is a set of configuration values that are the same across all instances.

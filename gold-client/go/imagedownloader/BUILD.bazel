@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "imagedownloader",
     srcs = ["imagedownloader.go"],
-    importpath = "go.skia.org/infra/gold-client/go/imagedownloader",
+    importpath = "go.goldmine.build/gold-client/go/imagedownloader",
     visibility = ["//visibility:public"],
     deps = [
         "//go/skerr",

@@ -7,10 +7,10 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/deepequal/assertdeep"
-	"go.skia.org/infra/go/git"
-	git_testutils "go.skia.org/infra/go/git/testutils"
-	"go.skia.org/infra/go/testutils"
+	"go.goldmine.build/go/deepequal/assertdeep"
+	"go.goldmine.build/go/git"
+	git_testutils "go.goldmine.build/go/git/testutils"
+	"go.goldmine.build/go/testutils"
 )
 
 // TestSerializeLocalRepo tests the serialization of localRepoImpl to/from disk.

@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/executil"
+	"go.goldmine.build/go/executil"
 )
 
 func TestRender_HappyPath(t *testing.T) {

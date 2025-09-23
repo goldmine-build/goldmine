@@ -9,23 +9,23 @@ import (
 	"testing"
 	"time"
 
-	"go.skia.org/infra/golden/go/sql/databuilder"
+	"go.goldmine.build/golden/go/sql/databuilder"
 
-	"go.skia.org/infra/go/repo_root"
+	"go.goldmine.build/go/repo_root"
 
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"go.skia.org/infra/go/now"
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/go/testutils"
-	"go.skia.org/infra/golden/go/diff/mocks"
-	"go.skia.org/infra/golden/go/sql"
-	dks "go.skia.org/infra/golden/go/sql/datakitchensink"
-	"go.skia.org/infra/golden/go/sql/schema"
-	"go.skia.org/infra/golden/go/sql/sqltest"
-	"go.skia.org/infra/golden/go/types"
+	"go.goldmine.build/go/now"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/go/testutils"
+	"go.goldmine.build/golden/go/diff/mocks"
+	"go.goldmine.build/golden/go/sql"
+	dks "go.goldmine.build/golden/go/sql/datakitchensink"
+	"go.goldmine.build/golden/go/sql/schema"
+	"go.goldmine.build/golden/go/sql/sqltest"
+	"go.goldmine.build/golden/go/types"
 )
 
 func TestWorkerImpl_CalculateDiffs_NoExistingData_Success(t *testing.T) {

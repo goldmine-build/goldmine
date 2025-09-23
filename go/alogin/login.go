@@ -12,9 +12,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"go.skia.org/infra/go/httputils"
-	"go.skia.org/infra/go/roles"
-	"go.skia.org/infra/go/sklog"
+	"go.goldmine.build/go/httputils"
+	"go.goldmine.build/go/roles"
+	"go.goldmine.build/go/sklog"
 )
 
 var (

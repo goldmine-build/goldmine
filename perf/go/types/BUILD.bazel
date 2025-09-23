@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "types",
     srcs = ["types.go"],
-    importpath = "go.skia.org/infra/perf/go/types",
+    importpath = "go.goldmine.build/perf/go/types",
     visibility = ["//visibility:public"],
     deps = ["//go/vec32"],
 )

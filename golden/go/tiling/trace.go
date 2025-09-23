@@ -1,7 +1,7 @@
 package tiling
 
 import (
-	"go.skia.org/infra/golden/go/types"
+	"go.goldmine.build/golden/go/types"
 )
 
 // Trace represents all the Digests of a single test across a series

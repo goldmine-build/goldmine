@@ -10,9 +10,9 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"go.skia.org/infra/go/git"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/kube/clusters"
+	"go.goldmine.build/go/git"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/kube/clusters"
 )
 
 // Cluster is detailed info on a particular cluster in a ClusterConfig.

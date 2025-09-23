@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "monorail",
     srcs = ["monorail.go"],
-    importpath = "go.skia.org/infra/go/monorail/v1",
+    importpath = "go.goldmine.build/go/monorail/v1",
     visibility = ["//visibility:public"],
     deps = [
         "@com_github_skia_dev_google_api_go_client//gensupport",

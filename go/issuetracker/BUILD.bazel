@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_binary", "go_library")
 go_library(
     name = "issuetracker_lib",
     srcs = ["getdiscovery.go"],
-    importpath = "go.skia.org/infra/go/issuetracker",
+    importpath = "go.goldmine.build/go/issuetracker",
     visibility = ["//visibility:private"],
     deps = [
         "//go/sklog",

@@ -4,7 +4,7 @@ package filter
 import (
 	"regexp"
 
-	"go.skia.org/infra/go/skerr"
+	"go.goldmine.build/go/skerr"
 )
 
 // Filter filenames by the accept/reject regexs.

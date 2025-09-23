@@ -4,14 +4,14 @@ import (
 	"crypto/md5"
 	"time"
 
-	"go.skia.org/infra/golden/go/types"
+	"go.goldmine.build/golden/go/types"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgtype"
 
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/golden/go/expectations"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/golden/go/expectations"
 )
 
 // MD5Hash is a specialized type for an array of bytes representing an MD5Hash. We use MD5 hashes

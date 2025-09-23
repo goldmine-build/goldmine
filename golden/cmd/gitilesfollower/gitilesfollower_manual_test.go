@@ -9,11 +9,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"go.skia.org/infra/go/gitiles"
-	"go.skia.org/infra/go/httputils"
-	"go.skia.org/infra/golden/go/config"
-	"go.skia.org/infra/golden/go/sql/schema"
-	"go.skia.org/infra/golden/go/sql/sqltest"
+	"go.goldmine.build/go/gitiles"
+	"go.goldmine.build/go/httputils"
+	"go.goldmine.build/golden/go/config"
+	"go.goldmine.build/golden/go/sql/schema"
+	"go.goldmine.build/golden/go/sql/sqltest"
 )
 
 func TestUpdateCycle_Load1501CommitsFromGitiles_Success(t *testing.T) {

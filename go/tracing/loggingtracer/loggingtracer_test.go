@@ -9,8 +9,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.goldmine.build/go/now"
 	"go.opencensus.io/trace"
-	"go.skia.org/infra/go/now"
 )
 
 func TestLoggingTracer(t *testing.T) {

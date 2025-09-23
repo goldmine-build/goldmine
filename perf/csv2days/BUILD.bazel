@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "csv2days_lib",
     srcs = ["main.go"],
-    importpath = "go.skia.org/infra/perf/csv2days",
+    importpath = "go.goldmine.build/perf/csv2days",
     visibility = ["//visibility:private"],
     deps = [
         "//go/skerr",

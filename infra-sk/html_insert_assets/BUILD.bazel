@@ -6,7 +6,7 @@ load(":index.bzl", "html_insert_assets")
 go_library(
     name = "html_insert_assets_lib",
     srcs = ["html_insert_assets.go"],
-    importpath = "go.skia.org/infra/infra-sk/html_insert_assets",
+    importpath = "go.goldmine.build/infra-sk/html_insert_assets",
     visibility = ["//visibility:private"],
     deps = ["@org_golang_x_net//html"],
 )

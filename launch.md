@@ -4,7 +4,7 @@
 
 Your service:
 
-- Is checked in to the `go.skia.org/infra` Git repo.
+- Is checked in to the `go.goldmine.build` Git repo.
 - Is an HTTP server written in Go with a front end in WebComponents (legacy apps
   have Polymer)
 - Will run in a Docker Container.
@@ -19,7 +19,7 @@ server code and modules/ and pages/ for the front end.
 
 ## Coding
 
-Use `go.skia.org/infra/go/sklog` for logging.
+Use `go.goldmine.build/go/sklog` for logging.
 
 Add flags to your main package like:
 
@@ -30,19 +30,19 @@ Add flags to your main package like:
 
 Call `common.InitWithMust([opt], [opt])` in your main function.
 
-Use `go.skia.org/infra/go/login` paired with
+Use `go.goldmine.build/go/login` paired with
 `../../../infra-sk/modules/login.ts` (Legacy Polymer apps use
-`res/imp/login.html`) and/or `go.skia.org/infra/go/webhook` for authentication.
+`res/imp/login.html`) and/or `go.goldmine.build/go/webhook` for authentication.
 When using OAuth, see the secrets section below for including client secrets.
 
 Wrap your `http.Handler` (many services use
 [chi.NewRouter()](https://github.com/go-chi/chi) with
-`go.skia.org/infra/go/httputils.LoggingGzipRequestResponse` to provide
+`go.goldmine.build/go/httputils.LoggingGzipRequestResponse` to provide
 monitoring and logging of HTTP requests and responses. Then, wrap it in
-`go.skia.org/infra/go/httputils.HealthzAndHTTPS` to add an unlogged /healthz
+`go.goldmine.build/go/httputils.HealthzAndHTTPS` to add an unlogged /healthz
 endpoint for use with GKE health monitoring and various HTTPS configuration.
 
-Use `go.skia.org/infra/go/httputils.DefaultClientConfig` for HTTP clients, which
+Use `go.goldmine.build/go/httputils.DefaultClientConfig` for HTTP clients, which
 provides several features:
 
 - ensures requests time out within a reasonable limit
@@ -319,7 +319,7 @@ spec:
     if desired.
 
 - Add additional stats gathering to your program using
-  `go.skia.org/infra/go/metrics2`, e.g. to ensure liveness/heartbeat of any
+  `go.goldmine.build/go/metrics2`, e.g. to ensure liveness/heartbeat of any
   background processes.
 
 - Add alert rules to

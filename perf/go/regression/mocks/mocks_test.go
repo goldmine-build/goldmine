@@ -8,10 +8,10 @@ import (
 	"context"
 
 	mock "github.com/stretchr/testify/mock"
-	"go.skia.org/infra/perf/go/clustering2"
-	"go.skia.org/infra/perf/go/regression"
-	"go.skia.org/infra/perf/go/types"
-	"go.skia.org/infra/perf/go/ui/frame"
+	"go.goldmine.build/perf/go/clustering2"
+	"go.goldmine.build/perf/go/regression"
+	"go.goldmine.build/perf/go/types"
+	"go.goldmine.build/perf/go/ui/frame"
 )
 
 // NewStore creates a new instance of Store. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

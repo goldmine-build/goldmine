@@ -8,10 +8,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/perf/go/clustering2"
-	"go.skia.org/infra/perf/go/regression"
-	"go.skia.org/infra/perf/go/types"
-	"go.skia.org/infra/perf/go/ui/frame"
+	"go.goldmine.build/perf/go/clustering2"
+	"go.goldmine.build/perf/go/regression"
+	"go.goldmine.build/perf/go/types"
+	"go.goldmine.build/perf/go/ui/frame"
 )
 
 var (

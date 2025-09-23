@@ -11,8 +11,8 @@
 //	package main
 //
 //	import (
-//	  "go.skia.org/infra/go/jsonschema"
-//	  "go.skia.org/infra/foo"
+//	  "go.goldmine.build/go/jsonschema"
+//	  "go.goldmine.build/foo"
 //	)
 //
 //	func main() {
@@ -47,9 +47,9 @@ import (
 
 	"github.com/invopop/jsonschema"
 	"github.com/xeipuuv/gojsonschema"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/util"
 )
 
 // ErrSchemaViolation is returned from Validate if the document doesn't conform

@@ -9,9 +9,9 @@ import (
 	"net/http"
 	"strings"
 
-	"go.skia.org/infra/go/secret"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/kube/go/authproxy/auth"
+	"go.goldmine.build/go/secret"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/kube/go/authproxy/auth"
 	"google.golang.org/protobuf/proto"
 )
 

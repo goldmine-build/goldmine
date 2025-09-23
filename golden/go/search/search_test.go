@@ -15,17 +15,17 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/golden/go/expectations"
-	"go.skia.org/infra/golden/go/publicparams"
-	"go.skia.org/infra/golden/go/search/query"
-	"go.skia.org/infra/golden/go/sql"
-	"go.skia.org/infra/golden/go/sql/databuilder"
-	dks "go.skia.org/infra/golden/go/sql/datakitchensink"
-	"go.skia.org/infra/golden/go/sql/schema"
-	"go.skia.org/infra/golden/go/sql/sqltest"
-	"go.skia.org/infra/golden/go/types"
-	"go.skia.org/infra/golden/go/web/frontend"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/golden/go/expectations"
+	"go.goldmine.build/golden/go/publicparams"
+	"go.goldmine.build/golden/go/search/query"
+	"go.goldmine.build/golden/go/sql"
+	"go.goldmine.build/golden/go/sql/databuilder"
+	dks "go.goldmine.build/golden/go/sql/datakitchensink"
+	"go.goldmine.build/golden/go/sql/schema"
+	"go.goldmine.build/golden/go/sql/sqltest"
+	"go.goldmine.build/golden/go/types"
+	"go.goldmine.build/golden/go/web/frontend"
 )
 
 // These are the later of the times of the last ingested data or last triage action for the

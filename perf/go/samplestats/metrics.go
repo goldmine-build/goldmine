@@ -2,7 +2,7 @@ package samplestats
 
 import (
 	"github.com/aclements/go-moremath/stats"
-	"go.skia.org/infra/perf/go/ingest/parser"
+	"go.goldmine.build/perf/go/ingest/parser"
 )
 
 // Metrics are calculated for each test.

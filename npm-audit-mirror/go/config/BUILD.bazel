@@ -10,7 +10,7 @@ go_library(
         "config.json",
         "verdaccio-config.tmpl",
     ],
-    importpath = "go.skia.org/infra/npm-audit-mirror/go/config",
+    importpath = "go.goldmine.build/npm-audit-mirror/go/config",
     visibility = ["//visibility:public"],
     deps = ["//go/skerr"],
 )

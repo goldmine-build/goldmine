@@ -9,7 +9,7 @@ import (
 
 	expect "github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/util"
 )
 
 const (

@@ -12,7 +12,7 @@
 //
 // Usage example:
 //
-//	import "go.skia.org/infra/go/issuetracker/v1"
+//	import "go.goldmine.build/go/issuetracker/v1"
 //	...
 //	ctx := context.Background()
 //	issuetrackerService, err := issuetracker.NewService(ctx)
@@ -35,7 +35,7 @@
 //	issuetrackerService, err := issuetracker.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx, token)))
 //
 // See https://godoc.org/google.golang.org/api/option/ for details on options.
-package issuetracker // import "go.skia.org/infra/go/issuetracker/v1"
+package issuetracker // import "go.goldmine.build/go/issuetracker/v1"
 
 import (
 	"bytes"

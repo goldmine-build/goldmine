@@ -13,14 +13,14 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"go.skia.org/infra/go/executil"
-	gitiles_mocks "go.skia.org/infra/go/gitiles/mocks"
-	"go.skia.org/infra/go/issuetracker/v1"
-	"go.skia.org/infra/go/metrics2"
-	"go.skia.org/infra/go/testutils"
-	"go.skia.org/infra/npm-audit-mirror/go/config"
-	"go.skia.org/infra/npm-audit-mirror/go/types"
-	npm_mocks "go.skia.org/infra/npm-audit-mirror/go/types/mocks"
+	"go.goldmine.build/go/executil"
+	gitiles_mocks "go.goldmine.build/go/gitiles/mocks"
+	"go.goldmine.build/go/issuetracker/v1"
+	"go.goldmine.build/go/metrics2"
+	"go.goldmine.build/go/testutils"
+	"go.goldmine.build/npm-audit-mirror/go/config"
+	"go.goldmine.build/npm-audit-mirror/go/types"
+	npm_mocks "go.goldmine.build/npm-audit-mirror/go/types/mocks"
 )
 
 func testOneAuditCycle(t *testing.T, noHighSeverityIssuesFound, auditIssueNotFiledYet, auditIssueClosedLessThanThreshold bool) {

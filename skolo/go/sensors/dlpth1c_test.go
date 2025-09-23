@@ -6,8 +6,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/serial/mocks"
-	"go.skia.org/infra/go/skerr"
+	"go.goldmine.build/go/serial/mocks"
+	"go.goldmine.build/go/skerr"
 )
 
 const invalidPingResponseVal byte = pingResponseVal - 1

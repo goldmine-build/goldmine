@@ -13,14 +13,14 @@ import (
 	"github.com/stretchr/testify/require"
 	"golang.org/x/time/rate"
 
-	"go.skia.org/infra/go/deepequal/assertdeep"
-	"go.skia.org/infra/go/git"
-	git_testutils "go.skia.org/infra/go/git/testutils"
-	"go.skia.org/infra/go/git/testutils/mem_git"
-	"go.skia.org/infra/go/gitstore/mem_gitstore"
-	"go.skia.org/infra/go/mockhttpclient"
-	"go.skia.org/infra/go/testutils"
-	"go.skia.org/infra/go/vcsinfo"
+	"go.goldmine.build/go/deepequal/assertdeep"
+	"go.goldmine.build/go/git"
+	git_testutils "go.goldmine.build/go/git/testutils"
+	"go.goldmine.build/go/git/testutils/mem_git"
+	"go.goldmine.build/go/gitstore/mem_gitstore"
+	"go.goldmine.build/go/mockhttpclient"
+	"go.goldmine.build/go/testutils"
+	"go.goldmine.build/go/vcsinfo"
 )
 
 func TestLog(t *testing.T) {

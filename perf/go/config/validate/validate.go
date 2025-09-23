@@ -9,20 +9,20 @@ import (
 
 	_ "embed" // For embed functionality.
 
-	"go.skia.org/infra/go/jsonschema"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/util"
-	"go.skia.org/infra/perf/go/alerts"
-	"go.skia.org/infra/perf/go/clustering2"
-	"go.skia.org/infra/perf/go/config"
-	"go.skia.org/infra/perf/go/dataframe"
-	"go.skia.org/infra/perf/go/git/provider"
-	"go.skia.org/infra/perf/go/notify"
-	"go.skia.org/infra/perf/go/notifytypes"
-	"go.skia.org/infra/perf/go/stepfit"
-	"go.skia.org/infra/perf/go/types"
-	"go.skia.org/infra/perf/go/ui/frame"
+	"go.goldmine.build/go/jsonschema"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/util"
+	"go.goldmine.build/perf/go/alerts"
+	"go.goldmine.build/perf/go/clustering2"
+	"go.goldmine.build/perf/go/config"
+	"go.goldmine.build/perf/go/dataframe"
+	"go.goldmine.build/perf/go/git/provider"
+	"go.goldmine.build/perf/go/notify"
+	"go.goldmine.build/perf/go/notifytypes"
+	"go.goldmine.build/perf/go/stepfit"
+	"go.goldmine.build/perf/go/types"
+	"go.goldmine.build/perf/go/ui/frame"
 )
 
 // schema is a json schema for InstanceConfig, it is created by

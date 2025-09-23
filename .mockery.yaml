@@ -5,52 +5,52 @@ template: testify
 template-data:
   unroll-variadic: true
 packages:
-  go.skia.org/infra/bugs-central/go/types:
+  go.goldmine.build/bugs-central/go/types:
     interfaces:
       BugsDB: {}
-  go.skia.org/infra/docsyserver/go/codereview:
+  go.goldmine.build/docsyserver/go/codereview:
     interfaces:
       CodeReview: {}
-  go.skia.org/infra/docsyserver/go/docsy:
+  go.goldmine.build/docsyserver/go/docsy:
     interfaces:
       Docsy: {}
-  go.skia.org/infra/fiddlek/go/store:
+  go.goldmine.build/fiddlek/go/store:
     interfaces:
       Store: {}
-  go.skia.org/infra/go/allowed:
+  go.goldmine.build/go/allowed:
     interfaces:
       Allow: {}
-  go.skia.org/infra/go/alogin:
+  go.goldmine.build/go/alogin:
     interfaces:
       Login: {}
-  go.skia.org/infra/go/chrome_branch:
+  go.goldmine.build/go/chrome_branch:
     interfaces:
       Client: {}
-  go.skia.org/infra/go/docker:
+  go.goldmine.build/go/docker:
     interfaces:
       Client: {}
-  go.skia.org/infra/go/gcs:
+  go.goldmine.build/go/gcs:
     interfaces:
       GCSClient: {}
-  go.skia.org/infra/go/gerrit:
+  go.goldmine.build/go/gerrit:
     interfaces:
       GerritInterface: {}
-  go.skia.org/infra/go/gitiles:
+  go.goldmine.build/go/gitiles:
     interfaces:
       GitilesRepo: {}
-  go.skia.org/infra/go/gitstore:
+  go.goldmine.build/go/gitstore:
     interfaces:
       GitStore: {}
-  go.skia.org/infra/go/login:
+  go.goldmine.build/go/login:
     interfaces:
       OAuthConfig: {}
-  go.skia.org/infra/go/monorail/v3:
+  go.goldmine.build/go/monorail/v3:
     interfaces:
       IMonorailService: {}
-  go.skia.org/infra/go/now:
+  go.goldmine.build/go/now:
     interfaces:
       TimeTicker: {}
-  go.skia.org/infra/go/pubsub:
+  go.goldmine.build/go/pubsub:
     config: {}
     interfaces:
       Client: {}
@@ -58,77 +58,77 @@ packages:
       Snapshot: {}
       Subscription: {}
       Topic: {}
-  go.skia.org/infra/go/secret:
+  go.goldmine.build/go/secret:
     interfaces:
       Client: {}
-  go.skia.org/infra/go/serial:
+  go.goldmine.build/go/serial:
     interfaces:
       Port: {}
-  go.skia.org/infra/go/sql/pool:
+  go.goldmine.build/go/sql/pool:
     interfaces:
       Pool: {}
-  go.skia.org/infra/go/sser:
+  go.goldmine.build/go/sser:
     interfaces:
       PeerFinder: {}
       Server: {}
-  go.skia.org/infra/go/vcsinfo:
+  go.goldmine.build/go/vcsinfo:
     interfaces:
       VCS: {}
-  go.skia.org/infra/go/vfs:
+  go.goldmine.build/go/vfs:
     interfaces:
       FS: {}
       File: {}
-  go.skia.org/infra/gold-client/go/gcsuploader:
+  go.goldmine.build/gold-client/go/gcsuploader:
     interfaces:
       GCSUploader: {}
-  go.skia.org/infra/gold-client/go/httpclient:
+  go.goldmine.build/gold-client/go/httpclient:
     config:
       dir: '{{.InterfaceDir}}/../mocks'
     interfaces:
       HTTPClient: {}
-  go.skia.org/infra/gold-client/go/imagedownloader:
+  go.goldmine.build/gold-client/go/imagedownloader:
     interfaces:
       ImageDownloader: {}
-  go.skia.org/infra/gold-client/go/imgmatching:
+  go.goldmine.build/gold-client/go/imgmatching:
     interfaces:
       Matcher: {}
-  go.skia.org/infra/golden/cmd/gitilesfollower:
+  go.goldmine.build/golden/cmd/gitilesfollower:
     interfaces:
       GitilesLogger: {}
-  go.skia.org/infra/golden/go/code_review:
+  go.goldmine.build/golden/go/code_review:
     interfaces:
       ChangelistLandedUpdater: {}
       Client: {}
-  go.skia.org/infra/golden/go/continuous_integration:
+  go.goldmine.build/golden/go/continuous_integration:
     interfaces:
       Client: {}
-  go.skia.org/infra/golden/go/diff:
+  go.goldmine.build/golden/go/diff:
     interfaces:
       Calculator: {}
-  go.skia.org/infra/golden/go/diff/worker:
+  go.goldmine.build/golden/go/diff/worker:
     interfaces:
       ImageSource: {}
-  go.skia.org/infra/golden/go/ignore:
+  go.goldmine.build/golden/go/ignore:
     interfaces:
       Store: {}
-  go.skia.org/infra/golden/go/ingestion:
+  go.goldmine.build/golden/go/ingestion:
     interfaces:
       FileSearcher: {}
       Processor: {}
       Source: {}
       Store: {}
-  go.skia.org/infra/golden/go/search:
+  go.goldmine.build/golden/go/search:
     interfaces:
       API: {}
-  go.skia.org/infra/golden/go/storage:
+  go.goldmine.build/golden/go/storage:
     config:
       dir: '{{.InterfaceDir}}/../mocks'
     interfaces:
       GCSClient: {}
-  go.skia.org/infra/kube/go/authproxy/auth:
+  go.goldmine.build/kube/go/authproxy/auth:
     interfaces:
       Auth: {}
-  go.skia.org/infra/npm-audit-mirror/go/types:
+  go.goldmine.build/npm-audit-mirror/go/types:
     interfaces:
       Check: {}
       ChecksManager: {}
@@ -136,44 +136,44 @@ packages:
       NpmDB: {}
       ProjectAudit: {}
       ProjectMirror: {}
-  go.skia.org/infra/perf/go/alerts:
+  go.goldmine.build/perf/go/alerts:
     config:
       dir: '{{.InterfaceDir}}/mock'
     interfaces:
       ConfigProvider: {}
       Store: {}
-  go.skia.org/infra/perf/go/dataframe:
+  go.goldmine.build/perf/go/dataframe:
     interfaces:
       DataFrameBuilder: {}
-  go.skia.org/infra/perf/go/git:
+  go.goldmine.build/perf/go/git:
     interfaces:
       Git: {}
-  go.skia.org/infra/perf/go/graphsshortcut:
+  go.goldmine.build/perf/go/graphsshortcut:
     interfaces:
       Store: {}
-  go.skia.org/infra/perf/go/notify:
+  go.goldmine.build/perf/go/notify:
     interfaces:
       Notifier: {}
       Transport: {}
-  go.skia.org/infra/perf/go/perf-tool/application:
+  go.goldmine.build/perf/go/perf-tool/application:
     interfaces:
       Application: {}
-  go.skia.org/infra/perf/go/psrefresh:
+  go.goldmine.build/perf/go/psrefresh:
     interfaces:
       OPSProvider: {}
-  go.skia.org/infra/perf/go/regression:
+  go.goldmine.build/perf/go/regression:
     interfaces:
       Store: {}
-  go.skia.org/infra/perf/go/shortcut:
+  go.goldmine.build/perf/go/shortcut:
     interfaces:
       Store: {}
-  go.skia.org/infra/perf/go/tracestore:
+  go.goldmine.build/perf/go/tracestore:
     interfaces:
       TraceStore: {}
-  go.skia.org/infra/perf/go/trybot/store:
+  go.goldmine.build/perf/go/trybot/store:
     interfaces:
       TryBotStore: {}
-  go.skia.org/infra/scrap/go/scrap:
+  go.goldmine.build/scrap/go/scrap:
     interfaces:
       ScrapExchange: {}
   k8s.io/apimachinery/pkg/watch:

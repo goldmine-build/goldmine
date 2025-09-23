@@ -15,8 +15,8 @@ import (
 	"net/url"
 	"strconv"
 
-	"go.skia.org/infra/go/httputils"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/httputils"
+	"go.goldmine.build/go/util"
 )
 
 const (

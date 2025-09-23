@@ -4,8 +4,8 @@ import (
 	"math"
 
 	"github.com/aclements/go-moremath/stats"
-	"go.skia.org/infra/go/vec32"
-	"go.skia.org/infra/perf/go/types"
+	"go.goldmine.build/go/vec32"
+	"go.goldmine.build/perf/go/types"
 )
 
 // StepFitStatus is the status of the StepFit.

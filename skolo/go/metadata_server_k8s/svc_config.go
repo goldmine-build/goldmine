@@ -3,9 +3,9 @@ package main
 import (
 	"strings"
 
-	"go.skia.org/infra/go/config"
-	"go.skia.org/infra/go/fileutil"
-	"go.skia.org/infra/go/skerr"
+	"go.goldmine.build/go/config"
+	"go.goldmine.build/go/fileutil"
+	"go.goldmine.build/go/skerr"
 )
 
 // ServiceAccountConf is one entry in the configuration file that defines multiple service accounts

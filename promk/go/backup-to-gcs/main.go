@@ -12,12 +12,12 @@ import (
 	"time"
 
 	"cloud.google.com/go/storage"
-	"go.skia.org/infra/go/auth"
-	"go.skia.org/infra/go/common"
-	"go.skia.org/infra/go/httputils"
-	"go.skia.org/infra/go/metrics2"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/auth"
+	"go.goldmine.build/go/common"
+	"go.goldmine.build/go/httputils"
+	"go.goldmine.build/go/metrics2"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/util"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/option"
 )

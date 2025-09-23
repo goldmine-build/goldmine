@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "nooplogging",
     srcs = ["nooplogging.go"],
-    importpath = "go.skia.org/infra/go/sklog/nooplogging",
+    importpath = "go.goldmine.build/go/sklog/nooplogging",
     visibility = ["//visibility:public"],
     deps = [
         "//go/sklog/sklogimpl",

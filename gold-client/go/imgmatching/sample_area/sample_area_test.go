@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"go.skia.org/infra/golden/go/image/text"
+	"go.goldmine.build/golden/go/image/text"
 )
 
 func TestMatcher_Match_InvalidParameters_ReturnsFalse(t *testing.T) {

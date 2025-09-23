@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "assertdeep",
     srcs = ["assertdeep.go"],
-    importpath = "go.skia.org/infra/go/deepequal/assertdeep",
+    importpath = "go.goldmine.build/go/deepequal/assertdeep",
     visibility = ["//visibility:public"],
     deps = [
         "//go/deepequal",

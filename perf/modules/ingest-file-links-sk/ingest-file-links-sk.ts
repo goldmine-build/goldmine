@@ -5,7 +5,7 @@
  * Displays links, if any are found, in the ingest.Format
  * for the provided CommitNumber and traceID.
  *
- * See also https://pkg.go.dev/go.skia.org/infra/perf/go/ingest/format#Format
+ * See also https://pkg.go.dev/go.goldmine.build/perf/go/ingest/format#Format
  */
 import { html, TemplateResult } from 'lit-html';
 import { define } from '../../../elements-sk/modules/define';

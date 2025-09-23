@@ -15,10 +15,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"go.skia.org/infra/go/httputils"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/puppeteer-tests/bazel/extract_puppeteer_screenshots/extract"
-	"go.skia.org/infra/puppeteer-tests/bazel/puppeteer_screenshot_server/rpc_types"
+	"go.goldmine.build/go/httputils"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/puppeteer-tests/bazel/extract_puppeteer_screenshots/extract"
+	"go.goldmine.build/puppeteer-tests/bazel/puppeteer_screenshot_server/rpc_types"
 )
 
 func main() {

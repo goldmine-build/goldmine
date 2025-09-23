@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "emailservice",
     srcs = ["emailservice.go"],
-    importpath = "go.skia.org/infra/email/go/emailservice",
+    importpath = "go.goldmine.build/email/go/emailservice",
     visibility = ["//visibility:public"],
     deps = [
         "//go/common",

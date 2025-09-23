@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "examiner",
     srcs = ["downloaded_packages_examiner.go"],
-    importpath = "go.skia.org/infra/npm-audit-mirror/go/examiner",
+    importpath = "go.goldmine.build/npm-audit-mirror/go/examiner",
     visibility = ["//visibility:public"],
     deps = [
         "//go/metrics2",

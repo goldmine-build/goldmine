@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"net/url"
 
-	"go.skia.org/infra/go/login"
-	"go.skia.org/infra/go/netutils"
+	"go.goldmine.build/go/login"
+	"go.goldmine.build/go/netutils"
 )
 
 // authImpl implements Auth using the login package.

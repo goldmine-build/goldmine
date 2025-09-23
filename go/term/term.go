@@ -8,10 +8,10 @@ import (
 	"strings"
 	"time"
 
-	"go.skia.org/infra/go/human"
-	"go.skia.org/infra/go/now"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/human"
+	"go.goldmine.build/go/now"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/util"
 	"golang.org/x/term"
 )
 

@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "shortcuttest",
     srcs = ["shortcuttest.go"],
-    importpath = "go.skia.org/infra/perf/go/shortcut/shortcuttest",
+    importpath = "go.goldmine.build/perf/go/shortcut/shortcuttest",
     visibility = ["//visibility:public"],
     deps = [
         "//perf/go/shortcut",

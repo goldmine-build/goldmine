@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/perf/go/shortcut/shortcuttest"
-	"go.skia.org/infra/perf/go/sql/sqltest"
+	"go.goldmine.build/perf/go/shortcut/shortcuttest"
+	"go.goldmine.build/perf/go/sql/sqltest"
 )
 
 func TestShortcutStore_CockroachDB(t *testing.T) {

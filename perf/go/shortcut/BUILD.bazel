@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "shortcut",
     srcs = ["shortcut.go"],
-    importpath = "go.skia.org/infra/perf/go/shortcut",
+    importpath = "go.goldmine.build/perf/go/shortcut",
     visibility = ["//visibility:public"],
 )
 

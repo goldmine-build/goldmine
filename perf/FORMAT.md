@@ -90,7 +90,7 @@ You can run the `perf-tool` as described below to parse a file and emit a
 description like the one above.
 
 The format is documented
-[here](https://pkg.go.dev/go.skia.org/infra/perf/go/ingest/format?tab=doc#Format).
+[here](https://pkg.go.dev/go.goldmine.build/perf/go/ingest/format?tab=doc#Format).
 
 # Storage
 
@@ -120,7 +120,7 @@ The Perf ingester will attempt to ingest all files below /HH/ that end in
 You can validate your files conform to the expected schema by installing
 `perf-tool`:
 
-    go install go.skia.org/infra/perf/go/perf-tool@latest
+    go install go.goldmine.build/perf/go/perf-tool@latest
 
 And then use it to validate an ingestion file:
 
@@ -164,5 +164,5 @@ to see how it converts all the keys and values in that file into trace identifie
   'older' and 'newer' are defined in terms of the data/time in the GCS file
   path.
 - See
-  [IngestionConfig](https://pkg.go.dev/go.skia.org/infra/perf/go/config?tab=doc#IngestionConfig)
+  [IngestionConfig](https://pkg.go.dev/go.goldmine.build/perf/go/config?tab=doc#IngestionConfig)
   for configuring the ingestion of new data.

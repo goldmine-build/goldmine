@@ -8,15 +8,15 @@ import (
 	"context"
 	"encoding/json"
 
-	"go.skia.org/infra/go/metrics2"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/sql/pool"
-	"go.skia.org/infra/perf/go/alerts"
-	"go.skia.org/infra/perf/go/clustering2"
-	"go.skia.org/infra/perf/go/regression"
-	"go.skia.org/infra/perf/go/types"
-	"go.skia.org/infra/perf/go/ui/frame"
+	"go.goldmine.build/go/metrics2"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/sql/pool"
+	"go.goldmine.build/perf/go/alerts"
+	"go.goldmine.build/perf/go/clustering2"
+	"go.goldmine.build/perf/go/regression"
+	"go.goldmine.build/perf/go/types"
+	"go.goldmine.build/perf/go/ui/frame"
 )
 
 // statement is an SQL statement identifier.

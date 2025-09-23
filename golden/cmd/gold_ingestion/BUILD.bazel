@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "gold_ingestion_lib",
     srcs = ["gold_ingestion.go"],
-    importpath = "go.skia.org/infra/golden/cmd/gold_ingestion",
+    importpath = "go.goldmine.build/golden/cmd/gold_ingestion",
     visibility = ["//visibility:private"],
     deps = [
         "//go/common",

@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "mocks",
     srcs = ["mocks_test.go"],
-    importpath = "go.skia.org/infra/perf/go/tracestore/mocks",
+    importpath = "go.goldmine.build/perf/go/tracestore/mocks",
     visibility = ["//visibility:public"],
     deps = [
         "//go/paramtools",

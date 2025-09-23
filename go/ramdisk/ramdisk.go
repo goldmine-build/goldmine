@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"os"
 
-	"go.skia.org/infra/go/executil"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
+	"go.goldmine.build/go/executil"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
 )
 
 // New mounts a ram disk and returns the mount location and a cleanup function

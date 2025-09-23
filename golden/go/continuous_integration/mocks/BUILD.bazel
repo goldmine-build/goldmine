@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "mocks",
     srcs = ["Client.go"],
-    importpath = "go.skia.org/infra/golden/go/continuous_integration/mocks",
+    importpath = "go.goldmine.build/golden/go/continuous_integration/mocks",
     visibility = ["//visibility:public"],
     deps = [
         "//golden/go/continuous_integration",

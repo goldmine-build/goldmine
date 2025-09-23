@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "gcr",
     srcs = ["gcr.go"],
-    importpath = "go.skia.org/infra/go/gcr",
+    importpath = "go.goldmine.build/go/gcr",
     visibility = ["//visibility:public"],
     deps = [
         "//go/httputils",

@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"go.skia.org/infra/perf/go/types"
+	"go.goldmine.build/perf/go/types"
 )
 
 func TestStdDevFuncImpl_WellKnownStdDeviations_Success(t *testing.T) {

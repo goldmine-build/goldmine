@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"os"
 
-	"go.skia.org/infra/tool/go/tool"
+	"go.goldmine.build/tool/go/tool"
 )
 
 var (

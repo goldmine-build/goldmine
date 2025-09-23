@@ -4,7 +4,7 @@ import (
 	"sort"
 	"strings"
 
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/util"
 )
 
 // AnyDomain is the value to use if any domain is allowed.

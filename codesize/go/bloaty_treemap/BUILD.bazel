@@ -4,7 +4,7 @@ go_library(
     name = "bloaty_treemap_lib",
     srcs = ["main.go"],
     embedsrcs = ["template.html"],
-    importpath = "go.skia.org/infra/codesize/go/bloaty_treemap",
+    importpath = "go.goldmine.build/codesize/go/bloaty_treemap",
     visibility = ["//visibility:private"],
     deps = ["//codesize/go/bloaty"],
 )

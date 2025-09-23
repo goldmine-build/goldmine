@@ -12,7 +12,7 @@ go_library(
         "cmd_whoami.go",
         "main.go",
     ],
-    importpath = "go.skia.org/infra/gold-client/cmd/goldctl",
+    importpath = "go.goldmine.build/gold-client/cmd/goldctl",
     visibility = ["//visibility:private"],
     deps = [
         "//go/fileutil",

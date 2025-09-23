@@ -8,7 +8,7 @@ import (
 	"context"
 
 	mock "github.com/stretchr/testify/mock"
-	"go.skia.org/infra/perf/go/alerts"
+	"go.goldmine.build/perf/go/alerts"
 )
 
 // NewConfigProvider creates a new instance of ConfigProvider. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

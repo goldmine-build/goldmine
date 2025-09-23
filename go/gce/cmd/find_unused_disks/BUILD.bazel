@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_binary", "go_library")
 go_library(
     name = "find_unused_disks_lib",
     srcs = ["find_unused_disks.go"],
-    importpath = "go.skia.org/infra/go/gce/cmd/find_unused_disks",
+    importpath = "go.goldmine.build/go/gce/cmd/find_unused_disks",
     visibility = ["//visibility:private"],
     deps = [
         "//go/common",

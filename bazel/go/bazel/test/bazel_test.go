@@ -9,8 +9,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/bazel/go/bazel"
-	"go.skia.org/infra/go/testutils/unittest"
+	"go.goldmine.build/bazel/go/bazel"
+	"go.goldmine.build/go/testutils/unittest"
 )
 
 func TestInBazel(t *testing.T) {

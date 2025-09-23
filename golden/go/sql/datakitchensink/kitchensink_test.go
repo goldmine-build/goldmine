@@ -9,12 +9,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/golden/go/sql"
-	dks "go.skia.org/infra/golden/go/sql/datakitchensink"
-	"go.skia.org/infra/golden/go/sql/schema"
-	"go.skia.org/infra/golden/go/sql/sqltest"
-	"go.skia.org/infra/golden/go/types"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/golden/go/sql"
+	dks "go.goldmine.build/golden/go/sql/datakitchensink"
+	"go.goldmine.build/golden/go/sql/schema"
+	"go.goldmine.build/golden/go/sql/sqltest"
+	"go.goldmine.build/golden/go/types"
 )
 
 func TestBuild_DataIsValidAndMatchesSchema(t *testing.T) {

@@ -6,8 +6,8 @@ import (
 	"io"
 
 	"cloud.google.com/go/storage"
-	"go.skia.org/infra/go/gcs"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/gcs"
+	"go.goldmine.build/go/util"
 	"google.golang.org/api/iterator"
 )
 

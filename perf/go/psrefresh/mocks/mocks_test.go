@@ -8,8 +8,8 @@ import (
 	"context"
 
 	mock "github.com/stretchr/testify/mock"
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/perf/go/types"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/perf/go/types"
 )
 
 // NewOPSProvider creates a new instance of OPSProvider. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

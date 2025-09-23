@@ -36,13 +36,13 @@ import (
 	"text/tabwriter"
 
 	"github.com/spf13/cobra"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/sklog/nooplogging"
-	"go.skia.org/infra/go/sklog/sklogimpl"
-	"go.skia.org/infra/go/sklog/stdlogging"
-	"go.skia.org/infra/go/util"
-	"go.skia.org/infra/golden/cmd/goldpushk/goldpushk"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/sklog/nooplogging"
+	"go.goldmine.build/go/sklog/sklogimpl"
+	"go.goldmine.build/go/sklog/stdlogging"
+	"go.goldmine.build/go/util"
+	"go.goldmine.build/golden/cmd/goldpushk/goldpushk"
 )
 
 const (

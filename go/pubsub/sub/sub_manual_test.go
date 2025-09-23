@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"go.skia.org/infra/go/emulators/gcp_emulator"
+	"go.goldmine.build/go/emulators/gcp_emulator"
 )
 
 func TestNewWithSubNameProviderAndExpirationPolicy(t *testing.T) {

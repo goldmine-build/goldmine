@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "psrefresh",
     srcs = ["psrefresh.go"],
-    importpath = "go.skia.org/infra/perf/go/psrefresh",
+    importpath = "go.goldmine.build/perf/go/psrefresh",
     visibility = ["//visibility:public"],
     deps = [
         "//go/metrics2",

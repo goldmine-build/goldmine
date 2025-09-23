@@ -8,7 +8,7 @@ go_library(
         "local.go",
         "mem.go",
     ],
-    importpath = "go.skia.org/infra/go/git/repograph",
+    importpath = "go.goldmine.build/go/git/repograph",
     visibility = ["//visibility:public"],
     deps = [
         "//go/git",

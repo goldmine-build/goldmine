@@ -10,9 +10,9 @@ import (
 	"cloud.google.com/go/storage"
 	"google.golang.org/api/iterator"
 
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/untar"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/untar"
+	"go.goldmine.build/go/util"
 )
 
 // This file implements utility functions for accessing data in Google Storage.

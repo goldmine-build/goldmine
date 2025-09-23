@@ -8,8 +8,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"go.skia.org/infra/go/git"
-	vcstu "go.skia.org/infra/go/vcsinfo/testutils"
+	"go.goldmine.build/go/git"
+	vcstu "go.goldmine.build/go/vcsinfo/testutils"
 )
 
 func TestVCSSuite(t *testing.T) {

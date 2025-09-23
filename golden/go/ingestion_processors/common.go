@@ -7,11 +7,11 @@ import (
 
 	"go.opencensus.io/trace"
 
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/util"
-	"go.skia.org/infra/go/vcsinfo"
-	"go.skia.org/infra/golden/go/jsonio"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/util"
+	"go.goldmine.build/go/vcsinfo"
+	"go.goldmine.build/golden/go/jsonio"
 )
 
 // parseGoldResultsFromReader parses the JSON stream out of the io.ReadCloser

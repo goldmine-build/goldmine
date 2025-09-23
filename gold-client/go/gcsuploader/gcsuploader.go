@@ -15,9 +15,9 @@ import (
 	"github.com/cenkalti/backoff"
 	"google.golang.org/api/option"
 
-	"go.skia.org/infra/go/exec"
-	"go.skia.org/infra/go/gcs"
-	"go.skia.org/infra/go/skerr"
+	"go.goldmine.build/go/exec"
+	"go.goldmine.build/go/gcs"
+	"go.goldmine.build/go/skerr"
 )
 
 const (

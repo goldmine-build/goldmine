@@ -9,9 +9,9 @@ import (
 	"time"
 
 	mock "github.com/stretchr/testify/mock"
-	"go.skia.org/infra/perf/go/trybot"
-	"go.skia.org/infra/perf/go/trybot/store"
-	"go.skia.org/infra/perf/go/types"
+	"go.goldmine.build/perf/go/trybot"
+	"go.goldmine.build/perf/go/trybot/store"
+	"go.goldmine.build/perf/go/types"
 )
 
 // NewTryBotStore creates a new instance of TryBotStore. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

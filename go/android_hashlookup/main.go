@@ -10,11 +10,11 @@ import (
 	"os"
 	"time"
 
-	"go.skia.org/infra/go/androidbuild"
-	androidbuildinternal "go.skia.org/infra/go/androidbuildinternal/v2beta1"
-	"go.skia.org/infra/go/common"
-	"go.skia.org/infra/go/httputils"
-	"go.skia.org/infra/go/sklog"
+	"go.goldmine.build/go/androidbuild"
+	androidbuildinternal "go.goldmine.build/go/androidbuildinternal/v2beta1"
+	"go.goldmine.build/go/common"
+	"go.goldmine.build/go/httputils"
+	"go.goldmine.build/go/sklog"
 	"golang.org/x/oauth2/google"
 	storage "google.golang.org/api/storage/v1"
 )

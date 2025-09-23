@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "fakeclient",
     srcs = ["fakeclient.go"],
-    importpath = "go.skia.org/infra/scrap/go/fakeclient",
+    importpath = "go.goldmine.build/scrap/go/fakeclient",
     visibility = ["//visibility:public"],
     deps = [
         "//go/skerr",

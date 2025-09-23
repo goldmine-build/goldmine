@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "netutils",
     srcs = ["netutils.go"],
-    importpath = "go.skia.org/infra/go/netutils",
+    importpath = "go.goldmine.build/go/netutils",
     visibility = ["//visibility:public"],
     deps = ["//go/skerr"],
 )

@@ -8,7 +8,7 @@ import (
 	"context"
 
 	mock "github.com/stretchr/testify/mock"
-	"go.skia.org/infra/go/gerrit"
+	"go.goldmine.build/go/gerrit"
 )
 
 // NewGerritInterface creates a new instance of GerritInterface. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

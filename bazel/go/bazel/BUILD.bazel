@@ -3,6 +3,6 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "bazel",
     srcs = ["bazel.go"],
-    importpath = "go.skia.org/infra/bazel/go/bazel",
+    importpath = "go.goldmine.build/bazel/go/bazel",
     visibility = ["//visibility:public"],
 )

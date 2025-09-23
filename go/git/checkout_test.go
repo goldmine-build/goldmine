@@ -8,8 +8,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/deepequal/assertdeep"
-	"go.skia.org/infra/go/testutils"
+	"go.goldmine.build/go/deepequal/assertdeep"
+	"go.goldmine.build/go/testutils"
 )
 
 func TestCheckout(t *testing.T) {

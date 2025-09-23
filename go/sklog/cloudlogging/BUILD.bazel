@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "cloudlogging",
     srcs = ["cloudlogging.go"],
-    importpath = "go.skia.org/infra/go/sklog/cloudlogging",
+    importpath = "go.goldmine.build/go/sklog/cloudlogging",
     visibility = ["//visibility:public"],
     deps = [
         "//go/skerr",

@@ -581,9 +581,9 @@ func TestCheckBannedGoAPIs(t *testing.T) {
 				num:      14,
 			}},
 		},
-	}, false, `file.go:2 Instead of reflect.DeepEqual, please use Equal in go.skia.org/infra/go/deepequal/assertdeep
+	}, false, `file.go:2 Instead of reflect.DeepEqual, please use Equal in go.goldmine.build/go/deepequal/assertdeep
 file.go:3 Instead of os.Interrupt, please use AtExit in go.skia.org/go/cleanup
-other.go:14 Instead of "git", please use Executable in go.skia.org/infra/go/git
+other.go:14 Instead of "git", please use Executable in go.goldmine.build/go/git
 `)
 }
 

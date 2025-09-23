@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"time"
 
-	"go.skia.org/infra/go/common"
-	"go.skia.org/infra/go/periodic"
-	"go.skia.org/infra/go/sklog"
+	"go.goldmine.build/go/common"
+	"go.goldmine.build/go/periodic"
+	"go.goldmine.build/go/sklog"
 	"golang.org/x/oauth2/google"
 )
 

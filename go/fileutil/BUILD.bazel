@@ -7,7 +7,7 @@ go_library(
         "filepath.go",
         "fileutil.go",
     ],
-    importpath = "go.skia.org/infra/go/fileutil",
+    importpath = "go.goldmine.build/go/fileutil",
     visibility = ["//visibility:public"],
     deps = [
         "//go/sklog",

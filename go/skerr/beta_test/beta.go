@@ -6,8 +6,8 @@ package beta_test
 import (
 	"errors"
 
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/skerr/alpha_test"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/skerr/alpha_test"
 )
 
 var (

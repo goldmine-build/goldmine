@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "process",
     srcs = ["process.go"],
-    importpath = "go.skia.org/infra/perf/go/ingest/process",
+    importpath = "go.goldmine.build/perf/go/ingest/process",
     visibility = ["//visibility:public"],
     deps = [
         "//go/metrics2",

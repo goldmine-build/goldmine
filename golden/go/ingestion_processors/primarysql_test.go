@@ -15,15 +15,15 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"go.skia.org/infra/go/metrics2"
-	"go.skia.org/infra/go/now"
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/go/testutils"
-	"go.skia.org/infra/golden/go/sql/databuilder"
-	dks "go.skia.org/infra/golden/go/sql/datakitchensink"
-	"go.skia.org/infra/golden/go/sql/schema"
-	"go.skia.org/infra/golden/go/sql/sqltest"
-	"go.skia.org/infra/golden/go/types"
+	"go.goldmine.build/go/metrics2"
+	"go.goldmine.build/go/now"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/go/testutils"
+	"go.goldmine.build/golden/go/sql/databuilder"
+	dks "go.goldmine.build/golden/go/sql/datakitchensink"
+	"go.goldmine.build/golden/go/sql/schema"
+	"go.goldmine.build/golden/go/sql/sqltest"
+	"go.goldmine.build/golden/go/types"
 )
 
 // This tests the first ingestion of data, with no data filled in except the GitCommits table, which

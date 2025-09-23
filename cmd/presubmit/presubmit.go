@@ -23,8 +23,8 @@ import (
 	"strconv"
 	"strings"
 
-	"go.skia.org/infra/bazel/external/buildifier"
-	"go.skia.org/infra/go/deepequal"
+	"go.goldmine.build/bazel/external/buildifier"
+	"go.goldmine.build/go/deepequal"
 )
 
 func main() {
@@ -509,17 +509,17 @@ type bannedGoAPI struct {
 // have APIs that we wish not to use. It logs suggested replacements in that case.
 func checkBannedGoAPIs(ctx context.Context, files []fileWithChanges) bool {
 	bannedAPIs := []bannedGoAPI{
-		{regex: regexp.MustCompile(`reflect\.DeepEqual`), suggestion: "Equal in go.skia.org/infra/go/deepequal/assertdeep"},
-		{regex: regexp.MustCompile(`github\.com/golang/glog`), suggestion: "go.skia.org/infra/go/sklog"},
-		{regex: regexp.MustCompile(`github\.com/skia-dev/glog`), suggestion: "go.skia.org/infra/go/sklog"},
-		{regex: regexp.MustCompile(`http\.Get`), suggestion: "NewTimeoutClient in go.skia.org/infra/go/httputils"},
-		{regex: regexp.MustCompile(`http\.Head`), suggestion: "NewTimeoutClient in go.skia.org/infra/go/httputils",
+		{regex: regexp.MustCompile(`reflect\.DeepEqual`), suggestion: "Equal in go.goldmine.build/go/deepequal/assertdeep"},
+		{regex: regexp.MustCompile(`github\.com/golang/glog`), suggestion: "go.goldmine.build/go/sklog"},
+		{regex: regexp.MustCompile(`github\.com/skia-dev/glog`), suggestion: "go.goldmine.build/go/sklog"},
+		{regex: regexp.MustCompile(`http\.Get`), suggestion: "NewTimeoutClient in go.goldmine.build/go/httputils"},
+		{regex: regexp.MustCompile(`http\.Head`), suggestion: "NewTimeoutClient in go.goldmine.build/go/httputils",
 			exceptions: []*regexp.Regexp{
 				// generated file we have no control over.
 				regexp.MustCompile(`go/issuetracker/.*\.go`),
 			}},
-		{regex: regexp.MustCompile(`http\.Post`), suggestion: "NewTimeoutClient in go.skia.org/infra/go/httputils"},
-		{regex: regexp.MustCompile(`http\.PostForm`), suggestion: "NewTimeoutClient in go.skia.org/infra/go/httputils"},
+		{regex: regexp.MustCompile(`http\.Post`), suggestion: "NewTimeoutClient in go.goldmine.build/go/httputils"},
+		{regex: regexp.MustCompile(`http\.PostForm`), suggestion: "NewTimeoutClient in go.goldmine.build/go/httputils"},
 		{regex: regexp.MustCompile(`os\.Interrupt`), suggestion: "AtExit in go.skia.org/go/cleanup"},
 		{regex: regexp.MustCompile(`signal\.Notify`), suggestion: "AtExit in go.skia.org/go/cleanup"},
 		{regex: regexp.MustCompile(`syscall\.SIGINT`), suggestion: "AtExit in go.skia.org/go/cleanup"},
@@ -528,7 +528,7 @@ func checkBannedGoAPIs(ctx context.Context, files []fileWithChanges) bool {
 		{regex: regexp.MustCompile(`assert\s+"github\.com/stretchr/testify/require"`), suggestion: `non-aliased import; this can be confused with package "github.com/stretchr/testify/assert"`},
 		{
 			regex:      regexp.MustCompile(`"git"`),
-			suggestion: `Executable in go.skia.org/infra/go/git`,
+			suggestion: `Executable in go.goldmine.build/go/git`,
 			exceptions: []*regexp.Regexp{
 				// These don't actually shell out to git; the tests look for "git" in the
 				// command line and mock stdout accordingly.

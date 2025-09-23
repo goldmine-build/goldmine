@@ -8,7 +8,7 @@ go_library(
         "leagacyformat.go",
     ],
     embedsrcs = ["formatSchema.json"],
-    importpath = "go.skia.org/infra/perf/go/ingest/format",
+    importpath = "go.goldmine.build/perf/go/ingest/format",
     visibility = ["//visibility:public"],
     deps = [
         "//go/jsonschema",

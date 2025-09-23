@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/now"
+	"go.goldmine.build/go/now"
 )
 
 func TestMakeTable_ColumnsEqual(t *testing.T) {

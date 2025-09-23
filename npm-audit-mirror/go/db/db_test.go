@@ -7,8 +7,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"go.skia.org/infra/go/firestore/testutils"
-	"go.skia.org/infra/go/sktest"
+	"go.goldmine.build/go/firestore/testutils"
+	"go.goldmine.build/go/sktest"
 )
 
 const (

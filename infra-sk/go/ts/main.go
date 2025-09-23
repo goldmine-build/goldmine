@@ -8,11 +8,11 @@ import (
 	"flag"
 	"io"
 
-	"go.skia.org/infra/go/alogin"
-	"go.skia.org/infra/go/go2ts"
-	"go.skia.org/infra/go/roles"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/alogin"
+	"go.goldmine.build/go/go2ts"
+	"go.goldmine.build/go/roles"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/util"
 )
 
 func main() {

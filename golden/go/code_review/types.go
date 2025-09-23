@@ -7,7 +7,7 @@ import (
 	"errors"
 	"time"
 
-	"go.skia.org/infra/go/vcsinfo"
+	"go.goldmine.build/go/vcsinfo"
 )
 
 // The Client interface is an abstraction around a Code Review System

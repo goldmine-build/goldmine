@@ -13,10 +13,10 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 	"go.opencensus.io/trace"
 
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/golden/go/sql/schema"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/golden/go/sql/schema"
 )
 
 // ConvertIgnoreRules turns a Paramset into a SQL clause that would match rows using a column

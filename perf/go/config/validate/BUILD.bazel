@@ -5,7 +5,7 @@ go_library(
     name = "validate",
     srcs = ["validate.go"],
     embedsrcs = ["instanceConfigSchema.json"],
-    importpath = "go.skia.org/infra/perf/go/config/validate",
+    importpath = "go.goldmine.build/perf/go/config/validate",
     visibility = ["//visibility:public"],
     deps = [
         "//go/jsonschema",

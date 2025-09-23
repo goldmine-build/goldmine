@@ -3,6 +3,6 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "service_accounts",
     srcs = ["service_accounts.go"],
-    importpath = "go.skia.org/infra/skolo/go/service_accounts",
+    importpath = "go.goldmine.build/skolo/go/service_accounts",
     visibility = ["//visibility:public"],
 )

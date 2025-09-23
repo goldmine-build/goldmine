@@ -17,7 +17,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/login"
+	"go.goldmine.build/go/login"
 )
 
 const (

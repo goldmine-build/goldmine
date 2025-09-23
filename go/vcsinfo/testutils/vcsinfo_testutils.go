@@ -7,11 +7,11 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/deepequal/assertdeep"
-	"go.skia.org/infra/go/git"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/sktest"
-	"go.skia.org/infra/go/vcsinfo"
+	"go.goldmine.build/go/deepequal/assertdeep"
+	"go.goldmine.build/go/git"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/sktest"
+	"go.goldmine.build/go/vcsinfo"
 )
 
 // InitTempRepo creates a temporary git repository from ./testdata/testrepo.zip.

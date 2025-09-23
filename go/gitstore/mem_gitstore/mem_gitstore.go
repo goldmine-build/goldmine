@@ -6,9 +6,9 @@ import (
 	"sync"
 	"time"
 
-	"go.skia.org/infra/go/gitstore"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/vcsinfo"
+	"go.goldmine.build/go/gitstore"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/vcsinfo"
 )
 
 // MemGitStore implements the gitstore.GitStore interface in memory.

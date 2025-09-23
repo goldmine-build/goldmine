@@ -10,10 +10,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/go/testutils"
-	"go.skia.org/infra/golden/go/sql/schema"
-	"go.skia.org/infra/golden/go/types"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/go/testutils"
+	"go.goldmine.build/golden/go/sql/schema"
+	"go.goldmine.build/golden/go/types"
 )
 
 const (

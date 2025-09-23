@@ -3,9 +3,9 @@ package issues
 import (
 	"context"
 
-	"go.skia.org/infra/go/issuetracker/v1"
-	"go.skia.org/infra/go/secret"
-	"go.skia.org/infra/go/skerr"
+	"go.goldmine.build/go/issuetracker/v1"
+	"go.goldmine.build/go/secret"
+	"go.goldmine.build/go/skerr"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/option"
 )

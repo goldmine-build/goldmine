@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "linenumbers",
     srcs = ["linenumbers.go"],
-    importpath = "go.skia.org/infra/fiddlek/go/linenumbers",
+    importpath = "go.goldmine.build/fiddlek/go/linenumbers",
     visibility = ["//visibility:public"],
 )
 

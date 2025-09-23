@@ -5,7 +5,7 @@ import (
 	"io"
 	"strings"
 
-	"go.skia.org/infra/go/skerr"
+	"go.goldmine.build/go/skerr"
 )
 
 // extractBodyUniforms will parse the SkSL code in a scrap and extract definitions

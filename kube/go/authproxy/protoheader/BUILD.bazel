@@ -8,7 +8,7 @@ go_library(
         "header.go",
         "header.pb.go",
     ],
-    importpath = "go.skia.org/infra/kube/go/authproxy/protoheader",
+    importpath = "go.goldmine.build/kube/go/authproxy/protoheader",
     visibility = ["//visibility:public"],
     deps = [
         "//go/secret",

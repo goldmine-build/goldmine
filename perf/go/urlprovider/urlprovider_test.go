@@ -8,8 +8,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	perfgit "go.skia.org/infra/perf/go/git"
-	"go.skia.org/infra/perf/go/git/gittest"
+	perfgit "go.goldmine.build/perf/go/git"
+	"go.goldmine.build/perf/go/git/gittest"
 )
 
 func TestProvider_Default(t *testing.T) {

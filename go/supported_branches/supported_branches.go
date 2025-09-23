@@ -12,9 +12,9 @@ import (
 	"sort"
 	"strconv"
 
-	"go.skia.org/infra/go/git"
-	"go.skia.org/infra/go/gitiles"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/git"
+	"go.goldmine.build/go/gitiles"
+	"go.goldmine.build/go/util"
 )
 
 const (

@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_binary", "go_library")
 go_library(
     name = "generate_typescript_rpc_types_lib",
     srcs = ["main.go"],
-    importpath = "go.skia.org/infra/golden/go/web/frontend/generate_typescript_rpc_types",
+    importpath = "go.goldmine.build/golden/go/web/frontend/generate_typescript_rpc_types",
     visibility = ["//visibility:private"],
     deps = [
         "//go/go2ts",

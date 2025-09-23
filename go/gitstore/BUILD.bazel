@@ -6,7 +6,7 @@ go_library(
         "repo_impl.go",
         "types.go",
     ],
-    importpath = "go.skia.org/infra/go/gitstore",
+    importpath = "go.goldmine.build/go/gitstore",
     visibility = ["//visibility:public"],
     deps = [
         "//go/git",

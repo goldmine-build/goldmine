@@ -4,9 +4,9 @@ import (
 	"math"
 	"testing"
 
-	"go.skia.org/infra/go/vec32"
-	"go.skia.org/infra/perf/go/config"
-	"go.skia.org/infra/perf/go/kmeans"
+	"go.goldmine.build/go/vec32"
+	"go.goldmine.build/perf/go/config"
+	"go.goldmine.build/perf/go/kmeans"
 )
 
 const (

@@ -12,11 +12,11 @@ import (
 	"io"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/git"
-	"go.skia.org/infra/go/gitiles"
-	"go.skia.org/infra/go/mockhttpclient"
-	"go.skia.org/infra/go/sktest"
-	"go.skia.org/infra/go/vfs"
+	"go.goldmine.build/go/git"
+	"go.goldmine.build/go/gitiles"
+	"go.goldmine.build/go/mockhttpclient"
+	"go.goldmine.build/go/sktest"
+	"go.goldmine.build/go/vfs"
 )
 
 type MockRepo struct {

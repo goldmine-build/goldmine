@@ -8,7 +8,7 @@ import (
 	"context"
 
 	mock "github.com/stretchr/testify/mock"
-	"go.skia.org/infra/golden/go/types"
+	"go.goldmine.build/golden/go/types"
 )
 
 // NewImageDownloader creates a new instance of ImageDownloader. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

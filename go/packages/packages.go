@@ -17,10 +17,10 @@ import (
 	"time"
 
 	"github.com/flynn/json5"
-	iexec "go.skia.org/infra/go/exec"
-	"go.skia.org/infra/go/gcs"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/util"
+	iexec "go.goldmine.build/go/exec"
+	"go.goldmine.build/go/gcs"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/util"
 	"google.golang.org/api/storage/v1"
 )
 

@@ -7,9 +7,9 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/pmezard/go-difflib/difflib"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/deepequal"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/sktest"
+	"go.goldmine.build/go/deepequal"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/sktest"
 )
 
 // Twiddle this flag for the complete spew.SDump of an object

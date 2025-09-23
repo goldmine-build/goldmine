@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_binary", "go_library")
 go_library(
     name = "npm-audit-mirror_lib",
     srcs = ["main.go"],
-    importpath = "go.skia.org/infra/npm-audit-mirror/go/npm-audit-mirror",
+    importpath = "go.goldmine.build/npm-audit-mirror/go/npm-audit-mirror",
     visibility = ["//visibility:private"],
     deps = [
         "//go/alogin",

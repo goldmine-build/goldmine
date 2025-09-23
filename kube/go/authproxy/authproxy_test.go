@@ -15,12 +15,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/allowed"
-	"go.skia.org/infra/go/cleanup"
-	"go.skia.org/infra/go/metrics2"
-	"go.skia.org/infra/go/mockhttpclient"
-	"go.skia.org/infra/go/roles"
-	"go.skia.org/infra/kube/go/authproxy/auth/mocks"
+	"go.goldmine.build/go/allowed"
+	"go.goldmine.build/go/cleanup"
+	"go.goldmine.build/go/metrics2"
+	"go.goldmine.build/go/mockhttpclient"
+	"go.goldmine.build/go/roles"
+	"go.goldmine.build/kube/go/authproxy/auth/mocks"
 )
 
 const (

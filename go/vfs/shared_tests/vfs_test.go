@@ -14,9 +14,9 @@ import (
 
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/deepequal/assertdeep"
-	"go.skia.org/infra/go/vfs"
-	"go.skia.org/infra/go/vfs/mocks"
+	"go.goldmine.build/go/deepequal/assertdeep"
+	"go.goldmine.build/go/vfs"
+	"go.goldmine.build/go/vfs/mocks"
 )
 
 func TestReuseContextFile(t *testing.T) {

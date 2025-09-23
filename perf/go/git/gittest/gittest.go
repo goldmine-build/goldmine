@@ -10,12 +10,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/git/testutils"
-	"go.skia.org/infra/go/sql/pool"
-	"go.skia.org/infra/perf/go/config"
-	"go.skia.org/infra/perf/go/git/provider"
-	"go.skia.org/infra/perf/go/git/providers/git_checkout"
-	"go.skia.org/infra/perf/go/sql/sqltest"
+	"go.goldmine.build/go/git/testutils"
+	"go.goldmine.build/go/sql/pool"
+	"go.goldmine.build/perf/go/config"
+	"go.goldmine.build/perf/go/git/provider"
+	"go.goldmine.build/perf/go/git/providers/git_checkout"
+	"go.goldmine.build/perf/go/sql/sqltest"
 )
 
 const (

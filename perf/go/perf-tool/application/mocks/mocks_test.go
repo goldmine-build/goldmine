@@ -6,9 +6,9 @@ package mocks
 
 import (
 	mock "github.com/stretchr/testify/mock"
-	"go.skia.org/infra/perf/go/config"
-	"go.skia.org/infra/perf/go/tracestore"
-	"go.skia.org/infra/perf/go/types"
+	"go.goldmine.build/perf/go/config"
+	"go.goldmine.build/perf/go/tracestore"
+	"go.goldmine.build/perf/go/types"
 )
 
 // NewApplication creates a new instance of Application. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

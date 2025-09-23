@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/alogin"
-	"go.skia.org/infra/go/roles"
+	"go.goldmine.build/go/alogin"
+	"go.goldmine.build/go/roles"
 )
 
 var (

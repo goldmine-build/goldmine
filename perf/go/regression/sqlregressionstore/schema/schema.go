@@ -1,6 +1,6 @@
 package schema
 
-import "go.skia.org/infra/perf/go/types"
+import "go.goldmine.build/perf/go/types"
 
 // RegressionSchema is the SQL schema for storing regression.Regression's.
 type RegressionSchema struct {

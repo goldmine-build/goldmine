@@ -11,12 +11,12 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"go.skia.org/infra/go/issuetracker/v1"
-	"go.skia.org/infra/go/metrics2"
-	"go.skia.org/infra/go/mockhttpclient"
-	"go.skia.org/infra/npm-audit-mirror/go/config"
-	"go.skia.org/infra/npm-audit-mirror/go/types"
-	npm_mocks "go.skia.org/infra/npm-audit-mirror/go/types/mocks"
+	"go.goldmine.build/go/issuetracker/v1"
+	"go.goldmine.build/go/metrics2"
+	"go.goldmine.build/go/mockhttpclient"
+	"go.goldmine.build/npm-audit-mirror/go/config"
+	"go.goldmine.build/npm-audit-mirror/go/types"
+	npm_mocks "go.goldmine.build/npm-audit-mirror/go/types/mocks"
 )
 
 func testOneExaminationCycle(t *testing.T, trustedScopes []string, packageCreatedLessThanThreshold, examinerIssueNotFiledYet, examinerIssueClosedLessThanThreshold bool) {

@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "memcached",
     srcs = ["memcached.go"],
-    importpath = "go.skia.org/infra/perf/go/cache/memcached",
+    importpath = "go.goldmine.build/perf/go/cache/memcached",
     visibility = ["//visibility:public"],
     deps = [
         "//go/skerr",

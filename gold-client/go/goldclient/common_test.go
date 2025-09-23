@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"go.skia.org/infra/gold-client/go/mocks"
+	"go.goldmine.build/gold-client/go/mocks"
 )
 
 func TestGetWithRetries_OneAttempt_Success(t *testing.T) {

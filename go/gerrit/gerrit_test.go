@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/httputils"
+	"go.goldmine.build/go/httputils"
 )
 
 const (

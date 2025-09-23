@@ -7,7 +7,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"go.skia.org/infra/go/sklog"
+	"go.goldmine.build/go/sklog"
 )
 
 // Timer is a struct used for measuring elapsed time. Unlike the other metrics

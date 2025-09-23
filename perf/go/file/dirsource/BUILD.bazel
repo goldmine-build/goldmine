@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "dirsource",
     srcs = ["dirsource.go"],
-    importpath = "go.skia.org/infra/perf/go/file/dirsource",
+    importpath = "go.goldmine.build/perf/go/file/dirsource",
     visibility = ["//visibility:public"],
     deps = [
         "//go/skerr",

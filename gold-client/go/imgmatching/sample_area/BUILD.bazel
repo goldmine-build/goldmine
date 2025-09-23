@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "sample_area",
     srcs = ["sample_area.go"],
-    importpath = "go.skia.org/infra/gold-client/go/imgmatching/sample_area",
+    importpath = "go.goldmine.build/gold-client/go/imgmatching/sample_area",
     visibility = ["//visibility:public"],
 )
 

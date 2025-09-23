@@ -9,9 +9,9 @@ import (
 
 	"github.com/r3labs/sse/v2"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/metrics2"
-	"go.skia.org/infra/go/sser/mocks"
-	"go.skia.org/infra/go/testutils"
+	"go.goldmine.build/go/metrics2"
+	"go.goldmine.build/go/sser/mocks"
+	"go.goldmine.build/go/testutils"
 )
 
 const (

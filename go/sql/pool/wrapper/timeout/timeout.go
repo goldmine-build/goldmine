@@ -8,8 +8,8 @@ import (
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
-	"go.skia.org/infra/go/ctxutil"
-	"go.skia.org/infra/go/sql/pool"
+	"go.goldmine.build/go/ctxutil"
+	"go.goldmine.build/go/sql/pool"
 )
 
 // ContextTimeout implements pool.Pool and confirms that every passed in

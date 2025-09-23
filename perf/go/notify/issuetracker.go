@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"strconv"
 
-	"go.skia.org/infra/go/issuetracker/v1"
-	"go.skia.org/infra/go/metrics2"
-	"go.skia.org/infra/go/secret"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/perf/go/alerts"
-	"go.skia.org/infra/perf/go/config"
+	"go.goldmine.build/go/issuetracker/v1"
+	"go.goldmine.build/go/metrics2"
+	"go.goldmine.build/go/secret"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/perf/go/alerts"
+	"go.goldmine.build/perf/go/config"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/option"
 )

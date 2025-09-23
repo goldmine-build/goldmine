@@ -3,7 +3,7 @@ package notify
 import (
 	"strings"
 
-	"go.skia.org/infra/perf/go/git/provider"
+	"go.goldmine.build/perf/go/git/provider"
 )
 
 // URLFromCommitRange returns a URL that points to commit.URL or the expansion

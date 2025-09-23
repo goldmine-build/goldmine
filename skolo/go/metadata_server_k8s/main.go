@@ -13,10 +13,10 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-	"go.skia.org/infra/go/common"
-	"go.skia.org/infra/go/httputils"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/skolo/go/skmetadata"
+	"go.goldmine.build/go/common"
+	"go.goldmine.build/go/httputils"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/skolo/go/skmetadata"
 )
 
 const (

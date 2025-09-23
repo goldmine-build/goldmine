@@ -11,14 +11,14 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"go.skia.org/infra/go/testutils"
-	"go.skia.org/infra/go/vcsinfo"
-	"go.skia.org/infra/golden/cmd/gitilesfollower/mocks"
-	"go.skia.org/infra/golden/go/config"
-	dks "go.skia.org/infra/golden/go/sql/datakitchensink"
-	"go.skia.org/infra/golden/go/sql/schema"
-	"go.skia.org/infra/golden/go/sql/sqltest"
-	"go.skia.org/infra/golden/go/types"
+	"go.goldmine.build/go/testutils"
+	"go.goldmine.build/go/vcsinfo"
+	"go.goldmine.build/golden/cmd/gitilesfollower/mocks"
+	"go.goldmine.build/golden/go/config"
+	dks "go.goldmine.build/golden/go/sql/datakitchensink"
+	"go.goldmine.build/golden/go/sql/schema"
+	"go.goldmine.build/golden/go/sql/sqltest"
+	"go.goldmine.build/golden/go/types"
 )
 
 func TestUpdateCycle_EmptyDB_UsesInitialCommit(t *testing.T) {

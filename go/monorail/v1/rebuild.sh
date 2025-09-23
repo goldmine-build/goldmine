@@ -11,7 +11,7 @@ wget https://monorail-prod.appspot.com/_ah/api/discovery/v1/apis/monorail/v1/res
 # Generate the Go file.
 google-api-go-generator \
   -api_json_file=rest \
-  -api_pkg_base="go.skia.org/infra/go" \
+  -api_pkg_base="go.goldmine.build/go" \
   -gensupport_pkg="github.com/skia-dev/google-api-go-client/gensupport" \
   -output="monorail.go"
 

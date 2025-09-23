@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"go.skia.org/infra/perf/go/ingest/parser"
+	"go.goldmine.build/perf/go/ingest/parser"
 )
 
 func TestCalculateMetrics_EmptySamples_SuccessWithNaNs(t *testing.T) {

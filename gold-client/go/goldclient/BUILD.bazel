@@ -9,7 +9,7 @@ go_library(
         "goldclient.go",
         "resultstate.go",
     ],
-    importpath = "go.skia.org/infra/gold-client/go/goldclient",
+    importpath = "go.goldmine.build/gold-client/go/goldclient",
     visibility = ["//visibility:public"],
     deps = [
         "//go/fileutil",

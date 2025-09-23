@@ -6,7 +6,7 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/require"
-	metrics_util "go.skia.org/infra/go/metrics2/testutils"
+	metrics_util "go.goldmine.build/go/metrics2/testutils"
 )
 
 func TestClean(t *testing.T) {

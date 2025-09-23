@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/twitchtv/twirp"
-	"go.skia.org/infra/go/alogin"
-	"go.skia.org/infra/go/roles"
+	"go.goldmine.build/go/alogin"
+	"go.goldmine.build/go/roles"
 )
 
 /*

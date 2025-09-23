@@ -7,11 +7,11 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/golden/go/sql"
-	"go.skia.org/infra/golden/go/sql/schema"
-	"go.skia.org/infra/golden/go/sql/sqltest"
-	"go.skia.org/infra/golden/go/types"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/golden/go/sql"
+	"go.goldmine.build/golden/go/sql/schema"
+	"go.goldmine.build/golden/go/sql/sqltest"
+	"go.goldmine.build/golden/go/types"
 )
 
 // The following benchmarks measure two different techniques for searching Traces by the keys.

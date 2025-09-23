@@ -3,13 +3,13 @@ package regression
 import (
 	"context"
 
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/vec32"
-	"go.skia.org/infra/perf/go/clustering2"
-	"go.skia.org/infra/perf/go/config"
-	"go.skia.org/infra/perf/go/dataframe"
-	"go.skia.org/infra/perf/go/stepfit"
-	"go.skia.org/infra/perf/go/types"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/vec32"
+	"go.goldmine.build/perf/go/clustering2"
+	"go.goldmine.build/perf/go/config"
+	"go.goldmine.build/perf/go/dataframe"
+	"go.goldmine.build/perf/go/stepfit"
+	"go.goldmine.build/perf/go/types"
 )
 
 // StepFit finds regressions by looking at each trace individually and seeing if that looks like a regression.

@@ -6,9 +6,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/gold-client/go/goldclient"
-	"go.skia.org/infra/golden/go/types"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/gold-client/go/goldclient"
+	"go.goldmine.build/golden/go/types"
 )
 
 // diffEnv provides the environment for the diff command.

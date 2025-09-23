@@ -4,9 +4,9 @@ package main
 import (
 	"os"
 
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/sql/schema/exportschema"
-	"go.skia.org/infra/perf/go/sql"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/sql/schema/exportschema"
+	"go.goldmine.build/perf/go/sql"
 )
 
 func main() {

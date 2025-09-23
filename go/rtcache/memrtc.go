@@ -4,7 +4,7 @@ import (
 	"context"
 
 	lru "github.com/hashicorp/golang-lru"
-	"go.skia.org/infra/go/skerr"
+	"go.goldmine.build/go/skerr"
 )
 
 // MemReadThroughCache implements the ReadThroughCache interface.

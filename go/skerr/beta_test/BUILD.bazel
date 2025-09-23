@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "beta_test",
     srcs = ["beta.go"],
-    importpath = "go.skia.org/infra/go/skerr/beta_test",
+    importpath = "go.goldmine.build/go/skerr/beta_test",
     visibility = ["//visibility:public"],
     deps = [
         "//go/skerr",

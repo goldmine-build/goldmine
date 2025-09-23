@@ -3,6 +3,6 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "rpc_types",
     srcs = ["rpc_types.go"],
-    importpath = "go.skia.org/infra/puppeteer-tests/bazel/puppeteer_screenshot_server/rpc_types",
+    importpath = "go.goldmine.build/puppeteer-tests/bazel/puppeteer_screenshot_server/rpc_types",
     visibility = ["//visibility:public"],
 )

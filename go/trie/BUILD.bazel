@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "trie",
     srcs = ["trie.go"],
-    importpath = "go.skia.org/infra/go/trie",
+    importpath = "go.goldmine.build/go/trie",
     visibility = ["//visibility:public"],
     deps = ["//go/util"],
 )

@@ -6,7 +6,7 @@ import (
 	"context"
 	"time"
 
-	ci "go.skia.org/infra/golden/go/continuous_integration"
+	ci "go.goldmine.build/golden/go/continuous_integration"
 )
 
 type CISImpl struct {

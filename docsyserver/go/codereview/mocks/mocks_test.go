@@ -8,7 +8,7 @@ import (
 	"context"
 
 	mock "github.com/stretchr/testify/mock"
-	"go.skia.org/infra/docsyserver/go/codereview"
+	"go.goldmine.build/docsyserver/go/codereview"
 )
 
 // NewCodeReview creates a new instance of CodeReview. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

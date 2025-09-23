@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "sqltest",
     srcs = ["sqltest.go"],
-    importpath = "go.skia.org/infra/perf/go/sql/sqltest",
+    importpath = "go.goldmine.build/perf/go/sql/sqltest",
     visibility = ["//visibility:public"],
     deps = [
         "//go/emulators",

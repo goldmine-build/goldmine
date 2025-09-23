@@ -12,15 +12,15 @@ import (
 	"strconv"
 	"strings"
 
+	"go.goldmine.build/go/auth"
+	"go.goldmine.build/go/git/git_common"
+	"go.goldmine.build/go/gitauth"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/perf/go/config"
+	"go.goldmine.build/perf/go/git/provider"
+	"go.goldmine.build/perf/go/types"
 	"go.opencensus.io/trace"
-	"go.skia.org/infra/go/auth"
-	"go.skia.org/infra/go/git/git_common"
-	"go.skia.org/infra/go/gitauth"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/perf/go/config"
-	"go.skia.org/infra/perf/go/git/provider"
-	"go.skia.org/infra/perf/go/types"
 	"golang.org/x/oauth2/google"
 )
 

@@ -8,7 +8,7 @@ go_library(
         "metrics.go",
         "sort.go",
     ],
-    importpath = "go.skia.org/infra/perf/go/samplestats",
+    importpath = "go.goldmine.build/perf/go/samplestats",
     visibility = ["//visibility:public"],
     deps = [
         "//go/paramtools",

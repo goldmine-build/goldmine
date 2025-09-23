@@ -11,7 +11,7 @@ import (
 	"sync"
 
 	"cloud.google.com/go/storage"
-	"go.skia.org/infra/go/gcs"
+	"go.goldmine.build/go/gcs"
 )
 
 // TransitionFn is a function to run when attempting to transition from one

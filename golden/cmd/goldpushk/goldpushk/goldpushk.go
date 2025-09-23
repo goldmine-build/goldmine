@@ -24,12 +24,12 @@ import (
 	"text/tabwriter"
 	"time"
 
-	"go.skia.org/infra/go/exec"
-	"go.skia.org/infra/go/gerrit/rubberstamper"
-	"go.skia.org/infra/go/git"
-	"go.skia.org/infra/go/now"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
+	"go.goldmine.build/go/exec"
+	"go.goldmine.build/go/gerrit/rubberstamper"
+	"go.goldmine.build/go/git"
+	"go.goldmine.build/go/now"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
 )
 
 const (

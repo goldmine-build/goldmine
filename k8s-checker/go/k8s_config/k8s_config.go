@@ -3,8 +3,8 @@ package k8s_config
 import (
 	"bytes"
 
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
 	apps "k8s.io/api/apps/v1"
 	batch "k8s.io/api/batch/v1beta1"
 	core "k8s.io/api/core/v1"

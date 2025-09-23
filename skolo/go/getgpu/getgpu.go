@@ -7,7 +7,7 @@ import (
 	"fmt"
 
 	"github.com/yusufpapurcu/wmi"
-	"go.skia.org/infra/go/gpus"
+	"go.goldmine.build/go/gpus"
 )
 
 type gpuQueryResult struct {

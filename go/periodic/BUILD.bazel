@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "periodic",
     srcs = ["periodic.go"],
-    importpath = "go.skia.org/infra/go/periodic",
+    importpath = "go.goldmine.build/go/periodic",
     visibility = ["//visibility:public"],
     deps = [
         "//go/sklog",

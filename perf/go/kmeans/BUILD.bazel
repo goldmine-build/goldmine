@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "kmeans",
     srcs = ["kmeans.go"],
-    importpath = "go.skia.org/infra/perf/go/kmeans",
+    importpath = "go.goldmine.build/perf/go/kmeans",
     visibility = ["//visibility:public"],
 )
 

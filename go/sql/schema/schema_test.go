@@ -9,8 +9,8 @@ import (
 
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/emulators"
-	"go.skia.org/infra/go/emulators/cockroachdb_instance"
+	"go.goldmine.build/go/emulators"
+	"go.goldmine.build/go/emulators/cockroachdb_instance"
 )
 
 const databaseNamePrefix = "schema"

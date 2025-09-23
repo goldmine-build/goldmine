@@ -8,9 +8,9 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"go.skia.org/infra/go/firestore"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/npm-audit-mirror/go/types"
+	"go.goldmine.build/go/firestore"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/npm-audit-mirror/go/types"
 )
 
 const (

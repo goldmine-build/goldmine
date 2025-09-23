@@ -1,6 +1,6 @@
 // Package grpcsp implements grpc server interceptors to apply role-based
 // access control to a grpc service. It is intended to work with headers
-// set by [go.skia.org/infra/kube/go/authproxy] on incoming requests.
+// set by [go.goldmine.build/kube/go/authproxy] on incoming requests.
 package grpcsp
 
 import (
@@ -13,8 +13,8 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
-	"go.skia.org/infra/go/roles"
-	"go.skia.org/infra/kube/go/authproxy"
+	"go.goldmine.build/go/roles"
+	"go.goldmine.build/kube/go/authproxy"
 )
 
 // ServerPolicy captures the set of authorization policies for

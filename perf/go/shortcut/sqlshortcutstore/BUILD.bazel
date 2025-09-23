@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "sqlshortcutstore",
     srcs = ["sqlshortcutstore.go"],
-    importpath = "go.skia.org/infra/perf/go/shortcut/sqlshortcutstore",
+    importpath = "go.goldmine.build/perf/go/shortcut/sqlshortcutstore",
     visibility = ["//visibility:public"],
     deps = [
         "//go/query",

@@ -11,9 +11,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/executil"
-	"go.skia.org/infra/go/secret"
-	"go.skia.org/infra/go/secret/mocks"
+	"go.goldmine.build/go/executil"
+	"go.goldmine.build/go/secret"
+	"go.goldmine.build/go/secret/mocks"
 )
 
 const (

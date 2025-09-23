@@ -16,7 +16,7 @@ test_on_env(
 go_library(
     name = "test_on_env_lib",
     srcs = ["test_on_env.go"],
-    importpath = "go.skia.org/infra/bazel/test_on_env",
+    importpath = "go.goldmine.build/bazel/test_on_env",
     visibility = ["//visibility:private"],
 )
 

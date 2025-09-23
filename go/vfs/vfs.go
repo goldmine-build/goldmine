@@ -16,7 +16,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"go.skia.org/infra/go/skerr"
+	"go.goldmine.build/go/skerr"
 )
 
 // FS represents a virtual filesystem.

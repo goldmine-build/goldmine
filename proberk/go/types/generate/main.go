@@ -4,8 +4,8 @@
 package main
 
 import (
-	"go.skia.org/infra/go/jsonschema"
-	"go.skia.org/infra/proberk/go/types"
+	"go.goldmine.build/go/jsonschema"
+	"go.goldmine.build/proberk/go/types"
 )
 
 func main() {

@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/scrap/go/scrap"
+	"go.goldmine.build/scrap/go/scrap"
 )
 
 func TestLoadScrap_NameExists_ReturnsBody(t *testing.T) {

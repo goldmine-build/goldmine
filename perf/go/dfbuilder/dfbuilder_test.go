@@ -8,17 +8,17 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/go/query"
-	"go.skia.org/infra/perf/go/config"
-	"go.skia.org/infra/perf/go/dataframe"
-	perfgit "go.skia.org/infra/perf/go/git"
-	"go.skia.org/infra/perf/go/git/gittest"
-	"go.skia.org/infra/perf/go/progress"
-	"go.skia.org/infra/perf/go/sql/sqltest"
-	"go.skia.org/infra/perf/go/tracestore"
-	"go.skia.org/infra/perf/go/tracestore/sqltracestore"
-	"go.skia.org/infra/perf/go/types"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/go/query"
+	"go.goldmine.build/perf/go/config"
+	"go.goldmine.build/perf/go/dataframe"
+	perfgit "go.goldmine.build/perf/go/git"
+	"go.goldmine.build/perf/go/git/gittest"
+	"go.goldmine.build/perf/go/progress"
+	"go.goldmine.build/perf/go/sql/sqltest"
+	"go.goldmine.build/perf/go/tracestore"
+	"go.goldmine.build/perf/go/tracestore/sqltracestore"
+	"go.goldmine.build/perf/go/types"
 )
 
 var (

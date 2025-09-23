@@ -6,10 +6,10 @@ import (
 	"flag"
 	"io"
 
-	"go.skia.org/infra/codesize/go/codesizeserver/rpc"
-	"go.skia.org/infra/go/go2ts"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/codesize/go/codesizeserver/rpc"
+	"go.goldmine.build/go/go2ts"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/util"
 )
 
 func main() {

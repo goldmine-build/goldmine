@@ -9,7 +9,7 @@ go_binary(
 go_library(
     name = "environment_monitor_ansible_lib",
     srcs = ["main.go"],
-    importpath = "go.skia.org/infra/skolo/go/environment_monitor_ansible",
+    importpath = "go.goldmine.build/skolo/go/environment_monitor_ansible",
     visibility = ["//visibility:private"],
     deps = [
         "//go/common",

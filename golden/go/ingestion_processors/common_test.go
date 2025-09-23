@@ -11,11 +11,11 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"go.skia.org/infra/go/testutils"
-	"go.skia.org/infra/go/vcsinfo"
-	mock_vcs "go.skia.org/infra/go/vcsinfo/mocks"
-	"go.skia.org/infra/golden/go/jsonio"
-	"go.skia.org/infra/golden/go/types"
+	"go.goldmine.build/go/testutils"
+	"go.goldmine.build/go/vcsinfo"
+	mock_vcs "go.goldmine.build/go/vcsinfo/mocks"
+	"go.goldmine.build/golden/go/jsonio"
+	"go.goldmine.build/golden/go/types"
 )
 
 // Tests parsing and processing of a single file.

@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
-	"go.skia.org/infra/go/metrics2"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/metrics2"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/util"
 )
 
 // Store is an interface for a database that saves ignore rules.

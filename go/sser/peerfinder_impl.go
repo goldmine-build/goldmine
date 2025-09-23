@@ -3,8 +3,8 @@ package sser
 import (
 	"context"
 
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"

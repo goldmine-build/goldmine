@@ -17,13 +17,13 @@ import (
 	"google.golang.org/api/iam/v1"
 	"google.golang.org/api/storage/v1"
 
-	"go.skia.org/infra/go/exec"
-	"go.skia.org/infra/go/httputils"
-	"go.skia.org/infra/go/metadata"
-	"go.skia.org/infra/go/secret"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/exec"
+	"go.goldmine.build/go/httputils"
+	"go.goldmine.build/go/metadata"
+	"go.goldmine.build/go/secret"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/util"
 )
 
 const (

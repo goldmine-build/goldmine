@@ -1,8 +1,8 @@
 package sensors
 
 import (
-	"go.skia.org/infra/go/serial"
-	"go.skia.org/infra/go/skerr"
+	"go.goldmine.build/go/serial"
+	"go.goldmine.build/go/skerr"
 )
 
 // fakeSerialPort implements a serial.Port interface for test purposes. It

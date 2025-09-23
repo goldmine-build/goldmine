@@ -6,8 +6,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"go.skia.org/infra/gold-client/go/gcsuploader"
-	"go.skia.org/infra/gold-client/go/mocks"
+	"go.goldmine.build/gold-client/go/gcsuploader"
+	"go.goldmine.build/gold-client/go/mocks"
 )
 
 func TestExtractProperties_ValuesSet_ReturnSetValues(t *testing.T) {

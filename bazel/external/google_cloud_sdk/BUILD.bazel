@@ -5,7 +5,7 @@ go_library(
     name = "google_cloud_sdk",
     srcs = ["google_cloud_sdk.go"],
     data = ["@google_cloud_sdk_ext//:all_files"],  # Provides access to the "gcloud" binary downloaded by Bazel.
-    importpath = "go.skia.org/infra/bazel/external/google_cloud_sdk",
+    importpath = "go.goldmine.build/bazel/external/google_cloud_sdk",
     visibility = ["//visibility:public"],
     deps = [
         "//bazel/go/bazel",

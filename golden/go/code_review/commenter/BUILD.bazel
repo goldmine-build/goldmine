@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "commenter",
     srcs = ["commenter.go"],
-    importpath = "go.skia.org/infra/golden/go/code_review/commenter",
+    importpath = "go.goldmine.build/golden/go/code_review/commenter",
     visibility = ["//visibility:public"],
     deps = [
         "//go/metrics2",

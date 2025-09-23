@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_binary", "go_library")
 go_library(
     name = "expand-and-reload_lib",
     srcs = ["main.go"],
-    importpath = "go.skia.org/infra/kube/go/expand-and-reload",
+    importpath = "go.goldmine.build/kube/go/expand-and-reload",
     visibility = ["//visibility:private"],
     deps = [
         "//go/common",

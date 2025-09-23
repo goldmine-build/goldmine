@@ -15,13 +15,13 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/stretchr/testify/require"
 
-	"go.skia.org/infra/bazel/external/cockroachdb"
-	"go.skia.org/infra/go/emulators"
-	"go.skia.org/infra/go/emulators/cockroachdb_instance"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sql/sqlutil"
-	"go.skia.org/infra/go/util"
-	"go.skia.org/infra/golden/go/sql/schema"
+	"go.goldmine.build/bazel/external/cockroachdb"
+	"go.goldmine.build/go/emulators"
+	"go.goldmine.build/go/emulators/cockroachdb_instance"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sql/sqlutil"
+	"go.goldmine.build/go/util"
+	"go.goldmine.build/golden/go/sql/schema"
 )
 
 // NewCockroachDBForTests creates a randomly named database on a test CockroachDB instance (aka the

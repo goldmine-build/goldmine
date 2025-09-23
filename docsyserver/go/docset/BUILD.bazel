@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "docset",
     srcs = ["docset.go"],
-    importpath = "go.skia.org/infra/docsyserver/go/docset",
+    importpath = "go.goldmine.build/docsyserver/go/docset",
     visibility = ["//visibility:public"],
     deps = [
         "//docsyserver/go/codereview",

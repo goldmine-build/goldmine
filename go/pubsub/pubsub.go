@@ -8,8 +8,8 @@ import (
 
 	"cloud.google.com/go/iam"
 	"cloud.google.com/go/pubsub"
-	"go.skia.org/infra/go/emulators"
-	"go.skia.org/infra/go/skerr"
+	"go.goldmine.build/go/emulators"
+	"go.goldmine.build/go/skerr"
 	"google.golang.org/api/option"
 )
 

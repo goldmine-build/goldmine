@@ -10,7 +10,7 @@ import (
 
 	"cloud.google.com/go/storage"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/testutils"
+	"go.goldmine.build/go/testutils"
 )
 
 func TestDownloadHelper(t *testing.T) {

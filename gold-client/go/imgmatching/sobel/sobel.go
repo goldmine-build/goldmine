@@ -6,7 +6,7 @@ import (
 	"image/draw"
 	"math"
 
-	"go.skia.org/infra/gold-client/go/imgmatching/fuzzy"
+	"go.goldmine.build/gold-client/go/imgmatching/fuzzy"
 )
 
 // testMatcher is an exact copy of the imgmatching.Matcher interface for the sole purpose of

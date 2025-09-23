@@ -9,12 +9,12 @@ import (
 	"net/url"
 	"regexp"
 
-	"go.skia.org/infra/go/now"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/golden/go/expectations"
-	"go.skia.org/infra/golden/go/jsonio"
-	"go.skia.org/infra/golden/go/types"
-	"go.skia.org/infra/golden/go/web/frontend"
+	"go.goldmine.build/go/now"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/golden/go/expectations"
+	"go.goldmine.build/golden/go/jsonio"
+	"go.goldmine.build/golden/go/types"
+	"go.goldmine.build/golden/go/web/frontend"
 )
 
 const (

@@ -5,7 +5,7 @@ go_library(
     name = "cockroachdb",
     srcs = ["cockroachdb.go"],
     data = ["@cockroachdb_cli_ext//:cockroachdb"],
-    importpath = "go.skia.org/infra/bazel/external/cockroachdb",
+    importpath = "go.goldmine.build/bazel/external/cockroachdb",
     visibility = ["//visibility:public"],
     deps = [
         "//bazel/go/bazel",

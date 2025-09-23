@@ -1,7 +1,7 @@
 // Package sets provides functions for operations on sets.
 package sets
 
-import "go.skia.org/infra/go/skerr"
+import "go.goldmine.build/go/skerr"
 
 // dup makes a copy of an int slice.
 func dup(s []int) []int {

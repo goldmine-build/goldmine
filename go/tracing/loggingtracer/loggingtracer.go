@@ -11,9 +11,9 @@ import (
 	"runtime"
 	"time"
 
+	"go.goldmine.build/go/now"
+	"go.goldmine.build/go/sklog"
 	"go.opencensus.io/trace"
-	"go.skia.org/infra/go/now"
-	"go.skia.org/infra/go/sklog"
 )
 
 // Logf is the logging function used by this package.

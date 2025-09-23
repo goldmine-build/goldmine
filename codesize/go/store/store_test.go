@@ -8,7 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/codesize/go/common"
+	"go.goldmine.build/codesize/go/common"
 )
 
 func TestStore_Index_InvalidJSONMetadataFile_Error(t *testing.T) {

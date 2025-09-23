@@ -5,9 +5,9 @@ import (
 	"sort"
 	"strings"
 
-	"go.skia.org/infra/go/sets"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/sets"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/util"
 )
 
 // Params is a set of key,value pairs.

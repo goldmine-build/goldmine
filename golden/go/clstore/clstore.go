@@ -7,7 +7,7 @@ import (
 	"math"
 	"time"
 
-	"go.skia.org/infra/golden/go/code_review"
+	"go.goldmine.build/golden/go/code_review"
 )
 
 var ErrNotFound = errors.New("not found")

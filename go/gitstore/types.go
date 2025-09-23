@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"go.skia.org/infra/go/vcsinfo"
+	"go.goldmine.build/go/vcsinfo"
 )
 
 const (

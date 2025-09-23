@@ -9,7 +9,7 @@ import (
 	"strings"
 	"text/template"
 
-	"go.skia.org/infra/go/skerr"
+	"go.goldmine.build/go/skerr"
 )
 
 const (

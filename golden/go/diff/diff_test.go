@@ -11,9 +11,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"go.skia.org/infra/go/testutils"
-	"go.skia.org/infra/golden/go/image/text"
-	one_by_five "go.skia.org/infra/golden/go/testutils/data_one_by_five"
+	"go.goldmine.build/go/testutils"
+	"go.goldmine.build/golden/go/image/text"
+	one_by_five "go.goldmine.build/golden/go/testutils/data_one_by_five"
 )
 
 func TestDiffMetrics(t *testing.T) {

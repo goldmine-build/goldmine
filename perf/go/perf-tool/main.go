@@ -7,17 +7,17 @@ import (
 	"os"
 
 	cli "github.com/urfave/cli/v2"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog/nooplogging"
-	"go.skia.org/infra/go/sklog/sklogimpl"
-	"go.skia.org/infra/go/sklog/stdlogging"
-	"go.skia.org/infra/go/urfavecli"
-	"go.skia.org/infra/perf/go/builders"
-	"go.skia.org/infra/perf/go/config"
-	"go.skia.org/infra/perf/go/config/validate"
-	"go.skia.org/infra/perf/go/perf-tool/application"
-	"go.skia.org/infra/perf/go/tracestore"
-	"go.skia.org/infra/perf/go/types"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog/nooplogging"
+	"go.goldmine.build/go/sklog/sklogimpl"
+	"go.goldmine.build/go/sklog/stdlogging"
+	"go.goldmine.build/go/urfavecli"
+	"go.goldmine.build/perf/go/builders"
+	"go.goldmine.build/perf/go/config"
+	"go.goldmine.build/perf/go/config/validate"
+	"go.goldmine.build/perf/go/perf-tool/application"
+	"go.goldmine.build/perf/go/tracestore"
+	"go.goldmine.build/perf/go/types"
 )
 
 // flag names

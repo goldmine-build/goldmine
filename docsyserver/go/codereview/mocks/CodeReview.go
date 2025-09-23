@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	codereview "go.skia.org/infra/docsyserver/go/codereview"
+	codereview "go.goldmine.build/docsyserver/go/codereview"
 
 	mock "github.com/stretchr/testify/mock"
 )

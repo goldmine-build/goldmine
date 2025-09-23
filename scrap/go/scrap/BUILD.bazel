@@ -11,7 +11,7 @@ go_library(
         "templates.go",
         "uniform_value.go",
     ],
-    importpath = "go.skia.org/infra/scrap/go/scrap",
+    importpath = "go.goldmine.build/scrap/go/scrap",
     visibility = ["//visibility:public"],
     deps = [
         "//go/gcs",

@@ -5,11 +5,11 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/deepequal/assertdeep"
-	"go.skia.org/infra/go/sql/schema"
-	"go.skia.org/infra/perf/go/sql"
-	"go.skia.org/infra/perf/go/sql/expectedschema"
-	"go.skia.org/infra/perf/go/sql/sqltest"
+	"go.goldmine.build/go/deepequal/assertdeep"
+	"go.goldmine.build/go/sql/schema"
+	"go.goldmine.build/perf/go/sql"
+	"go.goldmine.build/perf/go/sql/expectedschema"
+	"go.goldmine.build/perf/go/sql/sqltest"
 )
 
 func Test_NoMigrationNeeded(t *testing.T) {

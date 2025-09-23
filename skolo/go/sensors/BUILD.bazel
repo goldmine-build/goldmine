@@ -7,7 +7,7 @@ go_library(
         "dlpth1c.go",
         "fake_serial_port.go",
     ],
-    importpath = "go.skia.org/infra/skolo/go/sensors",
+    importpath = "go.goldmine.build/skolo/go/sensors",
     visibility = ["//visibility:public"],
     deps = [
         "//go/serial",

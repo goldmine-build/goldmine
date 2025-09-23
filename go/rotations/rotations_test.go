@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/mockhttpclient"
+	"go.goldmine.build/go/mockhttpclient"
 )
 
 func TestFromURL(t *testing.T) {

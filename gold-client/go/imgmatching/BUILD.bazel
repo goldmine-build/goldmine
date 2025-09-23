@@ -8,7 +8,7 @@ go_library(
         "factory.go",
         "matcher.go",
     ],
-    importpath = "go.skia.org/infra/gold-client/go/imgmatching",
+    importpath = "go.goldmine.build/gold-client/go/imgmatching",
     visibility = ["//visibility:public"],
     deps = [
         "//go/skerr",

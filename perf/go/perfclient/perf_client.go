@@ -13,8 +13,8 @@ import (
 	"path"
 	"time"
 
-	"go.skia.org/infra/go/gcs"
-	"go.skia.org/infra/perf/go/ingest/format"
+	"go.goldmine.build/go/gcs"
+	"go.goldmine.build/perf/go/ingest/format"
 )
 
 // ClientInterface is the interface around getting data into Perf's ingestion.

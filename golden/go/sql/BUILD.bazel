@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "sql",
     srcs = ["util.go"],
-    importpath = "go.skia.org/infra/golden/go/sql",
+    importpath = "go.goldmine.build/golden/go/sql",
     visibility = ["//visibility:public"],
     deps = [
         "//go/jsonutils",

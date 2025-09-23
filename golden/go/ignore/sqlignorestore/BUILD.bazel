@@ -7,7 +7,7 @@ go_library(
         "sqlignorestore.go",
         "util.go",
     ],
-    importpath = "go.skia.org/infra/golden/go/ignore/sqlignorestore",
+    importpath = "go.goldmine.build/golden/go/ignore/sqlignorestore",
     visibility = ["//visibility:public"],
     deps = [
         "//go/paramtools",

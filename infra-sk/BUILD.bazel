@@ -23,6 +23,6 @@ sass_library(
 go_library(
     name = "infra-sk",
     srcs = ["generate.go"],
-    importpath = "go.skia.org/infra/infra-sk",
+    importpath = "go.goldmine.build/infra-sk",
     visibility = ["//visibility:public"],
 )

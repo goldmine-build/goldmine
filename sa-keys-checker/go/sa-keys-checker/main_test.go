@@ -8,7 +8,7 @@ import (
 	adminpb "google.golang.org/genproto/googleapis/iam/admin/v1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	"go.skia.org/infra/go/metrics2"
+	"go.goldmine.build/go/metrics2"
 )
 
 // testFloat64Metric implements the Float64Metric interface.

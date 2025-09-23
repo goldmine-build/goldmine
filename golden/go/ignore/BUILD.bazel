@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "ignore",
     srcs = ["ignore.go"],
-    importpath = "go.skia.org/infra/golden/go/ignore",
+    importpath = "go.goldmine.build/golden/go/ignore",
     visibility = ["//visibility:public"],
     deps = [
         "//go/metrics2",

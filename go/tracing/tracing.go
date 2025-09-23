@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"contrib.go.opencensus.io/exporter/stackdriver"
+	"go.goldmine.build/go/skerr"
 	"go.opencensus.io/trace"
-	"go.skia.org/infra/go/skerr"
 )
 
 // Initialize sets up trace options and exporting for this application. It will sample the given

@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/perf/go/alerts"
+	"go.goldmine.build/perf/go/alerts"
 )
 
 func TestEmailTransportSendNewRegression_EmailIsMissing_ReturnsError(t *testing.T) {

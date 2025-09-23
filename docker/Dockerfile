@@ -32,7 +32,7 @@ RUN cd $GOPATH/src \
 
 # Set fake identity for git rebase. See thread in
 # https://skia-review.googlesource.com/c/buildbot/+/286537/5/docker/Dockerfile#46
-RUN cd $GOPATH/src/go.skia.org/infra \
+RUN cd $GOPATH/src/go.goldmine.build \
     && git config user.email "skia@skia.org" \
     && git config user.name "Skia"
 
@@ -40,18 +40,18 @@ RUN cd $GOPATH/src/go.skia.org/infra \
 ARG HASH
 RUN if [ -z "${HASH}" ] ; then echo "HASH must be specified as a --build-arg"; exit 1; fi
 
-RUN cd $GOPATH/src/go.skia.org/infra \
+RUN cd $GOPATH/src/go.goldmine.build \
   && git fetch \
   && git reset --hard ${HASH}
 
 # If patch ref is specified then update the ref to patch in a CL.
 ARG PATCH_REF
-RUN if [ ! -z "${PATCH_REF}" ] ; then cd $GOPATH/src/go.skia.org/infra \
+RUN if [ ! -z "${PATCH_REF}" ] ; then cd $GOPATH/src/go.goldmine.build \
     && git fetch https://skia.googlesource.com/buildbot ${PATCH_REF} \
     && git checkout FETCH_HEAD \
     && git rebase ${HASH}; fi
 
-RUN cd $GOPATH/src/go.skia.org/infra \
+RUN cd $GOPATH/src/go.goldmine.build \
     && go install ./...
 
 # Install bazelisk, which we use to load Bazel, which is needed for 'make
@@ -60,12 +60,12 @@ RUN go install github.com/bazelbuild/bazelisk@latest
 
 ENV BAZEL $GOPATH/bin/bazelisk
 
-RUN cd $GOPATH/src/go.skia.org/infra/fiddlek \
+RUN cd $GOPATH/src/go.goldmine.build/fiddlek \
   && make fiddle_secwrap
 
 USER root
 
 # USER skia
 #
-# RUN cd /home/skia/golib/src/go.skia.org/infra/perf \
+# RUN cd /home/skia/golib/src/go.goldmine.build/perf \
 #     && make

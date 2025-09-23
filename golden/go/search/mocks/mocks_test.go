@@ -9,11 +9,11 @@ import (
 	"time"
 
 	mock "github.com/stretchr/testify/mock"
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/golden/go/search"
-	"go.skia.org/infra/golden/go/search/query"
-	"go.skia.org/infra/golden/go/types"
-	"go.skia.org/infra/golden/go/web/frontend"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/golden/go/search"
+	"go.goldmine.build/golden/go/search/query"
+	"go.goldmine.build/golden/go/types"
+	"go.goldmine.build/golden/go/web/frontend"
 )
 
 // NewAPI creates a new instance of API. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

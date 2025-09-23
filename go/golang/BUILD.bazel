@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "golang",
     srcs = ["golang.go"],
-    importpath = "go.skia.org/infra/go/golang",
+    importpath = "go.goldmine.build/go/golang",
     visibility = ["//visibility:public"],
     deps = [
         "//bazel/external/rules_go",

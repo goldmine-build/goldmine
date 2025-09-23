@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "zip",
     srcs = ["zip.go"],
-    importpath = "go.skia.org/infra/go/util/zip",
+    importpath = "go.goldmine.build/go/util/zip",
     visibility = ["//visibility:public"],
 )
 

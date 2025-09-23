@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_binary", "go_library")
 go_library(
     name = "extract_comments_lib",
     srcs = ["main.go"],
-    importpath = "go.skia.org/infra/comments/go/extract_comments",
+    importpath = "go.goldmine.build/comments/go/extract_comments",
     visibility = ["//visibility:private"],
     deps = [
         "//comments/go/extract",

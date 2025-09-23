@@ -8,7 +8,7 @@ go_library(
         "license_check.go",
         "publish_age_check.go",
     ],
-    importpath = "go.skia.org/infra/npm-audit-mirror/go/checks",
+    importpath = "go.goldmine.build/npm-audit-mirror/go/checks",
     visibility = ["//visibility:public"],
     deps = [
         "//go/skerr",

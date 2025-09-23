@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
-	"go.skia.org/infra/go/common"
-	"go.skia.org/infra/go/httputils"
-	"go.skia.org/infra/go/sklog"
+	"go.goldmine.build/go/common"
+	"go.goldmine.build/go/httputils"
+	"go.goldmine.build/go/sklog"
 )
 
 var (

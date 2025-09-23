@@ -12,10 +12,10 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/perf/go/ingest/format"
-	"go.skia.org/infra/perf/go/ingest/parser"
-	"go.skia.org/infra/perf/go/samplestats"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/perf/go/ingest/format"
+	"go.goldmine.build/perf/go/ingest/parser"
+	"go.goldmine.build/perf/go/samplestats"
 )
 
 // sortNames maps --sort flag values to the matching Order function.

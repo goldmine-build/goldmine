@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/emulators"
+	"go.goldmine.build/go/emulators"
 )
 
 func TestEnsureNotEmulator_EnvNotVarSet_DoesNotPanic(t *testing.T) {

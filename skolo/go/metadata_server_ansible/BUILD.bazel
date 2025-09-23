@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_binary", "go_library")
 go_library(
     name = "metadata_server_ansible_lib",
     srcs = ["main.go"],
-    importpath = "go.skia.org/infra/skolo/go/metadata_server_ansible",
+    importpath = "go.goldmine.build/skolo/go/metadata_server_ansible",
     visibility = ["//visibility:private"],
     deps = [
         "//go/auth",

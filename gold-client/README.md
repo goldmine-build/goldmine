@@ -13,7 +13,7 @@ mocks used for testing.
 
 A typical user will download goldctl like any other Go executable
 
-    go install go.skia.org/infra/gold-client/cmd/goldctl
+    go install go.goldmine.build/gold-client/cmd/goldctl
 
 Googlers, if you are using goldctl from Swarming, you'll probably want to
 pull it in via [CIPD](https://chrome-infra-packages.appspot.com/p/skia/tools/goldctl)

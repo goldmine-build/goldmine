@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "travisci",
     srcs = ["travisci.go"],
-    importpath = "go.skia.org/infra/go/travisci",
+    importpath = "go.goldmine.build/go/travisci",
     visibility = ["//visibility:public"],
     deps = [
         "//go/httputils",

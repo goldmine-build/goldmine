@@ -2,7 +2,7 @@ include ../make/bazel.mk
 include ../make/docker.mk
 
 # First create a list of all the modules that ./go/ts depends upon.
-tsDependentModules := $(shell go list -f '{{ join .Imports "\n" }}' go.skia.org/infra/fiddlek/go/ts/  )
+tsDependentModules := $(shell go list -f '{{ join .Imports "\n" }}' go.goldmine.build/fiddlek/go/ts/  )
 
 # Then use that list to find all the Go files that make up those dependent modules.
 tsDependentFiles := $(shell echo $(tsDependentModules) | xargs -L 1 go list -f '{{ $$dir := .Dir }}{{ range  .GoFiles }}{{ $$dir }}/{{ . }}{{ "\n" }}{{ end }}' )

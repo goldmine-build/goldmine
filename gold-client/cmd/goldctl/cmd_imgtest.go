@@ -8,10 +8,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/gold-client/go/goldclient"
-	"go.skia.org/infra/golden/go/jsonio"
-	"go.skia.org/infra/golden/go/types"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/gold-client/go/goldclient"
+	"go.goldmine.build/golden/go/jsonio"
+	"go.goldmine.build/golden/go/types"
 )
 
 // imgTest is the state for the imgtest command and its sub-commands.

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"go.skia.org/infra/go/prom"
+	"go.goldmine.build/go/prom"
 )
 
 const (

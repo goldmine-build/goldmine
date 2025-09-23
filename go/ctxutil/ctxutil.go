@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
 )
 
 // ConfirmContextHasDeadline logs errors with the full stack trace if the given

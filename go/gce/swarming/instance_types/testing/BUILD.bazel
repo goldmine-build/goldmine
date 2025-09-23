@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "testing",
     srcs = ["testing.go"],
-    importpath = "go.skia.org/infra/go/gce/swarming/instance_types/testing",
+    importpath = "go.goldmine.build/go/gce/swarming/instance_types/testing",
     visibility = ["//visibility:public"],
     deps = [
         "//go/exec",

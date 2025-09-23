@@ -3,8 +3,8 @@ package local
 
 import (
 	lru "github.com/hashicorp/golang-lru"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/perf/go/cache"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/perf/go/cache"
 )
 
 // Cache implements the cache.Cache interface.

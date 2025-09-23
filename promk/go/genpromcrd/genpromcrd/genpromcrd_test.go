@@ -11,7 +11,7 @@ import (
 
 	"github.com/otiai10/copy"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/testutils"
+	"go.goldmine.build/go/testutils"
 )
 
 var alertTarget = AlertTarget{

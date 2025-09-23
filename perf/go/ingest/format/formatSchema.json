@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://go.skia.org/infra/perf/go/ingest/format/format",
+  "$id": "https://go.goldmine.build/perf/go/ingest/format/format",
   "$ref": "#/$defs/Format",
   "$defs": {
     "Format": {

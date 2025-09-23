@@ -8,10 +8,10 @@ import (
 	"context"
 
 	mock "github.com/stretchr/testify/mock"
-	"go.skia.org/infra/perf/go/alerts"
-	"go.skia.org/infra/perf/go/clustering2"
-	"go.skia.org/infra/perf/go/git/provider"
-	"go.skia.org/infra/perf/go/ui/frame"
+	"go.goldmine.build/perf/go/alerts"
+	"go.goldmine.build/perf/go/clustering2"
+	"go.goldmine.build/perf/go/git/provider"
+	"go.goldmine.build/perf/go/ui/frame"
 )
 
 // NewTransport creates a new instance of Transport. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

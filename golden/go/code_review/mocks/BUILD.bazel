@@ -6,7 +6,7 @@ go_library(
         "ChangelistLandedUpdater.go",
         "Client.go",
     ],
-    importpath = "go.skia.org/infra/golden/go/code_review/mocks",
+    importpath = "go.goldmine.build/golden/go/code_review/mocks",
     visibility = ["//visibility:public"],
     deps = [
         "//go/vcsinfo",

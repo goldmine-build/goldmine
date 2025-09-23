@@ -5,7 +5,7 @@ go_library(
     srcs = [
         "mocks_test.go",
     ],
-    importpath = "go.skia.org/infra/perf/go/notify/mocks",
+    importpath = "go.goldmine.build/perf/go/notify/mocks",
     visibility = ["//visibility:public"],
     deps = [
         "//perf/go/alerts",

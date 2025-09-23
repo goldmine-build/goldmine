@@ -36,9 +36,9 @@ import (
 	"net/url"
 	"sort"
 
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/go/query"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/go/query"
+	"go.goldmine.build/go/util"
 )
 
 type SubQuery struct {

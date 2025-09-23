@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/perf/go/git/provider"
+	"go.goldmine.build/perf/go/git/provider"
 )
 
 const uriTemplate = "https://example.org/from/{begin}/to/{end}/"

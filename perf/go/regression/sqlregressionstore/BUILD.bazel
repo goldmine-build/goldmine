@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "sqlregressionstore",
     srcs = ["sqlregressionstore.go"],
-    importpath = "go.skia.org/infra/perf/go/regression/sqlregressionstore",
+    importpath = "go.goldmine.build/perf/go/regression/sqlregressionstore",
     visibility = ["//visibility:public"],
     deps = [
         "//go/metrics2",

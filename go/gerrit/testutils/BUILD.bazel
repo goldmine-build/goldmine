@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "testutils",
     srcs = ["testutils.go"],
-    importpath = "go.skia.org/infra/go/gerrit/testutils",
+    importpath = "go.goldmine.build/go/gerrit/testutils",
     visibility = ["//visibility:public"],
     deps = [
         "//go/gerrit",

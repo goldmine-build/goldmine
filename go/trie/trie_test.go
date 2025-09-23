@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"go.skia.org/infra/go/deepequal/assertdeep"
+	"go.goldmine.build/go/deepequal/assertdeep"
 )
 
 func TestTrie(t *testing.T) {

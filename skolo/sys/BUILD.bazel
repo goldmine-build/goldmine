@@ -15,6 +15,6 @@ go_library(
         "powercycle-rack5.json5",
         "powercycle-rack6.json5",
     ],
-    importpath = "go.skia.org/infra/skolo/sys",
+    importpath = "go.goldmine.build/skolo/sys",
     visibility = ["//visibility:public"],
 )

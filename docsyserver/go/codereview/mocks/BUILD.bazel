@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "mocks",
     srcs = ["CodeReview.go"],
-    importpath = "go.skia.org/infra/docsyserver/go/codereview/mocks",
+    importpath = "go.goldmine.build/docsyserver/go/codereview/mocks",
     visibility = ["//visibility:public"],
     deps = [
         "//docsyserver/go/codereview",

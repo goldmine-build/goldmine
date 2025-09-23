@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/stretchr/testify/assert"
-	"go.skia.org/infra/go/mockhttpclient"
+	"go.goldmine.build/go/mockhttpclient"
 )
 
 const (

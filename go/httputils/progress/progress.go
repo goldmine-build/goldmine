@@ -8,7 +8,7 @@ import (
 
 	"github.com/dustin/go-humanize"
 
-	"go.skia.org/infra/go/now"
+	"go.goldmine.build/go/now"
 )
 
 var (

@@ -11,7 +11,7 @@ go_library(
         "exec_testutil.go",
         "exec_windows.go",
     ],
-    importpath = "go.skia.org/infra/go/exec",
+    importpath = "go.goldmine.build/go/exec",
     visibility = ["//visibility:public"],
     deps = [
         "//go/sklog",

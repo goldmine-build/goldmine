@@ -10,7 +10,7 @@ import (
 
 	"cloud.google.com/go/storage"
 	mock "github.com/stretchr/testify/mock"
-	"go.skia.org/infra/go/gcs"
+	"go.goldmine.build/go/gcs"
 )
 
 // NewGCSClient creates a new instance of GCSClient. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

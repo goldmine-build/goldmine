@@ -10,7 +10,7 @@ go_library(
         "util.go",
         "vfs.go",
     ],
-    importpath = "go.skia.org/infra/go/git",
+    importpath = "go.goldmine.build/go/git",
     visibility = ["//visibility:public"],
     deps = [
         "//go/exec",

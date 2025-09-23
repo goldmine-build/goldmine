@@ -16,10 +16,10 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"go.skia.org/infra/bazel/go/bazel"
-	"go.skia.org/infra/go/repo_root"
-	"go.skia.org/infra/go/sktest"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/bazel/go/bazel"
+	"go.goldmine.build/go/repo_root"
+	"go.goldmine.build/go/sktest"
+	"go.goldmine.build/go/util"
 )
 
 // TestDataDir returns the path to the caller's testdata directory, which

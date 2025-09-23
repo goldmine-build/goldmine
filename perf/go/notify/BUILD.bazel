@@ -12,7 +12,7 @@ go_library(
         "noop.go",
         "notify.go",
     ],
-    importpath = "go.skia.org/infra/perf/go/notify",
+    importpath = "go.goldmine.build/perf/go/notify",
     visibility = ["//visibility:public"],
     deps = [
         "//email/go/emailclient",

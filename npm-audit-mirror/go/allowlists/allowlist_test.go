@@ -7,8 +7,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"go.skia.org/infra/go/mockhttpclient"
-	"go.skia.org/infra/npm-audit-mirror/go/types"
+	"go.goldmine.build/go/mockhttpclient"
+	"go.goldmine.build/npm-audit-mirror/go/types"
 )
 
 var (

@@ -9,7 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/jsonutils"
+	"go.goldmine.build/go/jsonutils"
 )
 
 func TestRender_ComplexStruct_Success(t *testing.T) {

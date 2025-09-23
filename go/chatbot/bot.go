@@ -11,9 +11,9 @@ import (
 	"net/url"
 	"strings"
 
-	"go.skia.org/infra/go/httputils"
-	"go.skia.org/infra/go/metadata"
-	"go.skia.org/infra/go/sklog"
+	"go.goldmine.build/go/httputils"
+	"go.goldmine.build/go/metadata"
+	"go.goldmine.build/go/sklog"
 )
 
 const (

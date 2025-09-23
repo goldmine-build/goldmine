@@ -28,10 +28,10 @@ import (
 	"github.com/yannh/kubeconform/pkg/validator"
 	corev1 "k8s.io/api/core/v1"
 
-	"go.skia.org/infra/go/docker"
-	git_pkg "go.skia.org/infra/go/git"
-	"go.skia.org/infra/go/util"
-	"go.skia.org/infra/k8s-checker/go/k8s_config"
+	"go.goldmine.build/go/docker"
+	git_pkg "go.goldmine.build/go/git"
+	"go.goldmine.build/go/util"
+	"go.goldmine.build/k8s-checker/go/k8s_config"
 )
 
 func main() {

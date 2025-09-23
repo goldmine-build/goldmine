@@ -15,9 +15,9 @@ import (
 	"cloud.google.com/go/storage"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/gcs"
-	"go.skia.org/infra/go/gcs/mocks"
-	"go.skia.org/infra/go/testutils"
+	"go.goldmine.build/go/gcs"
+	"go.goldmine.build/go/gcs/mocks"
+	"go.goldmine.build/go/testutils"
 )
 
 const (

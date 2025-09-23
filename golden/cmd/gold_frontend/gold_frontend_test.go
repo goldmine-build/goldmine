@@ -8,8 +8,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/metrics2"
-	"go.skia.org/infra/golden/go/web"
+	"go.goldmine.build/go/metrics2"
+	"go.goldmine.build/golden/go/web"
 )
 
 func TestAddJSONRoute_ValidRoute_Success(t *testing.T) {

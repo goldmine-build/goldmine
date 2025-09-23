@@ -7,7 +7,7 @@ go_library(
         "sql.go",
         "tables.go",
     ],
-    importpath = "go.skia.org/infra/golden/go/sql/schema",
+    importpath = "go.goldmine.build/golden/go/sql/schema",
     visibility = ["//visibility:public"],
     deps = [
         "//go/paramtools",

@@ -8,8 +8,8 @@ import (
 	"regexp"
 	"strings"
 
-	"go.skia.org/infra/fiddlek/go/store"
-	"go.skia.org/infra/go/sklog"
+	"go.goldmine.build/fiddlek/go/store"
+	"go.goldmine.build/go/sklog"
 )
 
 var (

@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "icon",
     srcs = ["icon.go"],
-    importpath = "go.skia.org/infra/elements-sk/generate_icons/icon",
+    importpath = "go.goldmine.build/elements-sk/generate_icons/icon",
     visibility = ["//visibility:public"],
     deps = ["//go/skerr"],
 )

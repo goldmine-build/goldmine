@@ -6,10 +6,10 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/docsyserver/go/codereview"
-	"go.skia.org/infra/go/gerrit"
-	"go.skia.org/infra/go/gerrit/mocks"
-	"go.skia.org/infra/go/testutils"
+	"go.goldmine.build/docsyserver/go/codereview"
+	"go.goldmine.build/go/gerrit"
+	"go.goldmine.build/go/gerrit/mocks"
+	"go.goldmine.build/go/testutils"
 )
 
 var myFakeError = fmt.Errorf("My fake error")

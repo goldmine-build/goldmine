@@ -6,6 +6,6 @@ go_library(
         "sets.go",
         "types.go",
     ],
-    importpath = "go.skia.org/infra/golden/go/types",
+    importpath = "go.goldmine.build/golden/go/types",
     visibility = ["//visibility:public"],
 )

@@ -7,8 +7,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"go.skia.org/infra/go/fileutil"
-	"go.skia.org/infra/gold-client/go/auth"
+	"go.goldmine.build/go/fileutil"
+	"go.goldmine.build/gold-client/go/auth"
 )
 
 const (

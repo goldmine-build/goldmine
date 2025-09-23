@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "stdlogging",
     srcs = ["stdlogging.go"],
-    importpath = "go.skia.org/infra/go/sklog/stdlogging",
+    importpath = "go.goldmine.build/go/sklog/stdlogging",
     visibility = ["//visibility:public"],
     deps = [
         "//go/sklog/sklogimpl",

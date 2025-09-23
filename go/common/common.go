@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"go.skia.org/infra/go/cleanup"
-	"go.skia.org/infra/go/sklog"
+	"go.goldmine.build/go/cleanup"
+	"go.goldmine.build/go/sklog"
 )
 
 const (

@@ -3,6 +3,6 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "mocks",
     srcs = ["mocks.go"],
-    importpath = "go.skia.org/infra/go/mocks",
+    importpath = "go.goldmine.build/go/mocks",
     visibility = ["//visibility:public"],
 )

@@ -9,7 +9,7 @@ import (
 	"io"
 
 	mock "github.com/stretchr/testify/mock"
-	"go.skia.org/infra/scrap/go/scrap"
+	"go.goldmine.build/scrap/go/scrap"
 )
 
 // NewScrapExchange creates a new instance of ScrapExchange. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

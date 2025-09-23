@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "storage",
     srcs = ["gcsclient.go"],
-    importpath = "go.skia.org/infra/golden/go/storage",
+    importpath = "go.goldmine.build/golden/go/storage",
     visibility = ["//visibility:public"],
     deps = [
         "//go/gcs",

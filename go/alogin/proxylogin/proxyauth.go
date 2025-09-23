@@ -8,13 +8,13 @@ import (
 	"regexp"
 	"strings"
 
-	"go.skia.org/infra/go/alogin"
-	"go.skia.org/infra/go/login"
-	"go.skia.org/infra/go/netutils"
-	"go.skia.org/infra/go/roles"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/kube/go/authproxy"
+	"go.goldmine.build/go/alogin"
+	"go.goldmine.build/go/login"
+	"go.goldmine.build/go/netutils"
+	"go.goldmine.build/go/roles"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/kube/go/authproxy"
 )
 
 const (

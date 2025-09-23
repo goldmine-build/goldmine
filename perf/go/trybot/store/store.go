@@ -1,12 +1,12 @@
 // Package store stores the results from trybot runs.
-package store // import "go.skia.org/infra/perf/go/trybot/store"
+package store // import "go.goldmine.build/perf/go/trybot/store"
 
 import (
 	"context"
 	"time"
 
-	"go.skia.org/infra/perf/go/trybot"
-	"go.skia.org/infra/perf/go/types"
+	"go.goldmine.build/perf/go/trybot"
+	"go.goldmine.build/perf/go/types"
 )
 
 // TryBotStore stores trybot results.

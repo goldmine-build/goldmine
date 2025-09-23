@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/golden/cmd/goldpushk/goldpushk"
+	"go.goldmine.build/golden/cmd/goldpushk/goldpushk"
 )
 
 func TestParseAndValidateFlags_ErrorCases(t *testing.T) {

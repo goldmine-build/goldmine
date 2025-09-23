@@ -3,7 +3,7 @@ package mocks
 import (
 	time "time"
 
-	"go.skia.org/infra/go/now"
+	"go.goldmine.build/go/now"
 )
 
 func NewTimeTickerFunc(ch <-chan time.Time) now.NewTimeTickerFunc {

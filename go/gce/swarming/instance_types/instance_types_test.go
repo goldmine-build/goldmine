@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	instance_types_testing "go.skia.org/infra/go/gce/swarming/instance_types/testing"
+	instance_types_testing "go.goldmine.build/go/gce/swarming/instance_types/testing"
 )
 
 func TestFilesCorrectlyEmbedded(t *testing.T) {

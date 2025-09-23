@@ -6,9 +6,9 @@ import (
 	"encoding/json"
 	"io/fs"
 
-	"go.skia.org/infra/go/jsonschema"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
+	"go.goldmine.build/go/jsonschema"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
 )
 
 // Audience for the tool, i.e. the group of people that use a tool.

@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "k8s-checker_lib",
     srcs = ["main.go"],
-    importpath = "go.skia.org/infra/k8s-checker/go/k8s-checker",
+    importpath = "go.goldmine.build/k8s-checker/go/k8s-checker",
     visibility = ["//visibility:private"],
     deps = [
         "//go/auth",

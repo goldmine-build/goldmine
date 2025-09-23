@@ -6,10 +6,10 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/deepequal/assertdeep"
-	"go.skia.org/infra/go/git"
-	"go.skia.org/infra/go/gitstore"
-	"go.skia.org/infra/go/gitstore/mem_gitstore"
+	"go.goldmine.build/go/deepequal/assertdeep"
+	"go.goldmine.build/go/git"
+	"go.goldmine.build/go/gitstore"
+	"go.goldmine.build/go/gitstore/mem_gitstore"
 )
 
 func TestMemGit(t *testing.T) {

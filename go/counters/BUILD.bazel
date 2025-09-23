@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "counters",
     srcs = ["counters.go"],
-    importpath = "go.skia.org/infra/go/counters",
+    importpath = "go.goldmine.build/go/counters",
     visibility = ["//visibility:public"],
     deps = [
         "//go/gcs",

@@ -4,11 +4,11 @@ import (
 	"context"
 	"time"
 
-	"go.skia.org/infra/go/git"
-	"go.skia.org/infra/go/git/repograph"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/vcsinfo"
+	"go.goldmine.build/go/git"
+	"go.goldmine.build/go/git/repograph"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/vcsinfo"
 )
 
 // GetRepoGraph returns *repograph.Graph backed by the given GitStore.

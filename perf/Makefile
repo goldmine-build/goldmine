@@ -30,7 +30,7 @@ push_backup: release_backup
 	$(BAZEL) run --config=mayberemote //perf:pushk_perf-cockroachdb-backup
 
 # First create a list of all the modules that ./go/ts depends upon.
-tsDependentModules := $(shell go list -f '{{ join .Imports "\n" }}' go.skia.org/infra/perf/go/ts/  )
+tsDependentModules := $(shell go list -f '{{ join .Imports "\n" }}' go.goldmine.build/perf/go/ts/  )
 
 # Then use that list to find all the Go files that make up those dependent modules.
 tsDependentFiles := $(shell echo $(tsDependentModules) | xargs -L 1 go list -f '{{ $$dir := .Dir }}{{ range  .GoFiles }}{{ $$dir }}/{{ . }}{{ "\n" }}{{ end }}' )

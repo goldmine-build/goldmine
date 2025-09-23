@@ -7,8 +7,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/go/testutils"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/go/testutils"
 )
 
 // TestParseQuery spot checks the parsing of a string and makes sure the object produced

@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/testutils"
+	"go.goldmine.build/go/testutils"
 )
 
 func createFile(dir, prefix, content string, t *testing.T) string {

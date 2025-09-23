@@ -22,10 +22,10 @@ import (
 	"time"
 
 	"github.com/golang/groupcache/lru"
-	"go.skia.org/infra/go/auth"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/auth"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/util"
 	"golang.org/x/time/rate"
 )
 

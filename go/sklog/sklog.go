@@ -5,8 +5,8 @@ package sklog
 import (
 	"os"
 
-	"go.skia.org/infra/go/sklog/sklogimpl"
-	"go.skia.org/infra/go/sklog/stdlogging"
+	"go.goldmine.build/go/sklog/sklogimpl"
+	"go.goldmine.build/go/sklog/stdlogging"
 )
 
 // WE MUST CALL SetLogger in an init function; otherwise there's a very good

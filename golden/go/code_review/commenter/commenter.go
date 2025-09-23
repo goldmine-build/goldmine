@@ -12,13 +12,13 @@ import (
 	"go.opencensus.io/trace"
 	"golang.org/x/sync/errgroup"
 
-	"go.skia.org/infra/go/metrics2"
-	"go.skia.org/infra/go/now"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/golden/go/code_review"
-	"go.skia.org/infra/golden/go/sql"
-	"go.skia.org/infra/golden/go/sql/schema"
+	"go.goldmine.build/go/metrics2"
+	"go.goldmine.build/go/now"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/golden/go/code_review"
+	"go.goldmine.build/golden/go/sql"
+	"go.goldmine.build/golden/go/sql/schema"
 )
 
 const (

@@ -12,9 +12,9 @@ import (
 	"os"
 	"strings"
 
-	"go.skia.org/infra/go/executil"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/executil"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/util"
 )
 
 const (

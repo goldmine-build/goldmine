@@ -3,6 +3,6 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "alerts",
     srcs = ["alerts.go"],
-    importpath = "go.skia.org/infra/go/alerts",
+    importpath = "go.goldmine.build/go/alerts",
     visibility = ["//visibility:public"],
 )

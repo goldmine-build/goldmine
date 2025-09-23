@@ -2,8 +2,8 @@
 package tracing
 
 import (
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/perf/go/config"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/perf/go/config"
 )
 
 // Init tracing for this application.

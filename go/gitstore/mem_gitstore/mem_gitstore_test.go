@@ -3,7 +3,7 @@ package mem_gitstore
 import (
 	"testing"
 
-	"go.skia.org/infra/go/gitstore/shared_tests"
+	"go.goldmine.build/go/gitstore/shared_tests"
 )
 
 func TestMemGitStore(t *testing.T) {

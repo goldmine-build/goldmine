@@ -8,9 +8,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"go.skia.org/infra/go/mockhttpclient"
-	"go.skia.org/infra/go/vcsinfo"
-	"go.skia.org/infra/golden/go/code_review"
+	"go.goldmine.build/go/mockhttpclient"
+	"go.goldmine.build/go/vcsinfo"
+	"go.goldmine.build/golden/go/code_review"
 )
 
 func TestGetChangelistSunnyDay(t *testing.T) {

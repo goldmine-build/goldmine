@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "v2beta1",
     srcs = ["androidbuildinternal.go"],
-    importpath = "go.skia.org/infra/go/androidbuildinternal/v2beta1",
+    importpath = "go.goldmine.build/go/androidbuildinternal/v2beta1",
     visibility = ["//visibility:public"],
     deps = [
         "@com_github_skia_dev_google_api_go_client//gensupport",

@@ -6,7 +6,7 @@ go_library(
         "autoscaler.go",
         "mock_autoscaler.go",
     ],
-    importpath = "go.skia.org/infra/go/gce/autoscaler",
+    importpath = "go.goldmine.build/go/gce/autoscaler",
     visibility = ["//visibility:public"],
     deps = [
         "//go/gce",

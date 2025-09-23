@@ -10,11 +10,11 @@ import (
 	"go.opencensus.io/trace"
 
 	gstorage "cloud.google.com/go/storage"
-	"go.skia.org/infra/go/gcs"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/util"
-	"go.skia.org/infra/golden/go/types"
+	"go.goldmine.build/go/gcs"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/util"
+	"go.goldmine.build/golden/go/types"
 	"google.golang.org/api/option"
 )
 

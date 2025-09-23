@@ -3,10 +3,10 @@ package testutils
 import (
 	"context"
 
-	"go.skia.org/infra/go/emulators/gcp_emulator"
-	"go.skia.org/infra/go/firestore"
-	"go.skia.org/infra/go/sktest"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/emulators/gcp_emulator"
+	"go.goldmine.build/go/firestore"
+	"go.goldmine.build/go/sktest"
+	"go.goldmine.build/go/util"
 )
 
 // NewClientForTesting returns a Client and ensures that it will connect to the

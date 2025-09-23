@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"go.skia.org/infra/fiddlek/go/linenumbers"
+	"go.goldmine.build/fiddlek/go/linenumbers"
 )
 
 const (

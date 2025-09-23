@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "vec32",
     srcs = ["vec.go"],
-    importpath = "go.skia.org/infra/go/vec32",
+    importpath = "go.goldmine.build/go/vec32",
     visibility = ["//visibility:public"],
     deps = ["@com_github_aclements_go_moremath//stats"],
 )

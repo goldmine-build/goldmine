@@ -6,6 +6,6 @@ go_library(
     name = "clusters",
     srcs = ["embed.go"],
     embedsrcs = ["config.json"],
-    importpath = "go.skia.org/infra/kube/clusters",
+    importpath = "go.goldmine.build/kube/clusters",
     visibility = ["//visibility:public"],
 )

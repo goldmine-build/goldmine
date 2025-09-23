@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/mockhttpclient"
+	"go.goldmine.build/go/mockhttpclient"
 )
 
 const (

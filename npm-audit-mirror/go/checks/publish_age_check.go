@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"time"
 
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/npm-audit-mirror/go/types"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/npm-audit-mirror/go/types"
 )
 
 const (

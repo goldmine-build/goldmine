@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "sobel",
     srcs = ["sobel.go"],
-    importpath = "go.skia.org/infra/gold-client/go/imgmatching/sobel",
+    importpath = "go.goldmine.build/gold-client/go/imgmatching/sobel",
     visibility = ["//visibility:public"],
     deps = ["//gold-client/go/imgmatching/fuzzy"],
 )

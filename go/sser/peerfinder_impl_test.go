@@ -7,9 +7,9 @@ import (
 
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/k8s/mocks"
-	watchmocks "go.skia.org/infra/go/k8s/watch/mocks"
-	"go.skia.org/infra/go/testutils"
+	"go.goldmine.build/go/k8s/mocks"
+	watchmocks "go.goldmine.build/go/k8s/watch/mocks"
+	"go.goldmine.build/go/testutils"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"

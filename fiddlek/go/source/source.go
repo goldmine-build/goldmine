@@ -13,8 +13,8 @@ import (
 	"strings"
 
 	"github.com/nfnt/resize"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/util"
 )
 
 // Source handles the source images that may be used by fiddles.

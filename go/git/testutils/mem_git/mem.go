@@ -11,13 +11,13 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/git"
-	"go.skia.org/infra/go/git/git_common"
-	"go.skia.org/infra/go/gitstore"
-	"go.skia.org/infra/go/sktest"
-	"go.skia.org/infra/go/testutils"
-	"go.skia.org/infra/go/util"
-	"go.skia.org/infra/go/vcsinfo"
+	"go.goldmine.build/go/git"
+	"go.goldmine.build/go/git/git_common"
+	"go.goldmine.build/go/gitstore"
+	"go.goldmine.build/go/sktest"
+	"go.goldmine.build/go/testutils"
+	"go.goldmine.build/go/util"
+	"go.goldmine.build/go/vcsinfo"
 )
 
 const (

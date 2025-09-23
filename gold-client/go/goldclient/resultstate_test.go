@@ -4,10 +4,10 @@ import (
 	"testing"
 	"time"
 
-	"go.skia.org/infra/golden/go/jsonio"
+	"go.goldmine.build/golden/go/jsonio"
 
 	"github.com/stretchr/testify/assert"
-	"go.skia.org/infra/go/now"
+	"go.goldmine.build/go/now"
 )
 
 func TestGetResultFilePath_Success(t *testing.T) {

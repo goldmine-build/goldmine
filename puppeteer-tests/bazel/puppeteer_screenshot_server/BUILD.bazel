@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_binary", "go_library")
 go_library(
     name = "puppeteer_screenshot_server_lib",
     srcs = ["puppeteer_screenshot_server.go"],
-    importpath = "go.skia.org/infra/puppeteer-tests/bazel/puppeteer_screenshot_server",
+    importpath = "go.goldmine.build/puppeteer-tests/bazel/puppeteer_screenshot_server",
     visibility = ["//visibility:private"],
     deps = [
         "//go/httputils",

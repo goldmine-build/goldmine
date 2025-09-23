@@ -11,7 +11,7 @@ import (
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/metrics2"
+	"go.goldmine.build/go/metrics2"
 )
 
 const myMesageID = "<abcdef>"

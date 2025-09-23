@@ -6,7 +6,7 @@ go_library(
         "main.go",
         "svc_config.go",
     ],
-    importpath = "go.skia.org/infra/skolo/go/metadata_server_k8s",
+    importpath = "go.goldmine.build/skolo/go/metadata_server_k8s",
     visibility = ["//visibility:private"],
     deps = [
         "//go/common",

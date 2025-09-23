@@ -7,10 +7,10 @@ import (
 	"time"
 
 	"cloud.google.com/go/storage"
+	"go.goldmine.build/go/fileutil"
+	"go.goldmine.build/go/gcs"
+	"go.goldmine.build/go/sklog"
 	"go.opencensus.io/trace"
-	"go.skia.org/infra/go/fileutil"
-	"go.skia.org/infra/go/gcs"
-	"go.skia.org/infra/go/sklog"
 )
 
 // FileSearcher is an interface around the logic for polling for files that may have been

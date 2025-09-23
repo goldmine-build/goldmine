@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "limitwriter",
     srcs = ["limitwriter.go"],
-    importpath = "go.skia.org/infra/go/util/limitwriter",
+    importpath = "go.goldmine.build/go/util/limitwriter",
     visibility = ["//visibility:public"],
 )
 

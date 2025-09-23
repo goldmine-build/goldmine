@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_binary", "go_library")
 go_library(
     name = "update_probers_lib",
     srcs = ["main.go"],
-    importpath = "go.skia.org/infra/skfe/go/update_probers",
+    importpath = "go.goldmine.build/skfe/go/update_probers",
     visibility = ["//visibility:private"],
     deps = [
         "//go/sklog",

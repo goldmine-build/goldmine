@@ -13,12 +13,12 @@ import (
 	"sync"
 	"time"
 
-	"go.skia.org/infra/go/exec"
-	"go.skia.org/infra/go/git"
-	"go.skia.org/infra/go/git/git_common"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/vcsinfo"
+	"go.goldmine.build/go/exec"
+	"go.goldmine.build/go/git"
+	"go.goldmine.build/go/git/git_common"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/vcsinfo"
 )
 
 // commitLineRe matches one line of commit log and captures hash, author and

@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "ctrace2",
     srcs = ["ctrace.go"],
-    importpath = "go.skia.org/infra/perf/go/ctrace2",
+    importpath = "go.goldmine.build/perf/go/ctrace2",
     visibility = ["//visibility:public"],
     deps = [
         "//go/vec32",

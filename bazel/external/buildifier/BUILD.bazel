@@ -8,7 +8,7 @@ go_library(
         "//bazel/constraints:mac_x64": ["@buildifier_macos_amd64//file"],
         "//bazel/constraints:mac_arm64": ["@buildifier_macos_arm64//file"],
     }),
-    importpath = "go.skia.org/infra/bazel/external/buildifier",
+    importpath = "go.goldmine.build/bazel/external/buildifier",
     visibility = ["//visibility:public"],
     deps = [
         "//bazel/go/bazel",

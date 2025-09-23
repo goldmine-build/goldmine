@@ -9,7 +9,7 @@ go_library(
         "server_impl.go",
         "sser.go",
     ],
-    importpath = "go.skia.org/infra/go/sser",
+    importpath = "go.goldmine.build/go/sser",
     visibility = ["//visibility:public"],
     deps = [
         "//go/httputils",

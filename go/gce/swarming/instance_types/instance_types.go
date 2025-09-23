@@ -8,10 +8,10 @@ import (
 	"regexp"
 	"strings"
 
-	"go.skia.org/infra/go/auth"
-	"go.skia.org/infra/go/exec"
-	"go.skia.org/infra/go/gce"
-	"go.skia.org/infra/go/skerr"
+	"go.goldmine.build/go/auth"
+	"go.goldmine.build/go/exec"
+	"go.goldmine.build/go/gce"
+	"go.goldmine.build/go/skerr"
 	"gopkg.in/yaml.v2"
 
 	_ "embed"

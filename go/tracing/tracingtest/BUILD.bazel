@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "tracingtest",
     srcs = ["exporter.go"],
-    importpath = "go.skia.org/infra/go/tracing/tracingtest",
+    importpath = "go.goldmine.build/go/tracing/tracingtest",
     visibility = ["//visibility:public"],
     deps = ["@io_opencensus_go//trace"],
 )

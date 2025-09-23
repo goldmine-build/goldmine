@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/tarm/serial"
-	si "go.skia.org/infra/go/serial"
-	"go.skia.org/infra/go/skerr"
+	si "go.goldmine.build/go/serial"
+	"go.goldmine.build/go/skerr"
 )
 
 const (

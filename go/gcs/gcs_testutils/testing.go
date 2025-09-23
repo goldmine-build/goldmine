@@ -12,7 +12,7 @@ import (
 
 	"cloud.google.com/go/storage"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/httputils"
+	"go.goldmine.build/go/httputils"
 	"google.golang.org/api/option"
 )
 

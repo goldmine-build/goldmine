@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "issues",
     srcs = ["issuetracker.go"],
-    importpath = "go.skia.org/infra/npm-audit-mirror/go/issues",
+    importpath = "go.goldmine.build/npm-audit-mirror/go/issues",
     visibility = ["//visibility:public"],
     deps = [
         "//go/issuetracker/v1:issuetracker",

@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "oauth2redirect",
     srcs = ["oauth2redirect.go"],
-    importpath = "go.skia.org/infra/kube/go/oauth2redirect",
+    importpath = "go.goldmine.build/kube/go/oauth2redirect",
     visibility = ["//visibility:public"],
     deps = [
         "//go/cleanup",

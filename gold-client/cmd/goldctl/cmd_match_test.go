@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"go.skia.org/infra/go/testutils"
-	"go.skia.org/infra/gold-client/go/imgmatching"
+	"go.goldmine.build/go/testutils"
+	"go.goldmine.build/gold-client/go/imgmatching"
 )
 
 func TestMatch_Fuzzy_NonZeroPixelDeltaThreshold_ImagesAreWithinTolerance_ExitCodeZero(t *testing.T) {

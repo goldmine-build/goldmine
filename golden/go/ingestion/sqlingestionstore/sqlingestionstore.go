@@ -8,12 +8,12 @@ import (
 	"crypto/md5"
 	"time"
 
-	"go.skia.org/infra/golden/go/ingestion"
+	"go.goldmine.build/golden/go/ingestion"
 
 	lru "github.com/hashicorp/golang-lru"
 	"github.com/jackc/pgx/v4/pgxpool"
 
-	"go.skia.org/infra/go/skerr"
+	"go.goldmine.build/go/skerr"
 )
 
 const (

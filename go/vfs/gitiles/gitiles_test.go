@@ -6,13 +6,13 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/git"
-	"go.skia.org/infra/go/gitiles"
-	"go.skia.org/infra/go/gitiles/mocks"
-	gitiles_testutils "go.skia.org/infra/go/gitiles/testutils"
-	"go.skia.org/infra/go/mockhttpclient"
-	"go.skia.org/infra/go/testutils"
-	"go.skia.org/infra/go/vfs/shared_tests"
+	"go.goldmine.build/go/git"
+	"go.goldmine.build/go/gitiles"
+	"go.goldmine.build/go/gitiles/mocks"
+	gitiles_testutils "go.goldmine.build/go/gitiles/testutils"
+	"go.goldmine.build/go/mockhttpclient"
+	"go.goldmine.build/go/testutils"
+	"go.goldmine.build/go/vfs/shared_tests"
 )
 
 const (

@@ -18,13 +18,13 @@ import (
 
 	"github.com/google/uuid"
 
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/util"
-	"go.skia.org/infra/golden/go/diff"
-	"go.skia.org/infra/golden/go/sql"
-	"go.skia.org/infra/golden/go/sql/schema"
-	"go.skia.org/infra/golden/go/types"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/util"
+	"go.goldmine.build/golden/go/diff"
+	"go.goldmine.build/golden/go/sql"
+	"go.goldmine.build/golden/go/sql/schema"
+	"go.goldmine.build/golden/go/types"
 )
 
 // TablesBuilder has methods on it for generating trace data and other related data in a way

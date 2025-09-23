@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"go.skia.org/infra/go/common"
-	"go.skia.org/infra/go/sklog"
+	"go.goldmine.build/go/common"
+	"go.goldmine.build/go/sklog"
 )
 
 var (

@@ -9,8 +9,8 @@ import (
 	"sync"
 
 	"cloud.google.com/go/storage"
-	"go.skia.org/infra/go/gcs"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/gcs"
+	"go.goldmine.build/go/util"
 )
 
 // MemoryGCSClient is a struct used for testing. Instead of writing to GCS, it

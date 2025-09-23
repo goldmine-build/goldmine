@@ -15,17 +15,17 @@ import (
 	"sort"
 	"strings"
 
-	"go.skia.org/infra/go/skerr"
+	"go.goldmine.build/go/skerr"
 
-	"go.skia.org/infra/go/auth"
-	"go.skia.org/infra/go/common"
-	"go.skia.org/infra/go/exec"
-	"go.skia.org/infra/go/gcr"
-	"go.skia.org/infra/go/gerrit/rubberstamper"
-	"go.skia.org/infra/go/git"
-	"go.skia.org/infra/go/kube/clusterconfig"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/auth"
+	"go.goldmine.build/go/common"
+	"go.goldmine.build/go/exec"
+	"go.goldmine.build/go/gcr"
+	"go.goldmine.build/go/gerrit/rubberstamper"
+	"go.goldmine.build/go/git"
+	"go.goldmine.build/go/kube/clusterconfig"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/util"
 )
 
 const (

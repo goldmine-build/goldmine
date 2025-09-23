@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "firestore",
     srcs = ["firestore.go"],
-    importpath = "go.skia.org/infra/go/firestore",
+    importpath = "go.goldmine.build/go/firestore",
     visibility = ["//visibility:public"],
     deps = [
         "//go/metrics2",

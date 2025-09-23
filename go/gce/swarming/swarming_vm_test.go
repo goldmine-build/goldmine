@@ -7,9 +7,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/gce"
-	"go.skia.org/infra/go/gce/swarming/instance_types"
-	instance_types_testing "go.skia.org/infra/go/gce/swarming/instance_types/testing"
+	"go.goldmine.build/go/gce"
+	"go.goldmine.build/go/gce/swarming/instance_types"
+	instance_types_testing "go.goldmine.build/go/gce/swarming/instance_types/testing"
 )
 
 // vmsToCreateTestCase checks only a subset of the gce.Instance struct fields, which should be

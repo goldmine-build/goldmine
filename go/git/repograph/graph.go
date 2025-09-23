@@ -16,13 +16,13 @@ import (
 
 	"github.com/willf/bitset"
 
-	"go.skia.org/infra/go/git"
-	"go.skia.org/infra/go/metrics2"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/timer"
-	"go.skia.org/infra/go/util"
-	"go.skia.org/infra/go/vcsinfo"
+	"go.goldmine.build/go/git"
+	"go.goldmine.build/go/metrics2"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/timer"
+	"go.goldmine.build/go/util"
+	"go.goldmine.build/go/vcsinfo"
 )
 
 var (

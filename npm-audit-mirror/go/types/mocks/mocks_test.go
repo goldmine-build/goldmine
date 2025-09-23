@@ -9,8 +9,8 @@ import (
 	"time"
 
 	mock "github.com/stretchr/testify/mock"
-	"go.skia.org/infra/go/issuetracker/v1"
-	"go.skia.org/infra/npm-audit-mirror/go/types"
+	"go.goldmine.build/go/issuetracker/v1"
+	"go.goldmine.build/npm-audit-mirror/go/types"
 )
 
 // NewNpmDB creates a new instance of NpmDB. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

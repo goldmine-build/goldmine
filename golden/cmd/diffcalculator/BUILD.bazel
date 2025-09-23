@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "diffcalculator_lib",
     srcs = ["diffcalculator.go"],
-    importpath = "go.skia.org/infra/golden/cmd/diffcalculator",
+    importpath = "go.goldmine.build/golden/cmd/diffcalculator",
     visibility = ["//visibility:private"],
     deps = [
         "//go/common",

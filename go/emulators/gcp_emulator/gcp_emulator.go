@@ -6,10 +6,10 @@ import (
 	"os/exec"
 	"sync"
 
-	"go.skia.org/infra/bazel/external/google_cloud_sdk"
-	"go.skia.org/infra/go/emulators"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sktest"
+	"go.goldmine.build/bazel/external/google_cloud_sdk"
+	"go.goldmine.build/go/emulators"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sktest"
 )
 
 func RequireBigTable(t sktest.TestingT) {

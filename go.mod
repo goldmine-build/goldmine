@@ -1,4 +1,4 @@
-module go.skia.org/infra
+module go.goldmine.build
 
 require (
 	cloud.google.com/go/datastore v1.20.0

@@ -10,10 +10,10 @@ import (
 	"net/http"
 	"net/url"
 
-	"go.skia.org/infra/go/httputils"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/util"
-	"go.skia.org/infra/scrap/go/scrap"
+	"go.goldmine.build/go/httputils"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/util"
+	"go.goldmine.build/scrap/go/scrap"
 )
 
 // Client implements api.ScrapExchange using the HTTP REST API talking to a server.

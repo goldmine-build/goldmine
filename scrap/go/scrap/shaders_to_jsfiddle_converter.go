@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 
-	"go.skia.org/infra/go/skerr"
+	"go.goldmine.build/go/skerr"
 )
 
 // writeInfo contains data for of a single template execution of a scrap node tree.

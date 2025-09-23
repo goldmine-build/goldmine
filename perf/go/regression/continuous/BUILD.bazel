@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "continuous",
     srcs = ["continuous.go"],
-    importpath = "go.skia.org/infra/perf/go/regression/continuous",
+    importpath = "go.goldmine.build/perf/go/regression/continuous",
     visibility = ["//visibility:public"],
     deps = [
         "//go/ctxutil",

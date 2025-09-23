@@ -6,11 +6,11 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/git/repograph"
-	"go.skia.org/infra/go/git/repograph/shared_tests"
-	git_testutils "go.skia.org/infra/go/git/testutils"
-	"go.skia.org/infra/go/testutils"
-	"go.skia.org/infra/go/vcsinfo"
+	"go.goldmine.build/go/git/repograph"
+	"go.goldmine.build/go/git/repograph/shared_tests"
+	git_testutils "go.goldmine.build/go/git/testutils"
+	"go.goldmine.build/go/testutils"
+	"go.goldmine.build/go/vcsinfo"
 )
 
 // localRepoRefresher is a RepoImplRefresher backed by a local git repo.

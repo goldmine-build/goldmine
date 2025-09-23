@@ -5,13 +5,13 @@ import (
 	"hash/crc32"
 	"sync"
 
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/go/query"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/timer"
+	"go.goldmine.build/perf/go/git/provider"
+	"go.goldmine.build/perf/go/types"
 	"go.opencensus.io/trace"
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/go/query"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/timer"
-	"go.skia.org/infra/perf/go/git/provider"
-	"go.skia.org/infra/perf/go/types"
 )
 
 const (

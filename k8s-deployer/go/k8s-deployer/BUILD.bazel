@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_binary", "go_library")
 go_library(
     name = "k8s-deployer_lib",
     srcs = ["main.go"],
-    importpath = "go.skia.org/infra/k8s-deployer/go/k8s-deployer",
+    importpath = "go.goldmine.build/k8s-deployer/go/k8s-deployer",
     visibility = ["//visibility:private"],
     deps = [
         "//go/auth",

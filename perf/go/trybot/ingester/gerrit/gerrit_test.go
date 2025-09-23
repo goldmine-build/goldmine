@@ -6,11 +6,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/testutils"
-	"go.skia.org/infra/perf/go/config"
-	"go.skia.org/infra/perf/go/file"
-	"go.skia.org/infra/perf/go/ingest/parser"
-	"go.skia.org/infra/perf/go/types"
+	"go.goldmine.build/go/testutils"
+	"go.goldmine.build/perf/go/config"
+	"go.goldmine.build/perf/go/file"
+	"go.goldmine.build/perf/go/ingest/parser"
+	"go.goldmine.build/perf/go/types"
 )
 
 var createdTime = time.Date(2020, 01, 01, 00, 00, 00, 0000, time.UTC)

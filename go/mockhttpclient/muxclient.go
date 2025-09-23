@@ -12,7 +12,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	expect "github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/util"
 )
 
 // muxClient implements http.RoundTripper and sends requests to a mux.Router.

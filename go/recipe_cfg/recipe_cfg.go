@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/util"
 )
 
 /*

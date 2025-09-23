@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"go.skia.org/infra/go/roles"
-	"go.skia.org/infra/kube/go/authproxy"
+	"go.goldmine.build/go/roles"
+	"go.goldmine.build/kube/go/authproxy"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"

@@ -8,12 +8,12 @@ import (
 	"strings"
 
 	"cloud.google.com/go/pubsub"
-	"go.skia.org/infra/email/go/emailclient"
-	"go.skia.org/infra/go/chatbot"
-	"go.skia.org/infra/go/common"
-	"go.skia.org/infra/go/issues"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/email/go/emailclient"
+	"go.goldmine.build/go/chatbot"
+	"go.goldmine.build/go/common"
+	"go.goldmine.build/go/issues"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/util"
 )
 
 const (

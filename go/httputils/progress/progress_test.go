@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/mockhttpclient"
-	"go.skia.org/infra/go/now/mocks"
+	"go.goldmine.build/go/mockhttpclient"
+	"go.goldmine.build/go/now/mocks"
 )
 
 func TestProgressTracker(t *testing.T) {

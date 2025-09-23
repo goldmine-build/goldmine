@@ -4,8 +4,8 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"go.skia.org/infra/bazel/go/bazel"
-	"go.skia.org/infra/go/skerr"
+	"go.goldmine.build/bazel/go/bazel"
+	"go.goldmine.build/go/skerr"
 )
 
 // FindGo returns the path to the `go` binary provided by rules_go[1].

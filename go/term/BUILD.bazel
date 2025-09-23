@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "term",
     srcs = ["term.go"],
-    importpath = "go.skia.org/infra/go/term",
+    importpath = "go.goldmine.build/go/term",
     visibility = ["//visibility:public"],
     deps = [
         "//go/human",

@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"go.skia.org/infra/go/git/git_common"
+	"go.goldmine.build/go/git/git_common"
 
 	"github.com/stretchr/testify/require"
 )

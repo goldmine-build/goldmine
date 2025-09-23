@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "tiling",
     srcs = ["trace.go"],
-    importpath = "go.skia.org/infra/golden/go/tiling",
+    importpath = "go.goldmine.build/golden/go/tiling",
     visibility = ["//visibility:public"],
     deps = ["//golden/go/types"],
 )

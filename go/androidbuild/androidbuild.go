@@ -15,9 +15,9 @@ import (
 	"github.com/syndtr/goleveldb/leveldb"
 	"github.com/syndtr/goleveldb/leveldb/errors"
 	lutil "github.com/syndtr/goleveldb/leveldb/util"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/util"
-	"go.skia.org/infra/go/vcsinfo"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/util"
+	"go.goldmine.build/go/vcsinfo"
 )
 
 const (

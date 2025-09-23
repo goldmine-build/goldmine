@@ -10,8 +10,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"go.skia.org/infra/gold-client/go/goldclient"
-	"go.skia.org/infra/gold-client/go/mocks"
+	"go.goldmine.build/gold-client/go/goldclient"
+	"go.goldmine.build/gold-client/go/mocks"
 )
 
 func TestWhoami_AuthedWithGSUtil_Success(t *testing.T) {

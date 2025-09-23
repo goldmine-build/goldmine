@@ -9,10 +9,10 @@ import (
 
 	"github.com/google/uuid"
 	lru "github.com/hashicorp/golang-lru"
-	"go.skia.org/infra/go/metrics2"
-	"go.skia.org/infra/go/now"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
+	"go.goldmine.build/go/metrics2"
+	"go.goldmine.build/go/now"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
 )
 
 // Tracker keeps track of long running processes.

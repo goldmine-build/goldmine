@@ -8,15 +8,15 @@ import (
 	"sort"
 	"time"
 
-	"go.skia.org/infra/go/now"
-	"go.skia.org/infra/go/query"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/perf/go/config"
-	"go.skia.org/infra/perf/go/ctrace2"
-	"go.skia.org/infra/perf/go/dataframe"
-	"go.skia.org/infra/perf/go/kmeans"
-	"go.skia.org/infra/perf/go/stepfit"
-	"go.skia.org/infra/perf/go/types"
+	"go.goldmine.build/go/now"
+	"go.goldmine.build/go/query"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/perf/go/config"
+	"go.goldmine.build/perf/go/ctrace2"
+	"go.goldmine.build/perf/go/dataframe"
+	"go.goldmine.build/perf/go/kmeans"
+	"go.goldmine.build/perf/go/stepfit"
+	"go.goldmine.build/perf/go/types"
 )
 
 const (

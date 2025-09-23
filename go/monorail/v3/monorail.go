@@ -1,4 +1,4 @@
-package monorail // import "go.skia.org/infra/go/monorail/v3"
+package monorail // import "go.goldmine.build/go/monorail/v3"
 
 import (
 	"bytes"
@@ -12,10 +12,10 @@ import (
 
 	"google.golang.org/api/idtoken"
 
-	"go.skia.org/infra/go/httputils"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/httputils"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/util"
 )
 
 const (

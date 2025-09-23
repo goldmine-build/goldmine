@@ -3,12 +3,12 @@ package gerrit
 import (
 	"strconv"
 
-	"go.skia.org/infra/go/metrics2"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/perf/go/file"
-	"go.skia.org/infra/perf/go/ingest/parser"
-	"go.skia.org/infra/perf/go/trybot"
-	"go.skia.org/infra/perf/go/trybot/ingester"
+	"go.goldmine.build/go/metrics2"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/perf/go/file"
+	"go.goldmine.build/perf/go/ingest/parser"
+	"go.goldmine.build/perf/go/trybot"
+	"go.goldmine.build/perf/go/trybot/ingester"
 )
 
 // Gerrit implements trybot.Ingester for Gerrit code reviews.

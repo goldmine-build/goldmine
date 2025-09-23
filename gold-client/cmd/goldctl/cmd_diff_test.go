@@ -10,10 +10,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"go.skia.org/infra/go/testutils"
-	"go.skia.org/infra/gold-client/go/mocks"
-	"go.skia.org/infra/golden/go/types"
-	"go.skia.org/infra/golden/go/web/frontend"
+	"go.goldmine.build/go/testutils"
+	"go.goldmine.build/gold-client/go/mocks"
+	"go.goldmine.build/golden/go/types"
+	"go.goldmine.build/golden/go/web/frontend"
 )
 
 func TestDiff_LegacyTestParamUsed_Success(t *testing.T) {

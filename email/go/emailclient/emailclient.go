@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"net/mail"
 
-	"go.skia.org/infra/go/email"
-	"go.skia.org/infra/go/httputils"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
+	"go.goldmine.build/go/email"
+	"go.goldmine.build/go/httputils"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
 )
 
 // DefaultEmailServiceURL is the address of the service running in the default namespace.

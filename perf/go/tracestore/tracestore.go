@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/go/query"
-	"go.skia.org/infra/perf/go/git/provider"
-	"go.skia.org/infra/perf/go/types"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/go/query"
+	"go.goldmine.build/perf/go/git/provider"
+	"go.goldmine.build/perf/go/types"
 )
 
 // Source is returned from GetLastNSources.

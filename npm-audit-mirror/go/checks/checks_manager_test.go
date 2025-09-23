@@ -7,10 +7,10 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"go.skia.org/infra/go/mockhttpclient"
-	"go.skia.org/infra/npm-audit-mirror/go/config"
-	"go.skia.org/infra/npm-audit-mirror/go/types"
-	"go.skia.org/infra/npm-audit-mirror/go/types/mocks"
+	"go.goldmine.build/go/mockhttpclient"
+	"go.goldmine.build/npm-audit-mirror/go/config"
+	"go.goldmine.build/npm-audit-mirror/go/types"
+	"go.goldmine.build/npm-audit-mirror/go/types/mocks"
 )
 
 func TestGetPackageDetails(t *testing.T) {

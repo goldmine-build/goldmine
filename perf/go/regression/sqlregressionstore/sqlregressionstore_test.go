@@ -6,9 +6,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/perf/go/regression"
-	"go.skia.org/infra/perf/go/regression/regressiontest"
-	"go.skia.org/infra/perf/go/sql/sqltest"
+	"go.goldmine.build/perf/go/regression"
+	"go.goldmine.build/perf/go/regression/regressiontest"
+	"go.goldmine.build/perf/go/sql/sqltest"
 )
 
 func TestSQLRegressionStore_CockroachDB(t *testing.T) {

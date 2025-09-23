@@ -10,10 +10,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/exec"
-	"go.skia.org/infra/go/exec/testutils"
-	"go.skia.org/infra/go/git/git_common"
-	"go.skia.org/infra/go/skerr"
+	"go.goldmine.build/go/exec"
+	"go.goldmine.build/go/exec/testutils"
+	"go.goldmine.build/go/git/git_common"
+	"go.goldmine.build/go/skerr"
 	"golang.org/x/oauth2"
 )
 

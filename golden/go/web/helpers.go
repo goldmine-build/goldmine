@@ -7,9 +7,9 @@ import (
 	"io"
 	"net/http"
 
-	"go.skia.org/infra/go/httputils"
-	"go.skia.org/infra/go/util"
-	"go.skia.org/infra/golden/go/diff"
+	"go.goldmine.build/go/httputils"
+	"go.goldmine.build/go/util"
+	"go.goldmine.build/golden/go/diff"
 )
 
 const (

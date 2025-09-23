@@ -1,6 +1,6 @@
 package schema
 
-import "go.skia.org/infra/perf/go/types"
+import "go.goldmine.build/perf/go/types"
 
 // Commit represents a single commit stored in the database.
 //

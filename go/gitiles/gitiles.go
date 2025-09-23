@@ -16,11 +16,11 @@ import (
 	"strings"
 	"time"
 
-	"go.skia.org/infra/go/git"
-	"go.skia.org/infra/go/httputils"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/util"
-	"go.skia.org/infra/go/vcsinfo"
+	"go.goldmine.build/go/git"
+	"go.goldmine.build/go/httputils"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/util"
+	"go.goldmine.build/go/vcsinfo"
 	"golang.org/x/time/rate"
 )
 

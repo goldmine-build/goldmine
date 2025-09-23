@@ -4,8 +4,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/perf/go/alerts/alertstest"
-	"go.skia.org/infra/perf/go/sql/sqltest"
+	"go.goldmine.build/perf/go/alerts/alertstest"
+	"go.goldmine.build/perf/go/sql/sqltest"
 )
 
 func TestSQLAlertStore_CockroachDB(t *testing.T) {

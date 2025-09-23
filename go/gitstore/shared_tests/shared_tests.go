@@ -6,12 +6,12 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/deepequal/assertdeep"
-	"go.skia.org/infra/go/git"
-	"go.skia.org/infra/go/git/testutils/mem_git"
-	"go.skia.org/infra/go/gitstore"
-	"go.skia.org/infra/go/sktest"
-	"go.skia.org/infra/go/vcsinfo"
+	"go.goldmine.build/go/deepequal/assertdeep"
+	"go.goldmine.build/go/git"
+	"go.goldmine.build/go/git/testutils/mem_git"
+	"go.goldmine.build/go/gitstore"
+	"go.goldmine.build/go/sktest"
+	"go.goldmine.build/go/vcsinfo"
 )
 
 func TestGitStore(t sktest.TestingT, gs gitstore.GitStore) {

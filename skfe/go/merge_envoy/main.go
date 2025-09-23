@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/Jeffail/gabs/v2"
-	"go.skia.org/infra/go/sklog"
+	"go.goldmine.build/go/sklog"
 )
 
 const tls = `{

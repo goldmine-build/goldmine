@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "perf-tool_lib",
     srcs = ["main.go"],
-    importpath = "go.skia.org/infra/perf/go/perf-tool",
+    importpath = "go.goldmine.build/perf/go/perf-tool",
     visibility = ["//visibility:private"],
     deps = [
         "//go/skerr",

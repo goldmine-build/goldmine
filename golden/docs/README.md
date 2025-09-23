@@ -60,7 +60,7 @@ To install `goldctl` from source, make sure you a have a recent version of Go in
 Then it can be installed with:
 
 ```console
-   $ go get -u go.skia.org/infra/gold-client/cmd/goldctl
+   $ go get -u go.goldmine.build/gold-client/cmd/goldctl
 ```
 
 **If you are part of a Google team that uses CIPD**, goldctl is available via

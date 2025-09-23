@@ -8,9 +8,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"go.skia.org/infra/fiddlek/go/types"
-	"go.skia.org/infra/go/exec"
-	"go.skia.org/infra/go/testutils/unittest"
+	"go.goldmine.build/fiddlek/go/types"
+	"go.goldmine.build/go/exec"
+	"go.goldmine.build/go/testutils/unittest"
 )
 
 func TestPrep(t *testing.T) {

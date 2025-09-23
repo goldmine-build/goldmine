@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/vfs"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/vfs"
 )
 
 // VFS returns a vfs.FS using Git for the given revision.

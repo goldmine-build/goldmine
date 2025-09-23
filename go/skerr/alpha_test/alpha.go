@@ -3,7 +3,7 @@
 
 package alpha_test
 
-import "go.skia.org/infra/go/skerr"
+import "go.goldmine.build/go/skerr"
 
 type Alpha struct {
 	callback func() error

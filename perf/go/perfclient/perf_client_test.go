@@ -8,10 +8,10 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/gcs"
-	"go.skia.org/infra/go/gcs/mocks"
-	"go.skia.org/infra/go/testutils"
-	"go.skia.org/infra/perf/go/ingest/format"
+	"go.goldmine.build/go/gcs"
+	"go.goldmine.build/go/gcs/mocks"
+	"go.goldmine.build/go/testutils"
+	"go.goldmine.build/perf/go/ingest/format"
 )
 
 func TestHappyCase(t *testing.T) {

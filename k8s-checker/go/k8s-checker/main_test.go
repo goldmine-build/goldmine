@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/metrics2"
-	"go.skia.org/infra/go/now"
+	"go.goldmine.build/go/metrics2"
+	"go.goldmine.build/go/now"
 )
 
 func TestParseNamespaceAllowFilterFlag_MalFormed_ReturnsError(t *testing.T) {

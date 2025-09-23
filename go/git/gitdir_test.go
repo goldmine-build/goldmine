@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	exec_testutils "go.skia.org/infra/go/exec/testutils"
-	"go.skia.org/infra/go/testutils"
+	exec_testutils "go.goldmine.build/go/exec/testutils"
+	"go.goldmine.build/go/testutils"
 )
 
 func TestGitDetails(t *testing.T) {

@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "gitilesfollower_lib",
     srcs = ["gitilesfollower.go"],
-    importpath = "go.skia.org/infra/golden/cmd/gitilesfollower",
+    importpath = "go.goldmine.build/golden/cmd/gitilesfollower",
     visibility = ["//visibility:private"],
     deps = [
         "//go/common",

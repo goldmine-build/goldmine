@@ -9,9 +9,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/perf/go/file"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/perf/go/file"
 )
 
 // channelSize is the buffer size of the file.File channel.

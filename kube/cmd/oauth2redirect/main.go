@@ -1,8 +1,8 @@
 package main
 
 import (
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/kube/go/oauth2redirect"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/kube/go/oauth2redirect"
 )
 
 func main() {

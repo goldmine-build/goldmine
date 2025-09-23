@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "deepequal",
     srcs = ["deep_equals.go"],
-    importpath = "go.skia.org/infra/go/deepequal",
+    importpath = "go.goldmine.build/go/deepequal",
     visibility = ["//visibility:public"],
 )
 

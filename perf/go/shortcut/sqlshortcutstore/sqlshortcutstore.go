@@ -8,11 +8,11 @@ import (
 	"encoding/json"
 	"io"
 
-	"go.skia.org/infra/go/query"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/sql/pool"
-	"go.skia.org/infra/perf/go/shortcut"
+	"go.goldmine.build/go/query"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/sql/pool"
+	"go.goldmine.build/perf/go/shortcut"
 )
 
 // statement is an SQL statement identifier.

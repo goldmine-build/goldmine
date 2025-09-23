@@ -20,8 +20,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/puppeteer-tests/bazel/extract_puppeteer_screenshots/extract"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/puppeteer-tests/bazel/extract_puppeteer_screenshots/extract"
 )
 
 func main() {

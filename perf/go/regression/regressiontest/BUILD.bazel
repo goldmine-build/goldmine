@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "regressiontest",
     srcs = ["regressiontest.go"],
-    importpath = "go.skia.org/infra/perf/go/regression/regressiontest",
+    importpath = "go.goldmine.build/perf/go/regression/regressiontest",
     visibility = ["//visibility:public"],
     deps = [
         "//perf/go/clustering2",

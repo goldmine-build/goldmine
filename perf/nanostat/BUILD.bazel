@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "nanostat_lib",
     srcs = ["main.go"],
-    importpath = "go.skia.org/infra/perf/nanostat",
+    importpath = "go.goldmine.build/perf/nanostat",
     visibility = ["//visibility:private"],
     deps = [
         "//go/paramtools",

@@ -3,12 +3,12 @@ package sql
 //go:generate bazelisk run --config=mayberemote //:go -- run ./tosql
 
 import (
-	alertschema "go.skia.org/infra/perf/go/alerts/sqlalertstore/schema"
-	gitschema "go.skia.org/infra/perf/go/git/schema"
-	graphsshortcutschema "go.skia.org/infra/perf/go/graphsshortcut/graphsshortcutstore/schema"
-	regressionschema "go.skia.org/infra/perf/go/regression/sqlregressionstore/schema"
-	shortcutschema "go.skia.org/infra/perf/go/shortcut/sqlshortcutstore/schema"
-	traceschema "go.skia.org/infra/perf/go/tracestore/sqltracestore/schema"
+	alertschema "go.goldmine.build/perf/go/alerts/sqlalertstore/schema"
+	gitschema "go.goldmine.build/perf/go/git/schema"
+	graphsshortcutschema "go.goldmine.build/perf/go/graphsshortcut/graphsshortcutstore/schema"
+	regressionschema "go.goldmine.build/perf/go/regression/sqlregressionstore/schema"
+	shortcutschema "go.goldmine.build/perf/go/shortcut/sqlshortcutstore/schema"
+	traceschema "go.goldmine.build/perf/go/tracestore/sqltracestore/schema"
 )
 
 // Tables represents the full schema of the SQL database.

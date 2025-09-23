@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/gcs"
-	"go.skia.org/infra/go/gcs/mem_gcsclient"
+	"go.goldmine.build/go/gcs"
+	"go.goldmine.build/go/gcs/mem_gcsclient"
 )
 
 // captureFileWriterGCSClient captures FileWriter args for TestWithWriteFile* and

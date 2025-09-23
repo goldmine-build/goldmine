@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "presubmit_lib",
     srcs = ["presubmit.go"],
-    importpath = "go.skia.org/infra/cmd/presubmit",
+    importpath = "go.goldmine.build/cmd/presubmit",
     visibility = ["//visibility:private"],
     deps = [
         "//bazel/external/buildifier",

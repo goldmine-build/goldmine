@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "swarming_lib",
     srcs = ["swarming_vm.go"],
-    importpath = "go.skia.org/infra/go/gce/swarming",
+    importpath = "go.goldmine.build/go/gce/swarming",
     visibility = ["//visibility:private"],
     deps = [
         "//go/common",

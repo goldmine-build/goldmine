@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "paramreducer",
     srcs = ["paramreducer.go"],
-    importpath = "go.skia.org/infra/go/paramreducer",
+    importpath = "go.goldmine.build/go/paramreducer",
     visibility = ["//visibility:public"],
     deps = [
         "//go/paramtools",

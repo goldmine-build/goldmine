@@ -8,9 +8,9 @@ import (
 	"time"
 
 	lru "github.com/hashicorp/golang-lru"
-	"go.skia.org/infra/codesize/go/common"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
+	"go.goldmine.build/codesize/go/common"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
 )
 
 // Size of the in-memory cache with the contents of Bloaty output files.

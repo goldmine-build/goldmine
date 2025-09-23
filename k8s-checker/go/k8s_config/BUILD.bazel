@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "k8s_config",
     srcs = ["k8s_config.go"],
-    importpath = "go.skia.org/infra/k8s-checker/go/k8s_config",
+    importpath = "go.goldmine.build/k8s-checker/go/k8s_config",
     visibility = ["//visibility:public"],
     deps = [
         "//go/skerr",

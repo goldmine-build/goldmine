@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "rubberstamper",
     srcs = ["rubberstamper.go"],
-    importpath = "go.skia.org/infra/go/gerrit/rubberstamper",
+    importpath = "go.goldmine.build/go/gerrit/rubberstamper",
     visibility = ["//visibility:public"],
     deps = ["//go/git"],
 )

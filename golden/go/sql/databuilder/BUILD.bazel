@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "databuilder",
     srcs = ["databuilder.go"],
-    importpath = "go.skia.org/infra/golden/go/sql/databuilder",
+    importpath = "go.goldmine.build/golden/go/sql/databuilder",
     visibility = ["//visibility:public"],
     deps = [
         "//go/paramtools",

@@ -11,8 +11,8 @@ import (
 	"cloud.google.com/go/storage"
 	"golang.org/x/oauth2/google"
 
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
 	"google.golang.org/api/option"
 )
 

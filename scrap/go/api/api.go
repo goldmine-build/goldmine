@@ -10,10 +10,10 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
-	"go.skia.org/infra/go/httputils"
-	"go.skia.org/infra/go/metrics2"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/scrap/go/scrap"
+	"go.goldmine.build/go/httputils"
+	"go.goldmine.build/go/metrics2"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/scrap/go/scrap"
 )
 
 // Endpoint names used for metrics.

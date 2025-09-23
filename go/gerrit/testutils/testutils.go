@@ -5,10 +5,10 @@ import (
 	"fmt"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/gerrit"
-	"go.skia.org/infra/go/mockhttpclient"
-	"go.skia.org/infra/go/sktest"
-	"go.skia.org/infra/go/testutils"
+	"go.goldmine.build/go/gerrit"
+	"go.goldmine.build/go/mockhttpclient"
+	"go.goldmine.build/go/sktest"
+	"go.goldmine.build/go/testutils"
 )
 
 const (

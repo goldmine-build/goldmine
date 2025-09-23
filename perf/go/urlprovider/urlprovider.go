@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"time"
 
-	"go.skia.org/infra/go/sklog"
-	perfgit "go.skia.org/infra/perf/go/git"
-	"go.skia.org/infra/perf/go/types"
+	"go.goldmine.build/go/sklog"
+	perfgit "go.goldmine.build/perf/go/git"
+	"go.goldmine.build/perf/go/types"
 )
 
 type URLProvider struct {

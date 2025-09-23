@@ -4,11 +4,11 @@ import (
 	"os"
 	"path/filepath"
 
-	"go.skia.org/infra/go/sktest"
+	"go.goldmine.build/go/sktest"
 
-	"go.skia.org/infra/go/sklog"
-	go_testutils "go.skia.org/infra/go/testutils"
-	"go.skia.org/infra/go/util/zip"
+	"go.goldmine.build/go/sklog"
+	go_testutils "go.goldmine.build/go/testutils"
+	"go.goldmine.build/go/util/zip"
 )
 
 // tempRepo is used to setup and teardown a temporary repo for unit testing.

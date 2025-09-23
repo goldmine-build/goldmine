@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "mocks",
     srcs = ["IMonorailService.go"],
-    importpath = "go.skia.org/infra/go/monorail/v3/mocks",
+    importpath = "go.goldmine.build/go/monorail/v3/mocks",
     visibility = ["//visibility:public"],
     deps = [
         "//go/monorail/v3:monorail",

@@ -10,11 +10,11 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/emulators"
-	"go.skia.org/infra/go/emulators/cockroachdb_instance"
-	"go.skia.org/infra/go/sql/pool"
-	"go.skia.org/infra/go/sql/pool/wrapper/timeout"
-	"go.skia.org/infra/perf/go/sql"
+	"go.goldmine.build/go/emulators"
+	"go.goldmine.build/go/emulators/cockroachdb_instance"
+	"go.goldmine.build/go/sql/pool"
+	"go.goldmine.build/go/sql/pool/wrapper/timeout"
+	"go.goldmine.build/perf/go/sql"
 )
 
 // NewCockroachDBForTests creates a new temporary CockroachDB database with all

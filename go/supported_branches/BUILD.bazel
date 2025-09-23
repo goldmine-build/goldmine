@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "supported_branches",
     srcs = ["supported_branches.go"],
-    importpath = "go.skia.org/infra/go/supported_branches",
+    importpath = "go.goldmine.build/go/supported_branches",
     visibility = ["//visibility:public"],
     deps = [
         "//go/git",

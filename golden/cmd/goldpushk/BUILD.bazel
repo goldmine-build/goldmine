@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "goldpushk_lib",
     srcs = ["main.go"],
-    importpath = "go.skia.org/infra/golden/cmd/goldpushk",
+    importpath = "go.goldmine.build/golden/cmd/goldpushk",
     visibility = ["//visibility:private"],
     deps = [
         "//go/skerr",

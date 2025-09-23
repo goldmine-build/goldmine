@@ -5,11 +5,11 @@ import (
 	"path/filepath"
 	"time"
 
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/go/repo_root"
-	"go.skia.org/infra/golden/go/sql/databuilder"
-	"go.skia.org/infra/golden/go/sql/schema"
-	"go.skia.org/infra/golden/go/types"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/go/repo_root"
+	"go.goldmine.build/golden/go/sql/databuilder"
+	"go.goldmine.build/golden/go/sql/schema"
+	"go.goldmine.build/golden/go/types"
 )
 
 // Build creates a set of data that covers many common testing scenarios.

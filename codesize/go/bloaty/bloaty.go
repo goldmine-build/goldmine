@@ -29,7 +29,7 @@ import (
 	"strconv"
 	"strings"
 
-	"go.skia.org/infra/go/skerr"
+	"go.goldmine.build/go/skerr"
 )
 
 // OutputItem represents a single line in a Bloaty output file.

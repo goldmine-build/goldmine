@@ -11,8 +11,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/stretchr/testify/require"
 
-	"go.skia.org/infra/go/sktest"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/sktest"
+	"go.goldmine.build/go/util"
 )
 
 // GetRecordedMetric returns the value that prometheus is reporting.

@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "rpc",
     srcs = ["types.go"],
-    importpath = "go.skia.org/infra/codesize/go/codesizeserver/rpc",
+    importpath = "go.goldmine.build/codesize/go/codesizeserver/rpc",
     visibility = ["//visibility:public"],
     deps = [
         "//codesize/go/bloaty",

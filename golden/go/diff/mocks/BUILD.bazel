@@ -6,7 +6,7 @@ go_library(
         "Calculator.go",
         "ImageSource.go",
     ],
-    importpath = "go.skia.org/infra/golden/go/diff/mocks",
+    importpath = "go.goldmine.build/golden/go/diff/mocks",
     visibility = ["//visibility:public"],
     deps = [
         "//go/paramtools",

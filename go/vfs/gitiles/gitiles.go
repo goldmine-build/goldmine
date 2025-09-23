@@ -5,10 +5,10 @@ import (
 	"context"
 	"os"
 
-	"go.skia.org/infra/go/git"
-	"go.skia.org/infra/go/gitiles"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/vfs"
+	"go.goldmine.build/go/git"
+	"go.goldmine.build/go/gitiles"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/vfs"
 )
 
 // New returns a vfs.FS using Gitiles at the given revision.

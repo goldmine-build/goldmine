@@ -5,9 +5,9 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"go.skia.org/infra/perf/go/clustering2"
-	"go.skia.org/infra/perf/go/stepfit"
-	"go.skia.org/infra/perf/go/ui/frame"
+	"go.goldmine.build/perf/go/clustering2"
+	"go.goldmine.build/perf/go/stepfit"
+	"go.goldmine.build/perf/go/ui/frame"
 )
 
 var testTime = time.Date(2020, 05, 01, 12, 00, 00, 00, time.UTC)

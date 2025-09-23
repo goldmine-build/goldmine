@@ -1,9 +1,9 @@
 package rpc
 
 import (
-	"go.skia.org/infra/codesize/go/bloaty"
-	"go.skia.org/infra/codesize/go/common"
-	"go.skia.org/infra/codesize/go/store"
+	"go.goldmine.build/codesize/go/bloaty"
+	"go.goldmine.build/codesize/go/common"
+	"go.goldmine.build/codesize/go/store"
 )
 
 type BinaryRPCRequest struct {

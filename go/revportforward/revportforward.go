@@ -27,7 +27,7 @@ import (
 	"net"
 	"os"
 
-	"go.skia.org/infra/go/skerr"
+	"go.goldmine.build/go/skerr"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"

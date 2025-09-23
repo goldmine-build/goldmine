@@ -9,11 +9,11 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/gcs/mocks"
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/go/testutils"
-	"go.skia.org/infra/perf/go/config"
-	"go.skia.org/infra/perf/go/ingest/parser"
+	"go.goldmine.build/go/gcs/mocks"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/go/testutils"
+	"go.goldmine.build/perf/go/config"
+	"go.goldmine.build/perf/go/ingest/parser"
 )
 
 // sourceFileBody is a source file that contains the following keys:

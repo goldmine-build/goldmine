@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"go.skia.org/infra/fiddlek/go/store"
+	"go.goldmine.build/fiddlek/go/store"
 )
 
 type namedMock struct {

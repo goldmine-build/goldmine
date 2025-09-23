@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "gerrit",
     srcs = ["gerrit.go"],
-    importpath = "go.skia.org/infra/docsyserver/go/codereview/gerrit",
+    importpath = "go.goldmine.build/docsyserver/go/codereview/gerrit",
     visibility = ["//visibility:public"],
     deps = [
         "//docsyserver/go/codereview",

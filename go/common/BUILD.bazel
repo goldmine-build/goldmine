@@ -7,7 +7,7 @@ go_library(
         "common.go",
         "with.go",
     ],
-    importpath = "go.skia.org/infra/go/common",
+    importpath = "go.goldmine.build/go/common",
     visibility = ["//visibility:public"],
     deps = [
         "//go/cleanup",

@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "chrome_branch",
     srcs = ["chrome_branch.go"],
-    importpath = "go.skia.org/infra/go/chrome_branch",
+    importpath = "go.goldmine.build/go/chrome_branch",
     visibility = ["//visibility:public"],
     deps = [
         "//go/git",

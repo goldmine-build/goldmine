@@ -8,10 +8,10 @@ import (
 	"net/http"
 	"time"
 
-	"go.skia.org/infra/fiddlek/go/types"
-	"go.skia.org/infra/go/httputils"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/fiddlek/go/types"
+	"go.goldmine.build/go/httputils"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/util"
 )
 
 const (

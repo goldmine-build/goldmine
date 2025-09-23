@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_binary", "go_library")
 go_library(
     name = "schema_lib",
     srcs = ["generate.go"],
-    importpath = "go.skia.org/infra/tool/go/tool/schema",
+    importpath = "go.goldmine.build/tool/go/tool/schema",
     visibility = ["//visibility:private"],
     deps = [
         "//go/jsonschema",

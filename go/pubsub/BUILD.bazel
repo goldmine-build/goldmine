@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "pubsub",
     srcs = ["pubsub.go"],
-    importpath = "go.skia.org/infra/go/pubsub",
+    importpath = "go.goldmine.build/go/pubsub",
     visibility = ["//visibility:public"],
     deps = [
         "//go/emulators",

@@ -7,10 +7,10 @@ import (
 	"os/exec"
 	"sync"
 
-	"go.skia.org/infra/bazel/external/cockroachdb"
-	"go.skia.org/infra/go/emulators"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sktest"
+	"go.goldmine.build/bazel/external/cockroachdb"
+	"go.goldmine.build/go/emulators"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sktest"
 )
 
 // Require starts or verifies that a long-living instance of CockroachDB is running.

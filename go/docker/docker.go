@@ -11,10 +11,10 @@ import (
 	"strconv"
 	"time"
 
-	"go.skia.org/infra/go/auth"
-	"go.skia.org/infra/go/httputils"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/auth"
+	"go.goldmine.build/go/httputils"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/util"
 	"golang.org/x/oauth2/google"
 )
 

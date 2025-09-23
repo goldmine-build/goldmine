@@ -8,14 +8,14 @@ import (
 	"sort"
 	"time"
 
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/go/query"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/timer"
-	"go.skia.org/infra/go/vec32"
-	perfgit "go.skia.org/infra/perf/go/git"
-	"go.skia.org/infra/perf/go/progress"
-	"go.skia.org/infra/perf/go/types"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/go/query"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/timer"
+	"go.goldmine.build/go/vec32"
+	perfgit "go.goldmine.build/perf/go/git"
+	"go.goldmine.build/perf/go/progress"
+	"go.goldmine.build/perf/go/types"
 )
 
 const (

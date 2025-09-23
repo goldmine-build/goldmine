@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "recipe_cfg",
     srcs = ["recipe_cfg.go"],
-    importpath = "go.skia.org/infra/go/recipe_cfg",
+    importpath = "go.goldmine.build/go/recipe_cfg",
     visibility = ["//visibility:public"],
     deps = ["//go/util"],
 )

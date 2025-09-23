@@ -11,7 +11,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/executil"
+	"go.goldmine.build/go/executil"
 )
 
 // runSomething would normally be in the code under test, where it has to invoke a command.

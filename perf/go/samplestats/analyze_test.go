@@ -6,8 +6,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/perf/go/ingest/parser"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/perf/go/ingest/parser"
 )
 
 func TestAnalyze_MannWhitneyUTest_SuccessfullyDetectChange(t *testing.T) {

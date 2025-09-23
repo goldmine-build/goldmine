@@ -7,7 +7,7 @@ go_library(
         "progress.go",
         "tracker.go",
     ],
-    importpath = "go.skia.org/infra/perf/go/progress",
+    importpath = "go.goldmine.build/perf/go/progress",
     visibility = ["//visibility:public"],
     deps = [
         "//go/metrics2",

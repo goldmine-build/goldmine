@@ -7,7 +7,7 @@ go_library(
         "common.go",
         "primarysql.go",
     ],
-    importpath = "go.skia.org/infra/golden/go/ingestion_processors",
+    importpath = "go.goldmine.build/golden/go/ingestion_processors",
     visibility = ["//visibility:public"],
     deps = [
         "//go/metrics2",

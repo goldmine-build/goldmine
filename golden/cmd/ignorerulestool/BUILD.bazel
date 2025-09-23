@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_binary", "go_library")
 go_library(
     name = "ignorerulestool_lib",
     srcs = ["ignorerulestool.go"],
-    importpath = "go.skia.org/infra/golden/cmd/ignorerulestool",
+    importpath = "go.goldmine.build/golden/cmd/ignorerulestool",
     visibility = ["//visibility:private"],
     deps = [
         "//go/sklog",

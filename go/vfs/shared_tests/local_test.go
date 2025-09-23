@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"go.skia.org/infra/go/vfs"
+	"go.goldmine.build/go/vfs"
 )
 
 func TestLocal(t *testing.T) {

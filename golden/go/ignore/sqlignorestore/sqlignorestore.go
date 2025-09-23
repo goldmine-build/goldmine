@@ -10,10 +10,10 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 	"go.opencensus.io/trace"
 
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/golden/go/ignore"
-	"go.skia.org/infra/golden/go/sql/schema"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/golden/go/ignore"
+	"go.goldmine.build/golden/go/sql/schema"
 )
 
 type StoreImpl struct {

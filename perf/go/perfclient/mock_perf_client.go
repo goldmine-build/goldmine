@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/mock"
-	"go.skia.org/infra/perf/go/ingest/format"
+	"go.goldmine.build/perf/go/ingest/format"
 )
 
 type MockPerfClient struct {

@@ -8,7 +8,7 @@ go_library(
         "services_map.go",
         "types.go",
     ],
-    importpath = "go.skia.org/infra/golden/cmd/goldpushk/goldpushk",
+    importpath = "go.goldmine.build/golden/cmd/goldpushk/goldpushk",
     visibility = ["//visibility:public"],
     deps = [
         "//go/exec",

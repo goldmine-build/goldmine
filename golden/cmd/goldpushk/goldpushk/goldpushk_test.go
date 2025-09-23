@@ -11,11 +11,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"go.skia.org/infra/go/exec"
-	"go.skia.org/infra/go/git"
-	"go.skia.org/infra/go/git/testutils"
-	"go.skia.org/infra/go/now"
-	"go.skia.org/infra/go/testutils/unittest"
+	"go.goldmine.build/go/exec"
+	"go.goldmine.build/go/git"
+	"go.goldmine.build/go/git/testutils"
+	"go.goldmine.build/go/now"
+	"go.goldmine.build/go/testutils/unittest"
 )
 
 func TestNew(t *testing.T) {

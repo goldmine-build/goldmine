@@ -17,7 +17,7 @@ import (
 	"strings"
 	"text/template"
 
-	"go.skia.org/infra/codesize/go/bloaty"
+	"go.goldmine.build/codesize/go/bloaty"
 )
 
 //go:embed template.html

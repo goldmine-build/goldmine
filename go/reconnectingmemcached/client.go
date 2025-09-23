@@ -13,8 +13,8 @@ import (
 
 	"github.com/bradfitz/gomemcache/memcache"
 
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
 )
 
 // Client is a slightly modified version of the interface on *memcache.Client. Most of the methods

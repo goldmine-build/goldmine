@@ -6,9 +6,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"go.skia.org/infra/go/exec"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/exec"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/util"
 )
 
 // Upload the files specified by the given isolateFile to the isolate server.

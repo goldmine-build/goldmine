@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "gcsuploader",
     srcs = ["gcsuploader.go"],
-    importpath = "go.skia.org/infra/gold-client/go/gcsuploader",
+    importpath = "go.goldmine.build/gold-client/go/gcsuploader",
     visibility = ["//visibility:public"],
     deps = [
         "//go/exec",

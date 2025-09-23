@@ -6,7 +6,7 @@ import (
 	context "context"
 
 	iam "cloud.google.com/go/iam"
-	gopubsub "go.skia.org/infra/go/pubsub"
+	gopubsub "go.goldmine.build/go/pubsub"
 
 	mock "github.com/stretchr/testify/mock"
 

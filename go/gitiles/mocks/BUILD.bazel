@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "mocks",
     srcs = ["GitilesRepo.go"],
-    importpath = "go.skia.org/infra/go/gitiles/mocks",
+    importpath = "go.goldmine.build/go/gitiles/mocks",
     visibility = ["//visibility:public"],
     deps = [
         "//go/git",

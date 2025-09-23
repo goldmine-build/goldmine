@@ -4,7 +4,7 @@ package tracing
 import (
 	"os"
 
-	"go.skia.org/infra/go/tracing"
+	"go.goldmine.build/go/tracing"
 )
 
 // Initialize sets up trace options and exporting for this application. It will sample the given

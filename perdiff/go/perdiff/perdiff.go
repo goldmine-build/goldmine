@@ -8,7 +8,7 @@ import (
 	"log"
 	"os"
 
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/util"
 )
 
 var options struct {

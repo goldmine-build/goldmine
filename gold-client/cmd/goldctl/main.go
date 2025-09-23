@@ -10,8 +10,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"go.skia.org/infra/gold-client/go/auth"
-	"go.skia.org/infra/gold-client/go/goldclient"
+	"go.goldmine.build/gold-client/go/auth"
+	"go.goldmine.build/gold-client/go/goldclient"
 )
 
 const (

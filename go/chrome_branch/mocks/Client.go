@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	chrome_branch "go.skia.org/infra/go/chrome_branch"
+	chrome_branch "go.goldmine.build/go/chrome_branch"
 
 	mock "github.com/stretchr/testify/mock"
 )

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"go.skia.org/infra/email/go/emailservice"
-	"go.skia.org/infra/go/sklog"
+	"go.goldmine.build/email/go/emailservice"
+	"go.goldmine.build/go/sklog"
 )
 
 func main() {

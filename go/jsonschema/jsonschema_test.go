@@ -21,7 +21,7 @@ type testStruct struct {
 
 const testStructSchema = `{
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://go.skia.org/infra/go/jsonschema/test-struct",
+  "$id": "https://go.goldmine.build/go/jsonschema/test-struct",
   "$ref": "#/$defs/testStruct",
   "$defs": {
     "testStruct": {

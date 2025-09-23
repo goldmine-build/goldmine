@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "gcssource",
     srcs = ["gcssource.go"],
-    importpath = "go.skia.org/infra/perf/go/file/gcssource",
+    importpath = "go.goldmine.build/perf/go/file/gcssource",
     visibility = ["//visibility:public"],
     deps = [
         "//go/httputils",

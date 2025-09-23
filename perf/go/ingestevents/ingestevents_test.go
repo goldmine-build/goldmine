@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"go.skia.org/infra/go/paramtools"
+	"go.goldmine.build/go/paramtools"
 )
 
 func TestCreatePubSubBody(t *testing.T) {

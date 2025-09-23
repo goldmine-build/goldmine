@@ -8,11 +8,11 @@ import (
 	"math"
 	"unsafe"
 
-	"go.skia.org/infra/go/metrics2"
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/util"
-	"go.skia.org/infra/golden/go/types"
+	"go.goldmine.build/go/metrics2"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/util"
+	"go.goldmine.build/golden/go/types"
 )
 
 var (

@@ -10,9 +10,9 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/secret"
-	"go.skia.org/infra/go/secret/mocks"
-	"go.skia.org/infra/go/testutils"
+	"go.goldmine.build/go/secret"
+	"go.goldmine.build/go/secret/mocks"
+	"go.goldmine.build/go/testutils"
 )
 
 const (

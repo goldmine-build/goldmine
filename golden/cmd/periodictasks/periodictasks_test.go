@@ -7,20 +7,20 @@ import (
 
 	"github.com/stretchr/testify/mock"
 
-	"go.skia.org/infra/go/gcs"
+	"go.goldmine.build/go/gcs"
 
-	"go.skia.org/infra/go/testutils"
+	"go.goldmine.build/go/testutils"
 
-	"go.skia.org/infra/go/gcs/mocks"
+	"go.goldmine.build/go/gcs/mocks"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"go.skia.org/infra/go/now"
-	dks "go.skia.org/infra/golden/go/sql/datakitchensink"
-	"go.skia.org/infra/golden/go/sql/schema"
-	"go.skia.org/infra/golden/go/sql/sqltest"
-	"go.skia.org/infra/golden/go/types"
+	"go.goldmine.build/go/now"
+	dks "go.goldmine.build/golden/go/sql/datakitchensink"
+	"go.goldmine.build/golden/go/sql/schema"
+	"go.goldmine.build/golden/go/sql/sqltest"
+	"go.goldmine.build/golden/go/types"
 )
 
 func TestGatherFromPrimaryBranch_NoExistingWork_AllWorkAdded(t *testing.T) {

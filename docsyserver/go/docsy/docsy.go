@@ -8,11 +8,11 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"go.skia.org/infra/go/executil"
-	"go.skia.org/infra/go/metrics2"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/timer"
+	"go.goldmine.build/go/executil"
+	"go.goldmine.build/go/metrics2"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/timer"
 )
 
 // Docsy renders documentation against a Docsy template.

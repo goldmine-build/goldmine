@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_binary", "go_library")
 go_library(
     name = "periodic-trigger_lib",
     srcs = ["main.go"],
-    importpath = "go.skia.org/infra/periodic-trigger/go/periodic-trigger",
+    importpath = "go.goldmine.build/periodic-trigger/go/periodic-trigger",
     visibility = ["//visibility:private"],
     deps = [
         "//go/common",

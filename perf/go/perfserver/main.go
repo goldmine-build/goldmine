@@ -9,17 +9,17 @@ import (
 	"os"
 
 	cli "github.com/urfave/cli/v2"
-	"go.skia.org/infra/go/metrics2"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/sklog/sklogimpl"
-	"go.skia.org/infra/go/sklog/stdlogging"
-	"go.skia.org/infra/go/urfavecli"
-	"go.skia.org/infra/perf/go/config"
-	"go.skia.org/infra/perf/go/config/validate"
-	"go.skia.org/infra/perf/go/frontend"
-	"go.skia.org/infra/perf/go/ingest/process"
-	"go.skia.org/infra/perf/go/maintenance"
+	"go.goldmine.build/go/metrics2"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/sklog/sklogimpl"
+	"go.goldmine.build/go/sklog/stdlogging"
+	"go.goldmine.build/go/urfavecli"
+	"go.goldmine.build/perf/go/config"
+	"go.goldmine.build/perf/go/config/validate"
+	"go.goldmine.build/perf/go/frontend"
+	"go.goldmine.build/perf/go/ingest/process"
+	"go.goldmine.build/perf/go/maintenance"
 )
 
 func main() {

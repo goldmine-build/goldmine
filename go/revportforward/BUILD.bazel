@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "revportforward",
     srcs = ["revportforward.go"],
-    importpath = "go.skia.org/infra/go/revportforward",
+    importpath = "go.goldmine.build/go/revportforward",
     visibility = ["//visibility:public"],
     deps = [
         "//go/skerr",

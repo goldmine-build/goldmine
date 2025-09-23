@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_binary", "go_library")
 go_library(
     name = "run_on_vms_lib",
     srcs = ["run_on_vms.go"],
-    importpath = "go.skia.org/infra/go/gce/cmd/run_on_vms",
+    importpath = "go.goldmine.build/go/gce/cmd/run_on_vms",
     visibility = ["//visibility:private"],
     deps = [
         "//go/common",

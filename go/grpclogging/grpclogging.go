@@ -11,9 +11,9 @@ import (
 
 	"go.opencensus.io/trace"
 
-	"go.skia.org/infra/go/now"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/kube/go/authproxy"
+	"go.goldmine.build/go/now"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/kube/go/authproxy"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
@@ -23,7 +23,7 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	pb "go.skia.org/infra/go/grpclogging/proto"
+	pb "go.goldmine.build/go/grpclogging/proto"
 )
 
 // GRPCLogger provides interceptor methods for grpc clients and servers to log the request

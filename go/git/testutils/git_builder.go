@@ -10,10 +10,10 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/exec"
-	"go.skia.org/infra/go/git/git_common"
-	"go.skia.org/infra/go/sktest"
-	"go.skia.org/infra/go/testutils"
+	"go.goldmine.build/go/exec"
+	"go.goldmine.build/go/git/git_common"
+	"go.goldmine.build/go/sktest"
+	"go.goldmine.build/go/testutils"
 )
 
 // GitBuilder creates commits and branches in a git repo.

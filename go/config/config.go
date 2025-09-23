@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/flynn/json5"
-	"go.skia.org/infra/go/skerr"
+	"go.goldmine.build/go/skerr"
 )
 
 // Duration is a simple struct wrapper to allow us to parse strings as durations from the incoming

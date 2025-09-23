@@ -10,9 +10,9 @@ import (
 	"encoding/json"
 	"io"
 
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/util"
 )
 
 // IngestEvent is the PubSub body that is sent from the ingesters each time

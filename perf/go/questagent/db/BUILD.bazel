@@ -6,6 +6,6 @@ go_library(
         "schema.go",
         "tables.go",
     ],
-    importpath = "go.skia.org/infra/perf/go/questagent/db",
+    importpath = "go.goldmine.build/perf/go/questagent/db",
     visibility = ["//visibility:public"],
 )

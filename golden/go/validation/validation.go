@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/util"
 )
 
 // IsValidDigest returns true if the given string is a valid digest

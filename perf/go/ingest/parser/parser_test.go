@@ -10,14 +10,14 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/go/query"
-	"go.skia.org/infra/go/testutils"
-	"go.skia.org/infra/perf/go/config"
-	"go.skia.org/infra/perf/go/config/validate"
-	"go.skia.org/infra/perf/go/file"
-	"go.skia.org/infra/perf/go/ingest/format"
-	"go.skia.org/infra/perf/go/types"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/go/query"
+	"go.goldmine.build/go/testutils"
+	"go.goldmine.build/perf/go/config"
+	"go.goldmine.build/perf/go/config/validate"
+	"go.goldmine.build/perf/go/file"
+	"go.goldmine.build/perf/go/ingest/format"
+	"go.goldmine.build/perf/go/types"
 )
 
 const goodBranchName = "some-branch-name"

@@ -7,9 +7,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"go.skia.org/infra/go/query"
-	"go.skia.org/infra/go/vec32"
-	"go.skia.org/infra/perf/go/types"
+	"go.goldmine.build/go/query"
+	"go.goldmine.build/go/vec32"
+	"go.goldmine.build/perf/go/types"
 )
 
 var (

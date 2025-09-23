@@ -12,14 +12,14 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"go.skia.org/infra/go/deepequal/assertdeep"
-	"go.skia.org/infra/go/git"
-	"go.skia.org/infra/go/git/repograph"
-	git_testutils "go.skia.org/infra/go/git/testutils"
-	"go.skia.org/infra/go/sktest"
-	"go.skia.org/infra/go/testutils"
-	"go.skia.org/infra/go/util"
-	"go.skia.org/infra/go/vcsinfo"
+	"go.goldmine.build/go/deepequal/assertdeep"
+	"go.goldmine.build/go/git"
+	"go.goldmine.build/go/git/repograph"
+	git_testutils "go.goldmine.build/go/git/testutils"
+	"go.goldmine.build/go/sktest"
+	"go.goldmine.build/go/testutils"
+	"go.goldmine.build/go/util"
+	"go.goldmine.build/go/vcsinfo"
 )
 
 // RepoImplRefresher is an interface used for testing which notifies a RepoImpl

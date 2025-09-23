@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_binary", "go_library")
 go_library(
     name = "file-backup_lib",
     srcs = ["main.go"],
-    importpath = "go.skia.org/infra/skolo/go/file-backup",
+    importpath = "go.goldmine.build/skolo/go/file-backup",
     visibility = ["//visibility:private"],
     deps = [
         "//go/auth",
@@ -29,7 +29,7 @@ go_binary(
 go_library(
     name = "router_backup_ansible_lib",
     srcs = ["main.go"],
-    importpath = "go.skia.org/infra/skolo/go/router_backup_ansible",
+    importpath = "go.goldmine.build/skolo/go/router_backup_ansible",
     visibility = ["//visibility:private"],
     deps = [
         "//go/common",

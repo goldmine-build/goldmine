@@ -7,9 +7,9 @@ import (
 	"syscall"
 	"time"
 
-	"go.skia.org/infra/bazel/go/bazel"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sktest"
+	"go.goldmine.build/bazel/go/bazel"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sktest"
 )
 
 type EmulatorLauncherFn func() (bool, error)

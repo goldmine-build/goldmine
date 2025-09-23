@@ -6,9 +6,9 @@ import (
 	"context"
 	"encoding/json"
 
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sql/pool"
-	"go.skia.org/infra/perf/go/graphsshortcut"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sql/pool"
+	"go.goldmine.build/perf/go/graphsshortcut"
 )
 
 // statement is an SQL statement identifier.

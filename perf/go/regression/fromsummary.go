@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"math"
 
-	"go.skia.org/infra/perf/go/alerts"
-	perfgit "go.skia.org/infra/perf/go/git"
-	"go.skia.org/infra/perf/go/git/provider"
-	"go.skia.org/infra/perf/go/stepfit"
+	"go.goldmine.build/perf/go/alerts"
+	perfgit "go.goldmine.build/perf/go/git"
+	"go.goldmine.build/perf/go/git/provider"
+	"go.goldmine.build/perf/go/stepfit"
 )
 
 // RegressionFromClusterResponse returns the commit for the regression along with

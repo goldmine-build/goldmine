@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "shared_tests",
     srcs = ["shared_tests.go"],
-    importpath = "go.skia.org/infra/go/vfs/shared_tests",
+    importpath = "go.goldmine.build/go/vfs/shared_tests",
     visibility = ["//visibility:public"],
     deps = [
         "//go/sktest",

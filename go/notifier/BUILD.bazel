@@ -8,7 +8,7 @@ go_library(
         "notifier.go",
         "router.go",
     ],
-    importpath = "go.skia.org/infra/go/notifier",
+    importpath = "go.goldmine.build/go/notifier",
     visibility = ["//visibility:public"],
     deps = [
         "//email/go/emailclient",

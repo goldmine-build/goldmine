@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "go2ts",
     srcs = ["go2ts.go"],
-    importpath = "go.skia.org/infra/go/go2ts",
+    importpath = "go.goldmine.build/go/go2ts",
     visibility = ["//visibility:public"],
     deps = ["//go/go2ts/typescript"],
 )

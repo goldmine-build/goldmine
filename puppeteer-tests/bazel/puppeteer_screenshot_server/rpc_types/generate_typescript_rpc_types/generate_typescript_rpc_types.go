@@ -6,10 +6,10 @@ import (
 	"flag"
 	"io"
 
-	"go.skia.org/infra/go/go2ts"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/util"
-	"go.skia.org/infra/puppeteer-tests/bazel/puppeteer_screenshot_server/rpc_types"
+	"go.goldmine.build/go/go2ts"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/util"
+	"go.goldmine.build/puppeteer-tests/bazel/puppeteer_screenshot_server/rpc_types"
 )
 
 func main() {

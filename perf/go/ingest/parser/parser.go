@@ -10,17 +10,17 @@ import (
 	"strconv"
 	"strings"
 
+	"go.goldmine.build/go/metrics2"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/go/query"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/util"
+	"go.goldmine.build/perf/go/config"
+	"go.goldmine.build/perf/go/file"
+	"go.goldmine.build/perf/go/ingest/format"
+	"go.goldmine.build/perf/go/types"
 	"go.opencensus.io/trace"
-	"go.skia.org/infra/go/metrics2"
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/go/query"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/util"
-	"go.skia.org/infra/perf/go/config"
-	"go.skia.org/infra/perf/go/file"
-	"go.skia.org/infra/perf/go/ingest/format"
-	"go.skia.org/infra/perf/go/types"
 )
 
 var (

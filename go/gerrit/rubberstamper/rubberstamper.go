@@ -12,7 +12,7 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"go.skia.org/infra/go/git"
+	"go.goldmine.build/go/git"
 )
 
 const (

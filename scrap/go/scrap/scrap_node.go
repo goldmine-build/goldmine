@@ -4,8 +4,8 @@ package scrap
 import (
 	"fmt"
 
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/util"
 )
 
 // scrapNode represents a single scrap in a tree of scraps

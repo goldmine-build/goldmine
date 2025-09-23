@@ -11,7 +11,7 @@ go_library(
         "utils.go",
         "yee_compare.go",
     ],
-    importpath = "go.skia.org/infra/perdiff/go/perdiff",
+    importpath = "go.goldmine.build/perdiff/go/perdiff",
     visibility = ["//visibility:private"],
     deps = [
         "//go/sklog",

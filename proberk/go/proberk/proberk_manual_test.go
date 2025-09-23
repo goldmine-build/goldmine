@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"go.skia.org/infra/proberk/go/types"
+	"go.goldmine.build/proberk/go/types"
 )
 
 func TestProbeSSL_UseDefaultValues_Success(t *testing.T) {

@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "sqltest",
     srcs = ["sqltest.go"],
-    importpath = "go.skia.org/infra/golden/go/sql/sqltest",
+    importpath = "go.goldmine.build/golden/go/sql/sqltest",
     visibility = ["//visibility:public"],
     deps = [
         "//bazel/external/cockroachdb",

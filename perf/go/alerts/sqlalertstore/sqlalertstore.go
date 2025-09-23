@@ -9,9 +9,9 @@ import (
 	"sort"
 	"time"
 
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sql/pool"
-	"go.skia.org/infra/perf/go/alerts"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sql/pool"
+	"go.goldmine.build/perf/go/alerts"
 )
 
 // statement is an SQL statement identifier.

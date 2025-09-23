@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "exporter",
     srcs = ["exporter.go"],
-    importpath = "go.skia.org/infra/go/sql/exporter",
+    importpath = "go.goldmine.build/go/sql/exporter",
     visibility = ["//visibility:public"],
 )
 

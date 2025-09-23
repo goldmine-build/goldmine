@@ -1,9 +1,9 @@
 package query
 
 import (
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/golden/go/expectations"
-	"go.skia.org/infra/golden/go/types"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/golden/go/expectations"
+	"go.goldmine.build/golden/go/types"
 )
 
 // Search represents the params to the Search function.

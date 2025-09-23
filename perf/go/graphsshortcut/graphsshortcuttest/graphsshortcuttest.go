@@ -9,7 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/perf/go/graphsshortcut"
+	"go.goldmine.build/perf/go/graphsshortcut"
 )
 
 // GraphsShortcut_InsertGet does the core testing of an instance of graphsshortcut.Store.

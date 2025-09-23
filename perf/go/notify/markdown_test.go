@@ -4,9 +4,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/perf/go/clustering2"
-	"go.skia.org/infra/perf/go/dataframe"
-	"go.skia.org/infra/perf/go/ui/frame"
+	"go.goldmine.build/perf/go/clustering2"
+	"go.goldmine.build/perf/go/dataframe"
+	"go.goldmine.build/perf/go/ui/frame"
 )
 
 var (

@@ -8,17 +8,17 @@ import (
 	"net/http"
 	"sort"
 
-	"go.skia.org/infra/go/auditlog"
-	"go.skia.org/infra/go/httputils"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/perf/go/config"
-	"go.skia.org/infra/perf/go/dataframe"
-	perfgit "go.skia.org/infra/perf/go/git"
-	"go.skia.org/infra/perf/go/git/provider"
-	"go.skia.org/infra/perf/go/progress"
-	"go.skia.org/infra/perf/go/regression"
-	"go.skia.org/infra/perf/go/shortcut"
-	"go.skia.org/infra/perf/go/types"
+	"go.goldmine.build/go/auditlog"
+	"go.goldmine.build/go/httputils"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/perf/go/config"
+	"go.goldmine.build/perf/go/dataframe"
+	perfgit "go.goldmine.build/perf/go/git"
+	"go.goldmine.build/perf/go/git/provider"
+	"go.goldmine.build/perf/go/progress"
+	"go.goldmine.build/perf/go/regression"
+	"go.goldmine.build/perf/go/shortcut"
+	"go.goldmine.build/perf/go/types"
 )
 
 // RegressionAtCommit is a Regression found for a specific commit.

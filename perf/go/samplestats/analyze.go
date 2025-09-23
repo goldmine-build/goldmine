@@ -4,9 +4,9 @@ import (
 	"math"
 
 	"github.com/aclements/go-moremath/stats"
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/go/util"
-	"go.skia.org/infra/perf/go/ingest/parser"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/go/util"
+	"go.goldmine.build/perf/go/ingest/parser"
 )
 
 // defaultAlpha is the default value to use if Config.Alpha is not set.

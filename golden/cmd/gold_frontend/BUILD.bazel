@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "gold_frontend_lib",
     srcs = ["gold_frontend.go"],
-    importpath = "go.skia.org/infra/golden/cmd/gold_frontend",
+    importpath = "go.goldmine.build/golden/cmd/gold_frontend",
     visibility = ["//visibility:private"],
     deps = [
         "//go/alogin",

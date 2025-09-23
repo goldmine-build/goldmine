@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "atomic_miss_cache",
     srcs = ["atomic_miss_cache.go"],
-    importpath = "go.skia.org/infra/go/atomic_miss_cache",
+    importpath = "go.goldmine.build/go/atomic_miss_cache",
     visibility = ["//visibility:public"],
 )
 

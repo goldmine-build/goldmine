@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "pushgateway",
     srcs = ["pushgateway.go"],
-    importpath = "go.skia.org/infra/promk/go/pushgateway",
+    importpath = "go.goldmine.build/promk/go/pushgateway",
     visibility = ["//visibility:public"],
     deps = [
         "//go/httputils",

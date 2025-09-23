@@ -9,16 +9,16 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"go.skia.org/infra/go/emulators/cockroachdb_instance"
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/perf/go/alerts/alertstest"
-	"go.skia.org/infra/perf/go/config"
-	"go.skia.org/infra/perf/go/file/dirsource"
-	"go.skia.org/infra/perf/go/git/gittest"
-	"go.skia.org/infra/perf/go/regression/regressiontest"
-	"go.skia.org/infra/perf/go/shortcut/shortcuttest"
-	"go.skia.org/infra/perf/go/sql/sqltest"
-	"go.skia.org/infra/perf/go/types"
+	"go.goldmine.build/go/emulators/cockroachdb_instance"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/perf/go/alerts/alertstest"
+	"go.goldmine.build/perf/go/config"
+	"go.goldmine.build/perf/go/file/dirsource"
+	"go.goldmine.build/perf/go/git/gittest"
+	"go.goldmine.build/perf/go/regression/regressiontest"
+	"go.goldmine.build/perf/go/shortcut/shortcuttest"
+	"go.goldmine.build/perf/go/sql/sqltest"
+	"go.goldmine.build/perf/go/types"
 )
 
 func TestNewSourceFromConfig_DirSource_Success(t *testing.T) {

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sort"
 
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/util"
 )
 
 // Trie is a struct used for efficient searching on sets of strings.

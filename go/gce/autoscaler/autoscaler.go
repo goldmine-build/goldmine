@@ -5,9 +5,9 @@ import (
 	"sort"
 	"sync"
 
-	"go.skia.org/infra/go/gce"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/gce"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/util"
 	"golang.org/x/oauth2"
 )
 

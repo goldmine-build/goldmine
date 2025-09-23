@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "frontend",
     srcs = ["types.go"],
-    importpath = "go.skia.org/infra/golden/go/web/frontend",
+    importpath = "go.goldmine.build/golden/go/web/frontend",
     visibility = ["//visibility:public"],
     deps = [
         "//go/httputils",

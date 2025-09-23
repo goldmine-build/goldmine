@@ -3,8 +3,8 @@ package unittest
 import (
 	"runtime"
 
-	"go.skia.org/infra/bazel/go/bazel"
-	"go.skia.org/infra/go/sktest"
+	"go.goldmine.build/bazel/go/bazel"
+	"go.goldmine.build/go/sktest"
 )
 
 // BazelOnlyTest is a function which should be called at the beginning of tests

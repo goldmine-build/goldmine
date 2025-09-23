@@ -3,7 +3,7 @@ package notify
 import (
 	"context"
 
-	"go.skia.org/infra/perf/go/alerts"
+	"go.goldmine.build/perf/go/alerts"
 )
 
 // NoopTransport implements Transport by doing nothing.

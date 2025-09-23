@@ -7,8 +7,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/docker/build/pubsub"
-	"go.skia.org/infra/go/exec"
+	"go.goldmine.build/go/docker/build/pubsub"
+	"go.goldmine.build/go/exec"
 	"golang.org/x/oauth2"
 )
 

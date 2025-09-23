@@ -21,15 +21,15 @@ import (
 
 	"contrib.go.opencensus.io/exporter/stackdriver"
 	"github.com/go-chi/chi/v5"
+	"go.goldmine.build/fiddlek/go/types"
+	"go.goldmine.build/go/common"
+	"go.goldmine.build/go/exec"
+	"go.goldmine.build/go/httputils"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/util"
+	"go.goldmine.build/go/util/limitwriter"
 	"go.opencensus.io/plugin/ochttp"
 	"go.opencensus.io/trace"
-	"go.skia.org/infra/fiddlek/go/types"
-	"go.skia.org/infra/go/common"
-	"go.skia.org/infra/go/exec"
-	"go.skia.org/infra/go/httputils"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/util"
-	"go.skia.org/infra/go/util/limitwriter"
 	"golang.org/x/sync/errgroup"
 )
 

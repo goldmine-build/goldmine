@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "sqlinit_lib",
     srcs = ["sqlinit.go"],
-    importpath = "go.skia.org/infra/golden/cmd/sqlinit",
+    importpath = "go.goldmine.build/golden/cmd/sqlinit",
     visibility = ["//visibility:private"],
     deps = [
         "//go/sklog",

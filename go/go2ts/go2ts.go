@@ -10,7 +10,7 @@ import (
 	"reflect"
 	"strings"
 
-	"go.skia.org/infra/go/go2ts/typescript"
+	"go.goldmine.build/go/go2ts/typescript"
 )
 
 // ignoreNilPolicy determines whether or not nil values in Go types should be reflected in the

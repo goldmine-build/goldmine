@@ -180,7 +180,7 @@ columns the current version of the application expects.
 To do that we need to export information about the tables, in this case the
 column names, their types, and any extra indexes.
 
-> https://pkg.go.dev/go.skia.org/infra/go/sql/schema#Description
+> https://pkg.go.dev/go.goldmine.build/go/sql/schema#Description
 
 The description can be exported to a JSON file:
 
@@ -197,8 +197,8 @@ import (
 	"embed" // Enable go:embed.
 	"encoding/json"
 
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sql/schema"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sql/schema"
 )
 
 // FS is a filesystem with the schema.json file.
@@ -286,7 +286,7 @@ func Test_LiveToNextSchemaMigration(t *testing.T) {
 
 ## Utilities for writing queries
 
-The [sqlutil](https://pkg.go.dev/go.skia.org/infra/go/sql/sqlutil) package has
+The [sqlutil](https://pkg.go.dev/go.goldmine.build/go/sql/sqlutil) package has
 utilities that work with the generated column names to make writing some SQL
 queries easier.
 

@@ -6,9 +6,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/alogin"
-	"go.skia.org/infra/go/roles"
-	"go.skia.org/infra/kube/go/authproxy"
+	"go.goldmine.build/go/alogin"
+	"go.goldmine.build/go/roles"
+	"go.goldmine.build/kube/go/authproxy"
 )
 
 const (

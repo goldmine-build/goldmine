@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"go.skia.org/infra/go/sklog"
+	"go.goldmine.build/go/sklog"
 )
 
 const MIN_TICKS = 2

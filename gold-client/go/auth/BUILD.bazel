@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "auth",
     srcs = ["goldauth.go"],
-    importpath = "go.skia.org/infra/gold-client/go/auth",
+    importpath = "go.goldmine.build/gold-client/go/auth",
     visibility = ["//visibility:public"],
     deps = [
         "//go/auth",

@@ -9,12 +9,12 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/docsyserver/go/codereview"
-	crmocks "go.skia.org/infra/docsyserver/go/codereview/mocks"
-	"go.skia.org/infra/docsyserver/go/docsy/mocks"
-	gittestutils "go.skia.org/infra/go/git/testutils"
-	"go.skia.org/infra/go/now"
-	"go.skia.org/infra/go/testutils"
+	"go.goldmine.build/docsyserver/go/codereview"
+	crmocks "go.goldmine.build/docsyserver/go/codereview/mocks"
+	"go.goldmine.build/docsyserver/go/docsy/mocks"
+	gittestutils "go.goldmine.build/go/git/testutils"
+	"go.goldmine.build/go/now"
+	"go.goldmine.build/go/testutils"
 )
 
 const (

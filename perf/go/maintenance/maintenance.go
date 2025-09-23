@@ -5,11 +5,11 @@ import (
 	"context"
 	"time"
 
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/perf/go/builders"
-	"go.skia.org/infra/perf/go/config"
-	"go.skia.org/infra/perf/go/sql/expectedschema"
-	"go.skia.org/infra/perf/go/tracing"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/perf/go/builders"
+	"go.goldmine.build/perf/go/config"
+	"go.goldmine.build/perf/go/sql/expectedschema"
+	"go.goldmine.build/perf/go/tracing"
 )
 
 const (

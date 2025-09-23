@@ -228,8 +228,8 @@ $ bazel run //:go -- generate ./...
 # Equivalent to "gofmt -s -w ."
 $ bazel run //:gofmt -- -s -w .
 
-# Equivalent to "errcheck go.skia.org/infra/..."
-$ bazel run //:errcheck -- go.skia.org/infra/...
+# Equivalent to "errcheck go.goldmine.build/..."
+$ bazel run //:errcheck -- go.goldmine.build/...
 
 # Equivalent to "protoc --go_out . myproto.proto"
 $ bazel run //:protoc -- --go_out=. myproto.proto

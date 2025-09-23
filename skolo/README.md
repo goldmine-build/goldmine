@@ -10,7 +10,7 @@ Linux bots in the Skolo.
 The /bash/skolo.sh file is a set of shortcuts for interacting with the skolo.
 It can be 'source'd from your .bashrc.
 
-    source $GOPATH/src/go.skia.org/infra/skolo/bash/skolo.sh
+    source $GOPATH/src/go.goldmine.build/skolo/bash/skolo.sh
 
 ## Deploying Executables
 

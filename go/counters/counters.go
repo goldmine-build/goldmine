@@ -13,9 +13,9 @@ import (
 	"time"
 
 	"cloud.google.com/go/storage"
-	"go.skia.org/infra/go/gcs"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/gcs"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/util"
 )
 
 // These can be mocked for testing.

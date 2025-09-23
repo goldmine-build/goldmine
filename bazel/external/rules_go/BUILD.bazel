@@ -5,7 +5,7 @@ go_library(
     name = "rules_go",
     srcs = ["rules_go.go"],
     data = ["@go_sdk//:files"],  # Provides access to the "go" binary downloaded by Bazel.
-    importpath = "go.skia.org/infra/bazel/external/rules_go",
+    importpath = "go.goldmine.build/bazel/external/rules_go",
     visibility = ["//visibility:public"],
     deps = [
         "//bazel/go/bazel",

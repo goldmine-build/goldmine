@@ -13,10 +13,10 @@ import (
 	"os"
 	"sync"
 
-	"go.skia.org/infra/fiddlek/go/client"
-	"go.skia.org/infra/fiddlek/go/types"
-	"go.skia.org/infra/go/common"
-	"go.skia.org/infra/go/sklog"
+	"go.goldmine.build/fiddlek/go/client"
+	"go.goldmine.build/fiddlek/go/types"
+	"go.goldmine.build/go/common"
+	"go.goldmine.build/go/sklog"
 	"golang.org/x/sync/errgroup"
 )
 

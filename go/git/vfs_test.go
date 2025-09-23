@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/vfs/shared_tests"
+	"go.goldmine.build/go/vfs/shared_tests"
 )
 
 func TestFS(t *testing.T) {

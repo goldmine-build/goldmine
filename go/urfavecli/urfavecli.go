@@ -3,7 +3,7 @@ package urfavecli
 
 import (
 	cli "github.com/urfave/cli/v2"
-	"go.skia.org/infra/go/sklog"
+	"go.goldmine.build/go/sklog"
 )
 
 // LogFlags reflects all the flags and their values as Info logs.

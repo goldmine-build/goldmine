@@ -8,8 +8,8 @@ import (
 
 	iSchema "github.com/invopop/jsonschema"
 	cli "github.com/urfave/cli/v2"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/perf/go/notifytypes"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/perf/go/notifytypes"
 )
 
 var errSchemaViolation = errors.New("schema violation")

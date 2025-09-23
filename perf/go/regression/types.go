@@ -3,9 +3,9 @@ package regression
 import (
 	"context"
 
-	"go.skia.org/infra/perf/go/clustering2"
-	"go.skia.org/infra/perf/go/types"
-	"go.skia.org/infra/perf/go/ui/frame"
+	"go.goldmine.build/perf/go/clustering2"
+	"go.goldmine.build/perf/go/types"
+	"go.goldmine.build/perf/go/ui/frame"
 )
 
 // Store persists Regressions.

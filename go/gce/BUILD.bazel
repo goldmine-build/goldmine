@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "gce",
     srcs = ["gce.go"],
-    importpath = "go.skia.org/infra/go/gce",
+    importpath = "go.goldmine.build/go/gce",
     visibility = ["//visibility:public"],
     deps = [
         "//go/common",

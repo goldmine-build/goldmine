@@ -7,10 +7,10 @@ package results
 import (
 	"context"
 
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/perf/go/dataframe"
-	"go.skia.org/infra/perf/go/progress"
-	"go.skia.org/infra/perf/go/types"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/perf/go/dataframe"
+	"go.goldmine.build/perf/go/progress"
+	"go.goldmine.build/perf/go/types"
 )
 
 // Kind is the type of results we are requesting. The request will be

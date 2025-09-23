@@ -6,16 +6,16 @@ import (
 	"testing"
 	"time"
 
-	"go.skia.org/infra/go/now"
+	"go.goldmine.build/go/now"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"go.skia.org/infra/go/metrics2"
-	"go.skia.org/infra/go/testutils"
-	"go.skia.org/infra/golden/go/config"
-	"go.skia.org/infra/golden/go/ingestion"
-	"go.skia.org/infra/golden/go/ingestion/mocks"
+	"go.goldmine.build/go/metrics2"
+	"go.goldmine.build/go/testutils"
+	"go.goldmine.build/golden/go/config"
+	"go.goldmine.build/golden/go/ingestion"
+	"go.goldmine.build/golden/go/ingestion/mocks"
 )
 
 func TestPubSubSource_IngestFile_PrimaryBranch_NoErrors_Ack(t *testing.T) {

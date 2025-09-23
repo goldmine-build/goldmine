@@ -8,12 +8,12 @@ import (
 	"strings"
 	"text/template"
 
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/perf/go/alerts"
-	"go.skia.org/infra/perf/go/clustering2"
-	"go.skia.org/infra/perf/go/config"
-	"go.skia.org/infra/perf/go/git/provider"
-	"go.skia.org/infra/perf/go/ui/frame"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/perf/go/alerts"
+	"go.goldmine.build/perf/go/clustering2"
+	"go.goldmine.build/perf/go/config"
+	"go.goldmine.build/perf/go/git/provider"
+	"go.goldmine.build/perf/go/ui/frame"
 )
 
 const (

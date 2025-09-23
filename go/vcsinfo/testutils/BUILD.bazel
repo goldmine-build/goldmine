@@ -7,7 +7,7 @@ go_library(
         "vcsinfo_testutils.go",
     ],
     data = glob(["testdata/**"]),
-    importpath = "go.skia.org/infra/go/vcsinfo/testutils",
+    importpath = "go.goldmine.build/go/vcsinfo/testutils",
     visibility = ["//visibility:public"],
     deps = [
         "//go/deepequal/assertdeep",

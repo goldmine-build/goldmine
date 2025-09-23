@@ -9,8 +9,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/util"
 )
 
 // EnsureDirExists checks whether the given path to a directory exits and creates it

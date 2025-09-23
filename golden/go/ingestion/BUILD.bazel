@@ -6,7 +6,7 @@ go_library(
         "sources.go",
         "types.go",
     ],
-    importpath = "go.skia.org/infra/golden/go/ingestion",
+    importpath = "go.goldmine.build/golden/go/ingestion",
     visibility = ["//visibility:public"],
     deps = [
         "//go/fileutil",

@@ -6,7 +6,7 @@ import (
 	context "context"
 	io "io"
 
-	gcs "go.skia.org/infra/go/gcs"
+	gcs "go.goldmine.build/go/gcs"
 
 	mock "github.com/stretchr/testify/mock"
 

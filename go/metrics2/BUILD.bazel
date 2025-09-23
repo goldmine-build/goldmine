@@ -12,7 +12,7 @@ go_library(
         "prom.go",
         "timer.go",
     ],
-    importpath = "go.skia.org/infra/go/metrics2",
+    importpath = "go.goldmine.build/go/metrics2",
     visibility = ["//visibility:public"],
     deps = [
         "//go/skerr",

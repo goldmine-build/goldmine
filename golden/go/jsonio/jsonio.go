@@ -45,8 +45,8 @@ import (
 	"strconv"
 	"strings"
 
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/golden/go/types"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/golden/go/types"
 )
 
 var (

@@ -6,7 +6,7 @@ import (
 	"strings"
 	"sync"
 
-	"go.skia.org/infra/golden/go/types"
+	"go.goldmine.build/golden/go/types"
 )
 
 // Expectations captures the expectations for a set of tests and digests as

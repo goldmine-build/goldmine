@@ -19,17 +19,17 @@ import (
 
 	"golang.org/x/sync/errgroup"
 
-	"go.skia.org/infra/go/fileutil"
-	"go.skia.org/infra/go/jsonutils"
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/gold-client/go/imgmatching"
-	"go.skia.org/infra/golden/go/diff"
-	"go.skia.org/infra/golden/go/expectations"
-	"go.skia.org/infra/golden/go/jsonio"
-	"go.skia.org/infra/golden/go/tiling"
-	"go.skia.org/infra/golden/go/types"
-	"go.skia.org/infra/golden/go/web/frontend"
+	"go.goldmine.build/go/fileutil"
+	"go.goldmine.build/go/jsonutils"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/gold-client/go/imgmatching"
+	"go.goldmine.build/golden/go/diff"
+	"go.goldmine.build/golden/go/expectations"
+	"go.goldmine.build/golden/go/jsonio"
+	"go.goldmine.build/golden/go/tiling"
+	"go.goldmine.build/golden/go/types"
+	"go.goldmine.build/golden/go/web/frontend"
 )
 
 const (

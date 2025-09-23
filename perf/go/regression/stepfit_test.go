@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/perf/go/dataframe"
-	"go.skia.org/infra/perf/go/types"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/perf/go/dataframe"
+	"go.goldmine.build/perf/go/types"
 )
 
 func TestStepFit(t *testing.T) {

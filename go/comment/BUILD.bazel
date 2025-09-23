@@ -3,6 +3,6 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "comment",
     srcs = ["comment.go"],
-    importpath = "go.skia.org/infra/go/comment",
+    importpath = "go.goldmine.build/go/comment",
     visibility = ["//visibility:public"],
 )

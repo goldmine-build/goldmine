@@ -5,8 +5,8 @@ import (
 	"sync"
 	"time"
 
-	"go.skia.org/infra/go/now"
-	"go.skia.org/infra/go/skerr"
+	"go.goldmine.build/go/now"
+	"go.goldmine.build/go/skerr"
 )
 
 type WhatToInclude bool

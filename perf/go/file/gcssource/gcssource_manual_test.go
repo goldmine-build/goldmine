@@ -11,9 +11,9 @@ import (
 	"cloud.google.com/go/pubsub"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/emulators/gcp_emulator"
-	"go.skia.org/infra/perf/go/config"
-	"go.skia.org/infra/perf/go/file"
+	"go.goldmine.build/go/emulators/gcp_emulator"
+	"go.goldmine.build/perf/go/config"
+	"go.goldmine.build/perf/go/file"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/option"
 )

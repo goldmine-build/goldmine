@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"go.skia.org/infra/go/testutils"
+	"go.goldmine.build/go/testutils"
 )
 
 func TestMain_DifferentFlags_ChangeOutput(t *testing.T) {

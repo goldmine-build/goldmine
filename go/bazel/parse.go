@@ -6,7 +6,7 @@ import (
 
 	"github.com/go-python/gpython/ast"
 	"github.com/go-python/gpython/parser"
-	"go.skia.org/infra/go/skerr"
+	"go.goldmine.build/go/skerr"
 )
 
 // IsBazelFile returns true if the filename looks like a Bazel file.

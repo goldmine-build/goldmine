@@ -7,7 +7,7 @@ go_library(
         "query.go",
         "types.go",
     ],
-    importpath = "go.skia.org/infra/golden/go/search/query",
+    importpath = "go.goldmine.build/golden/go/search/query",
     visibility = ["//visibility:public"],
     deps = [
         "//go/paramtools",

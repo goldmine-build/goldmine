@@ -5,7 +5,7 @@ go_library(
     name = "instance_types",
     srcs = ["instance_types.go"],
     embedsrcs = ["setup-script.sh"],
-    importpath = "go.skia.org/infra/go/gce/ct/instance_types",
+    importpath = "go.goldmine.build/go/gce/ct/instance_types",
     visibility = ["//visibility:public"],
     deps = [
         "//go/auth",

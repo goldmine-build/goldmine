@@ -7,9 +7,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/perf/go/dataframe"
-	"go.skia.org/infra/perf/go/types"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/perf/go/dataframe"
+	"go.goldmine.build/perf/go/types"
 )
 
 const badValue = "not a valid choice"

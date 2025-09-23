@@ -4,7 +4,7 @@ package trybot
 import (
 	"time"
 
-	"go.skia.org/infra/perf/go/types"
+	"go.goldmine.build/perf/go/types"
 )
 
 // TryFile represents a single file of trybot results.

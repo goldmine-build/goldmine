@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"go.skia.org/infra/go/testutils"
+	"go.goldmine.build/go/testutils"
 )
 
 func TestNew(t *testing.T) {

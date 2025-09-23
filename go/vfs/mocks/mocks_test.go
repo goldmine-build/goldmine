@@ -9,7 +9,7 @@ import (
 	"io/fs"
 
 	mock "github.com/stretchr/testify/mock"
-	"go.skia.org/infra/go/vfs"
+	"go.goldmine.build/go/vfs"
 )
 
 // NewFS creates a new instance of FS. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

@@ -10,12 +10,12 @@ import (
 	"sort"
 
 	"cloud.google.com/go/logging"
-	"go.skia.org/infra/go/cleanup"
-	"go.skia.org/infra/go/ephemeral_storage"
-	"go.skia.org/infra/go/metrics2"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/sklog/cloudlogging"
-	"go.skia.org/infra/go/sklog/sklogimpl"
+	"go.goldmine.build/go/cleanup"
+	"go.goldmine.build/go/ephemeral_storage"
+	"go.goldmine.build/go/metrics2"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/sklog/cloudlogging"
+	"go.goldmine.build/go/sklog/sklogimpl"
 	"golang.org/x/oauth2/google"
 )
 

@@ -4,8 +4,8 @@ package main
 import (
 	"os"
 
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/promk/go/genpromcrd/genpromcrd"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/promk/go/genpromcrd/genpromcrd"
 )
 
 func main() {

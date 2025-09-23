@@ -5,7 +5,7 @@
 // instance of each emulator running at any given time.
 package emulators
 
-// This package uses "os/exec" as opposed to "go.skia.org/infra/go/exec" in order to avoid the
+// This package uses "os/exec" as opposed to "go.goldmine.build/go/exec" in order to avoid the
 // following circular dependency:
 //
 //   //go/exec/exec_test.go -> //go/testutils/unittest/unittest.go -> //go/emulators/emulators.go
@@ -18,8 +18,8 @@ import (
 	"regexp"
 	"strings"
 
-	"go.skia.org/infra/bazel/go/bazel"
-	"go.skia.org/infra/go/skerr"
+	"go.goldmine.build/bazel/go/bazel"
+	"go.goldmine.build/go/skerr"
 )
 
 // Emulator represents a Google Cloud emulator, a test-only CockroachDB server, etc.

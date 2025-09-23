@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "reconnectingmemcached",
     srcs = ["client.go"],
-    importpath = "go.skia.org/infra/go/reconnectingmemcached",
+    importpath = "go.goldmine.build/go/reconnectingmemcached",
     visibility = ["//visibility:public"],
     deps = [
         "//go/skerr",

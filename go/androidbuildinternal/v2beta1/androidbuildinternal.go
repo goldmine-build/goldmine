@@ -10,7 +10,7 @@
 //
 // Usage example:
 //
-//	import "go.skia.org/infra/go/androidbuildinternal/v2beta1"
+//	import "go.goldmine.build/go/androidbuildinternal/v2beta1"
 //	...
 //	ctx := context.Background()
 //	androidbuildinternalService, err := androidbuildinternal.NewService(ctx)
@@ -33,7 +33,7 @@
 //	androidbuildinternalService, err := androidbuildinternal.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx, token)))
 //
 // See https://godoc.org/google.golang.org/api/option/ for details on options.
-package androidbuildinternal // import "go.skia.org/infra/go/androidbuildinternal/v2beta1"
+package androidbuildinternal // import "go.goldmine.build/go/androidbuildinternal/v2beta1"
 
 import (
 	"bytes"

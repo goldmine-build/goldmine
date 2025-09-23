@@ -15,9 +15,9 @@ import (
 	"regexp"
 
 	"cloud.google.com/go/storage"
-	"go.skia.org/infra/go/gcs"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/gcs"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/util"
 )
 
 const maxScrapSize = 128 * 1024

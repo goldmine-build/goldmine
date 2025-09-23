@@ -17,17 +17,17 @@ import (
 	ttlcache "github.com/patrickmn/go-cache"
 	"go.opencensus.io/trace"
 
-	"go.skia.org/infra/go/metrics2"
-	"go.skia.org/infra/go/now"
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/sql/sqlutil"
-	"go.skia.org/infra/go/util"
-	"go.skia.org/infra/golden/go/diff"
-	"go.skia.org/infra/golden/go/sql"
-	"go.skia.org/infra/golden/go/sql/schema"
-	"go.skia.org/infra/golden/go/types"
+	"go.goldmine.build/go/metrics2"
+	"go.goldmine.build/go/now"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/sql/sqlutil"
+	"go.goldmine.build/go/util"
+	"go.goldmine.build/golden/go/diff"
+	"go.goldmine.build/golden/go/sql"
+	"go.goldmine.build/golden/go/sql/schema"
+	"go.goldmine.build/golden/go/types"
 )
 
 const (

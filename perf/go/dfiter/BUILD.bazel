@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "dfiter",
     srcs = ["dfiter.go"],
-    importpath = "go.skia.org/infra/perf/go/dfiter",
+    importpath = "go.goldmine.build/perf/go/dfiter",
     visibility = ["//visibility:public"],
     deps = [
         "//go/metrics2",

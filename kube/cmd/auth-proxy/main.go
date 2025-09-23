@@ -1,8 +1,8 @@
 package main
 
 import (
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/kube/go/authproxy"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/kube/go/authproxy"
 )
 
 func main() {

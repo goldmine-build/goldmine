@@ -7,7 +7,7 @@ go_library(
         "impl.go",
         "interface.go",
     ],
-    importpath = "go.skia.org/infra/perf/go/git",
+    importpath = "go.goldmine.build/perf/go/git",
     visibility = ["//visibility:public"],
     deps = [
         "//go/gitiles",

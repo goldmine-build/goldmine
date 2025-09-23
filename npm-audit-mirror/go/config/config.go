@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"html/template"
 
-	"go.skia.org/infra/go/skerr"
+	"go.goldmine.build/go/skerr"
 )
 
 // Config is a struct that contains all required configurations of projects

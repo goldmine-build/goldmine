@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/deepequal/assertdeep"
+	"go.goldmine.build/go/deepequal/assertdeep"
 )
 
 type myTestType struct {

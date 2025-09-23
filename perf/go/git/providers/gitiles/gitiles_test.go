@@ -8,12 +8,12 @@ import (
 
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/git"
-	"go.skia.org/infra/go/gitiles"
-	gitiles_mocks "go.skia.org/infra/go/gitiles/mocks"
-	"go.skia.org/infra/go/testutils"
-	"go.skia.org/infra/go/vcsinfo"
-	"go.skia.org/infra/perf/go/git/provider"
+	"go.goldmine.build/go/git"
+	"go.goldmine.build/go/gitiles"
+	gitiles_mocks "go.goldmine.build/go/gitiles/mocks"
+	"go.goldmine.build/go/testutils"
+	"go.goldmine.build/go/vcsinfo"
+	"go.goldmine.build/perf/go/git/provider"
 )
 
 const (

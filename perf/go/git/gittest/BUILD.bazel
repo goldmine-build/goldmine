@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "gittest",
     srcs = ["gittest.go"],
-    importpath = "go.skia.org/infra/perf/go/git/gittest",
+    importpath = "go.goldmine.build/perf/go/git/gittest",
     visibility = ["//visibility:public"],
     deps = [
         "//go/git/testutils",

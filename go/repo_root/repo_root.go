@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"go.skia.org/infra/bazel/go/bazel"
-	"go.skia.org/infra/go/skerr"
+	"go.goldmine.build/bazel/go/bazel"
+	"go.goldmine.build/go/skerr"
 )
 
 // Get returns the path to the workspace's root directory.
@@ -27,7 +27,7 @@ func Get() (string, error) {
 	if err != nil {
 		return "", skerr.Wrap(err)
 	}
-	prefixes := []string{"go.skia.org/infra", "buildbot"}
+	prefixes := []string{"go.goldmine.build", "buildbot"}
 	for _, prefix := range prefixes {
 		if strings.Contains(dir, prefix) {
 			return strings.Split(dir, prefix)[0] + prefix, nil

@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"go.skia.org/infra/go/repo_root"
-	"go.skia.org/infra/go/skerr"
+	"go.goldmine.build/go/repo_root"
+	"go.goldmine.build/go/skerr"
 )
 
 // Local returns a FS which uses the local filesystem with the given root.

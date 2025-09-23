@@ -8,8 +8,8 @@ import (
 	"context"
 
 	mock "github.com/stretchr/testify/mock"
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/golden/go/types"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/golden/go/types"
 )
 
 // NewCalculator creates a new instance of Calculator. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

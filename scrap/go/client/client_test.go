@@ -13,10 +13,10 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/testutils"
-	"go.skia.org/infra/scrap/go/api"
-	"go.skia.org/infra/scrap/go/scrap"
-	"go.skia.org/infra/scrap/go/scrap/mocks"
+	"go.goldmine.build/go/testutils"
+	"go.goldmine.build/scrap/go/api"
+	"go.goldmine.build/scrap/go/scrap"
+	"go.goldmine.build/scrap/go/scrap/mocks"
 )
 
 var (

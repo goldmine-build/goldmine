@@ -3,6 +3,6 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "pubsub",
     srcs = ["pubsub.go"],
-    importpath = "go.skia.org/infra/go/docker/build/pubsub",
+    importpath = "go.goldmine.build/go/docker/build/pubsub",
     visibility = ["//visibility:public"],
 )

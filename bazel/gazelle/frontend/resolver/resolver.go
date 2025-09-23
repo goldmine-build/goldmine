@@ -14,8 +14,8 @@ import (
 	"github.com/bazelbuild/bazel-gazelle/repo"
 	"github.com/bazelbuild/bazel-gazelle/resolve"
 	"github.com/bazelbuild/bazel-gazelle/rule"
-	"go.skia.org/infra/bazel/gazelle/frontend/common"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/bazel/gazelle/frontend/common"
+	"go.goldmine.build/go/util"
 )
 
 const (

@@ -5,10 +5,10 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/go/vec32"
-	"go.skia.org/infra/perf/go/git/provider"
-	"go.skia.org/infra/perf/go/types"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/go/vec32"
+	"go.goldmine.build/perf/go/git/provider"
+	"go.goldmine.build/perf/go/types"
 )
 
 const e = vec32.MissingDataSentinel

@@ -7,7 +7,7 @@ go_library(
         "clustering.go",
         "valuepercent.go",
     ],
-    importpath = "go.skia.org/infra/perf/go/clustering2",
+    importpath = "go.goldmine.build/perf/go/clustering2",
     visibility = ["//visibility:public"],
     deps = [
         "//go/now",

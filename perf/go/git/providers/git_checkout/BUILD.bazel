@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "git_checkout",
     srcs = ["git_checkout.go"],
-    importpath = "go.skia.org/infra/perf/go/git/providers/git_checkout",
+    importpath = "go.goldmine.build/perf/go/git/providers/git_checkout",
     visibility = ["//visibility:public"],
     deps = [
         "//go/auth",

@@ -59,7 +59,7 @@ load(":puppeteerrc.bzl", "puppeteerrc_js")
 # The new_element directory has templates which do not compile/run.
 # gazelle:exclude new_element*
 
-# gazelle:prefix go.skia.org/infra
+# gazelle:prefix go.goldmine.build
 gazelle(
     name = "gazelle",
     # We use a custom Gazelle binary that adds support for our front-end Bazel rules and macros.
@@ -248,7 +248,7 @@ alias(
 # Errcheck #
 ############
 
-# Sample usage: "bazel run //:errcheck -- go.skia.org/infra/...".
+# Sample usage: "bazel run //:errcheck -- go.goldmine.build/...".
 alias(
     name = "errcheck",
     actual = "//bazel/tools/errcheck",

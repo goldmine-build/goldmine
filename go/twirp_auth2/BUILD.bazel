@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "twirp_auth2",
     srcs = ["twirp_auth2.go"],
-    importpath = "go.skia.org/infra/go/twirp_auth2",
+    importpath = "go.goldmine.build/go/twirp_auth2",
     visibility = ["//visibility:public"],
     deps = [
         "//go/alogin",

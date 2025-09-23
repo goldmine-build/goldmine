@@ -10,16 +10,16 @@ import (
 
 	lru "github.com/hashicorp/golang-lru"
 	"github.com/jackc/pgx/v4"
+	"go.goldmine.build/go/gitiles"
+	"go.goldmine.build/go/metrics2"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/sql/pool"
+	"go.goldmine.build/perf/go/config"
+	"go.goldmine.build/perf/go/git/provider"
+	"go.goldmine.build/perf/go/git/providers"
+	"go.goldmine.build/perf/go/types"
 	"go.opencensus.io/trace"
-	"go.skia.org/infra/go/gitiles"
-	"go.skia.org/infra/go/metrics2"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/sql/pool"
-	"go.skia.org/infra/perf/go/config"
-	"go.skia.org/infra/perf/go/git/provider"
-	"go.skia.org/infra/perf/go/git/providers"
-	"go.skia.org/infra/perf/go/types"
 )
 
 // For rough numbers a Commit Author is 50 , Subject 80 , URL 200, and GitHash 32 bytes. So

@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"text/template"
 
-	"go.skia.org/infra/go/skerr"
+	"go.goldmine.build/go/skerr"
 )
 
 const iconsTSPath = "elements-sk/modules/icons-demo-sk/icons.ts"

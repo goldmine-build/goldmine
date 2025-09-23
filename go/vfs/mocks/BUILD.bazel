@@ -6,7 +6,7 @@ go_library(
         "FS.go",
         "File.go",
     ],
-    importpath = "go.skia.org/infra/go/vfs/mocks",
+    importpath = "go.goldmine.build/go/vfs/mocks",
     visibility = ["//visibility:public"],
     deps = [
         "//go/vfs",

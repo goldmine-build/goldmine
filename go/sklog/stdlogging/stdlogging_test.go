@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/loggingsyncbuffer"
-	"go.skia.org/infra/go/sklog/sklogimpl"
+	"go.goldmine.build/go/loggingsyncbuffer"
+	"go.goldmine.build/go/sklog/sklogimpl"
 )
 
 func testLogAtSeverity(t *testing.T, prefix, contains string, severity sklogimpl.Severity, fmt string, args ...interface{}) {

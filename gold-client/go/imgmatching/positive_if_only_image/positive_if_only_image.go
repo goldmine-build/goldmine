@@ -3,7 +3,7 @@ package positive_if_only_image
 import (
 	"image"
 
-	"go.skia.org/infra/gold-client/go/imgmatching/exact"
+	"go.goldmine.build/gold-client/go/imgmatching/exact"
 )
 
 // Matcher is an image matching algorithm.

@@ -10,10 +10,10 @@ import (
 	"fmt"
 	"sort"
 
-	"go.skia.org/infra/go/auth"
-	"go.skia.org/infra/go/common"
-	"go.skia.org/infra/go/gce"
-	"go.skia.org/infra/go/sklog"
+	"go.goldmine.build/go/auth"
+	"go.goldmine.build/go/common"
+	"go.goldmine.build/go/gce"
+	"go.goldmine.build/go/sklog"
 )
 
 var (

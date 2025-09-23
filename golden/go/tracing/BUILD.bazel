@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "tracing",
     srcs = ["tracing.go"],
-    importpath = "go.skia.org/infra/golden/go/tracing",
+    importpath = "go.goldmine.build/golden/go/tracing",
     visibility = ["//visibility:public"],
     deps = ["//go/tracing"],
 )

@@ -8,15 +8,15 @@ import (
 	"net/url"
 	"time"
 
-	"go.skia.org/infra/golden/go/validation"
+	"go.goldmine.build/golden/go/validation"
 
-	"go.skia.org/infra/go/httputils"
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/golden/go/expectations"
-	"go.skia.org/infra/golden/go/ignore"
-	"go.skia.org/infra/golden/go/tiling"
-	"go.skia.org/infra/golden/go/types"
+	"go.goldmine.build/go/httputils"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/golden/go/expectations"
+	"go.goldmine.build/golden/go/ignore"
+	"go.goldmine.build/golden/go/tiling"
+	"go.goldmine.build/golden/go/types"
 )
 
 // RefClosest is effectively an enum of two values - positive/negative.

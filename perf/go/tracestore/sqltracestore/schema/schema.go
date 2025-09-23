@@ -1,6 +1,6 @@
 package schema
 
-import "go.skia.org/infra/perf/go/types"
+import "go.goldmine.build/perf/go/types"
 
 // TraceValuesSchema describes the SQL schema of the TraceValues table.
 type TraceValuesSchema struct {

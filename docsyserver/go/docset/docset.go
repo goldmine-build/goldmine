@@ -13,15 +13,15 @@ import (
 	"sync"
 	"time"
 
-	"go.skia.org/infra/docsyserver/go/codereview"
-	"go.skia.org/infra/docsyserver/go/docsy"
-	"go.skia.org/infra/go/fileutil"
-	"go.skia.org/infra/go/git/gitinfo"
-	"go.skia.org/infra/go/metrics2"
-	"go.skia.org/infra/go/now"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/docsyserver/go/codereview"
+	"go.goldmine.build/docsyserver/go/docsy"
+	"go.goldmine.build/go/fileutil"
+	"go.goldmine.build/go/git/gitinfo"
+	"go.goldmine.build/go/metrics2"
+	"go.goldmine.build/go/now"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/util"
 )
 
 const (

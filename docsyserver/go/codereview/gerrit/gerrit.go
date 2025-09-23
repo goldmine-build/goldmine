@@ -6,12 +6,12 @@ import (
 	"path"
 	"strconv"
 
-	"go.skia.org/infra/docsyserver/go/codereview"
-	"go.skia.org/infra/go/auth"
-	"go.skia.org/infra/go/gerrit"
-	"go.skia.org/infra/go/gitiles"
-	"go.skia.org/infra/go/httputils"
-	"go.skia.org/infra/go/skerr"
+	"go.goldmine.build/docsyserver/go/codereview"
+	"go.goldmine.build/go/auth"
+	"go.goldmine.build/go/gerrit"
+	"go.goldmine.build/go/gitiles"
+	"go.goldmine.build/go/httputils"
+	"go.goldmine.build/go/skerr"
 	"golang.org/x/oauth2/google"
 )
 

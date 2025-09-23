@@ -8,12 +8,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/gerrit"
-	"go.skia.org/infra/go/gerrit/mocks"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/testutils"
-	"go.skia.org/infra/go/vcsinfo"
-	"go.skia.org/infra/golden/go/code_review"
+	"go.goldmine.build/go/gerrit"
+	"go.goldmine.build/go/gerrit/mocks"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/testutils"
+	"go.goldmine.build/go/vcsinfo"
+	"go.goldmine.build/golden/go/code_review"
 )
 
 func TestGetChangelistSunnyDay(t *testing.T) {

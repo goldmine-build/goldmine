@@ -3,7 +3,7 @@ package stdlogging
 
 import (
 	logger "github.com/jcgregorio/logger"
-	"go.skia.org/infra/go/sklog/sklogimpl"
+	"go.goldmine.build/go/sklog/sklogimpl"
 )
 
 type stdlog struct {

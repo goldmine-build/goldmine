@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"go.skia.org/infra/go/sklog"
+	"go.goldmine.build/go/sklog"
 )
 
 type auditLog struct {

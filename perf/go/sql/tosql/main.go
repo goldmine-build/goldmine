@@ -8,9 +8,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/sql/exporter"
-	"go.skia.org/infra/perf/go/sql"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/sql/exporter"
+	"go.goldmine.build/perf/go/sql"
 )
 
 func main() {

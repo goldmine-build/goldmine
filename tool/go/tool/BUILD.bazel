@@ -4,7 +4,7 @@ go_library(
     name = "tool",
     srcs = ["tool.go"],
     embedsrcs = ["schema.json"],
-    importpath = "go.skia.org/infra/tool/go/tool",
+    importpath = "go.goldmine.build/tool/go/tool",
     visibility = ["//visibility:public"],
     deps = [
         "//go/jsonschema",

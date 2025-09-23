@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package testproto;
-option go_package = "go.skia.org/infra/go/grpclogging/testproto";
+option go_package = "go.goldmine.build/go/grpclogging/testproto";
 
 service TestService {
   rpc GetSomething(GetSomethingRequest) returns (GetSomethingResponse) {

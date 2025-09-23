@@ -12,14 +12,14 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"go.skia.org/infra/go/deepequal/assertdeep"
-	"go.skia.org/infra/go/git"
-	"go.skia.org/infra/go/git/repograph"
-	"go.skia.org/infra/go/git/repograph/shared_tests"
-	git_testutils "go.skia.org/infra/go/git/testutils"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/testutils"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/deepequal/assertdeep"
+	"go.goldmine.build/go/git"
+	"go.goldmine.build/go/git/repograph"
+	"go.goldmine.build/go/git/repograph/shared_tests"
+	git_testutils "go.goldmine.build/go/git/testutils"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/testutils"
+	"go.goldmine.build/go/util"
 )
 
 func TestFindCommit(t *testing.T) {

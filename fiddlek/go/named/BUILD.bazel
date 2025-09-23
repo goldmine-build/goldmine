@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "named",
     srcs = ["named.go"],
-    importpath = "go.skia.org/infra/fiddlek/go/named",
+    importpath = "go.goldmine.build/fiddlek/go/named",
     visibility = ["//visibility:public"],
     deps = [
         "//fiddlek/go/store",

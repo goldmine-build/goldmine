@@ -10,7 +10,7 @@ go_library(
         "string_set.go",
         "util.go",
     ],
-    importpath = "go.skia.org/infra/go/util",
+    importpath = "go.goldmine.build/go/util",
     visibility = ["//visibility:public"],
     deps = [
         "//go/skerr",

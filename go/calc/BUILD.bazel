@@ -9,7 +9,7 @@ go_library(
         "lex.go",
         "parser.go",
     ],
-    importpath = "go.skia.org/infra/go/calc",
+    importpath = "go.goldmine.build/go/calc",
     visibility = ["//visibility:public"],
     deps = [
         "//go/vec32",

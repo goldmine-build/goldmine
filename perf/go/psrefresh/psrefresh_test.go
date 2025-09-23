@@ -7,10 +7,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/go/testutils"
-	"go.skia.org/infra/perf/go/psrefresh/mocks"
-	"go.skia.org/infra/perf/go/types"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/go/testutils"
+	"go.goldmine.build/perf/go/psrefresh/mocks"
+	"go.goldmine.build/perf/go/types"
 )
 
 var (

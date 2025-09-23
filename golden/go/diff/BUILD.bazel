@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "diff",
     srcs = ["diff.go"],
-    importpath = "go.skia.org/infra/golden/go/diff",
+    importpath = "go.goldmine.build/golden/go/diff",
     visibility = ["//visibility:public"],
     deps = [
         "//go/metrics2",

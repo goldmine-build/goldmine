@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_binary", "go_library")
 go_library(
     name = "validate_lib",
     srcs = ["main.go"],
-    importpath = "go.skia.org/infra/tool/go/cmd/validate",
+    importpath = "go.goldmine.build/tool/go/cmd/validate",
     visibility = ["//visibility:private"],
     deps = ["//tool/go/tool"],
 )

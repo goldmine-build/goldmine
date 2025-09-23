@@ -10,10 +10,10 @@ import (
 	"flag"
 	"time"
 
-	"go.skia.org/infra/go/common"
-	"go.skia.org/infra/go/exec"
-	"go.skia.org/infra/go/metrics2"
-	"go.skia.org/infra/go/sklog"
+	"go.goldmine.build/go/common"
+	"go.goldmine.build/go/exec"
+	"go.goldmine.build/go/metrics2"
+	"go.goldmine.build/go/sklog"
 )
 
 const (

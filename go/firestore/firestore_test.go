@@ -13,9 +13,9 @@ import (
 	"cloud.google.com/go/firestore"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/emulators/gcp_emulator"
-	"go.skia.org/infra/go/sktest"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/emulators/gcp_emulator"
+	"go.goldmine.build/go/sktest"
+	"go.goldmine.build/go/util"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

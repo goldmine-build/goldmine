@@ -10,9 +10,9 @@ import (
 	"time"
 
 	"github.com/cenkalti/backoff"
-	"go.skia.org/infra/go/git"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
+	"go.goldmine.build/go/git"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
 )
 
 var (

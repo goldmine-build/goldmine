@@ -70,7 +70,7 @@ eslint:
 
 .PHONY: errcheck
 errcheck:
-	$(BAZEL) run //:errcheck -- -ignore :Close go.skia.org/infra/...
+	$(BAZEL) run //:errcheck -- -ignore :Close go.goldmine.build/...
 
 .PHONY: mocks
 mocks:

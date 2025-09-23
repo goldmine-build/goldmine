@@ -8,8 +8,8 @@ import (
 	"fmt"
 
 	"github.com/jackc/pgx/v4/pgxpool"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/perf/go/sql"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/perf/go/sql"
 )
 
 const (

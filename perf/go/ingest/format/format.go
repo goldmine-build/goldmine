@@ -8,9 +8,9 @@ import (
 	"errors"
 	"io"
 
-	"go.skia.org/infra/go/jsonschema"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/perf/go/types"
+	"go.goldmine.build/go/jsonschema"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/perf/go/types"
 
 	_ "embed" // For embed functionality.
 )

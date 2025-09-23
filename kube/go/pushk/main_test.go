@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/util"
 )
 
 func TestFilter(t *testing.T) {

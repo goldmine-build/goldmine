@@ -9,11 +9,11 @@ import (
 	"net/http"
 	"net/url"
 
-	"go.skia.org/infra/go/auth"
-	"go.skia.org/infra/go/httputils"
-	"go.skia.org/infra/go/metrics2"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
+	"go.goldmine.build/go/auth"
+	"go.goldmine.build/go/httputils"
+	"go.goldmine.build/go/metrics2"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
 	"golang.org/x/oauth2/google"
 )
 

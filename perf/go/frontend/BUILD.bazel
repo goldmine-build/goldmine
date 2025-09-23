@@ -8,7 +8,7 @@ go_library(
         "googleanalytics.html",
         "cookieconsent.html",
     ],
-    importpath = "go.skia.org/infra/perf/go/frontend",
+    importpath = "go.goldmine.build/perf/go/frontend",
     visibility = ["//visibility:public"],
     deps = [
         "//go/alogin",

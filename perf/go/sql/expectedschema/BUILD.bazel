@@ -11,7 +11,7 @@ go_library(
         "schema.json",
         "schema_prev.json",
     ],
-    importpath = "go.skia.org/infra/perf/go/sql/expectedschema",
+    importpath = "go.goldmine.build/perf/go/sql/expectedschema",
     visibility = ["//visibility:public"],
     deps = [
         "//go/deepequal/assertdeep",

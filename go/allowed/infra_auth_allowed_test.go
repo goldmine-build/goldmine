@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"go.skia.org/infra/go/mockhttpclient"
+	"go.goldmine.build/go/mockhttpclient"
 )
 
 func TestInfraConvert(t *testing.T) {

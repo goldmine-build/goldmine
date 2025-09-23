@@ -4,9 +4,9 @@ import (
 	"flag"
 	"strings"
 
-	"go.skia.org/infra/go/common"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/kube/go/kube_conf_gen_lib"
+	"go.goldmine.build/go/common"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/kube/go/kube_conf_gen_lib"
 )
 
 func main() {

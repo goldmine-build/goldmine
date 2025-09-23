@@ -6,7 +6,7 @@ package mocks
 
 import (
 	mock "github.com/stretchr/testify/mock"
-	"go.skia.org/infra/go/monorail/v3"
+	"go.goldmine.build/go/monorail/v3"
 )
 
 // NewIMonorailService creates a new instance of IMonorailService. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "update_ssh_gce_config_lib",
     srcs = ["update_ssh_gce_config.go"],
-    importpath = "go.skia.org/infra/skolo/go/update_ssh_gce_config",
+    importpath = "go.goldmine.build/skolo/go/update_ssh_gce_config",
     visibility = ["//visibility:private"],
     deps = [
         "//go/executil",

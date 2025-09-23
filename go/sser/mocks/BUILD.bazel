@@ -7,7 +7,7 @@ go_library(
         "PeerFinder.go",
         "Server.go",
     ],
-    importpath = "go.skia.org/infra/go/sser/mocks",
+    importpath = "go.goldmine.build/go/sser/mocks",
     visibility = ["//visibility:public"],
     deps = [
         "@com_github_stretchr_testify//mock",

@@ -3,6 +3,6 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "vcsinfo",
     srcs = ["types.go"],
-    importpath = "go.skia.org/infra/go/vcsinfo",
+    importpath = "go.goldmine.build/go/vcsinfo",
     visibility = ["//visibility:public"],
 )

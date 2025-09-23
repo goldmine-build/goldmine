@@ -12,12 +12,12 @@ import (
 	"strings"
 	"time"
 
-	"go.skia.org/infra/go/httputils"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/util"
-	"go.skia.org/infra/go/vcsinfo"
-	"go.skia.org/infra/golden/go/code_review"
+	"go.goldmine.build/go/httputils"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/util"
+	"go.goldmine.build/go/vcsinfo"
+	"go.goldmine.build/golden/go/code_review"
 	"golang.org/x/time/rate"
 )
 

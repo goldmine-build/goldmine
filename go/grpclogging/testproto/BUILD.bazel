@@ -7,7 +7,7 @@ go_library(
         "test.pb.go",
         "test_grpc.pb.go",
     ],
-    importpath = "go.skia.org/infra/go/grpclogging/testproto",
+    importpath = "go.goldmine.build/go/grpclogging/testproto",
     visibility = ["//visibility:public"],
     deps = [
         "@org_golang_google_grpc//:grpc",

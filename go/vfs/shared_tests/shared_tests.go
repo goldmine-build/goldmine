@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/sktest"
-	"go.skia.org/infra/go/vfs"
+	"go.goldmine.build/go/sktest"
+	"go.goldmine.build/go/vfs"
 )
 
 const (

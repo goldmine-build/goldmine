@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"time"
 
-	"go.skia.org/infra/go/human"
-	"go.skia.org/infra/perf/go/types"
+	"go.goldmine.build/go/human"
+	"go.goldmine.build/perf/go/types"
 )
 
 // Commit represents a single commit stored in the database.

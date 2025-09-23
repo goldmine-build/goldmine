@@ -8,8 +8,8 @@ import (
 	"net/http"
 
 	mock "github.com/stretchr/testify/mock"
-	"go.skia.org/infra/go/alogin"
-	"go.skia.org/infra/go/roles"
+	"go.goldmine.build/go/alogin"
+	"go.goldmine.build/go/roles"
 )
 
 // NewLogin creates a new instance of Login. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

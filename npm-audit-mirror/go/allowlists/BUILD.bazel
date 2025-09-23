@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "allowlists",
     srcs = ["allowlist.go"],
-    importpath = "go.skia.org/infra/npm-audit-mirror/go/allowlists",
+    importpath = "go.goldmine.build/npm-audit-mirror/go/allowlists",
     visibility = ["//visibility:public"],
     deps = [
         "//go/skerr",

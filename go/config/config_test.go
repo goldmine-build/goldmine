@@ -9,8 +9,8 @@ import (
 
 	expect "github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/deepequal/assertdeep"
-	"go.skia.org/infra/go/testutils"
+	"go.goldmine.build/go/deepequal/assertdeep"
+	"go.goldmine.build/go/testutils"
 )
 
 type TestInnerConfig struct {

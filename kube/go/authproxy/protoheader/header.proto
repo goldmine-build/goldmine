@@ -1,6 +1,6 @@
 syntax = "proto3";
 package authproxy.rpc;
-option go_package = "go.skia.org/infra/kube/go/authproxy/protoheader";
+option go_package = "go.goldmine.build/kube/go/authproxy/protoheader";
 
 // Authorized users may be passed to the server via protobuf serialized into a
 // header. We use this proto to extract the email address of the authorized

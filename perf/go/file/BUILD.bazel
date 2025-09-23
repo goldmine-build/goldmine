@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "file",
     srcs = ["file.go"],
-    importpath = "go.skia.org/infra/perf/go/file",
+    importpath = "go.goldmine.build/perf/go/file",
     visibility = ["//visibility:public"],
     deps = ["@com_google_cloud_go_pubsub//:pubsub"],
 )

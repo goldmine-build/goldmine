@@ -7,7 +7,7 @@ go_library(
         "expectations.go",
         "labels.go",
     ],
-    importpath = "go.skia.org/infra/golden/go/expectations",
+    importpath = "go.goldmine.build/golden/go/expectations",
     visibility = ["//visibility:public"],
     deps = ["//golden/go/types"],
 )

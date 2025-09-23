@@ -12,11 +12,11 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v4/pgxpool"
-	"go.skia.org/infra/go/emulators"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/sql/schema"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/emulators"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/sql/schema"
+	"go.goldmine.build/go/util"
 )
 
 // Main exports the expected schema as a serialized schema.Description.

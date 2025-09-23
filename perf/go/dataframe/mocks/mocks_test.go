@@ -9,10 +9,10 @@ import (
 	"time"
 
 	mock "github.com/stretchr/testify/mock"
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/go/query"
-	"go.skia.org/infra/perf/go/dataframe"
-	"go.skia.org/infra/perf/go/progress"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/go/query"
+	"go.goldmine.build/perf/go/dataframe"
+	"go.goldmine.build/perf/go/progress"
 )
 
 // NewDataFrameBuilder creates a new instance of DataFrameBuilder. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

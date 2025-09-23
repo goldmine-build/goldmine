@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"os"
 
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/skolo/go/sensors"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/skolo/go/sensors"
 )
 
 func openDevice(portName string) (*sensors.DLPTH1C, error) {

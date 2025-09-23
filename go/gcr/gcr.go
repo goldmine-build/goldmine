@@ -24,9 +24,9 @@ import (
 	"strings"
 	"time"
 
-	"go.skia.org/infra/go/httputils"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/httputils"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/util"
 	"golang.org/x/oauth2"
 )
 

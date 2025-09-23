@@ -14,9 +14,9 @@ import (
 	"net/http"
 	"os"
 
-	"go.skia.org/infra/go/metadata"
-	"go.skia.org/infra/go/sklog"
-	skutil "go.skia.org/infra/go/util"
+	"go.goldmine.build/go/metadata"
+	"go.goldmine.build/go/sklog"
+	skutil "go.goldmine.build/go/util"
 )
 
 // Required header for requests to a webhook authenticated using AuthenticateRequest. The value must

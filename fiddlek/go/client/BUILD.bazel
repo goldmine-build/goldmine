@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "client",
     srcs = ["client.go"],
-    importpath = "go.skia.org/infra/fiddlek/go/client",
+    importpath = "go.goldmine.build/fiddlek/go/client",
     visibility = ["//visibility:public"],
     deps = [
         "//fiddlek/go/types",

@@ -9,8 +9,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/executil"
-	"go.skia.org/infra/go/util"
+	"go.goldmine.build/go/executil"
+	"go.goldmine.build/go/util"
 )
 
 func TestUpdateSshCfg_Success(t *testing.T) {

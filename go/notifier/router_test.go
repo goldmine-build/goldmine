@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/email/go/emailclient"
+	"go.goldmine.build/email/go/emailclient"
 )
 
 type sentMessage struct {

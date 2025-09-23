@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "packages",
     srcs = ["packages.go"],
-    importpath = "go.skia.org/infra/go/packages",
+    importpath = "go.goldmine.build/go/packages",
     visibility = ["//visibility:public"],
     deps = [
         "//go/exec",

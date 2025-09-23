@@ -7,7 +7,7 @@ go_library(
         "mock_perf_client.go",
         "perf_client.go",
     ],
-    importpath = "go.skia.org/infra/perf/go/perfclient",
+    importpath = "go.goldmine.build/perf/go/perfclient",
     visibility = ["//visibility:public"],
     deps = [
         "//go/gcs",

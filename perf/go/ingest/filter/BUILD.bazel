@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "filter",
     srcs = ["filter.go"],
-    importpath = "go.skia.org/infra/perf/go/ingest/filter",
+    importpath = "go.goldmine.build/perf/go/ingest/filter",
     visibility = ["//visibility:public"],
     deps = ["//go/skerr"],
 )

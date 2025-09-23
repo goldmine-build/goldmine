@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/gcs"
-	"go.skia.org/infra/go/gcs/mem_gcsclient"
-	"go.skia.org/infra/go/testutils"
+	"go.goldmine.build/go/gcs"
+	"go.goldmine.build/go/gcs/mem_gcsclient"
+	"go.goldmine.build/go/testutils"
 )
 
 // mockTime is a struct used for faking the passage of time. It keeps a current

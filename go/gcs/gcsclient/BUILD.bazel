@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "gcsclient",
     srcs = ["gcsclient.go"],
-    importpath = "go.skia.org/infra/go/gcs/gcsclient",
+    importpath = "go.goldmine.build/go/gcs/gcsclient",
     visibility = ["//visibility:public"],
     deps = [
         "//go/gcs",

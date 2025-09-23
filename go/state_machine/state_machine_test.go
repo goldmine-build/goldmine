@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/gcs/mem_gcsclient"
+	"go.goldmine.build/go/gcs/mem_gcsclient"
 )
 
 func TestStateMachine(t *testing.T) {

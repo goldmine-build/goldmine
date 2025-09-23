@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_binary", "go_library")
 go_library(
     name = "generate_remmina_profiles_lib",
     srcs = ["generate_remmina_profiles.go"],
-    importpath = "go.skia.org/infra/skolo/go/generate_remmina_profiles",
+    importpath = "go.goldmine.build/skolo/go/generate_remmina_profiles",
     visibility = ["//visibility:private"],
     deps = ["@org_golang_x_term//:term"],
 )

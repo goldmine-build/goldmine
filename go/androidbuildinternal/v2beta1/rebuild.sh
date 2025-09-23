@@ -19,7 +19,7 @@ wget https://www.googleapis.com/discovery/v1/apis/androidbuildinternal/v2beta1/r
 # https://github.com/googleapis/google-api-go-client/tree/master/internal/gensupport.
 google-api-go-generator \
   -api_json_file=rest \
-  -api_pkg_base="go.skia.org/infra/go" \
+  -api_pkg_base="go.goldmine.build/go" \
   -gensupport_pkg="github.com/skia-dev/google-api-go-client/gensupport" \
   -output="androidbuildinternal.go"
 

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://go.skia.org/infra/tool/go/tool/tool",
+  "$id": "https://go.goldmine.build/tool/go/tool/tool",
   "$ref": "#/$defs/Tool",
   "$defs": {
     "Tool": {

@@ -12,9 +12,9 @@ import (
 	"github.com/google/go-github/v29/github"
 	"github.com/stretchr/testify/require"
 
-	"go.skia.org/infra/go/git"
-	"go.skia.org/infra/go/mockhttpclient"
-	"go.skia.org/infra/go/testutils"
+	"go.goldmine.build/go/git"
+	"go.goldmine.build/go/mockhttpclient"
+	"go.goldmine.build/go/testutils"
 )
 
 func TestAddComment(t *testing.T) {

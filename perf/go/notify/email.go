@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"regexp"
 
-	"go.skia.org/infra/email/go/emailclient"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/perf/go/alerts"
+	"go.goldmine.build/email/go/emailclient"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/perf/go/alerts"
 )
 
 var (

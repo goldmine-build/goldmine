@@ -10,7 +10,7 @@ import (
 	"sync"
 	"syscall"
 
-	"go.skia.org/infra/go/sklog"
+	"go.goldmine.build/go/sklog"
 )
 
 var (

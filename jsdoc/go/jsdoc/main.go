@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"path/filepath"
 
-	"go.skia.org/infra/go/common"
-	"go.skia.org/infra/go/httputils"
-	"go.skia.org/infra/go/sklog"
+	"go.goldmine.build/go/common"
+	"go.goldmine.build/go/httputils"
+	"go.goldmine.build/go/sklog"
 )
 
 // flags

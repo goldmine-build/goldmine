@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "metadata",
     srcs = ["metadata.go"],
-    importpath = "go.skia.org/infra/go/metadata",
+    importpath = "go.goldmine.build/go/metadata",
     visibility = ["//visibility:public"],
     deps = [
         "//go/httputils",

@@ -5,7 +5,7 @@ go_library(
     name = "types",
     srcs = ["types.go"],
     embedsrcs = ["probesSchema.json"],
-    importpath = "go.skia.org/infra/proberk/go/types",
+    importpath = "go.goldmine.build/proberk/go/types",
     visibility = ["//visibility:public"],
     deps = [
         "//go/jsonschema",

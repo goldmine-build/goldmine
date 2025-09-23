@@ -16,11 +16,11 @@ import (
 
 	expect "github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/testutils/unittest"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/testutils/unittest"
 )
 
-// Copied from go.skia.org/infra/go/util/util.go to avoid recursive dependency.
+// Copied from go.goldmine.build/go/util/util.go to avoid recursive dependency.
 func RemoveAll(path string) {
 	if err := os.RemoveAll(path); err != nil {
 		sklog.Errorf("Failed to RemoveAll(%s): %v", path, err)

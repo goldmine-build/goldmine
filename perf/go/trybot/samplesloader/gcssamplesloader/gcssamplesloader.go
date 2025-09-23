@@ -5,12 +5,12 @@ import (
 	"context"
 	"net/url"
 
-	"go.skia.org/infra/go/gcs"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/util"
-	"go.skia.org/infra/perf/go/ingest/format"
-	"go.skia.org/infra/perf/go/ingest/parser"
-	"go.skia.org/infra/perf/go/trybot/samplesloader"
+	"go.goldmine.build/go/gcs"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/util"
+	"go.goldmine.build/perf/go/ingest/format"
+	"go.goldmine.build/perf/go/ingest/parser"
+	"go.goldmine.build/perf/go/trybot/samplesloader"
 )
 
 // loader implements samplesloader.SamplesLoader.

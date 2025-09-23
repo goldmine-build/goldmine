@@ -10,11 +10,11 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/fiddlek/go/store/mocks"
-	"go.skia.org/infra/fiddlek/go/types"
-	"go.skia.org/infra/go/testutils"
-	"go.skia.org/infra/scrap/go/scrap"
-	scrapMocks "go.skia.org/infra/scrap/go/scrap/mocks"
+	"go.goldmine.build/fiddlek/go/store/mocks"
+	"go.goldmine.build/fiddlek/go/types"
+	"go.goldmine.build/go/testutils"
+	"go.goldmine.build/scrap/go/scrap"
+	scrapMocks "go.goldmine.build/scrap/go/scrap/mocks"
 )
 
 const (

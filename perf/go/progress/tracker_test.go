@@ -10,7 +10,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/now"
+	"go.goldmine.build/go/now"
 )
 
 var testDate = time.Date(2020, 04, 01, 0, 0, 0, 0, time.UTC)

@@ -59,13 +59,13 @@ package pivot
 import (
 	"context"
 
-	"go.skia.org/infra/go/calc"
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/go/query"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/vec32"
-	"go.skia.org/infra/perf/go/dataframe"
-	"go.skia.org/infra/perf/go/types"
+	"go.goldmine.build/go/calc"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/go/query"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/vec32"
+	"go.goldmine.build/perf/go/dataframe"
+	"go.goldmine.build/perf/go/types"
 )
 
 // Operation that can be applied to pivot values.

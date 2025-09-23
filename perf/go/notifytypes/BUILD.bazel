@@ -3,6 +3,6 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "notifytypes",
     srcs = ["notifytypes.go"],
-    importpath = "go.skia.org/infra/perf/go/notifytypes",
+    importpath = "go.goldmine.build/perf/go/notifytypes",
     visibility = ["//visibility:public"],
 )

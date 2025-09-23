@@ -14,6 +14,6 @@ go_binary(
 go_library(
     name = "sk_demo_page_server_lib",
     srcs = ["demo_page_server.go"],
-    importpath = "go.skia.org/infra/infra-sk/sk_demo_page_server",
+    importpath = "go.goldmine.build/infra-sk/sk_demo_page_server",
     visibility = ["//visibility:private"],
 )

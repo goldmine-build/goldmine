@@ -8,7 +8,7 @@ go_library(
         "emulators_sysprocattr_linux.go",
         "start.go",
     ],
-    importpath = "go.skia.org/infra/go/emulators",
+    importpath = "go.goldmine.build/go/emulators",
     visibility = ["//visibility:public"],
     deps = [
         "//bazel/go/bazel",

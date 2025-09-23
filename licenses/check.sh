@@ -4,7 +4,7 @@ set -e
 
 # Build the list of all recursive dependent packages, excluding the ones we
 # know are going to licensed correctly.
-DEPS=`go-licenses csv go.skia.org/infra/... | \
+DEPS=`go-licenses csv go.goldmine.build/... | \
   cut -d, -f2 --complement | \
   sort | \
   (echo -e "Package,License\n," && cat) | \
@@ -27,4 +27,4 @@ else
   exit 1
 fi
 
-go-licenses check go.skia.org/infra/...
+go-licenses check go.goldmine.build/...

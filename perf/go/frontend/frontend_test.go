@@ -9,9 +9,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/alogin"
-	"go.skia.org/infra/go/alogin/mocks"
-	"go.skia.org/infra/go/roles"
+	"go.goldmine.build/go/alogin"
+	"go.goldmine.build/go/alogin/mocks"
+	"go.goldmine.build/go/roles"
 )
 
 func setupForTest(t *testing.T, userIsEditor bool) (*httptest.ResponseRecorder, *http.Request, *Frontend) {

@@ -3,7 +3,7 @@ package samplesloader
 import (
 	"context"
 
-	"go.skia.org/infra/perf/go/ingest/parser"
+	"go.goldmine.build/perf/go/ingest/parser"
 )
 
 // SamplesLoader loads all the samples from storage for the given filename.

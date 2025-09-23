@@ -8,8 +8,8 @@ import (
 	"context"
 
 	mock "github.com/stretchr/testify/mock"
-	"go.skia.org/infra/go/vcsinfo"
-	"go.skia.org/infra/golden/go/code_review"
+	"go.goldmine.build/go/vcsinfo"
+	"go.goldmine.build/golden/go/code_review"
 )
 
 // NewClient creates a new instance of Client. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

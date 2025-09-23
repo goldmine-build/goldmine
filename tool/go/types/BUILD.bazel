@@ -3,6 +3,6 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "types",
     srcs = ["types.go"],
-    importpath = "go.skia.org/infra/tool/go/types",
+    importpath = "go.goldmine.build/tool/go/types",
     visibility = ["//visibility:public"],
 )

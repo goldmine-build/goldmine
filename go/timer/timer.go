@@ -4,8 +4,8 @@ package timer
 import (
 	"time"
 
-	"go.skia.org/infra/go/metrics2"
-	"go.skia.org/infra/go/sklog"
+	"go.goldmine.build/go/metrics2"
+	"go.goldmine.build/go/sklog"
 )
 
 // Timer is for timing events. When finished the duration is reported

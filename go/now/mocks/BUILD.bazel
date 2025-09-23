@@ -6,7 +6,7 @@ go_library(
         "TimeTicker.go",
         "generate.go",
     ],
-    importpath = "go.skia.org/infra/go/now/mocks",
+    importpath = "go.goldmine.build/go/now/mocks",
     visibility = ["//visibility:public"],
     deps = [
         "//go/now",

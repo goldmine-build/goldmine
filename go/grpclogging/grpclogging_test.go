@@ -18,11 +18,11 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/encoding/protojson"
 
-	pb "go.skia.org/infra/go/grpclogging/proto"
-	tpb "go.skia.org/infra/go/grpclogging/testproto"
-	"go.skia.org/infra/go/now"
-	"go.skia.org/infra/go/tracing/tracingtest"
-	"go.skia.org/infra/kube/go/authproxy"
+	pb "go.goldmine.build/go/grpclogging/proto"
+	tpb "go.goldmine.build/go/grpclogging/testproto"
+	"go.goldmine.build/go/now"
+	"go.goldmine.build/go/tracing/tracingtest"
+	"go.goldmine.build/kube/go/authproxy"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

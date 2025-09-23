@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"go.skia.org/infra/perf/go/git/provider"
-	"go.skia.org/infra/perf/go/types"
+	"go.goldmine.build/perf/go/git/provider"
+	"go.goldmine.build/perf/go/types"
 )
 
 // Git is the interface for the minimal functionality Perf needs to interface to

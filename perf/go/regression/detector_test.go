@@ -7,13 +7,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/paramtools"
-	"go.skia.org/infra/go/vec32"
-	"go.skia.org/infra/perf/go/alerts"
-	"go.skia.org/infra/perf/go/config"
-	"go.skia.org/infra/perf/go/dataframe/mocks"
-	"go.skia.org/infra/perf/go/progress"
-	"go.skia.org/infra/perf/go/types"
+	"go.goldmine.build/go/paramtools"
+	"go.goldmine.build/go/vec32"
+	"go.goldmine.build/perf/go/alerts"
+	"go.goldmine.build/perf/go/config"
+	"go.goldmine.build/perf/go/dataframe/mocks"
+	"go.goldmine.build/perf/go/progress"
+	"go.goldmine.build/perf/go/types"
 )
 
 const (

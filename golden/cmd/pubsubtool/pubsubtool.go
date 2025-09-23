@@ -15,10 +15,10 @@ import (
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/option"
 
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/sklog/sklogimpl"
-	"go.skia.org/infra/go/sklog/stdlogging"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/sklog/sklogimpl"
+	"go.goldmine.build/go/sklog/stdlogging"
 )
 
 func main() {

@@ -7,11 +7,11 @@ import (
 	"fmt"
 	"time"
 
-	"go.skia.org/infra/go/common"
-	"go.skia.org/infra/go/metrics2"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/skolo/go/sensors"
+	"go.goldmine.build/go/common"
+	"go.goldmine.build/go/metrics2"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/skolo/go/sensors"
 )
 
 var (

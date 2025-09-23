@@ -9,16 +9,16 @@ import (
 	"strings"
 	"time"
 
-	"go.skia.org/infra/go/sklog/sklogimpl"
-	"go.skia.org/infra/go/sklog/stdlogging"
+	"go.goldmine.build/go/sklog/sklogimpl"
+	"go.goldmine.build/go/sklog/stdlogging"
 
 	"cloud.google.com/go/pubsub"
 	"cloud.google.com/go/storage"
 
-	"go.skia.org/infra/go/common"
-	"go.skia.org/infra/go/fileutil"
-	"go.skia.org/infra/go/gcs"
-	"go.skia.org/infra/go/sklog"
+	"go.goldmine.build/go/common"
+	"go.goldmine.build/go/fileutil"
+	"go.goldmine.build/go/gcs"
+	"go.goldmine.build/go/sklog"
 )
 
 func main() {

@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"go.skia.org/infra/go/skerr"
+	"go.goldmine.build/go/skerr"
 )
 
 var (

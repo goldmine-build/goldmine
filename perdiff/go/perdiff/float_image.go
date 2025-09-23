@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"go.skia.org/infra/go/sklog"
+	"go.goldmine.build/go/sklog"
 )
 
 type FloatImage struct {

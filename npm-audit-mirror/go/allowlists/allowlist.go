@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"sort"
 
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/npm-audit-mirror/go/config"
-	"go.skia.org/infra/npm-audit-mirror/go/types"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/npm-audit-mirror/go/config"
+	"go.goldmine.build/npm-audit-mirror/go/types"
 )
 
 // GetAllowlistWithDeps returns a slice of packages that contains all packages

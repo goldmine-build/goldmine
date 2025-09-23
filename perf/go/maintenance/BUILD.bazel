@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "maintenance",
     srcs = ["maintenance.go"],
-    importpath = "go.skia.org/infra/perf/go/maintenance",
+    importpath = "go.goldmine.build/perf/go/maintenance",
     visibility = ["//visibility:public"],
     deps = [
         "//go/skerr",

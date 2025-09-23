@@ -15,10 +15,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/metrics2"
-	"go.skia.org/infra/go/testutils"
-	"go.skia.org/infra/scrap/go/scrap"
-	"go.skia.org/infra/scrap/go/scrap/mocks"
+	"go.goldmine.build/go/metrics2"
+	"go.goldmine.build/go/testutils"
+	"go.goldmine.build/scrap/go/scrap"
+	"go.goldmine.build/scrap/go/scrap/mocks"
 )
 
 // hash used by some tests.

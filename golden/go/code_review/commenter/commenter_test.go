@@ -10,13 +10,13 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"go.skia.org/infra/go/now"
-	"go.skia.org/infra/go/testutils"
-	"go.skia.org/infra/golden/go/code_review"
-	mock_codereview "go.skia.org/infra/golden/go/code_review/mocks"
-	dks "go.skia.org/infra/golden/go/sql/datakitchensink"
-	"go.skia.org/infra/golden/go/sql/schema"
-	"go.skia.org/infra/golden/go/sql/sqltest"
+	"go.goldmine.build/go/now"
+	"go.goldmine.build/go/testutils"
+	"go.goldmine.build/golden/go/code_review"
+	mock_codereview "go.goldmine.build/golden/go/code_review/mocks"
+	dks "go.goldmine.build/golden/go/sql/datakitchensink"
+	"go.goldmine.build/golden/go/sql/schema"
+	"go.goldmine.build/golden/go/sql/sqltest"
 )
 
 var (

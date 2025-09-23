@@ -1,4 +1,4 @@
-package monorail // import "go.skia.org/infra/go/monorail/v3"
+package monorail // import "go.goldmine.build/go/monorail/v3"
 
 import (
 	"encoding/json"
@@ -9,7 +9,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/stretchr/testify/require"
 
-	"go.skia.org/infra/go/mockhttpclient"
+	"go.goldmine.build/go/mockhttpclient"
 )
 
 func TestGetEmail_Success(t *testing.T) {

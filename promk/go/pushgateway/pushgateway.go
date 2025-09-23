@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strings"
 
-	"go.skia.org/infra/go/httputils"
-	"go.skia.org/infra/go/skerr"
+	"go.goldmine.build/go/httputils"
+	"go.goldmine.build/go/skerr"
 )
 
 const (

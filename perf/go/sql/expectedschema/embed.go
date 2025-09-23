@@ -5,8 +5,8 @@ import (
 	"embed" // Enable go:embed.
 	"encoding/json"
 
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sql/schema"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sql/schema"
 )
 
 // FS is a filesystem with the schema.json file.

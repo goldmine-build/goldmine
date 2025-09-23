@@ -19,12 +19,12 @@ import (
 	"sort"
 	"strings"
 
-	"go.skia.org/infra/elements-sk/generate_icons/demo"
-	"go.skia.org/infra/elements-sk/generate_icons/icon"
-	"go.skia.org/infra/go/httputils"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/untar"
+	"go.goldmine.build/elements-sk/generate_icons/demo"
+	"go.goldmine.build/elements-sk/generate_icons/icon"
+	"go.goldmine.build/go/httputils"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/untar"
 )
 
 var iconCategories = []string{

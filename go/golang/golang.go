@@ -3,9 +3,9 @@ package golang
 import (
 	"os/exec"
 
-	"go.skia.org/infra/bazel/external/rules_go"
-	"go.skia.org/infra/bazel/go/bazel"
-	"go.skia.org/infra/go/skerr"
+	"go.goldmine.build/bazel/external/rules_go"
+	"go.goldmine.build/bazel/go/bazel"
+	"go.goldmine.build/go/skerr"
 )
 
 // FindGo returns the path to the `go` binary. When running under Bazel

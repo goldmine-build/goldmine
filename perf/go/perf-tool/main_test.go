@@ -8,8 +8,8 @@ import (
 
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/perf/go/config"
-	"go.skia.org/infra/perf/go/perf-tool/application/mocks"
+	"go.goldmine.build/perf/go/config"
+	"go.goldmine.build/perf/go/perf-tool/application/mocks"
 )
 
 func createInstanceConfigFile(t *testing.T) string {

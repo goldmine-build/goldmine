@@ -12,7 +12,7 @@
 //
 // Usage example:
 //
-//	import "go.skia.org/infra/go/monorail/v1"
+//	import "go.goldmine.build/go/monorail/v1"
 //	...
 //	ctx := context.Background()
 //	monorailService, err := monorail.NewService(ctx)
@@ -35,7 +35,7 @@
 //	monorailService, err := monorail.NewService(ctx, option.WithTokenSource(config.TokenSource(ctx, token)))
 //
 // See https://godoc.org/google.golang.org/api/option/ for details on options.
-package monorail // import "go.skia.org/infra/go/monorail/v1"
+package monorail // import "go.goldmine.build/go/monorail/v1"
 
 import (
 	"bytes"

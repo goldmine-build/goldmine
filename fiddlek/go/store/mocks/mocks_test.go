@@ -6,8 +6,8 @@ package mocks
 
 import (
 	mock "github.com/stretchr/testify/mock"
-	"go.skia.org/infra/fiddlek/go/store"
-	"go.skia.org/infra/fiddlek/go/types"
+	"go.goldmine.build/fiddlek/go/store"
+	"go.goldmine.build/fiddlek/go/types"
 )
 
 // NewStore creates a new instance of Store. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.

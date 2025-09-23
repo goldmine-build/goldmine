@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"go.skia.org/infra/bazel/go/bazel"
-	"go.skia.org/infra/go/skerr"
+	"go.goldmine.build/bazel/go/bazel"
+	"go.goldmine.build/go/skerr"
 )
 
 // FindGcloud returns the path to the `gcloud` binary downloaded by Bazel.

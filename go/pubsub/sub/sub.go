@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"cloud.google.com/go/pubsub"
-	"go.skia.org/infra/go/skerr"
+	"go.goldmine.build/go/skerr"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/option"
 )

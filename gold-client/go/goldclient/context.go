@@ -5,9 +5,9 @@ import (
 	"io"
 	"os"
 
-	"go.skia.org/infra/gold-client/go/gcsuploader"
-	"go.skia.org/infra/gold-client/go/httpclient"
-	"go.skia.org/infra/gold-client/go/imagedownloader"
+	"go.goldmine.build/gold-client/go/gcsuploader"
+	"go.goldmine.build/gold-client/go/httpclient"
+	"go.goldmine.build/gold-client/go/imagedownloader"
 )
 
 const (

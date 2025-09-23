@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "configurer",
     srcs = ["configurer.go"],
-    importpath = "go.skia.org/infra/bazel/gazelle/frontend/configurer",
+    importpath = "go.goldmine.build/bazel/gazelle/frontend/configurer",
     visibility = ["//visibility:public"],
     deps = [
         "@gazelle//config",

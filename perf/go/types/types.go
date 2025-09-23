@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"go.skia.org/infra/go/vec32"
+	"go.goldmine.build/go/vec32"
 )
 
 // CommitNumber is the offset of any commit from the first commit in a repo.

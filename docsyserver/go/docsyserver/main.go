@@ -8,14 +8,14 @@ import (
 
 	"github.com/fiorix/go-web/autogzip"
 	"github.com/go-chi/chi/v5"
-	"go.skia.org/infra/docsyserver/go/codereview"
-	"go.skia.org/infra/docsyserver/go/codereview/gerrit"
-	"go.skia.org/infra/docsyserver/go/docset"
-	"go.skia.org/infra/docsyserver/go/docsy"
-	"go.skia.org/infra/go/common"
-	"go.skia.org/infra/go/httputils"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
+	"go.goldmine.build/docsyserver/go/codereview"
+	"go.goldmine.build/docsyserver/go/codereview/gerrit"
+	"go.goldmine.build/docsyserver/go/docset"
+	"go.goldmine.build/docsyserver/go/docsy"
+	"go.goldmine.build/go/common"
+	"go.goldmine.build/go/httputils"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
 )
 
 // flags

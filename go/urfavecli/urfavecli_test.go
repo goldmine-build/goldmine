@@ -7,9 +7,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 	cli "github.com/urfave/cli/v2"
-	"go.skia.org/infra/go/loggingsyncbuffer"
-	"go.skia.org/infra/go/sklog/sklogimpl"
-	"go.skia.org/infra/go/sklog/stdlogging"
+	"go.goldmine.build/go/loggingsyncbuffer"
+	"go.goldmine.build/go/sklog/sklogimpl"
+	"go.goldmine.build/go/sklog/stdlogging"
 )
 
 type myGeneric struct {

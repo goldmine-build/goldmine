@@ -17,11 +17,11 @@ import (
 	"text/template"
 	"time"
 
-	"go.skia.org/infra/go/sklog/sklogimpl"
-	"go.skia.org/infra/go/sklog/stdlogging"
+	"go.goldmine.build/go/sklog/sklogimpl"
+	"go.goldmine.build/go/sklog/stdlogging"
 
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/golden/go/sql/schema"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/golden/go/sql/schema"
 )
 
 func main() {

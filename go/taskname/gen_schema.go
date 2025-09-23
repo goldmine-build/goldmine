@@ -14,11 +14,11 @@ import (
 	"sort"
 	"strings"
 
-	"go.skia.org/infra/go/exec"
-	"go.skia.org/infra/go/git"
-	"go.skia.org/infra/go/gitiles"
-	"go.skia.org/infra/go/sklog"
-	"go.skia.org/infra/go/taskname"
+	"go.goldmine.build/go/exec"
+	"go.goldmine.build/go/git"
+	"go.goldmine.build/go/gitiles"
+	"go.goldmine.build/go/sklog"
+	"go.goldmine.build/go/taskname"
 )
 
 const (

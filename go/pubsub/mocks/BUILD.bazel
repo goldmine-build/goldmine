@@ -9,7 +9,7 @@ go_library(
         "Subscription.go",
         "Topic.go",
     ],
-    importpath = "go.skia.org/infra/go/pubsub/mocks",
+    importpath = "go.goldmine.build/go/pubsub/mocks",
     visibility = ["//visibility:public"],
     deps = [
         "//go/pubsub",

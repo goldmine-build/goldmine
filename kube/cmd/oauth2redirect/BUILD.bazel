@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_binary", "go_library")
 go_library(
     name = "oauth2redirect_lib",
     srcs = ["main.go"],
-    importpath = "go.skia.org/infra/kube/cmd/oauth2redirect",
+    importpath = "go.goldmine.build/kube/cmd/oauth2redirect",
     visibility = ["//visibility:private"],
     deps = [
         "//go/sklog",

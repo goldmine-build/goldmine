@@ -20,7 +20,7 @@ import (
 	"sort"
 	"strings"
 
-	"go.skia.org/infra/bazel/gazelle/parsers"
+	"go.goldmine.build/bazel/gazelle/parsers"
 )
 
 ////////////////////////////////

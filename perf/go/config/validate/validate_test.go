@@ -7,9 +7,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/go/testutils"
-	"go.skia.org/infra/perf/go/config"
-	"go.skia.org/infra/perf/go/notifytypes"
+	"go.goldmine.build/go/testutils"
+	"go.goldmine.build/perf/go/config"
+	"go.goldmine.build/perf/go/notifytypes"
 )
 
 func TestInstanceConfigBytes_AllExistingConfigs_ShouldBeValid(t *testing.T) {

@@ -7,7 +7,7 @@ import (
 	"context"
 	"net/http"
 
-	"go.skia.org/infra/kube/go/authproxy/auth"
+	"go.goldmine.build/kube/go/authproxy/auth"
 )
 
 type mockedAuth struct {

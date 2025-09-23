@@ -4,7 +4,7 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "sqlingestionstore",
     srcs = ["sqlingestionstore.go"],
-    importpath = "go.skia.org/infra/golden/go/ingestion/sqlingestionstore",
+    importpath = "go.goldmine.build/golden/go/ingestion/sqlingestionstore",
     visibility = ["//visibility:public"],
     deps = [
         "//go/skerr",

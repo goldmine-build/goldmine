@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "shared_tests",
     srcs = ["shared_tests.go"],
-    importpath = "go.skia.org/infra/go/git/repograph/shared_tests",
+    importpath = "go.goldmine.build/go/git/repograph/shared_tests",
     visibility = ["//visibility:public"],
     deps = [
         "//go/deepequal/assertdeep",

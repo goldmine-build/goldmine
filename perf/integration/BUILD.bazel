@@ -9,7 +9,7 @@ filegroup(
 go_library(
     name = "integration_lib",
     srcs = ["generate_data.go"],
-    importpath = "go.skia.org/infra/perf/integration",
+    importpath = "go.goldmine.build/perf/integration",
     visibility = ["//visibility:private"],
     deps = [
         "//go/sklog",

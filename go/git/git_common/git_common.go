@@ -13,9 +13,9 @@ import (
 	"strings"
 	"sync"
 
-	"go.skia.org/infra/go/exec"
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/go/sklog"
+	"go.goldmine.build/go/exec"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
 )
 
 const (

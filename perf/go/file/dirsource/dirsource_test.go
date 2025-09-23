@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.skia.org/infra/perf/go/file"
+	"go.goldmine.build/perf/go/file"
 )
 
 func TestStart_Success(t *testing.T) {

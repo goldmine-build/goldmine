@@ -14,8 +14,8 @@ import (
 	"io"
 	"sort"
 
-	"go.skia.org/infra/go/skerr"
-	"go.skia.org/infra/scrap/go/scrap"
+	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/scrap/go/scrap"
 )
 
 type FakeClient struct {

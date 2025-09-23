@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_binary", "go_library")
 go_library(
     name = "jsdoc_lib",
     srcs = ["main.go"],
-    importpath = "go.skia.org/infra/jsdoc/go/jsdoc",
+    importpath = "go.goldmine.build/jsdoc/go/jsdoc",
     visibility = ["//visibility:private"],
     deps = [
         "//go/common",
