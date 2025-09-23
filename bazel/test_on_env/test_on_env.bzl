@@ -45,7 +45,7 @@ def test_on_env(name, test, env, timeout_secs = 10, tags = None, test_on_env_bin
       tags: Tags for the generated sh_test rule.
       test_on_env_binary: Optional override of the test_on_env binary to use. This is useful when
           this macro is used by the Skia repo and the binary needs to be referenced like
-          "@org_skia_go_infra//bazel/test_on_env:test_on_env".
+          "//bazel/test_on_env:test_on_env".
     """
     if not tags:
         tags = []

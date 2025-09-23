@@ -195,8 +195,6 @@ func New(ctx context.Context, cfg *config.NotifyConfig, URL, commitRangeURITempl
 			return nil, skerr.Wrap(err)
 		}
 		return newNotifier(f, tracker, URL), nil
-	case notifytypes.ChromeperfAlerting:
-		return NewChromePerfNotifier(ctx, nil)
 	default:
 		return nil, skerr.Fmt("invalid Notifier type: %s, must be one of: %v", cfg.Notifications, notifytypes.AllNotifierTypes)
 	}

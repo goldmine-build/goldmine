@@ -4,7 +4,6 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "notify",
     srcs = [
-        "chromeperfnotifier.go",
         "commitrange.go",
         "email.go",
         "html.go",
@@ -27,7 +26,6 @@ go_library(
         "//go/sklog",
         "//go/vec32",
         "//perf/go/alerts",
-        "//perf/go/chromeperf",
         "//perf/go/clustering2",
         "//perf/go/config",
         "//perf/go/dataframe",
@@ -43,7 +41,6 @@ go_library(
 go_test(
     name = "notify_test",
     srcs = [
-        "chromeperfnotifier_test.go",
         "commitrange_test.go",
         "email_test.go",
         "markdown_test.go",
@@ -57,8 +54,6 @@ go_test(
         "//go/query",
         "//go/testutils",
         "//perf/go/alerts",
-        "//perf/go/chromeperf",
-        "//perf/go/chromeperf/mock",
         "//perf/go/clustering2",
         "//perf/go/config",
         "//perf/go/dataframe",

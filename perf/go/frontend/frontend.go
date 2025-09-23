@@ -41,11 +41,8 @@ import (
 	"go.skia.org/infra/go/util"
 	"go.skia.org/infra/perf/go/alertfilter"
 	"go.skia.org/infra/perf/go/alerts"
-	"go.skia.org/infra/perf/go/anomalies"
-	"go.skia.org/infra/perf/go/anomalies/cache"
 	"go.skia.org/infra/perf/go/bug"
 	"go.skia.org/infra/perf/go/builders"
-	"go.skia.org/infra/perf/go/chromeperf"
 	"go.skia.org/infra/perf/go/config"
 	"go.skia.org/infra/perf/go/config/validate"
 	"go.skia.org/infra/perf/go/dataframe"
@@ -57,7 +54,6 @@ import (
 	"go.skia.org/infra/perf/go/ingest/format"
 	"go.skia.org/infra/perf/go/notify"
 	"go.skia.org/infra/perf/go/notifytypes"
-	"go.skia.org/infra/perf/go/pinpoint"
 	"go.skia.org/infra/perf/go/progress"
 	"go.skia.org/infra/perf/go/psrefresh"
 	"go.skia.org/infra/perf/go/regression"
@@ -164,12 +160,6 @@ type Frontend struct {
 
 	// The HOST parsed out of Config.URL.
 	host string
-
-	anomalyStore anomalies.Store
-
-	pinpoint *pinpoint.Client
-
-	alertGroupClient chromeperf.AlertGroupApiClient
 
 	urlProvider *urlprovider.URLProvider
 }
@@ -451,27 +441,6 @@ func (f *Frontend) initialize() {
 		f.flags.NumParamSetsForQueries,
 		dfbuilder.Filtering(config.Config.FilterParentTraces))
 
-	if config.Config.FetchChromePerfAnomalies {
-		anomalyApiClient, err := chromeperf.NewAnomalyApiClient(ctx)
-		if err != nil {
-			sklog.Fatal("Failed to build chrome anomaly api client: %s", err)
-		}
-		f.anomalyStore, err = cache.New(anomalyApiClient)
-		if err != nil {
-			sklog.Fatal("Failed to build anomalies.Store: %s", err)
-		}
-
-		f.pinpoint, err = pinpoint.New(ctx)
-		if err != nil {
-			sklog.Fatal("Failed to build pinpoint.Client: %s", err)
-		}
-
-		f.alertGroupClient, err = chromeperf.NewAlertGroupApiClient(ctx)
-		if err != nil {
-			sklog.Fatal("Failed to build alert group client: %s", err)
-		}
-	}
-
 	f.urlProvider = urlprovider.New(f.perfGit)
 
 	// TODO(jcgregorio) Implement store.TryBotStore and add a reference to it here.
@@ -714,7 +683,7 @@ func (f *Frontend) frameStartHandler(w http.ResponseWriter, r *http.Request) {
 		timeoutCtx, cancel := context.WithTimeout(ctx, config.QueryMaxRunTime)
 		defer cancel()
 		defer span.End()
-		err := frame.ProcessFrameRequest(timeoutCtx, fr, f.perfGit, f.dfBuilder, f.shortcutStore, f.anomalyStore, config.Config.GitRepoConfig.CommitNumberRegex == "")
+		err := frame.ProcessFrameRequest(timeoutCtx, fr, f.perfGit, f.dfBuilder, f.shortcutStore)
 		if err != nil {
 			fr.Progress.Error(err.Error())
 		} else {
@@ -724,66 +693,6 @@ func (f *Frontend) frameStartHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err := fr.Progress.JSON(w); err != nil {
 		sklog.Errorf("Failed to encode paramset: %s", err)
-	}
-}
-
-func (f *Frontend) alertGroupQueryHandler(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), defaultDatabaseTimeout)
-	defer cancel()
-
-	sklog.Info("Received alert group request")
-	if f.alertGroupClient == nil {
-		sklog.Info("Alert Grouping is not enabled")
-		httputils.ReportError(w, nil, "Alert Grouping is not enabled", http.StatusNotFound)
-		return
-	}
-	groupId := r.URL.Query().Get("group_id")
-	sklog.Infof("Group id is %s", groupId)
-	ctx, span := trace.StartSpan(ctx, "alertGroupQueryRequest")
-	defer span.End()
-	alertGroupDetails, err := f.alertGroupClient.GetAlertGroupDetails(ctx, groupId)
-	if err != nil {
-		sklog.Errorf("Error in retrieving alert group details: %s", err)
-	}
-
-	if alertGroupDetails != nil {
-		sklog.Infof("Retrieved %d anomalies for alert group id %s", len(alertGroupDetails.Anomalies), groupId)
-
-		explore := r.URL.Query().Get("e")
-		var redirectUrl string
-		if explore == "" {
-			queryParamsPerTrace := alertGroupDetails.GetQueryParamsPerTrace(ctx)
-			graphs := []graphsshortcut.GraphConfig{}
-			for _, queryParams := range queryParamsPerTrace {
-				queryString := f.urlProvider.GetQueryStringFromParameters(queryParams)
-				graphs = append(graphs, graphsshortcut.GraphConfig{
-					Queries:  []string{queryString},
-					Formulas: []string{},
-				})
-			}
-
-			shortcutObj := graphsshortcut.GraphsShortcut{
-				Graphs: graphs,
-			}
-
-			shortcutId, err := f.graphsShortcutStore.InsertShortcut(ctx, &shortcutObj)
-			if err != nil {
-				// Something went wrong while inserting shortcut.
-				sklog.Errorf("Error inserting shortcut %s", err)
-				// Let's redirect the user to the explore page instead.
-				queryParams := alertGroupDetails.GetQueryParams(ctx)
-				redirectUrl = f.urlProvider.Explore(ctx, int(alertGroupDetails.StartCommitNumber), int(alertGroupDetails.EndCommitNumber), queryParams)
-			} else {
-				redirectUrl = f.urlProvider.MultiGraph(ctx, int(alertGroupDetails.StartCommitNumber), int(alertGroupDetails.EndCommitNumber), shortcutId)
-			}
-
-		} else {
-			queryParams := alertGroupDetails.GetQueryParams(ctx)
-			redirectUrl = f.urlProvider.Explore(ctx, int(alertGroupDetails.StartCommitNumber), int(alertGroupDetails.EndCommitNumber), queryParams)
-		}
-		sklog.Infof("Generated url: %s", redirectUrl)
-		http.Redirect(w, r, redirectUrl, http.StatusSeeOther)
-		return
 	}
 }
 
@@ -1227,81 +1136,6 @@ func (f *Frontend) regressionCountHandler(w http.ResponseWriter, r *http.Request
 	}
 
 	if err := json.NewEncoder(w).Encode(struct{ Count int }{Count: count}); err != nil {
-		sklog.Errorf("Failed to write or encode output: %s", err)
-	}
-}
-
-func (f *Frontend) revisionHandler(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), defaultDatabaseTimeout)
-	defer cancel()
-	ctx, span := trace.StartSpan(ctx, "revisionQueryRequest")
-	defer span.End()
-	revisionIdStr := r.URL.Query().Get("rev")
-	revisionId, err := strconv.Atoi(revisionIdStr)
-	if err != nil {
-		httputils.ReportError(w, err, "Revision value is not an integer", http.StatusBadRequest)
-		return
-	}
-
-	anomaliesForRevision, err := f.anomalyStore.GetAnomaliesAroundRevision(ctx, revisionId)
-	if err != nil {
-		httputils.ReportError(w, err, "Failed to get tests with anomalies for revision", http.StatusInternalServerError)
-		return
-	}
-	// Create url for the test paths
-	_, err = f.perfGit.CommitFromCommitNumber(ctx, types.CommitNumber(revisionId))
-	if err != nil {
-		sklog.Error("Error getting commit info")
-	}
-
-	revisionInfoMap := map[string]chromeperf.RevisionInfo{}
-	for _, anomalyData := range anomaliesForRevision {
-		key := fmt.Sprintf(
-			"%s-%s-%s-%s",
-			anomalyData.Params["master"],
-			anomalyData.Params["bot"],
-			anomalyData.Params["benchmark"],
-			anomalyData.Params["test"])
-		if _, ok := revisionInfoMap[key]; !ok {
-			exploreUrl := f.urlProvider.Explore(
-				ctx,
-				anomalyData.StartRevision,
-				anomalyData.EndRevision,
-				anomalyData.Params)
-			bugId := ""
-			if anomalyData.Anomaly.BugId > 0 {
-				bugId = strconv.Itoa(anomalyData.Anomaly.BugId)
-			}
-			revisionInfoMap[key] = chromeperf.RevisionInfo{
-				StartRevision: anomalyData.StartRevision,
-				EndRevision:   anomalyData.EndRevision,
-				Master:        anomalyData.Params["master"][0],
-				Bot:           anomalyData.Params["bot"][0],
-				Benchmark:     anomalyData.Params["benchmark"][0],
-				Test:          anomalyData.Params["test"][0],
-				BugId:         bugId,
-				ExploreUrl:    exploreUrl,
-			}
-		} else {
-			revInfo := revisionInfoMap[key]
-			if anomalyData.StartRevision < revInfo.StartRevision {
-				revInfo.StartRevision = anomalyData.StartRevision
-			}
-
-			if anomalyData.EndRevision > revInfo.EndRevision {
-				revInfo.EndRevision = anomalyData.EndRevision
-			}
-
-			revisionInfoMap[key] = revInfo
-		}
-	}
-
-	revisionInfos := []chromeperf.RevisionInfo{}
-	for _, info := range revisionInfoMap {
-		revisionInfos = append(revisionInfos, info)
-	}
-	sklog.Infof("Returning %d anomaly groups", len(revisionInfoMap))
-	if err := json.NewEncoder(w).Encode(revisionInfos); err != nil {
 		sklog.Errorf("Failed to write or encode output: %s", err)
 	}
 }
@@ -1870,7 +1704,6 @@ func (f *Frontend) Serve() {
 	// Common endpoint for all long-running requests.
 	router.Get("/_/status/{id:[a-zA-Z0-9-]+}", f.progressTracker.Handler)
 
-	router.Get("/_/alertgroup", f.alertGroupQueryHandler)
 	router.HandleFunc("/_/initpage/", f.initpageHandler)
 	router.Post("/_/cidRange/", f.cidRangeHandler)
 	router.Post("/_/count/", f.countHandler)
@@ -1902,7 +1735,6 @@ func (f *Frontend) Serve() {
 
 	router.Get("/_/favorites/", f.favoritesHandler)
 	router.Get("/_/defaults/", f.defaultsHandler)
-	router.Get("/_/revision/", f.revisionHandler)
 	var h http.Handler = router
 	h = httputils.LoggingGzipRequestResponse(h)
 	if !f.flags.Local {

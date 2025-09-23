@@ -28,7 +28,6 @@ app_container(
         "//perf/pages:help",
         "//perf/pages:multiexplore",
         "//perf/pages:newindex",
-        "//perf/pages:revisions",
         "//perf/pages:triage",
         "//perf/pages:trybot",
     ],

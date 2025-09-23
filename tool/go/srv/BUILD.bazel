@@ -51,6 +51,5 @@ go_test(
         "@com_github_go_chi_chi_v5//:chi",
         "@com_github_stretchr_testify//mock",
         "@com_github_stretchr_testify//require",
-        "@org_skia_go_infra//go/gerrit/mocks:go_default_library",
     ],
 )

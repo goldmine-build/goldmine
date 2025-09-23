@@ -261,7 +261,7 @@ alias(
 
 alias(
     name = "mockery",
-    actual = "@com_github_vektra_mockery_v2//:v2",
+    actual = "@com_github_vektra_mockery_v3//:v3",
     visibility = ["//visibility:public"],
 )
 

@@ -13,7 +13,6 @@ import (
 	"go.skia.org/infra/go/sklog"
 	"go.skia.org/infra/go/util"
 	"go.skia.org/infra/perf/go/alerts"
-	"go.skia.org/infra/perf/go/chromeperf"
 	"go.skia.org/infra/perf/go/clustering2"
 	"go.skia.org/infra/perf/go/config"
 	"go.skia.org/infra/perf/go/dryrun"
@@ -60,7 +59,6 @@ func main() {
 	generator.AddMultiple(generator,
 		alerts.Alert{},
 		alerts.AlertsStatus{},
-		chromeperf.RevisionInfo{},
 		clustering2.ClusterSummary{},
 		clustering2.ValuePercent{},
 		config.Favorites{},

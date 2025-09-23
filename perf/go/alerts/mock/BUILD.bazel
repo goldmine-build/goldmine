@@ -3,8 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "mock",
     srcs = [
-        "ConfigProvider.go",
-        "Store.go",
+        "mocks_test.go",
     ],
     importpath = "go.skia.org/infra/perf/go/alerts/mock",
     visibility = ["//visibility:public"],

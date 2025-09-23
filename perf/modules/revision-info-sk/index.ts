@@ -1,1 +1,0 @@
-import './revision-info-sk';
