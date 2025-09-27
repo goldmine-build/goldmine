@@ -70,14 +70,40 @@ def _app_container_impl(name, repository, base, exe, config, entrypoint, cmd, pa
     oci_push(
         name = name + "_push",
         image = name_image,
+        # Should we add a flag to provide the docker tags?
         remote_tags = [
-            "latest",
+            "{STABLE_DOCKER_TAG}",
         ],
         repository = repository,
         visibility = ["//visibility:public"],
     )
 
+# app_container builds a container image that can be run locally or can be
+# pushed to a registry.
 app_container = macro(
+    doc = """
+app_container builds a container image that can be run locally or can be
+pushed to a registry.
+
+This macro produces the following targets:
+
+    <name>_local - Use this target to build and load the 
+        container image into the local image
+        registry from where it can be run.
+        
+        For example:
+
+            $ bazel run //perf:perfserver_local
+            $ docker run -ti perfserver:latest
+
+    <name>_push - Use this target to push the container
+        image to the specified repository.
+
+    <name>_image.digest - This target is built by
+        the _local and _push targets is a file that contains
+        the sha256 hash of the image.
+
+    """,
     attrs = {
         "repository": attr.string(
             configurable = False,

@@ -44,5 +44,9 @@ echo "BUILD_DATETIME $BUILD_DATETIME"
 echo "STABLE_GIT_REVISION $STABLE_GIT_REVISION"
 echo "STABLE_GIT_STATUS $STABLE_GIT_STATUS"
 
-# If the format of this ever changes then please also update k8s_checker/main.go.
+# Yes, we really do want the Docker tag to be stable, that forces container
+# images to be rebuilt all the time because the timestamp is part of the tag.
+#
+# If the format of this ever changes then please also update
+# k8s_checker/main.go.
 echo "STABLE_DOCKER_TAG ${BUILD_DATETIME}-${USER}-${STABLE_GIT_REVISION:0:7}-${STABLE_GIT_STATUS}"
