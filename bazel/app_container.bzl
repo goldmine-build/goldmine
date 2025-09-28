@@ -71,7 +71,7 @@ def _app_container_impl(name, repository, base, exe, config, entrypoint, cmd, pa
     name_stamped = name + "_stamped"
     expand_template(
         name = name_stamped,
-        out = "_stamped.tags.txt",
+        out = name + "_tag.txt",
         stamp_substitutions = {"0.0.0": "{{STABLE_DOCKER_TAG}}"},
         template = [
             "0.0.0",
