@@ -1,7 +1,7 @@
 include ../make/bazel.mk
 
 push:
-	$(BAZEL) run //jsdoc:jsdoc_push
+	$(BAZEL) run --stamp //jsdoc:jsdoc_push
 
 run-local:
 	$(BAZEL) run //jsdoc:jsdoc_local
