@@ -1,5 +1,6 @@
 """This module defines the app_container macro."""
 
+load("@aspect_bazel_lib//lib:expand_template.bzl", "expand_template")
 load("@rules_oci//oci:defs.bzl", "oci_image", "oci_load", "oci_push")
 load("@rules_pkg//:pkg.bzl", "pkg_tar")
 
@@ -67,13 +68,20 @@ def _app_container_impl(name, repository, base, exe, config, entrypoint, cmd, pa
         visibility = ["//visibility:public"],
     )
 
+    name_stamped = name + "_stamped"
+    expand_template(
+        name = name_stamped,
+        out = "_stamped.tags.txt",
+        stamp_substitutions = {"0.0.0": "{{STABLE_DOCKER_TAG}}"},
+        template = [
+            "0.0.0",
+        ],
+    )
+
     oci_push(
         name = name + "_push",
         image = name_image,
-        # Should we add a flag to provide the docker tags?
-        remote_tags = [
-            "{STABLE_DOCKER_TAG}",
-        ],
+        remote_tags = ":" + name_stamped,
         repository = repository,
         visibility = ["//visibility:public"],
     )
@@ -98,6 +106,13 @@ This macro produces the following targets:
 
     <name>_push - Use this target to push the container
         image to the specified repository.
+
+        If you want the image in the repository to have be tagged with
+        the value of the STABLE_DOCKER_TAG, then you need to run the
+        target with the --stamp flag, e.g.:
+
+            bazel run --stamp //jsdoc:jsdoc_push
+
 
     <name>_image.digest - This target is built by
         the _local and _push targets is a file that contains
