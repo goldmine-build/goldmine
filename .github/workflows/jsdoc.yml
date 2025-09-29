@@ -1,0 +1,21 @@
+name: jsdoc
+
+on:
+  push:
+    branches: [ "main", "workflow" ]
+  pull_request:
+    branches: [ "main", "workflow" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: configure
+      run: bazel run --stamp //jsdoc:jsdoc_push
+
+    - name: update image reference
+      run: echo kustomize edit set image "us-east1-docker.pkg.dev/api-project-146332866891/goldmine/jsdoc@*=*@`cat _bazel_bin/jsdoc/jsdoc_tag.txt`"
