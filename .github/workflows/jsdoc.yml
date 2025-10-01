@@ -42,9 +42,11 @@ jobs:
 
     - name: Update the image reference in the k8s-config repo.
       working-directory: ./k8s-config/jsdoc
-      run: kustomize edit set image "ghcr.io/goldmine-build/jsdoc@*=*@`cat ../main/_bazel_bin/jsdoc/jsdoc_tag.txt`"
+      run: kustomize edit set image "ghcr.io/goldmine-build/jsdoc@*=*@`cat ../../main/_bazel_bin/jsdoc/jsdoc_tag.txt`"
 
-    - run: |
+    - name: Commit and push to k8s-config.
+      working-directory: ./k8s-config
+      run: |
         git config user.name "github-actions[bot]"
         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
         git add .
