@@ -18,17 +18,35 @@ jobs:
       id-token: write    
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout goldmine repo.
+      uses: actions/checkout@v5
+      with:
+        path: main
 
-    - name: Log in to the Container registry
+    - name: Checkout k8s config repo.
+      uses: actions/checkout@v5
+      with:
+        repository: goldmine-build/k8s-config
+        path: k8s-config
+
+    - name: Log in to the GitHub Container registry.
       uses: docker/login-action@v3
       with:
         registry: ghcr.io
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: configure
+    - name: Build and push jsdoc to the container registry.
+      working-directory: ./main
       run: bazelisk run --stamp //jsdoc:jsdoc_push
 
-    - name: update image reference
-      run: echo kustomize edit set image "us-east1-docker.pkg.dev/api-project-146332866891/goldmine/jsdoc@*=*@`cat _bazel_bin/jsdoc/jsdoc_tag.txt`"
+    - name: Update the image reference in the k8s-config repo.
+      working-directory: ./k8s-config
+      run: kustomize edit set image "ghcr.io/goldmine-build/jsdoc@*=*@`cat ../main/_bazel_bin/jsdoc/jsdoc_tag.txt`"
+
+    - run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git add .
+        git commit -m "[automated] Workflow commit from jsdoc push."
+        git push      

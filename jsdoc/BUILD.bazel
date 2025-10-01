@@ -8,7 +8,9 @@ app_container(
     entrypoint = "/usr/local/bin/jsdoc",
     exe = "//jsdoc/go/jsdoc:jsdoc",
     pages = [
-        "//elements-sk/modules/icons-demo-sk:icons-demo-sk-demo",
+        # Comment out icons demo for now since it takes so long to build.
+        #        "//elements-sk/modules/icons-demo-sk:icons-demo-sk-demo",
+        #
         "//infra-sk/modules/theme-chooser-sk:theme-chooser-sk-demo",
         "//jsdoc/page:index",
     ],
