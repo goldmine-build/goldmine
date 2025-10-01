@@ -41,7 +41,7 @@ jobs:
       run: bazelisk run --stamp //jsdoc:jsdoc_push
 
     - name: Update the image reference in the k8s-config repo.
-      working-directory: ./k8s-config
+      working-directory: ./k8s-config/jsdoc
       run: kustomize edit set image "ghcr.io/goldmine-build/jsdoc@*=*@`cat ../main/_bazel_bin/jsdoc/jsdoc_tag.txt`"
 
     - run: |
