@@ -23,10 +23,18 @@ jobs:
       with:
         path: main
 
+    - name: Generate a token that has write access to the k8s-config repo via an app.
+      id: generate-token
+      uses: actions/create-github-app-token@v2
+      with:
+        app-id: ${{ vars.APP_ID }}
+        private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
     - name: Checkout k8s config repo.
       uses: actions/checkout@v5
       with:
         repository: goldmine-build/k8s-config
+        token: ${{ steps.generate-token.outputs.token }}
         path: k8s-config
 
     - name: Log in to the GitHub Container registry.
