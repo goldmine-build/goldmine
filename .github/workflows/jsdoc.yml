@@ -28,7 +28,7 @@ jobs:
       uses: actions/create-github-app-token@v2
       with:
         app-id: ${{ vars.APP_ID }}
-        private-key: ${{ secrets.APP_PRIVATE_KEY }}
+        private-key: ${{ secrets.K8S_CONFIG_ACCESS_TOKEN }}
 
     - name: Checkout k8s config repo.
       uses: actions/checkout@v5
