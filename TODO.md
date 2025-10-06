@@ -12,3 +12,4 @@
 * Test out open source RBE build options
 * Move Gold and Perf to separate projects to prove out Goldmine capabilities.
 * Helm charts for Perf and Gold?
+* Find a replacement for icon-sk, or make build more efficient.
