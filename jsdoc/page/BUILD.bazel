@@ -1,4 +1,4 @@
-load("//infra-sk:index.bzl", "sk_page")
+load("//infra-sk:index.bzl", "sass_library", "sk_page", "ts_library")
 
 sk_page(
     name = "index",
@@ -11,4 +11,16 @@ sk_page(
     ts_deps = [
     ],
     ts_entry_point = "index.ts",
+)
+
+sass_library(
+    name = "index_sass_lib",
+    srcs = ["index.scss"],
+    visibility = ["//visibility:public"],
+)
+
+ts_library(
+    name = "index_ts_lib",
+    srcs = ["index.ts"],
+    visibility = ["//visibility:public"],
 )

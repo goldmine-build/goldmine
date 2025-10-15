@@ -2,7 +2,7 @@ load("@rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "mocks",
-    srcs = ["Port.go"],
+    srcs = ["mocks.go"],
     importpath = "go.goldmine.build/go/serial/mocks",
     visibility = ["//visibility:public"],
     deps = ["@com_github_stretchr_testify//mock"],

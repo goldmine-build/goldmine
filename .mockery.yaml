@@ -2,12 +2,10 @@ dir: '{{.InterfaceDir}}/mocks'
 structname: '{{.InterfaceName}}'
 pkgname: mocks
 template: testify
+filename: mocks.go
 template-data:
   unroll-variadic: true
 packages:
-  go.goldmine.build/bugs-central/go/types:
-    interfaces:
-      BugsDB: {}
   go.goldmine.build/docsyserver/go/codereview:
     interfaces:
       CodeReview: {}

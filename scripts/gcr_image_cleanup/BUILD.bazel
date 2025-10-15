@@ -3,7 +3,7 @@ load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
 go_library(
     name = "gcr_image_cleanup_lib",
     srcs = ["gcr_image_cleanup.go"],
-    importpath = "go.skia.org/infra/scripts/gcr_image_cleanup",
+    importpath = "go.goldmine.build/scripts/gcr_image_cleanup",
     visibility = ["//visibility:private"],
     deps = ["//go/exec"],
 )

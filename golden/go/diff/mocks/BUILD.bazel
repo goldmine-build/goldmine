@@ -5,6 +5,7 @@ go_library(
     srcs = [
         "Calculator.go",
         "ImageSource.go",
+        "mocks.go",
     ],
     importpath = "go.goldmine.build/golden/go/diff/mocks",
     visibility = ["//visibility:public"],

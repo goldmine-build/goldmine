@@ -9,6 +9,7 @@ go_library(
         "NpmDB.go",
         "ProjectAudit.go",
         "ProjectMirror.go",
+        "mocks.go",
     ],
     importpath = "go.goldmine.build/npm-audit-mirror/go/types/mocks",
     visibility = ["//visibility:public"],

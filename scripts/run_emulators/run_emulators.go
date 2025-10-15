@@ -5,12 +5,12 @@ import (
 	"os"
 	"path/filepath"
 
-	"go.skia.org/infra/go/emulators/cockroachdb_instance"
-	"go.skia.org/infra/go/emulators/gcp_emulator"
+	"go.goldmine.build/go/emulators/cockroachdb_instance"
+	"go.goldmine.build/go/emulators/gcp_emulator"
 
-	"go.skia.org/infra/go/common"
-	"go.skia.org/infra/go/emulators"
-	"go.skia.org/infra/go/sklog"
+	"go.goldmine.build/go/common"
+	"go.goldmine.build/go/emulators"
+	"go.goldmine.build/go/sklog"
 )
 
 func usage() {
@@ -45,7 +45,7 @@ func main() {
 		}
 		fmt.Println("Emulators started. Set environment variables as follows:")
 		for _, e := range emulators.AllEmulators {
-			fmt.Println(fmt.Sprintf("export %s=%s", emulators.GetEmulatorHostEnvVarName(e), emulators.GetEmulatorHostEnvVar(e)))
+			fmt.Println(fmt.Sprintf("export %s=%s", emulators.GetEmulatorHostEnvVarName(e), fmt.Sprintf("localhost:%d", emulators.GetEmulatorHostPort(e))))
 		}
 	} else {
 		fmt.Println("Emulators stopped. Unset environment variables as follows:")

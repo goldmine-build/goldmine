@@ -2,7 +2,10 @@ load("@rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "mocks",
-    srcs = ["Store.go"],
+    srcs = [
+        "Store.go",
+        "mocks.go",
+    ],
     importpath = "go.goldmine.build/golden/go/ignore/mocks",
     visibility = ["//visibility:public"],
     deps = [

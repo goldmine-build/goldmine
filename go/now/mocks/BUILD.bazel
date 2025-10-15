@@ -3,8 +3,8 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "mocks",
     srcs = [
-        "TimeTicker.go",
         "generate.go",
+        "mocks.go",
     ],
     importpath = "go.goldmine.build/go/now/mocks",
     visibility = ["//visibility:public"],

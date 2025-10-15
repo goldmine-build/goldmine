@@ -7,6 +7,7 @@ go_library(
         "Processor.go",
         "Source.go",
         "Store.go",
+        "mocks.go",
     ],
     importpath = "go.goldmine.build/golden/go/ingestion/mocks",
     visibility = ["//visibility:public"],

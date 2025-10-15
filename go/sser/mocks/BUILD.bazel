@@ -4,8 +4,7 @@ go_library(
     name = "mocks",
     srcs = [
         "Interface.go",
-        "PeerFinder.go",
-        "Server.go",
+        "mocks.go",
     ],
     importpath = "go.goldmine.build/go/sser/mocks",
     visibility = ["//visibility:public"],

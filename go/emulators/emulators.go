@@ -58,6 +58,17 @@ func GetEmulatorHostEnvVarName(emulator Emulator) string {
 	}
 }
 
+func GetEmulatorHostPort(emulator Emulator) int {
+	switch emulator {
+	case CockroachDB:
+		return CockroachDBPort
+	case PubSub:
+		return PubSubPort
+	default:
+		panic("Unknown emulator " + emulator)
+	}
+}
+
 func setEmulatorHostEnvVar(emulator Emulator) error {
 	envVar := GetEmulatorHostEnvVarName(emulator)
 	var port int

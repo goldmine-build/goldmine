@@ -42,6 +42,7 @@ go_test(
         "//go/alogin",
         "//go/alogin/mocks",
         "//go/gerrit",
+        "//go/gerrit/mocks",
         "//go/git",
         "//go/gitiles/mocks",
         "//go/roles",

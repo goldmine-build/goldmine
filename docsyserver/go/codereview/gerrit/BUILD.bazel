@@ -22,9 +22,9 @@ go_test(
     srcs = ["gerrit_test.go"],
     embed = [":gerrit"],
     deps = [
-        "_go_infra//go/gerrit/mocks:go_default_library",
         "//docsyserver/go/codereview",
         "//go/gerrit",
+        "//go/gerrit/mocks",
         "//go/testutils",
         "@com_github_stretchr_testify//require",
     ],

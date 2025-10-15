@@ -4,9 +4,9 @@ go_library(
     name = "mocks",
     srcs = [
         "GCSUploader.go",
-        "HTTPClient.go",
         "ImageDownloader.go",
         "Matcher.go",
+        "mocks.go",
     ],
     importpath = "go.goldmine.build/gold-client/go/mocks",
     visibility = ["//visibility:public"],

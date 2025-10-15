@@ -8,7 +8,7 @@ import (
 	"os"
 	"strings"
 
-	"go.skia.org/infra/go/exec"
+	"go.goldmine.build/go/exec"
 )
 
 var (

@@ -5,6 +5,7 @@ go_library(
     srcs = [
         "ChangelistLandedUpdater.go",
         "Client.go",
+        "mocks.go",
     ],
     importpath = "go.goldmine.build/golden/go/code_review/mocks",
     visibility = ["//visibility:public"],
