@@ -3,7 +3,6 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "mocks",
     srcs = [
-        "Calculator.go",
         "ImageSource.go",
         "mocks.go",
     ],
