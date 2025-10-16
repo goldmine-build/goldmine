@@ -91,11 +91,9 @@ func TestPubSubSource_IngestFile_TryjobData_NoErrors_Ack(t *testing.T) {
 	ms.On("SetIngested", testutils.AnyContext, realTryjobFile, mock.Anything).Return(nil)
 
 	ps := pubSubSource{
-		IngestionStore:                   ms,
-		PrimaryBranchProcessor:           mp,
-		TryjobProcessor:                  mtp,
-		SecondaryBranchStreamingLiveness: nopLiveness{},
-		SuccessCounter:                   nopCounter{},
+		IngestionStore:         ms,
+		PrimaryBranchProcessor: mp,
+		SuccessCounter:         nopCounter{},
 	}
 	shouldAck := ps.ingestFile(context.Background(), realTryjobFile)
 	assert.True(t, shouldAck)
@@ -118,7 +116,6 @@ func TestPubSubSource_IngestFile_TryjobData_NonRetryableError_Ack(t *testing.T) 
 	ps := pubSubSource{
 		IngestionStore:         ms,
 		PrimaryBranchProcessor: mp,
-		TryjobProcessor:        mtp,
 		FailedCounter:          nopCounter{},
 	}
 	shouldAck := ps.ingestFile(context.Background(), realTryjobFile)
@@ -138,7 +135,6 @@ func TestPubSubSource_IngestFile_TryjobData_RetryableError_Nack(t *testing.T) {
 
 	ps := pubSubSource{
 		PrimaryBranchProcessor: mp,
-		TryjobProcessor:        mtp,
 		FailedCounter:          nopCounter{},
 	}
 	shouldAck := ps.ingestFile(context.Background(), realTryjobFile)
@@ -156,7 +152,6 @@ func TestPubSubSource_IngestFile_InvalidFile_Ack(t *testing.T) {
 
 	ps := pubSubSource{
 		PrimaryBranchProcessor: mp,
-		TryjobProcessor:        mtp,
 		FailedCounter:          nopCounter{},
 	}
 	shouldAck := ps.ingestFile(context.Background(), unknownFile)
