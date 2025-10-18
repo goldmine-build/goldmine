@@ -77,73 +77,12 @@ func TestPubSubSource_IngestFile_PrimaryBranch_RetryableError_Nack(t *testing.T)
 	assert.False(t, shouldAck)
 }
 
-func TestPubSubSource_IngestFile_TryjobData_NoErrors_Ack(t *testing.T) {
-
-	const realTryjobFile = "trybot/dm-json-v1/2021/03/02/17/378362__1/8853853547141503920/dm-1614705135861548495.json"
-
-	mp := &mocks.Processor{}
-	mp.On("HandlesFile", realTryjobFile).Return(false)
-	mtp := &mocks.Processor{}
-	mtp.On("HandlesFile", realTryjobFile).Return(true)
-	mtp.On("Process", testutils.AnyContext, realTryjobFile).Return(nil)
-
-	ms := &mocks.Store{}
-	ms.On("SetIngested", testutils.AnyContext, realTryjobFile, mock.Anything).Return(nil)
-
-	ps := pubSubSource{
-		IngestionStore:         ms,
-		PrimaryBranchProcessor: mp,
-		SuccessCounter:         nopCounter{},
-	}
-	shouldAck := ps.ingestFile(context.Background(), realTryjobFile)
-	assert.True(t, shouldAck)
-	ms.AssertExpectations(t)
-}
-
-func TestPubSubSource_IngestFile_TryjobData_NonRetryableError_Ack(t *testing.T) {
-
-	const realTryjobFile = "trybot/dm-json-v1/2021/03/02/17/378362__1/8853853547141503920/dm-1614705135861548495.json"
-
-	mp := &mocks.Processor{}
-	mp.On("HandlesFile", realTryjobFile).Return(false)
-	mtp := &mocks.Processor{}
-	mtp.On("HandlesFile", realTryjobFile).Return(true)
-	mtp.On("Process", testutils.AnyContext, realTryjobFile).Return(errors.New("invalid JSON"))
-
-	ms := &mocks.Store{}
-	ms.On("SetIngested", testutils.AnyContext, realTryjobFile, mock.Anything).Return(nil)
-
-	ps := pubSubSource{
-		IngestionStore:         ms,
-		PrimaryBranchProcessor: mp,
-		FailedCounter:          nopCounter{},
-	}
-	shouldAck := ps.ingestFile(context.Background(), realTryjobFile)
-	assert.True(t, shouldAck)
-	ms.AssertExpectations(t)
-}
-
-func TestPubSubSource_IngestFile_TryjobData_RetryableError_Nack(t *testing.T) {
-
-	const realTryjobFile = "trybot/dm-json-v1/2021/03/02/17/378362__1/8853853547141503920/dm-1614705135861548495.json"
-
-	mp := &mocks.Processor{}
-	mp.On("HandlesFile", realTryjobFile).Return(false)
-	mtp := &mocks.Processor{}
-	mtp.On("HandlesFile", realTryjobFile).Return(true)
-	mtp.On("Process", testutils.AnyContext, realTryjobFile).Return(ingestion.ErrRetryable)
-
-	ps := pubSubSource{
-		PrimaryBranchProcessor: mp,
-		FailedCounter:          nopCounter{},
-	}
-	shouldAck := ps.ingestFile(context.Background(), realTryjobFile)
-	assert.False(t, shouldAck)
-}
-
 func TestPubSubSource_IngestFile_InvalidFile_Ack(t *testing.T) {
 
 	const unknownFile = "unknownfile.json"
+
+	ms := &mocks.Store{}
+	ms.On("SetIngested", testutils.AnyContext, unknownFile, mock.Anything).Return(nil)
 
 	mp := &mocks.Processor{}
 	mp.On("HandlesFile", unknownFile).Return(false)
@@ -151,8 +90,10 @@ func TestPubSubSource_IngestFile_InvalidFile_Ack(t *testing.T) {
 	mtp.On("HandlesFile", unknownFile).Return(false)
 
 	ps := pubSubSource{
+		IngestionStore:         ms,
 		PrimaryBranchProcessor: mp,
 		FailedCounter:          nopCounter{},
+		SuccessCounter:         nopCounter{},
 	}
 	shouldAck := ps.ingestFile(context.Background(), unknownFile)
 	assert.True(t, shouldAck)
