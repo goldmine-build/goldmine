@@ -31,7 +31,7 @@ func TestAuth_NoMethodSpecified_FallsBackToGsutil(t *testing.T) {
 This should not be used in production.`)
 	b, err := os.ReadFile(filepath.Join(workDir, "auth_opt.json"))
 	require.NoError(t, err)
-	assert.Equal(t, `{"Luci":false,"ServiceAccount":"","GSUtil":true,"NoAuth":false}`, strings.TrimSpace(string(b)))
+	assert.Equal(t, `{"ServiceAccount":"","GSUtil":true,"NoAuth":false}`, strings.TrimSpace(string(b)))
 }
 
 func TestAuth_NoAuthenticationSpecified_Success(t *testing.T) {
@@ -51,7 +51,7 @@ func TestAuth_NoAuthenticationSpecified_Success(t *testing.T) {
 	exit.AssertWasCalledWithCode(t, 0, output.String())
 	b, err := os.ReadFile(filepath.Join(workDir, "auth_opt.json"))
 	require.NoError(t, err)
-	assert.Equal(t, `{"Luci":false,"ServiceAccount":"","GSUtil":false,"NoAuth":true}`, strings.TrimSpace(string(b)))
+	assert.Equal(t, `{"ServiceAccount":"","GSUtil":false,"NoAuth":true}`, strings.TrimSpace(string(b)))
 }
 
 func setupAuthWithGSUtil(t *testing.T, workDir string) {
