@@ -1,8 +1,0 @@
-load("@rules_go//go:def.bzl", "go_library")
-
-go_library(
-    name = "codereview",
-    srcs = ["codereview.go"],
-    importpath = "go.goldmine.build/docsyserver/go/codereview",
-    visibility = ["//visibility:public"],
-)

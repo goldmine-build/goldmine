@@ -547,6 +547,12 @@ $ bazel run //golden/modules/dots-sk:dots-sk_puppeteer_test_debug_headful
 Run your test in headful mode to visually inspect how your test interacts with the demo page under
 test as you step through your test code with the attached debugger.
 
+To run all the puppeteer tests:
+
+```
+bazel query //perf/... | grep "sk_puppeteer_test$" | xargs -L 1 bazel run 
+```
+
 #### NodeJS tests (`nodejs_test` rule)
 
 Use `bazel test` to run a NodeJS test, e.g.:
