@@ -100,7 +100,15 @@ func loadJSONFile(fileName string, data interface{}) (bool, error) {
 // saveJSONFile stores the given 'data' in a file with the given name
 func saveJSONFile(fileName string, data interface{}) error {
 	err := util.WithWriteFile(fileName, func(w io.Writer) error {
-		return json.NewEncoder(w).Encode(data)
+		b, err := json.MarshalIndent(data, "", "  ")
+		if err != nil {
+			return skerr.Wrapf(err, "serializing data to JSON for file %s", fileName)
+		}
+		_, err = w.Write(b)
+		if err != nil {
+			return skerr.Wrapf(err, "writing JSON to file %s", fileName)
+		}
+		return nil
 	})
 	if err != nil {
 		return skerr.Wrapf(err, "writing/serializing to JSON file %s", fileName)
