@@ -18,7 +18,7 @@ export class ScreenshotsViewerSk extends ElementSk {
           @input=${(e: Event) => el.onFilterInput(e)} />
         <button @click=${() => el.onClearClick()}>Clear</button>
         <button @click=${() => el.fetch()}>Reload</button>
-      </div>  
+      </div>
 
       ${ScreenshotsViewerSk.screenshotsTemplate(el)}
     </div>
@@ -40,7 +40,25 @@ export class ScreenshotsViewerSk extends ElementSk {
     }
 
     return html`
+      <header></header>
       <div class="applications">
+        <h2>Applications</h2>
+        <ul>
+          ${el.getApplications().map(
+            (app: string) =>
+              html`<li><a href="#${app}">${app}</a></li>
+                <ul>
+                  ${el.getScreenshotsForApplication(app).map(
+                    (screenshot: Screenshot) =>
+                      html`<li>
+                        <a href="#${app}_${screenshot.test_name}"
+                          >${screenshot.test_name}</a
+                        >
+                      </li> `
+                  )}
+                </ul>`
+          )}
+        </ul>
         ${el
           .getApplications()
           .map((app: string) =>
@@ -55,18 +73,21 @@ export class ScreenshotsViewerSk extends ElementSk {
     app: string
   ) => html`
     <div class="application">
-      <h2 class="application-name">${app}</h2>
+      <h2 class="application-name" id="${app}">${app}</h2>
 
       ${el
         .getScreenshotsForApplication(app)
         .map((screenshot: Screenshot) =>
-          ScreenshotsViewerSk.screenshotTemplate(screenshot)
+          ScreenshotsViewerSk.screenshotTemplate(app, screenshot)
         )}
     </div>
   `;
 
-  private static screenshotTemplate = (screenshot: Screenshot) => html`
-    <figure class="screenshot">
+  private static screenshotTemplate = (
+    app: string,
+    screenshot: Screenshot
+  ) => html`
+    <figure class="screenshot" id="${app}_${screenshot.test_name}">
       <figcaption class="test-name">${screenshot.test_name}</figcaption>
       <img title="${screenshot.test_name}" src="${screenshot.url}" />
     </figure>
