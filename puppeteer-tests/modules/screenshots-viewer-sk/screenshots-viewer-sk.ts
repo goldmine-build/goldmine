@@ -17,7 +17,8 @@ export class ScreenshotsViewerSk extends ElementSk {
           .value=${el.filter}
           @input=${(e: Event) => el.onFilterInput(e)} />
         <button @click=${() => el.onClearClick()}>Clear</button>
-      </div>
+        <button @click=${() => el.fetch()}>Reload</button>
+      </div>  
 
       ${ScreenshotsViewerSk.screenshotsTemplate(el)}
     </div>
