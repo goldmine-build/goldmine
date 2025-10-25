@@ -38,7 +38,7 @@ describe('explore-sk', () => {
     });
     it('loads the traces', async () => {
       await testBed.page.click('#demo-load-traces');
-      await testBed.page.waitForSelector('#traceButtons', {
+      await testBed.page.waitForSelector("th[data-key='arch'", {
         visible: true,
       });
       await takeScreenshot(testBed.page, 'perf', 'explore-sk_traces_loaded');
@@ -46,7 +46,7 @@ describe('explore-sk', () => {
 
     it('displays bisect button if window.perf.fetch_chrome_perf_anomalies is true', async () => {
       await testBed.page.click('#demo-show-bisect-button');
-      await testBed.page.waitForSelector('#traceButtons', {
+      await testBed.page.waitForSelector("th[data-key='arch'", {
         visible: true,
       });
       await takeScreenshot(
@@ -86,7 +86,7 @@ describe('explore-sk', () => {
 
     it('loads the traces and collapses the details section', async () => {
       await testBed.page.click('#demo-load-traces');
-      await testBed.page.waitForSelector('#traceButtons', {
+      await testBed.page.waitForSelector("th[data-key='arch'", {
         visible: true,
       });
       await testBed.page.click('#collapseButton');
@@ -95,7 +95,7 @@ describe('explore-sk', () => {
 
     it('loads the traces and hovers over a trace to display trace information', async () => {
       await testBed.page.click('#demo-load-traces');
-      await testBed.page.waitForSelector('#traceButtons', {
+      await testBed.page.waitForSelector("th[data-key='arch'", {
         visible: true,
       });
 
