@@ -10,7 +10,7 @@ app_container(
     pages = [
         "//elements-sk/modules/icons-demo-sk:icons-demo-sk-demo",
         "//infra-sk/modules/theme-chooser-sk:theme-chooser-sk-demo",
-        "//jsdoc/page:index",
+        "//jsdoc/pages:index",
     ],
     repository = "ghcr.io/goldmine-build/jsdoc",
 )
