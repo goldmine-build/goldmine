@@ -1,0 +1,24 @@
+name: jsdoc
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout goldmine repo.
+      uses: actions/checkout@v5
+      with:
+        path: main
+
+    - name: Run all the UI tests and upload the results to Gold.
+      env:
+        GCP_GCS_SERVICE_ACCT : ${{secrets.GOLDMINE_PRIVATE_GOLD_SERVICE_ACCOUNT_KEY}}
+      working-directory: ./main
+      run: ./upload_to_gold/upload.sh 

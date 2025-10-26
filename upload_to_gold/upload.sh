@@ -3,11 +3,18 @@ set -e
 set -x
 set -o pipefail 
 
+echo "$GCP_GCS_SERVICE_ACCT" > /tmp/serice-account.json
+
+bazel run //gold-client/cmd/goldctl -- auth --service-account /tmp/serice-account.json --work-dir $HOME/goldctlx`
+
+# bazel run //gold-client/cmd/goldctl -- auth --service-account ~/Downloads/api-project-146332866891-3816d0d33259.json --work-dir $HOME/goldctlx`
+
+# Run all the modules tests which generate images to be uploaded to Gold.
 bazel test //golden/modules/... //perf/modules/...
 
-bazel run //gold-client/cmd/goldctl -- auth --service-account ~/Downloads/api-project-146332866891-3816d0d33259.json --work-dir $HOME/goldctlx`
+WORKDIR=/tmp/goldctl
+mkdir -p "$WORK_DIR"
 
-WORKDIR=$HOME/goldctl
 EXTRACT_DIR=/tmp/gold
 mkdir -p "$EXTRACT_DIR"
 
