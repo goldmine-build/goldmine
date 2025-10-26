@@ -34,5 +34,12 @@ For each image add it to the files to be uploaded:
 filename=/tmp/gold/perf_commit-detail-picker-sk.png
 bazel run //gold-client/cmd/goldctl -- imgtest add \
 --png-file /tmp/gold/perf_commit-detail-picker-sk.png \
---test-name `echo $(basename $filename) | sed s/.*_// | sed s/.png//` 
+--test-name `echo $(basename $filename) | sed s/.*_// | sed s/.png//` \
+--work-dir $HOME/goldctl
+```
+
+Then finalize:
+
+```
+bazel run //gold-client/cmd/goldctl -- imgtest finalize --work-dir $HOME/goldctl
 ```

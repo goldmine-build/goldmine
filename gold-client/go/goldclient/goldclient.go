@@ -404,20 +404,24 @@ func (c *CloudClient) addTest(ctx context.Context, name types.TestName, imgFileN
 // groupingForTrace returns the grouping for the given trace. It fails if the trace params do not
 // include all the keys needed by the corpus' grouping.
 func (c *CloudClient) groupingForTrace(ctx context.Context, traceParams paramtools.Params) (paramtools.Params, error) {
-	corpus, ok := traceParams[types.CorpusField]
-	if !ok {
-		return nil, skerr.Fmt("trace params must include key %q, got: %v", types.CorpusField, traceParams)
-	}
-	groupings, err := c.getGroupings(ctx)
-	if err != nil {
-		return nil, skerr.Wrapf(err, "retrieving groupings")
-	}
-	groupingParams, ok := groupings[corpus]
-	if !ok {
-		return nil, skerr.Fmt("grouping params for corpus %q are unknown; known grouping params: %v", corpus, groupings)
-	}
+	/*
+		corpus, ok := traceParams[types.CorpusField]
+		if !ok {
+			return nil, skerr.Fmt("trace params must include key %q, got: %v", types.CorpusField, traceParams)
+		}
+			groupings, err := c.getGroupings(ctx)
+			if err != nil {
+				return nil, skerr.Wrapf(err, "retrieving groupings")
+			}
+			groupingParams, ok := groupings[corpus]
+			if !ok {
+				return nil, skerr.Fmt("grouping params for corpus %q are unknown; known grouping params: %v", corpus, groupings)
+			}
+	*/
+	groupingParams := []string{types.CorpusField, "name"}
 	grouping := paramtools.Params{}
 	for _, param := range groupingParams {
+		var ok bool
 		grouping[param], ok = traceParams[param]
 		if !ok {
 			return nil, skerr.Fmt("trace params must include key %q, got: %v", param, traceParams)
@@ -428,6 +432,8 @@ func (c *CloudClient) groupingForTrace(ctx context.Context, traceParams paramtoo
 
 // getGroupings returns the param keys by which digests on each corpus are grouped.
 func (c *CloudClient) getGroupings(ctx context.Context) (map[string][]string, error) {
+	// Should return ["source_type", "name"] for all corpora in Gold.
+
 	if c.groupingParamKeysByCorpus == nil {
 		endpointUrl := c.resultState.GoldURL + "/json/v1/groupings"
 
