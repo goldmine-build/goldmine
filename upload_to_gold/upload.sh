@@ -3,15 +3,6 @@ set -e
 set -x
 set -o pipefail 
 
-echo "$GCP_GCS_SERVICE_ACCT" > /tmp/serice-account.json
-
-bazel run //gold-client/cmd/goldctl -- auth --service-account /tmp/serice-account.json --work-dir $HOME/goldctlx`
-
-# bazel run //gold-client/cmd/goldctl -- auth --service-account ~/Downloads/api-project-146332866891-3816d0d33259.json --work-dir $HOME/goldctlx`
-
-# Run all the modules tests which generate images to be uploaded to Gold.
-bazel test //golden/modules/... //perf/modules/...
-
 # Create working directory for goldctl.
 WORKDIR=/tmp/goldctl
 mkdir -p "$WORKDIR"
@@ -20,11 +11,21 @@ mkdir -p "$WORKDIR"
 EXTRACT_DIR=/tmp/gold
 mkdir -p "$EXTRACT_DIR"
 
+
+echo "$GCP_GCS_SERVICE_ACCT" > /tmp/serice-account.json
+
+bazel run //gold-client/cmd/goldctl -- auth --service-account /tmp/serice-account.json --work-dir $WORKDIR`
+
+# bazel run //gold-client/cmd/goldctl -- auth --service-account ~/Downloads/api-project-146332866891-3816d0d33259.json --work-dir $WORKDIR`
+
+# Run all the modules tests which generate images to be uploaded to Gold.
+bazel test //golden/modules/... //perf/modules/...
+
 # Initialize goldctl with the appropriate parameters.
 bazel run //gold-client/cmd/goldctl -- imgtest init \
   --bucket goldmine-build-private \
   --git_hash `git rev-parse HEAD` \
-  --work-dir $HOME/goldctl \
+  --work-dir $WORKDIR \
   --upload-only \
   --corpus goldmine \
   --instance goldmine \
@@ -44,4 +45,4 @@ done
 
 # Finalize the upload by uploading the metadata in the WORKDIR to the cloud
 # storage bucket.
-bazel run //gold-client/cmd/goldctl -- imgtest finalize --work-dir $HOME/goldctl
+bazel run //gold-client/cmd/goldctl -- imgtest finalize --work-dir $WORKDIR
