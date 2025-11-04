@@ -82,7 +82,7 @@ app_container(
     cmd = [],
     entrypoint = "/usr/local/bin/gold_ingestion",
     exe = "//golden/cmd/gold_ingestion:gold_ingestion",
-    repository = "us-east1-docker.pkg.dev/api-project-146332866891/goldmine/gold_ingestion",
+    repository = "ghcr.io/goldmine-build/gold_ingestion",
 )
 
 skia_app_container(
