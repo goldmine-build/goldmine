@@ -24,17 +24,30 @@ import (
 	"go.goldmine.build/golden/go/sql/schema"
 )
 
+func execSql(dbURL, sqlCmd string) {
+	out, err := exec.Command(
+		"cockroach", "sql",
+		"--insecure", "--url="+dbURL,
+		"--execute="+sqlCmd,
+	).CombinedOutput()
+	if err != nil {
+		sklog.Fatalf("%s: %s: %s: %v", dbURL, sqlCmd, string(out), err)
+	}
+	sklog.Infof("Out: %s", string(out))
+}
+
 func main() {
-	backupBucket := flag.String("backup_bucket", "skia-gold-sql-backups", "The bucket backups should be written to. Defaults to public bucket.")
-	dbCluster := flag.String("db_cluster", "gold-cockroachdb:26234", "The name of the cluster")
-	dbName := flag.String("db_name", "", "name of database to init")
+	// Why aren't these read from the config?
+	backupBucket := flag.String("backup_bucket", "goldmine-gold-database-backups", "The bucket backups should be written to. Defaults to public bucket.")
+	dbURL := flag.String("db_cluster", "postgres://root@goldmine-prime:26257/gold", "The URL of the cluster")
+	dbName := flag.String("db_name", "gold", "name of database to init")
 
 	sklogimpl.SetLogger(stdlogging.New(os.Stderr))
 	flag.Parse()
 	if *dbName == "" {
 		sklog.Fatalf("Must supply db_name")
 	}
-	if *dbCluster == "" {
+	if *dbURL == "" {
 		sklog.Fatalf("Must supply db_cluster")
 	}
 	if *backupBucket == "" {
@@ -44,61 +57,22 @@ func main() {
 	normalizedDB := strings.ToLower(*dbName)
 
 	sklog.Infof("Creating database %s", normalizedDB)
-	out, err := exec.Command("kubectl", "run",
-		"gold-cockroachdb-init-"+normalizedDB,
-		"--restart=Never", "--image=cockroachdb/cockroach:v20.2.7",
-		"--rm", "-it", // -it forces this command to wait until it completes.
-		"--", "sql",
-		"--insecure", "--host="+*dbCluster,
-		"--execute=CREATE DATABASE IF NOT EXISTS "+normalizedDB,
-	).CombinedOutput()
-	if err != nil {
-		sklog.Fatalf("Error while creating database %s: %s %s", normalizedDB, err, out)
-	}
+	execSql(*dbURL, "CREATE DATABASE IF NOT EXISTS "+normalizedDB+";")
 
 	sklog.Infof("Creating tables")
-	out, err = exec.Command("kubectl", "run",
-		"gold-cockroachdb-init-"+normalizedDB,
-		"--restart=Never", "--image=cockroachdb/cockroach:v20.2.7",
-		"--rm", "-it", // -it forces this command to wait until it completes.
-		"--", "sql",
-		"--insecure", "--host="+*dbCluster, "--database="+normalizedDB,
-		"--execute="+schema.Schema,
-	).CombinedOutput()
-	if err != nil {
-		sklog.Fatalf("Error while creating tables: %s %s", err, out)
-	}
+	execSql(*dbURL, schema.Schema)
 
 	sklog.Infof("Deleting existing schedules, if any")
-	out, err = exec.Command("kubectl", "run",
-		"gold-cockroachdb-init-"+normalizedDB,
-		"--restart=Never", "--image=cockroachdb/cockroach:v20.2.7",
-		"--rm", "-it", // -it forces this command to wait until it completes.
-		"--", "sql",
-		"--insecure", "--host="+*dbCluster, "--database="+normalizedDB,
-		"--execute="+dropExistingSchedules(normalizedDB),
-	).CombinedOutput()
-	if err != nil {
-		sklog.Fatalf("Error while creating tables: %s %s", err, out)
-	}
-	sklog.Infof("Output: %s", out)
+	execSql(*dbURL, dropExistingSchedules(normalizedDB))
+
 	// Make sure the drop commands really finish before creating new things.
 	time.Sleep(2 * time.Second)
 
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	sklog.Infof("Creating automatic backup schedules")
-	out, err = exec.Command("kubectl", "run",
-		"gold-cockroachdb-init-"+normalizedDB,
-		"--restart=Never", "--image=cockroachdb/cockroach:v20.2.7",
-		"--rm", "-it", // -it forces this command to wait until it completes.
-		"--", "sql",
-		"--insecure", "--host="+*dbCluster,
-		"--execute="+getSchedules(schema.Tables{}, *backupBucket, normalizedDB, rng),
-	).CombinedOutput()
-	if err != nil {
-		sklog.Fatalf("Error while creating schedules: %s %s", err, out)
-	}
+	execSql(*dbURL, getSchedules(schema.Tables{}, *backupBucket, normalizedDB, rng))
+
 	sklog.Info("Done")
 }
 

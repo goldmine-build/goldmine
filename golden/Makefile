@@ -37,7 +37,7 @@ release_gitilesfollower_container:
 # Build the gold-ingestion container with Bazel and push it to GCR.
 .PHONY: release_ingestion_container
 release_ingestion_container:
-	$(BAZEL) run --config=mayberemote //golden:push_gold_ingestion_container
+	$(BAZEL) run --config=mayberemote --stamp //golden:gold_ingestion_container_push
 
 # Build the gold-periodictasks container with Bazel and push it to GCR.
 .PHONY: release_periodictasks_container

@@ -1,5 +1,6 @@
 # TODO
 
+* Add GOOGLE_APPLICATION_CREDENTIALS env variable to cdb so backup to GCS will work.
 * Add support for a non-CockroachDB backend to Perf, maybe [Yugabyte](https://www.yugabyte.com/)?
 * Update to latest Google Material color utilities.
 * Move to strictly pnpm.

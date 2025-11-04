@@ -1,3 +1,4 @@
+load("//bazel:app_container.bzl", "app_container")
 load("//bazel:skia_app_container.bzl", "skia_app_container")
 load("//golden/pages:all_gold_pages.bzl", "ALL_GOLD_PAGES")
 load(":gold_launcher.bzl", "gold_launcher")
@@ -75,18 +76,13 @@ skia_app_container(
     repository = "skia-public/gold-gitilesfollower",
 )
 
-skia_app_container(
+app_container(
     name = "gold_ingestion_container",
-    dirs = {
-        "/usr/local/bin": [
-            [
-                "//golden/cmd/gold_ingestion:gold_ingestion",
-                "0755",
-            ],
-        ],
-    },
+    base = "@ubuntu",
+    cmd = [],
     entrypoint = "/usr/local/bin/gold_ingestion",
-    repository = "skia-public/gold-ingestion",
+    exe = "//golden/cmd/gold_ingestion:gold_ingestion",
+    repository = "us-east1-docker.pkg.dev/api-project-146332866891/goldmine/gold_ingestion",
 )
 
 skia_app_container(
