@@ -15,7 +15,7 @@ filegroup(
 #    $ docker run -ti perfserver:latest
 app_container(
     name = "perfserver",
-    base = "@ubuntu",
+    base = "@base",
     cmd = [],
     config = ":configs",
     entrypoint = "/usr/bin/bash",

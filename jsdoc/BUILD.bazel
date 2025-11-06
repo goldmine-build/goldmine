@@ -3,7 +3,7 @@ load("//bazel:app_container.bzl", "app_container")
 #
 app_container(
     name = "jsdoc",
-    base = "@distroless_base",
+    base = "@base",
     cmd = ["--resources_dir=/usr/local/share/jsdoc/dist"],
     entrypoint = "/usr/local/bin/jsdoc",
     exe = "//jsdoc/go/jsdoc:jsdoc",
