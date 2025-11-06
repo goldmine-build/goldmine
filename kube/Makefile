@@ -9,9 +9,7 @@ test:
 	go test ./go/...
 
 push_base:
-	podman build -t base -f ./base/Containerfile 
-	podman tag base:latest ghcr.io/goldmine-build/base:latest	
-	podman push ghcr.io/goldmine-build/base:latest	
+	./build_base_release
 
 release_auth_proxy:
 	$(BAZEL) run --config=mayberemote //kube/cmd/auth-proxy:push_auth-proxy-container
