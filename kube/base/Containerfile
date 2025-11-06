@@ -5,4 +5,4 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y  \
   && rm -rf /var/lib/apt/lists/* \
   && addgroup --gid 2000 goldminer \
   && adduser --uid 2000 --gid 2000 goldminer
-USER goldminer:goldminer
+# USER goldminer:goldminer
