@@ -78,7 +78,7 @@ skia_app_container(
 
 app_container(
     name = "gold_ingestion_container",
-    base = "@ubuntu",
+    base = "@base",
     cmd = [],
     entrypoint = "/usr/local/bin/gold_ingestion",
     exe = "//golden/cmd/gold_ingestion:gold_ingestion",

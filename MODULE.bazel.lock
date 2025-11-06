@@ -1133,7 +1133,7 @@
     "@@rules_oci+//oci:extensions.bzl%oci": {
       "general": {
         "bzlTransitiveDigest": "wpnwi989JUEReiBka08jrHl/G2W0T5K62RMgH2FZ4c4=",
-        "usagesDigest": "ZiZogs6mxlwefGSN9qffdL2ln9lu7zNlyGJNAI0arWo=",
+        "usagesDigest": "qDjglvcDVYIwPpZ/nGL9V1i0Xxz1DjyANC+H2jjA9To=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -1193,6 +1193,35 @@
                 "@@platforms//cpu:x86_64": "@ubuntu_linux_amd64"
               },
               "bzlmod_repository": "ubuntu",
+              "reproducible": true
+            }
+          },
+          "base_linux_amd64": {
+            "repoRuleId": "@@rules_oci+//oci/private:pull.bzl%oci_pull",
+            "attributes": {
+              "www_authenticate_challenges": {},
+              "scheme": "https",
+              "registry": "ghcr.io",
+              "repository": "goldmine-build/base",
+              "identifier": "sha256:8a99973433cbab61707e6ef3e485235de463121d07d5df68b44134835889ef8b",
+              "platform": "linux/amd64",
+              "target_name": "base_linux_amd64",
+              "bazel_tags": []
+            }
+          },
+          "base": {
+            "repoRuleId": "@@rules_oci+//oci/private:pull.bzl%oci_alias",
+            "attributes": {
+              "target_name": "base",
+              "www_authenticate_challenges": {},
+              "scheme": "https",
+              "registry": "ghcr.io",
+              "repository": "goldmine-build/base",
+              "identifier": "sha256:8a99973433cbab61707e6ef3e485235de463121d07d5df68b44134835889ef8b",
+              "platforms": {
+                "@@platforms//cpu:x86_64": "@base_linux_amd64"
+              },
+              "bzlmod_repository": "base",
               "reproducible": true
             }
           },
@@ -1315,7 +1344,9 @@
             "distroless_base",
             "distroless_base_linux_amd64",
             "ubuntu",
-            "ubuntu_linux_amd64"
+            "ubuntu_linux_amd64",
+            "base",
+            "base_linux_amd64"
           ],
           "explicitRootModuleDirectDevDeps": [],
           "useAllRepos": "NO",
