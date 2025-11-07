@@ -101,6 +101,13 @@ const (
 	FromSubject = extractionTechnique("FromSubject")
 )
 
+// GitilesLogger is a subset of the gitiles client library that we need. This allows us to mock
+// it out during tests.
+type GitilesLogger interface {
+	Log(ctx context.Context, logExpr string, opts ...gitiles.LogOption) ([]*vcsinfo.LongCommit, error)
+	LogFirstParent(ctx context.Context, from, to string, opts ...gitiles.LogOption) ([]*vcsinfo.LongCommit, error)
+}
+
 func main() {
 	// Command line flags.
 	var (
@@ -139,7 +146,8 @@ func main() {
 		sklog.Fatalf("Problem setting up default token source: %s", err)
 	}
 	client := httputils.DefaultClientConfig().WithTokenSource(ts).Client()
-	gitilesClient := gitiles.NewRepo(rfc.GitRepoURL, client)
+	var gitilesClient GitilesLogger
+	gitilesClient = gitiles.NewRepo(rfc.GitRepoURL, client)
 	// This starts a goroutine in the background
 	if err := pollRepo(ctx, db, gitilesClient, rfc); err != nil {
 		sklog.Fatalf("Could not do initial update: %s", err)
@@ -173,7 +181,7 @@ func mustInitSQLDatabase(ctx context.Context, fcc repoFollowerConfig) *pgxpool.P
 
 // pollRepo does an initial updateCycle and starts a goroutine to continue updating according
 // to the provided duration for as long as the context remains ok.
-func pollRepo(ctx context.Context, db *pgxpool.Pool, client *gitiles.Repo, rfc repoFollowerConfig) error {
+func pollRepo(ctx context.Context, db *pgxpool.Pool, client GitilesLogger, rfc repoFollowerConfig) error {
 	sklog.Infof("Doing initial update")
 	err := updateCycle(ctx, db, client, rfc)
 	if err != nil {
@@ -197,13 +205,6 @@ func pollRepo(ctx context.Context, db *pgxpool.Pool, client *gitiles.Repo, rfc r
 		}
 	}()
 	return nil
-}
-
-// GitilesLogger is a subset of the gitiles client library that we need. This allows us to mock
-// it out during tests.
-type GitilesLogger interface {
-	Log(ctx context.Context, logExpr string, opts ...gitiles.LogOption) ([]*vcsinfo.LongCommit, error)
-	LogFirstParent(ctx context.Context, from, to string, opts ...gitiles.LogOption) ([]*vcsinfo.LongCommit, error)
 }
 
 // updateCycle polls the gitiles repo for the latest commit and the database for the previously
@@ -336,7 +337,7 @@ func checkForLanded(ctx context.Context, db *pgxpool.Pool, client *http.Client, 
 		return nil
 	}
 	sklog.Infof("Doing initial check for landed CLs")
-	var gClients []*gitiles.Repo
+	var gClients []GitilesLogger
 	for _, repo := range rfc.ReposToMonitorCLs {
 		gClients = append(gClients, gitiles.NewRepo(repo.RepoURL, client))
 	}
