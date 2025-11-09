@@ -17,12 +17,13 @@ func New(
 	ctx context.Context,
 	provider config.GitProvider,
 	url string,
+	branch string,
 	startCommit string,
 	authType config.GitAuthType, // Only used for git_checkout provider.
 	dir string, // Only used for git_checkout provider.
 ) (provider.Provider, error) {
 	if util.In(string(provider), []string{"", string(config.GitProviderCLI)}) {
-		return git_checkout.New(ctx, authType, url, startCommit, dir)
+		return git_checkout.New(ctx, authType, url, branch, startCommit, dir)
 	} else if provider == config.GitProviderGitiles {
 		return gitiles.New(ctx, url, startCommit)
 	}

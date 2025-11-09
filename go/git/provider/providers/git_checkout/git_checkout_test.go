@@ -32,7 +32,7 @@ func NewForTest(t *testing.T) (context.Context, *testutils.GitBuilder, []string,
 	ctx, cancel := context.WithCancel(ctx)
 
 	// Create a git repo for testing purposes.
-	gb := testutils.GitInit(t, ctx)
+	gb := testutils.GitInitWithDefaultBranch(t, ctx, "main")
 	hashes := []string{}
 	hashes = append(hashes, gb.CommitGenAt(ctx, "foo.txt", StartTime))
 	hashes = append(hashes, gb.CommitGenAt(ctx, "foo.txt", StartTime.Add(time.Minute)))
@@ -58,6 +58,24 @@ func NewForTest(t *testing.T) (context.Context, *testutils.GitBuilder, []string,
 	url := gb.Dir()
 	dir := filepath.Join(tmpDir, "checkout")
 	return ctx, gb, hashes, url, dir
+}
+
+func TestNewWithBranchThatDoesNotExist_Failure(t *testing.T) {
+	ctx, _, _, url, dir := NewForTest(t)
+	_, err := New(ctx, "", url, "unknown-branch-name", "", dir)
+	require.Error(t, err)
+}
+
+func TestNewWithEmptyBranchThatShouldPickDefaultBranch_Failure(t *testing.T) {
+	ctx, _, _, url, dir := NewForTest(t)
+	_, err := New(ctx, "", url, "", "", dir)
+	require.NoError(t, err)
+}
+
+func TestNewWithBranchNameSpecified_Failure(t *testing.T) {
+	ctx, _, _, url, dir := NewForTest(t)
+	_, err := New(ctx, "", url, "main", "", dir)
+	require.NoError(t, err)
 }
 
 func TestParseGitRevLogStream_Success(t *testing.T) {
@@ -181,7 +199,7 @@ func TestParseGitRevLogStream_ErrMalformedCommitLine(t *testing.T) {
 
 func TestLogEntry_Success(t *testing.T) {
 	ctx, _, hashes, url, dir := NewForTest(t)
-	g, err := New(ctx, "", url, "", dir)
+	g, err := New(ctx, "", url, "", "", dir)
 	require.NoError(t, err)
 
 	got, err := g.LogEntry(ctx, hashes[1])
@@ -197,7 +215,7 @@ Date:   Tue Mar 28 10:41:00 2023 +0000
 
 func TestLogEntry_BadCommitId_ReturnsError(t *testing.T) {
 	ctx, _, _, url, dir := NewForTest(t)
-	g, err := New(ctx, "", url, "", dir)
+	g, err := New(ctx, "", url, "", "", dir)
 	require.NoError(t, err)
 
 	_, err = g.LogEntry(ctx, "this-is-not-a-known-git-hash")
@@ -206,7 +224,7 @@ func TestLogEntry_BadCommitId_ReturnsError(t *testing.T) {
 
 func TestUpdate_SuccessAndNewCommitAppears(t *testing.T) {
 	ctx, gb, _, url, dir := NewForTest(t)
-	g, err := New(ctx, "", url, "", dir)
+	g, err := New(ctx, "", url, "", "", dir)
 	require.NoError(t, err)
 
 	_, err = g.LogEntry(ctx, "this-is-not-a-known-git-hash")
@@ -223,7 +241,7 @@ func TestUpdate_SuccessAndNewCommitAppears(t *testing.T) {
 func TestGitHashesInRangeForFile_FileIsChangedAtBeginHash_BeginHashIsExcludedFromResponse(t *testing.T) {
 	// The 'bar.txt' file is only changed commit 3 and 6.
 	ctx, _, hashes, url, dir := NewForTest(t)
-	g, err := New(ctx, "", url, "", dir)
+	g, err := New(ctx, "", url, "", "", dir)
 	require.NoError(t, err)
 
 	// GitHashesInRangeForFile is exclusive of 'begin', so it should not be in
@@ -236,7 +254,7 @@ func TestGitHashesInRangeForFile_FileIsChangedAtBeginHash_BeginHashIsExcludedFro
 func TestGitHashesInRangeForFile_BeginHashIsEmpty_SearchGoesToBeginningOfRepoHistory(t *testing.T) {
 	// The 'bar.txt' file is only changed commit 3 and 6.
 	ctx, _, hashes, url, dir := NewForTest(t)
-	g, err := New(ctx, "", url, "", dir)
+	g, err := New(ctx, "", url, "", "", dir)
 	require.NoError(t, err)
 
 	changedAt, err := g.GitHashesInRangeForFile(ctx, "", hashes[7], "bar.txt")
@@ -248,7 +266,7 @@ func TestGitHashesInRangeForFile_BeginHashIsEmptyButStartCommitIsSet_SearchGoesT
 	// The 'bar.txt' file is only changed commit 3 and 6.
 	ctx, _, hashes, url, dir := NewForTest(t)
 	// We change the StartCommit to 3, so we should only see the change at 6.
-	g, err := New(ctx, "", url, hashes[3], dir)
+	g, err := New(ctx, "", url, "", hashes[3], dir)
 
 	require.NoError(t, err)
 
@@ -259,7 +277,7 @@ func TestGitHashesInRangeForFile_BeginHashIsEmptyButStartCommitIsSet_SearchGoesT
 
 func TestCommitsFromMostRecentGitHashToHead_ProvideEmptyGitHash_ReceiveAllHashesInRepo(t *testing.T) {
 	ctx, _, hashes, url, dir := NewForTest(t)
-	g, err := New(ctx, "", url, "", dir)
+	g, err := New(ctx, "", url, "", "", dir)
 	require.NoError(t, err)
 
 	err = g.CommitsFromMostRecentGitHashToHead(ctx, "", func(c provider.Commit) error {
@@ -274,7 +292,7 @@ func TestCommitsFromMostRecentGitHashToHead_ProvideEmptyGitHashButStartCommitIsS
 	// The 'bar.txt' file is only changed commit 3 and 6.
 	ctx, _, hashes, url, dir := NewForTest(t)
 	// We change the StartCommit to 3, so we should only see the change at 6.
-	g, err := New(ctx, "", url, hashes[2], dir)
+	g, err := New(ctx, "", url, "", hashes[2], dir)
 
 	require.NoError(t, err)
 
@@ -290,7 +308,7 @@ func TestCommitsFromMostRecentGitHashToHead_ProvideEmptyGitHashButStartCommitIsS
 
 func TestCommitsFromMostRecentGitHashToHead_ProvideNonEmptyGitHash_ReceiveAllNewerHashesInRepo(t *testing.T) {
 	ctx, _, hashes, url, dir := NewForTest(t)
-	g, err := New(ctx, "", url, "", dir)
+	g, err := New(ctx, "", url, "", "", dir)
 	require.NoError(t, err)
 
 	// Note we use 3 here, because we pass hashes[2] below, so

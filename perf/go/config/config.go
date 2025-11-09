@@ -287,6 +287,9 @@ type GitRepoConfig struct {
 	// URL that the Git repo is fetched from.
 	URL string `json:"url"`
 
+	// The git branch to follow.
+	Branch string `json:"branch,omitempty"`
+
 	// Dir is the directory into which the repo should be checked out.
 	Dir string `json:"dir"`
 

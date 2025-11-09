@@ -27,6 +27,8 @@ const (
 var (
 	// StartTime is the time of the first commit.
 	StartTime = time.Unix(1680000000, 0)
+
+	BranchName = "main"
 )
 
 // NewForTest returns all the necessary variables needed to test against infra/go/git.
@@ -39,7 +41,7 @@ func NewForTest(t *testing.T) (context.Context, pool.Pool, *testutils.GitBuilder
 	ctx, cancel := context.WithCancel(ctx)
 
 	// Create a git repo for testing purposes.
-	gb := testutils.GitInit(t, ctx)
+	gb := testutils.GitInitWithDefaultBranch(t, ctx, BranchName)
 	hashes := []string{}
 	hashes = append(hashes, gb.CommitGenAt(ctx, "foo.txt", StartTime))
 	hashes = append(hashes, gb.CommitGenAt(ctx, "foo.txt", StartTime.Add(time.Minute)))
@@ -89,7 +91,7 @@ func NewForTest(t *testing.T) (context.Context, pool.Pool, *testutils.GitBuilder
 			Dir: filepath.Join(tmpDir, "checkout"),
 		},
 	}
-	gp, err := git_checkout.New(ctx, "", instanceConfig.GitRepoConfig.URL, "", instanceConfig.GitRepoConfig.Dir)
+	gp, err := git_checkout.New(ctx, "", instanceConfig.GitRepoConfig.URL, BranchName, "", instanceConfig.GitRepoConfig.Dir)
 	require.NoError(t, err)
 	return ctx, db, gb, hashes, gp, instanceConfig
 }

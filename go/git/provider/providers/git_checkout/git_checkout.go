@@ -43,6 +43,7 @@ func New(
 	ctx context.Context,
 	authType config.GitAuthType,
 	url string,
+	branch string,
 	startCommit string,
 	dir string, // Only used for git_checkout provider.
 ) (*Impl, error) {
@@ -71,13 +72,22 @@ func New(
 		return nil, skerr.Wrapf(err, "Failed to get absolute path to git.")
 	}
 
+	// Example command to clone a single branch:
+	// git clone --single-branch --branch <branchname> <remote-repo> <target-dir>
+
 	// Clone the git repo if necessary.
 	sklog.Infof("Cloning repo.")
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
-		cmd := exec.CommandContext(ctx, gitFullPath, "clone", url, dir)
+		args := []string{"clone", "--single-branch"}
+		if branch != "" {
+			args = append(args, "--branch", branch)
+		}
+		args = append(args, url, dir)
+		sklog.Infof("Running git clone command: %q", strings.Join(args, " "))
+		cmd := exec.CommandContext(ctx, gitFullPath, args...)
 		if err := cmd.Run(); err != nil {
 			exerr := err.(*exec.ExitError)
-			return nil, skerr.Wrapf(err, "Failed to clone repo: %s - %s", err, exerr.Stderr)
+			return nil, skerr.Wrapf(err, "cloning repo: %s - %s", err, exerr.Stderr)
 		}
 	}
 
