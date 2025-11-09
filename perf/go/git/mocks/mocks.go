@@ -9,7 +9,7 @@ import (
 	"time"
 
 	mock "github.com/stretchr/testify/mock"
-	"go.goldmine.build/perf/go/git/provider"
+	"go.goldmine.build/go/git/provider"
 	"go.goldmine.build/perf/go/types"
 )
 

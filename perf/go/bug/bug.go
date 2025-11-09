@@ -2,8 +2,8 @@
 package bug
 
 import (
+	"go.goldmine.build/go/git/provider"
 	"go.goldmine.build/go/sklog"
-	"go.goldmine.build/perf/go/git/provider"
 	"gopkg.in/olivere/elastic.v5/uritemplates"
 )
 

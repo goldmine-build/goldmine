@@ -11,6 +11,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.goldmine.build/go/git/provider"
 	"go.goldmine.build/go/now"
 	"go.goldmine.build/go/paramtools"
 	"go.goldmine.build/go/query"
@@ -18,7 +19,6 @@ import (
 	"go.goldmine.build/perf/go/config"
 	"go.goldmine.build/perf/go/git"
 	"go.goldmine.build/perf/go/git/gittest"
-	"go.goldmine.build/perf/go/git/provider"
 	"go.goldmine.build/perf/go/sql/sqltest"
 	"go.goldmine.build/perf/go/tracestore"
 	"go.goldmine.build/perf/go/types"

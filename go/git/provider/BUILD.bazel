@@ -3,7 +3,7 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "provider",
     srcs = ["provider.go"],
-    importpath = "go.goldmine.build/perf/go/git/provider",
+    importpath = "go.goldmine.build/go/git/provider",
     visibility = ["//visibility:public"],
     deps = [
         "//go/human",

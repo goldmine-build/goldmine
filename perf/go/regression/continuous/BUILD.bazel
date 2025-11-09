@@ -33,6 +33,7 @@ go_test(
     srcs = ["continuous_test.go"],
     embed = [":continuous"],
     deps = [
+        "//go/git/provider",
         "//go/paramtools",
         "//go/testutils",
         "//perf/go/alerts",
@@ -42,7 +43,6 @@ go_test(
         "//perf/go/dataframe",
         "//perf/go/dataframe/mocks",
         "//perf/go/git/mocks",
-        "//perf/go/git/provider",
         "//perf/go/notify/mocks",
         "//perf/go/regression",
         "//perf/go/regression/mocks",

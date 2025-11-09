@@ -1,9 +1,0 @@
-load("@rules_go//go:def.bzl", "go_library")
-
-go_library(
-    name = "types",
-    srcs = ["types.go"],
-    importpath = "go.goldmine.build/npm-audit-mirror/go/types",
-    visibility = ["//visibility:public"],
-    deps = ["//go/issuetracker/v1:issuetracker"],
-)

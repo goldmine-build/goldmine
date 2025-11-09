@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
+	"go.goldmine.build/go/git/provider"
 	"go.goldmine.build/go/paramtools"
 	"go.goldmine.build/go/query"
-	"go.goldmine.build/perf/go/git/provider"
 	"go.goldmine.build/perf/go/types"
 )
 

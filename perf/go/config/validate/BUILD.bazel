@@ -8,6 +8,7 @@ go_library(
     importpath = "go.goldmine.build/perf/go/config/validate",
     visibility = ["//visibility:public"],
     deps = [
+        "//go/git/provider",
         "//go/jsonschema",
         "//go/skerr",
         "//go/sklog",
@@ -16,7 +17,6 @@ go_library(
         "//perf/go/clustering2",
         "//perf/go/config",
         "//perf/go/dataframe",
-        "//perf/go/git/provider",
         "//perf/go/notify",
         "//perf/go/notifytypes",
         "//perf/go/stepfit",

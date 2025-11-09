@@ -4,13 +4,13 @@ package notify
 import (
 	"context"
 
+	"go.goldmine.build/go/git/provider"
 	"go.goldmine.build/go/paramtools"
 	"go.goldmine.build/go/skerr"
 	"go.goldmine.build/perf/go/alerts"
 	"go.goldmine.build/perf/go/clustering2"
 	"go.goldmine.build/perf/go/config"
 	"go.goldmine.build/perf/go/dataframe"
-	"go.goldmine.build/perf/go/git/provider"
 	"go.goldmine.build/perf/go/notifytypes"
 	"go.goldmine.build/perf/go/stepfit"
 	"go.goldmine.build/perf/go/ui/frame"

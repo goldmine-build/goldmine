@@ -6,11 +6,11 @@ go_library(
     importpath = "go.goldmine.build/perf/go/git/gittest",
     visibility = ["//visibility:public"],
     deps = [
+        "//go/git/provider",
+        "//go/git/provider/providers/git_checkout",
         "//go/git/testutils",
         "//go/sql/pool",
         "//perf/go/config",
-        "//perf/go/git/provider",
-        "//perf/go/git/provider/providers/git_checkout",
         "//perf/go/sql/sqltest",
         "@com_github_stretchr_testify//assert",
         "@com_github_stretchr_testify//require",

@@ -11,6 +11,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"go.goldmine.build/email/go/emailclient"
+	"go.goldmine.build/go/git/provider"
 	"go.goldmine.build/go/now"
 	"go.goldmine.build/go/paramtools"
 	"go.goldmine.build/go/testutils"
@@ -18,7 +19,6 @@ import (
 	"go.goldmine.build/perf/go/clustering2"
 	"go.goldmine.build/perf/go/config"
 	"go.goldmine.build/perf/go/dataframe"
-	"go.goldmine.build/perf/go/git/provider"
 	"go.goldmine.build/perf/go/notify/mocks"
 	"go.goldmine.build/perf/go/stepfit"
 	"go.goldmine.build/perf/go/ui/frame"

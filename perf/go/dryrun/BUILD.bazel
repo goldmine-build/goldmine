@@ -7,12 +7,12 @@ go_library(
     visibility = ["//visibility:public"],
     deps = [
         "//go/auditlog",
+        "//go/git/provider",
         "//go/httputils",
         "//go/sklog",
         "//perf/go/config",
         "//perf/go/dataframe",
         "//perf/go/git",
-        "//perf/go/git/provider",
         "//perf/go/progress",
         "//perf/go/regression",
         "//perf/go/shortcut",

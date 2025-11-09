@@ -4,17 +4,17 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "gitiles",
     srcs = ["gitiles.go"],
-    importpath = "go.goldmine.build/perf/go/git/provider/providers/gitiles",
+    importpath = "go.goldmine.build/go/git/provider/providers/gitiles",
     visibility = ["//visibility:public"],
     deps = [
         "//go/auth",
         "//go/git",
+        "//go/git/provider",
         "//go/gitiles",
         "//go/httputils",
         "//go/skerr",
         "//go/sklog",
         "//go/vcsinfo",
-        "//perf/go/git/provider",
         "@org_golang_x_oauth2//google",
     ],
 )
@@ -25,11 +25,11 @@ go_test(
     embed = [":gitiles"],
     deps = [
         "//go/git",
+        "//go/git/provider",
         "//go/gitiles",
         "//go/gitiles/mocks",
         "//go/testutils",
         "//go/vcsinfo",
-        "//perf/go/git/provider",
         "@com_github_stretchr_testify//mock",
         "@com_github_stretchr_testify//require",
     ],

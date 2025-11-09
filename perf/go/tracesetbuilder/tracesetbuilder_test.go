@@ -5,9 +5,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"go.goldmine.build/go/git/provider"
 	"go.goldmine.build/go/paramtools"
 	"go.goldmine.build/go/vec32"
-	"go.goldmine.build/perf/go/git/provider"
 	"go.goldmine.build/perf/go/types"
 )
 

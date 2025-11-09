@@ -9,12 +9,12 @@ import (
 	"sort"
 
 	"go.goldmine.build/go/auditlog"
+	"go.goldmine.build/go/git/provider"
 	"go.goldmine.build/go/httputils"
 	"go.goldmine.build/go/sklog"
 	"go.goldmine.build/perf/go/config"
 	"go.goldmine.build/perf/go/dataframe"
 	perfgit "go.goldmine.build/perf/go/git"
-	"go.goldmine.build/perf/go/git/provider"
 	"go.goldmine.build/perf/go/progress"
 	"go.goldmine.build/perf/go/regression"
 	"go.goldmine.build/perf/go/shortcut"

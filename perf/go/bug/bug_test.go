@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"go.goldmine.build/perf/go/git/provider"
+	"go.goldmine.build/go/git/provider"
 )
 
 func TestExpand(t *testing.T) {

@@ -10,14 +10,14 @@ import (
 
 	lru "github.com/hashicorp/golang-lru"
 	"github.com/jackc/pgx/v4"
+	"go.goldmine.build/go/git/provider"
+	"go.goldmine.build/go/git/provider/providers"
 	"go.goldmine.build/go/gitiles"
 	"go.goldmine.build/go/metrics2"
 	"go.goldmine.build/go/skerr"
 	"go.goldmine.build/go/sklog"
 	"go.goldmine.build/go/sql/pool"
 	"go.goldmine.build/perf/go/config"
-	"go.goldmine.build/perf/go/git/provider"
-	"go.goldmine.build/perf/go/git/provider/providers"
 	"go.goldmine.build/perf/go/types"
 	"go.opencensus.io/trace"
 )

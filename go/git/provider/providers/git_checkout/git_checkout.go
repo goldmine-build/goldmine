@@ -14,11 +14,11 @@ import (
 
 	"go.goldmine.build/go/auth"
 	"go.goldmine.build/go/git/git_common"
+	"go.goldmine.build/go/git/provider"
 	"go.goldmine.build/go/gitauth"
 	"go.goldmine.build/go/skerr"
 	"go.goldmine.build/go/sklog"
 	"go.goldmine.build/perf/go/config"
-	"go.goldmine.build/perf/go/git/provider"
 	"go.goldmine.build/perf/go/types"
 	"go.opencensus.io/trace"
 	"golang.org/x/oauth2/google"

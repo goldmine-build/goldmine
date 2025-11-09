@@ -6,9 +6,9 @@ go_library(
     importpath = "go.goldmine.build/perf/go/notify/mocks",
     visibility = ["//visibility:public"],
     deps = [
+        "//go/git/provider",
         "//perf/go/alerts",
         "//perf/go/clustering2",
-        "//perf/go/git/provider",
         "//perf/go/ui/frame",
         "@com_github_stretchr_testify//mock",
     ],

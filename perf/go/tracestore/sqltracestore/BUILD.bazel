@@ -10,6 +10,7 @@ go_library(
     importpath = "go.goldmine.build/perf/go/tracestore/sqltracestore",
     visibility = ["//visibility:public"],
     deps = [
+        "//go/git/provider",
         "//go/metrics2",
         "//go/now",
         "//go/paramtools",
@@ -24,7 +25,6 @@ go_library(
         "//perf/go/cache/local",
         "//perf/go/cache/memcached",
         "//perf/go/config",
-        "//perf/go/git/provider",
         "//perf/go/tracestore",
         "//perf/go/types",
         "@com_github_hashicorp_golang_lru//:golang-lru",
@@ -52,6 +52,7 @@ go_test(
     # https://docs.bazel.build/versions/master/be/common-definitions.html#common-attributes-tests
     flaky = True,
     deps = [
+        "//go/git/provider",
         "//go/now",
         "//go/paramtools",
         "//go/query",
@@ -59,7 +60,6 @@ go_test(
         "//perf/go/config",
         "//perf/go/git",
         "//perf/go/git/gittest",
-        "//perf/go/git/provider",
         "//perf/go/sql/sqltest",
         "//perf/go/tracestore",
         "//perf/go/types",

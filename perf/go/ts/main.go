@@ -8,6 +8,7 @@ import (
 	"flag"
 	"io"
 
+	"go.goldmine.build/go/git/provider"
 	"go.goldmine.build/go/go2ts"
 	"go.goldmine.build/go/paramtools"
 	"go.goldmine.build/go/sklog"
@@ -17,7 +18,6 @@ import (
 	"go.goldmine.build/perf/go/config"
 	"go.goldmine.build/perf/go/dryrun"
 	"go.goldmine.build/perf/go/frontend"
-	"go.goldmine.build/perf/go/git/provider"
 	"go.goldmine.build/perf/go/graphsshortcut"
 	"go.goldmine.build/perf/go/ingest/format"
 	"go.goldmine.build/perf/go/notifytypes"

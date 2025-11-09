@@ -16,6 +16,7 @@ go_library(
     visibility = ["//visibility:public"],
     deps = [
         "//email/go/emailclient",
+        "//go/git/provider",
         "//go/issuetracker/v1:issuetracker",
         "//go/metrics2",
         "//go/now",
@@ -26,7 +27,6 @@ go_library(
         "//perf/go/clustering2",
         "//perf/go/config",
         "//perf/go/dataframe",
-        "//perf/go/git/provider",
         "//perf/go/notifytypes",
         "//perf/go/stepfit",
         "//perf/go/ui/frame",
@@ -46,6 +46,7 @@ go_test(
     embed = [":notify"],
     deps = [
         "//email/go/emailclient",
+        "//go/git/provider",
         "//go/now",
         "//go/paramtools",
         "//go/testutils",
@@ -53,7 +54,6 @@ go_test(
         "//perf/go/clustering2",
         "//perf/go/config",
         "//perf/go/dataframe",
-        "//perf/go/git/provider",
         "//perf/go/notify/mocks",
         "//perf/go/stepfit",
         "//perf/go/ui/frame",

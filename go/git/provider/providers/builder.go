@@ -4,12 +4,12 @@ package providers
 import (
 	"context"
 
+	"go.goldmine.build/go/git/provider"
+	"go.goldmine.build/go/git/provider/providers/git_checkout"
+	"go.goldmine.build/go/git/provider/providers/gitiles"
 	"go.goldmine.build/go/skerr"
 	"go.goldmine.build/go/util"
 	"go.goldmine.build/perf/go/config"
-	"go.goldmine.build/perf/go/git/provider"
-	"go.goldmine.build/perf/go/git/provider/providers/git_checkout"
-	"go.goldmine.build/perf/go/git/provider/providers/gitiles"
 )
 
 // New builds a Provider based on the instance config.

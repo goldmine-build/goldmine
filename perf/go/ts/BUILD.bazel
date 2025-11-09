@@ -6,6 +6,7 @@ go_library(
     importpath = "go.goldmine.build/perf/go/ts",
     visibility = ["//visibility:private"],
     deps = [
+        "//go/git/provider",
         "//go/go2ts",
         "//go/paramtools",
         "//go/sklog",
@@ -15,7 +16,6 @@ go_library(
         "//perf/go/config",
         "//perf/go/dryrun",
         "//perf/go/frontend",
-        "//perf/go/git/provider",
         "//perf/go/graphsshortcut",
         "//perf/go/ingest/format",
         "//perf/go/notifytypes",

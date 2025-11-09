@@ -6,9 +6,9 @@ go_library(
     importpath = "go.goldmine.build/perf/go/tracestore",
     visibility = ["//visibility:public"],
     deps = [
+        "//go/git/provider",
         "//go/paramtools",
         "//go/query",
-        "//perf/go/git/provider",
         "//perf/go/types",
     ],
 )

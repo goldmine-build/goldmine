@@ -8,9 +8,9 @@ import (
 	"context"
 
 	mock "github.com/stretchr/testify/mock"
+	"go.goldmine.build/go/git/provider"
 	"go.goldmine.build/perf/go/alerts"
 	"go.goldmine.build/perf/go/clustering2"
-	"go.goldmine.build/perf/go/git/provider"
 	"go.goldmine.build/perf/go/ui/frame"
 )
 

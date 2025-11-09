@@ -4,16 +4,16 @@ load("//bazel/go:go_test.bzl", "go_test")
 go_library(
     name = "git_checkout",
     srcs = ["git_checkout.go"],
-    importpath = "go.goldmine.build/perf/go/git/provider/providers/git_checkout",
+    importpath = "go.goldmine.build/go/git/provider/providers/git_checkout",
     visibility = ["//visibility:public"],
     deps = [
         "//go/auth",
         "//go/git/git_common",
+        "//go/git/provider",
         "//go/gitauth",
         "//go/skerr",
         "//go/sklog",
         "//perf/go/config",
-        "//perf/go/git/provider",
         "//perf/go/types",
         "@io_opencensus_go//trace",
         "@org_golang_x_oauth2//google",
@@ -25,8 +25,8 @@ go_test(
     srcs = ["git_checkout_test.go"],
     embed = [":git_checkout"],
     deps = [
+        "//go/git/provider",
         "//go/git/testutils",
-        "//perf/go/git/provider",
         "//perf/go/types",
         "@com_github_stretchr_testify//assert",
         "@com_github_stretchr_testify//require",

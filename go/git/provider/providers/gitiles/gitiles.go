@@ -8,12 +8,12 @@ import (
 
 	"go.goldmine.build/go/auth"
 	"go.goldmine.build/go/git"
+	"go.goldmine.build/go/git/provider"
 	"go.goldmine.build/go/gitiles"
 	"go.goldmine.build/go/httputils"
 	"go.goldmine.build/go/skerr"
 	"go.goldmine.build/go/sklog"
 	"go.goldmine.build/go/vcsinfo"
-	"go.goldmine.build/perf/go/git/provider"
 	"golang.org/x/oauth2/google"
 )
 

@@ -8,6 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.goldmine.build/go/git/provider"
 	"go.goldmine.build/go/paramtools"
 	"go.goldmine.build/go/testutils"
 	"go.goldmine.build/perf/go/alerts"
@@ -17,7 +18,6 @@ import (
 	"go.goldmine.build/perf/go/dataframe"
 	"go.goldmine.build/perf/go/dataframe/mocks"
 	gitmocks "go.goldmine.build/perf/go/git/mocks"
-	"go.goldmine.build/perf/go/git/provider"
 	notifymocks "go.goldmine.build/perf/go/notify/mocks"
 	"go.goldmine.build/perf/go/regression"
 	regressionmocks "go.goldmine.build/perf/go/regression/mocks"

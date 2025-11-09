@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"math"
 
+	"go.goldmine.build/go/git/provider"
 	"go.goldmine.build/perf/go/alerts"
 	perfgit "go.goldmine.build/perf/go/git"
-	"go.goldmine.build/perf/go/git/provider"
 	"go.goldmine.build/perf/go/stepfit"
 )
 

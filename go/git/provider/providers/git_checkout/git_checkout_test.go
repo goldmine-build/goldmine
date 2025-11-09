@@ -12,8 +12,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"go.goldmine.build/go/git/provider"
 	"go.goldmine.build/go/git/testutils"
-	"go.goldmine.build/perf/go/git/provider"
 	"go.goldmine.build/perf/go/types"
 )
 

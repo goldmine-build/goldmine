@@ -7,8 +7,8 @@ go_library(
     importpath = "go.goldmine.build/perf/go/bug",
     visibility = ["//visibility:public"],
     deps = [
+        "//go/git/provider",
         "//go/sklog",
-        "//perf/go/git/provider",
         "@in_gopkg_olivere_elastic_v5//uritemplates",
     ],
 )
@@ -18,7 +18,7 @@ go_test(
     srcs = ["bug_test.go"],
     embed = [":bug"],
     deps = [
-        "//perf/go/git/provider",
+        "//go/git/provider",
         "@com_github_stretchr_testify//assert",
     ],
 )
