@@ -4,16 +4,17 @@ package gitiles
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"time"
 
+	"go.goldmine.build/go/auth"
 	"go.goldmine.build/go/git"
 	"go.goldmine.build/go/gitiles"
+	"go.goldmine.build/go/httputils"
 	"go.goldmine.build/go/skerr"
 	"go.goldmine.build/go/sklog"
 	"go.goldmine.build/go/vcsinfo"
-	"go.goldmine.build/perf/go/config"
 	"go.goldmine.build/perf/go/git/provider"
+	"golang.org/x/oauth2/google"
 )
 
 const (
@@ -31,11 +32,21 @@ type Gitiles struct {
 }
 
 // New returns a new instance of Gitiles.
-func New(c *http.Client, instanceConfig *config.InstanceConfig) *Gitiles {
-	return &Gitiles{
-		gr:          gitiles.NewRepo(instanceConfig.GitRepoConfig.URL, c),
-		startCommit: instanceConfig.GitRepoConfig.StartCommit,
+func New(
+	ctx context.Context,
+	url string,
+	startCommit string,
+) (*Gitiles, error) {
+	ts, err := google.DefaultTokenSource(ctx, auth.ScopeGerrit)
+	c := httputils.DefaultClientConfig().WithTokenSource(ts).Client()
+	if err != nil {
+		return nil, skerr.Wrap(err)
 	}
+
+	return &Gitiles{
+		gr:          gitiles.NewRepo(url, c),
+		startCommit: startCommit,
+	}, nil
 }
 
 // CommitsFromMostRecentGitHashToHead implements provider.Provider.

@@ -22,15 +22,10 @@ go_library(
 
 go_test(
     name = "gcs_test",
-    srcs = [
-        "download_helper_test.go",
-        "helpers_test.go",
-    ],
-    embed = [":gcs"],
+    srcs = ["helpers_test.go"],
     deps = [
+        ":gcs",
         "//go/gcs/mem_gcsclient",
-        "//go/testutils",
         "@com_github_stretchr_testify//require",
-        "@com_google_cloud_go_storage//:storage",
     ],
 )

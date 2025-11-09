@@ -208,7 +208,7 @@ func New(ctx context.Context, local bool, db pool.Pool, instanceConfig *config.I
 	if err != nil {
 		return nil, skerr.Wrap(err)
 	}
-	gp, err := providers.New(ctx, instanceConfig)
+	gp, err := providers.New(ctx, instanceConfig.GitRepoConfig.Provider, instanceConfig.GitRepoConfig.URL, instanceConfig.GitRepoConfig.StartCommit, instanceConfig.GitRepoConfig.GitAuthType, instanceConfig.GitRepoConfig.Dir)
 	if err != nil {
 		return nil, skerr.Wrap(err)
 	}

@@ -2,10 +2,7 @@ load("@rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "mocks",
-    srcs = [
-        "Auth.go",
-        "mocks.go",
-    ],
+    srcs = ["mocks.go"],
     importpath = "go.goldmine.build/kube/go/authproxy/auth/mocks",
     visibility = ["//visibility:public"],
     deps = ["@com_github_stretchr_testify//mock"],

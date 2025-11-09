@@ -13,7 +13,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.goldmine.build/go/git/testutils"
-	"go.goldmine.build/perf/go/config"
 	"go.goldmine.build/perf/go/git/provider"
 	"go.goldmine.build/perf/go/types"
 )
@@ -28,7 +27,7 @@ var (
 // The repo is populated with 8 commits, one minute apart, starting at StartTime.
 //
 // The hashes for each commit are going to be random and so are returned also.
-func NewForTest(t *testing.T) (context.Context, *testutils.GitBuilder, []string, *config.InstanceConfig) {
+func NewForTest(t *testing.T) (context.Context, *testutils.GitBuilder, []string, string, string) {
 	ctx := context.Background()
 	ctx, cancel := context.WithCancel(ctx)
 
@@ -56,13 +55,9 @@ func NewForTest(t *testing.T) (context.Context, *testutils.GitBuilder, []string,
 		gb.Cleanup()
 	})
 
-	instanceConfig := &config.InstanceConfig{
-		GitRepoConfig: config.GitRepoConfig{
-			URL: gb.Dir(),
-			Dir: filepath.Join(tmpDir, "checkout"),
-		},
-	}
-	return ctx, gb, hashes, instanceConfig
+	url := gb.Dir()
+	dir := filepath.Join(tmpDir, "checkout")
+	return ctx, gb, hashes, url, dir
 }
 
 func TestParseGitRevLogStream_Success(t *testing.T) {
@@ -185,8 +180,8 @@ func TestParseGitRevLogStream_ErrMalformedCommitLine(t *testing.T) {
 }
 
 func TestLogEntry_Success(t *testing.T) {
-	ctx, _, hashes, instanceConfig := NewForTest(t)
-	g, err := New(ctx, instanceConfig)
+	ctx, _, hashes, url, dir := NewForTest(t)
+	g, err := New(ctx, "", url, "", dir)
 	require.NoError(t, err)
 
 	got, err := g.LogEntry(ctx, hashes[1])
@@ -201,8 +196,8 @@ Date:   Tue Mar 28 10:41:00 2023 +0000
 }
 
 func TestLogEntry_BadCommitId_ReturnsError(t *testing.T) {
-	ctx, _, _, instanceConfig := NewForTest(t)
-	g, err := New(ctx, instanceConfig)
+	ctx, _, _, url, dir := NewForTest(t)
+	g, err := New(ctx, "", url, "", dir)
 	require.NoError(t, err)
 
 	_, err = g.LogEntry(ctx, "this-is-not-a-known-git-hash")
@@ -210,8 +205,8 @@ func TestLogEntry_BadCommitId_ReturnsError(t *testing.T) {
 }
 
 func TestUpdate_SuccessAndNewCommitAppears(t *testing.T) {
-	ctx, gb, _, instanceConfig := NewForTest(t)
-	g, err := New(ctx, instanceConfig)
+	ctx, gb, _, url, dir := NewForTest(t)
+	g, err := New(ctx, "", url, "", dir)
 	require.NoError(t, err)
 
 	_, err = g.LogEntry(ctx, "this-is-not-a-known-git-hash")
@@ -227,8 +222,8 @@ func TestUpdate_SuccessAndNewCommitAppears(t *testing.T) {
 
 func TestGitHashesInRangeForFile_FileIsChangedAtBeginHash_BeginHashIsExcludedFromResponse(t *testing.T) {
 	// The 'bar.txt' file is only changed commit 3 and 6.
-	ctx, _, hashes, instanceConfig := NewForTest(t)
-	g, err := New(ctx, instanceConfig)
+	ctx, _, hashes, url, dir := NewForTest(t)
+	g, err := New(ctx, "", url, "", dir)
 	require.NoError(t, err)
 
 	// GitHashesInRangeForFile is exclusive of 'begin', so it should not be in
@@ -240,8 +235,8 @@ func TestGitHashesInRangeForFile_FileIsChangedAtBeginHash_BeginHashIsExcludedFro
 
 func TestGitHashesInRangeForFile_BeginHashIsEmpty_SearchGoesToBeginningOfRepoHistory(t *testing.T) {
 	// The 'bar.txt' file is only changed commit 3 and 6.
-	ctx, _, hashes, instanceConfig := NewForTest(t)
-	g, err := New(ctx, instanceConfig)
+	ctx, _, hashes, url, dir := NewForTest(t)
+	g, err := New(ctx, "", url, "", dir)
 	require.NoError(t, err)
 
 	changedAt, err := g.GitHashesInRangeForFile(ctx, "", hashes[7], "bar.txt")
@@ -251,10 +246,10 @@ func TestGitHashesInRangeForFile_BeginHashIsEmpty_SearchGoesToBeginningOfRepoHis
 
 func TestGitHashesInRangeForFile_BeginHashIsEmptyButStartCommitIsSet_SearchGoesToBeginningOfRepoHistory(t *testing.T) {
 	// The 'bar.txt' file is only changed commit 3 and 6.
-	ctx, _, hashes, instanceConfig := NewForTest(t)
+	ctx, _, hashes, url, dir := NewForTest(t)
 	// We change the StartCommit to 3, so we should only see the change at 6.
-	instanceConfig.GitRepoConfig.StartCommit = hashes[3]
-	g, err := New(ctx, instanceConfig)
+	g, err := New(ctx, "", url, hashes[3], dir)
+
 	require.NoError(t, err)
 
 	changedAt, err := g.GitHashesInRangeForFile(ctx, "", hashes[7], "bar.txt")
@@ -263,8 +258,8 @@ func TestGitHashesInRangeForFile_BeginHashIsEmptyButStartCommitIsSet_SearchGoesT
 }
 
 func TestCommitsFromMostRecentGitHashToHead_ProvideEmptyGitHash_ReceiveAllHashesInRepo(t *testing.T) {
-	ctx, _, hashes, instanceConfig := NewForTest(t)
-	g, err := New(ctx, instanceConfig)
+	ctx, _, hashes, url, dir := NewForTest(t)
+	g, err := New(ctx, "", url, "", dir)
 	require.NoError(t, err)
 
 	err = g.CommitsFromMostRecentGitHashToHead(ctx, "", func(c provider.Commit) error {
@@ -276,9 +271,11 @@ func TestCommitsFromMostRecentGitHashToHead_ProvideEmptyGitHash_ReceiveAllHashes
 }
 
 func TestCommitsFromMostRecentGitHashToHead_ProvideEmptyGitHashButStartCommitIsSet_ReceiveAllHashesInRepoStartingFromStartCommit(t *testing.T) {
-	ctx, _, hashes, instanceConfig := NewForTest(t)
-	instanceConfig.GitRepoConfig.StartCommit = hashes[2]
-	g, err := New(ctx, instanceConfig)
+	// The 'bar.txt' file is only changed commit 3 and 6.
+	ctx, _, hashes, url, dir := NewForTest(t)
+	// We change the StartCommit to 3, so we should only see the change at 6.
+	g, err := New(ctx, "", url, hashes[2], dir)
+
 	require.NoError(t, err)
 
 	// StartCommit is set to 2, so we should get all commits after that.
@@ -292,8 +289,8 @@ func TestCommitsFromMostRecentGitHashToHead_ProvideEmptyGitHashButStartCommitIsS
 }
 
 func TestCommitsFromMostRecentGitHashToHead_ProvideNonEmptyGitHash_ReceiveAllNewerHashesInRepo(t *testing.T) {
-	ctx, _, hashes, instanceConfig := NewForTest(t)
-	g, err := New(ctx, instanceConfig)
+	ctx, _, hashes, url, dir := NewForTest(t)
+	g, err := New(ctx, "", url, "", dir)
 	require.NoError(t, err)
 
 	// Note we use 3 here, because we pass hashes[2] below, so

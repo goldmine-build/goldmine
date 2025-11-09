@@ -89,7 +89,7 @@ func NewForTest(t *testing.T) (context.Context, pool.Pool, *testutils.GitBuilder
 			Dir: filepath.Join(tmpDir, "checkout"),
 		},
 	}
-	gp, err := git_checkout.New(ctx, instanceConfig)
+	gp, err := git_checkout.New(ctx, "", instanceConfig.GitRepoConfig.URL, "", instanceConfig.GitRepoConfig.Dir)
 	require.NoError(t, err)
 	return ctx, db, gb, hashes, gp, instanceConfig
 }

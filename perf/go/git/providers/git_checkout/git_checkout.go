@@ -39,17 +39,23 @@ type Impl struct {
 }
 
 // New returns a new instance of Impl, which implements provider.Provider.
-func New(ctx context.Context, instanceConfig *config.InstanceConfig) (*Impl, error) {
+func New(
+	ctx context.Context,
+	authType config.GitAuthType,
+	url string,
+	startCommit string,
+	dir string, // Only used for git_checkout provider.
+) (*Impl, error) {
 
 	// Do git authentication if required.
-	if instanceConfig.GitRepoConfig.GitAuthType == config.GitAuthGerrit {
+	if authType == config.GitAuthGerrit {
 		sklog.Info("Authenticating to Gerrit.")
 		ts, err := google.DefaultTokenSource(ctx, auth.ScopeGerrit)
 		if err != nil {
-			return nil, skerr.Wrapf(err, "Failed to get tokensource perfgit.Git for config %v", *instanceConfig)
+			return nil, skerr.Wrapf(err, "get tokensource perfgit.Git")
 		}
 		if _, err := gitauth.New(ctx, ts, "/tmp/git-cookie", true, ""); err != nil {
-			return nil, skerr.Wrapf(err, "Failed to gitauth perfgit.Git for config %v", *instanceConfig)
+			return nil, skerr.Wrapf(err, "gitauth perfgit.Git")
 		}
 	}
 
@@ -67,8 +73,8 @@ func New(ctx context.Context, instanceConfig *config.InstanceConfig) (*Impl, err
 
 	// Clone the git repo if necessary.
 	sklog.Infof("Cloning repo.")
-	if _, err := os.Stat(instanceConfig.GitRepoConfig.Dir); os.IsNotExist(err) {
-		cmd := exec.CommandContext(ctx, gitFullPath, "clone", instanceConfig.GitRepoConfig.URL, instanceConfig.GitRepoConfig.Dir)
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		cmd := exec.CommandContext(ctx, gitFullPath, "clone", url, dir)
 		if err := cmd.Run(); err != nil {
 			exerr := err.(*exec.ExitError)
 			return nil, skerr.Wrapf(err, "Failed to clone repo: %s - %s", err, exerr.Stderr)
@@ -77,8 +83,8 @@ func New(ctx context.Context, instanceConfig *config.InstanceConfig) (*Impl, err
 
 	return &Impl{
 		gitFullPath:  gitFullPath,
-		repoFullPath: instanceConfig.GitRepoConfig.Dir,
-		startCommit:  instanceConfig.GitRepoConfig.StartCommit,
+		repoFullPath: dir,
+		startCommit:  startCommit,
 	}, nil
 }
 

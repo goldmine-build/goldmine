@@ -48,6 +48,11 @@ var (
 type contextKeyType string
 
 func findGitPath(ctx context.Context) (string, error) {
+	if f := ctx.Value(gitPathFinderKey); f != nil {
+		finder := f.(func() (string, error))
+		gitPath, err := finder()
+		return gitPath, skerr.Wrap(err)
+	}
 	gitPath, err := osexec.LookPath("git")
 	return gitPath, skerr.Wrap(err)
 }
