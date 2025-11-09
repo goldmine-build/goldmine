@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-
+    run-name: Run UI tests and upload results to Gold.
     runs-on: ubuntu-latest
 
     steps:

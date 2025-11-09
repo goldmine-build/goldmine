@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-
+    run-name: Build and push jsdoc container and update k8s config.
     runs-on: ubuntu-latest
 
     permissions:
