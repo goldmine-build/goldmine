@@ -10,7 +10,7 @@ go_library(
         "//go/sql/pool",
         "//perf/go/config",
         "//perf/go/git/provider",
-        "//perf/go/git/providers/git_checkout",
+        "//perf/go/git/provider/providers/git_checkout",
         "//perf/go/sql/sqltest",
         "@com_github_stretchr_testify//assert",
         "@com_github_stretchr_testify//require",

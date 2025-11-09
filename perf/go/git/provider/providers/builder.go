@@ -8,8 +8,8 @@ import (
 	"go.goldmine.build/go/util"
 	"go.goldmine.build/perf/go/config"
 	"go.goldmine.build/perf/go/git/provider"
-	"go.goldmine.build/perf/go/git/providers/git_checkout"
-	"go.goldmine.build/perf/go/git/providers/gitiles"
+	"go.goldmine.build/perf/go/git/provider/providers/git_checkout"
+	"go.goldmine.build/perf/go/git/provider/providers/gitiles"
 )
 
 // New builds a Provider based on the instance config.

@@ -3,14 +3,14 @@ load("@rules_go//go:def.bzl", "go_library")
 go_library(
     name = "providers",
     srcs = ["builder.go"],
-    importpath = "go.goldmine.build/perf/go/git/providers",
+    importpath = "go.goldmine.build/perf/go/git/provider/providers",
     visibility = ["//visibility:public"],
     deps = [
         "//go/skerr",
         "//go/util",
         "//perf/go/config",
         "//perf/go/git/provider",
-        "//perf/go/git/providers/git_checkout",
-        "//perf/go/git/providers/gitiles",
+        "//perf/go/git/provider/providers/git_checkout",
+        "//perf/go/git/provider/providers/gitiles",
     ],
 )

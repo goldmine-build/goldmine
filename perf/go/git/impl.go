@@ -17,7 +17,7 @@ import (
 	"go.goldmine.build/go/sql/pool"
 	"go.goldmine.build/perf/go/config"
 	"go.goldmine.build/perf/go/git/provider"
-	"go.goldmine.build/perf/go/git/providers"
+	"go.goldmine.build/perf/go/git/provider/providers"
 	"go.goldmine.build/perf/go/types"
 	"go.opencensus.io/trace"
 )

@@ -9,7 +9,6 @@ go_library(
     deps = [
         "//go/skerr",
         "//npm-audit-mirror/go/types",
-        "@build_goldmine_go//go/firestore:go_default_library",
         "@org_golang_google_grpc//codes",
         "@org_golang_google_grpc//status",
         "@org_golang_x_oauth2//:oauth2",
@@ -22,7 +21,6 @@ go_test(
     embed = [":db"],
     deps = [
         "//go/sktest",
-        "@build_goldmine_go//go/firestore/testutils:go_default_library",
         "@com_github_stretchr_testify//require",
     ],
 )

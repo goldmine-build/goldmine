@@ -14,7 +14,7 @@ import (
 	"go.goldmine.build/go/sql/pool"
 	"go.goldmine.build/perf/go/config"
 	"go.goldmine.build/perf/go/git/provider"
-	"go.goldmine.build/perf/go/git/providers/git_checkout"
+	"go.goldmine.build/perf/go/git/provider/providers/git_checkout"
 	"go.goldmine.build/perf/go/sql/sqltest"
 )
 
