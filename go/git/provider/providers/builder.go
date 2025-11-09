@@ -25,7 +25,7 @@ func New(
 	if util.In(string(provider), []string{"", string(config.GitProviderCLI)}) {
 		return git_checkout.New(ctx, authType, url, branch, startCommit, dir)
 	} else if provider == config.GitProviderGitiles {
-		return gitiles.New(ctx, url, startCommit)
+		return gitiles.New(ctx, url, branch, startCommit)
 	}
 	return nil, skerr.Fmt("invalid type of Provider selected: %q expected one of %q", provider, config.AllGitProviders)
 }

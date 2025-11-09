@@ -127,6 +127,7 @@ type GitilesRepo interface {
 // Repo is an object used for interacting with a single Git repo using Gitiles.
 type Repo struct {
 	client *http.Client
+	branch string
 	rl     *rate.Limiter
 	url    string
 }
@@ -140,6 +141,22 @@ func NewRepo(url string, c *http.Client) *Repo {
 	}
 	return &Repo{
 		client: c,
+		branch: git.MainBranch,
+		rl:     rate.NewLimiter(maxQPS, maxBurst),
+		url:    url,
+	}
+}
+
+// NewRepoWithBranch creates and returns a new Repo object.
+func NewRepoWithBranch(url string, branch string, c *http.Client) *Repo {
+	// TODO(borenet):Stop supporting a nil client; we should enforce that we
+	// always use an authenticated client to talk to Gitiles.
+	if c == nil {
+		c = httputils.NewTimeoutClient()
+	}
+	return &Repo{
+		client: c,
+		branch: branch,
 		rl:     rate.NewLimiter(maxQPS, maxBurst),
 		url:    url,
 	}
@@ -213,7 +230,7 @@ func (r *Repo) ReadFileAtRef(ctx context.Context, srcPath, ref string) ([]byte, 
 // ReadFile reads the current version of the given file from the main branch
 // of the Repo.
 func (r *Repo) ReadFile(ctx context.Context, srcPath string) ([]byte, error) {
-	return r.ReadFileAtRef(ctx, srcPath, git.MainBranch)
+	return r.ReadFileAtRef(ctx, srcPath, r.branch)
 }
 
 // DownloadFile downloads the current version of the given file from the main
@@ -256,7 +273,7 @@ func (r *Repo) ListDirAtRef(ctx context.Context, dir, ref string) ([]os.FileInfo
 // file names and a slice of dir names, relative to the given directory, or any
 // error which occurred.
 func (r *Repo) ListDir(ctx context.Context, dir string) ([]os.FileInfo, error) {
-	return r.ListDirAtRef(ctx, dir, git.MainBranch)
+	return r.ListDirAtRef(ctx, dir, r.branch)
 }
 
 // ResolveRef resolves the given ref to a commit hash.
@@ -306,7 +323,7 @@ func (r *Repo) ListFilesRecursiveAtRef(ctx context.Context, topDir, ref string) 
 // ListFilesRecursive returns a list of all file paths, relative to the given
 // directory, under the given directory on the main branch.
 func (r *Repo) ListFilesRecursive(ctx context.Context, dir string) ([]string, error) {
-	return r.ListFilesRecursiveAtRef(ctx, dir, git.MainBranch)
+	return r.ListFilesRecursiveAtRef(ctx, dir, r.branch)
 }
 
 // Author represents the author of a Commit.

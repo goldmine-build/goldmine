@@ -35,6 +35,7 @@ type Gitiles struct {
 func New(
 	ctx context.Context,
 	url string,
+	branch string,
 	startCommit string,
 ) (*Gitiles, error) {
 	ts, err := google.DefaultTokenSource(ctx, auth.ScopeGerrit)
@@ -44,7 +45,7 @@ func New(
 	}
 
 	return &Gitiles{
-		gr:          gitiles.NewRepo(url, c),
+		gr:          gitiles.NewRepoWithBranch(url, branch, c),
 		startCommit: startCommit,
 	}, nil
 }
