@@ -101,6 +101,11 @@ func TestUpdateCycle_EmptyDB_UsesInitialCommit(t *testing.T) {
 	assertDBContainsFirstThreeCommits(t, ctx, db)
 	// The initial commit is not stored in the DB nor queried, but is implicitly has id
 	// equal to initialID.
+
+	// This cycle shouldn't touch the Changelists tables
+	cls := sqltest.GetAllRows(ctx, t, db, "Changelists", &schema.ChangelistRow{}).([]schema.ChangelistRow)
+	assert.Empty(t, cls)
+
 }
 
 var existingDataThreeCommits = schema.Tables{GitCommits: []schema.GitCommitRow{{
@@ -200,10 +205,16 @@ func TestUpdateCycle_NoNewCommits_NothingChanges(t *testing.T) {
 	assertDBContainsFirstThreeCommits(t, ctx, db)
 }
 
-func TestCheckForLandedCycle_EmptyDB_UsesInitialCommit(t *testing.T) {
+func TestUpdateCycle_UpToDate_Success(t *testing.T) {
 	ctx, db := setupForTest(t)
-
-	gitp := createGitProviderMock(t, "1111111111111111111111111111111111111111", firstThreeCommitsForGitProviderMock)
+	gitp := createGitProviderMock(t, "1111111111111111111111111111111111111111", nil)
+	existingData := schema.Tables{
+		TrackingCommits: []schema.TrackingCommitRow{{
+			Repo:        "https://example.com/my-repo.git",
+			LastGitHash: "4444444444444444444444444444444444444444",
+		}},
+	}
+	require.NoError(t, sqltest.BulkInsertDataTables(ctx, db, existingData))
 
 	rfc := repoFollowerConfig{
 		Common: config.Common{
@@ -214,7 +225,6 @@ func TestCheckForLandedCycle_EmptyDB_UsesInitialCommit(t *testing.T) {
 		ExtractionTechnique: ReviewedLine,
 		InitialCommit:       "1111111111111111111111111111111111111111", // we expect this to not be used
 	}
-
 	require.NoError(t, updateCycle(ctx, db, gitp, rfc))
 
 	actualRows := sqltest.GetAllRows(ctx, t, db, "TrackingCommits", &schema.TrackingCommitRow{}).([]schema.TrackingCommitRow)
@@ -222,51 +232,9 @@ func TestCheckForLandedCycle_EmptyDB_UsesInitialCommit(t *testing.T) {
 		Repo:        "https://example.com/my-repo.git",
 		LastGitHash: "4444444444444444444444444444444444444444",
 	}}, actualRows)
-
-	// This cycle shouldn't touch the Changelists tables
-	cls := sqltest.GetAllRows(ctx, t, db, "Changelists", &schema.ChangelistRow{}).([]schema.ChangelistRow)
-	assert.Empty(t, cls)
 }
 
 /*
-
-func TestCheckForLandedCycle_UpToDate_Success(t *testing.T) {
-	ctx := context.Background()
-	db := sqltest.NewCockroachDBForTestsWithProductionSchema(ctx, t)
-	existingData := schema.Tables{
-		TrackingCommits: []schema.TrackingCommitRow{{
-			Repo:        "https://example.com/my-repo.git",
-			LastGitHash: "4444444444444444444444444444444444444444",
-		}},
-	}
-	require.NoError(t, sqltest.BulkInsertDataTables(ctx, db, existingData))
-
-	mgl := mocks.GitilesLogger{}
-	mgl.On("Log", testutils.AnyContext, "main", mock.Anything).Return([]*vcsinfo.LongCommit{
-		{
-			ShortCommit: &vcsinfo.ShortCommit{
-				Hash: "4444444444444444444444444444444444444444",
-				// The rest is ignored from Log
-			},
-		},
-	}, nil)
-
-	mc := monitorConfig{
-		RepoURL:             "https://example.com/my-repo.git",
-		SystemName:          "gerrit",
-		branch:              "main",
-		ExtractionTechnique: ReviewedLine,
-		InitialCommit:       "1111111111111111111111111111111111111111", // ignored
-	}
-	require.NoError(t, checkForLandedCycle(ctx, db, &mgl, mc))
-
-	actualRows := sqltest.GetAllRows(ctx, t, db, "TrackingCommits", &schema.TrackingCommitRow{}).([]schema.TrackingCommitRow)
-	assert.Equal(t, []schema.TrackingCommitRow{{
-		Repo:        "https://example.com/my-repo.git",
-		LastGitHash: "4444444444444444444444444444444444444444",
-	}}, actualRows)
-}
-
 func TestCheckForLandedCycle_UnparsableCL_Success(t *testing.T) {
 	ctx := context.Background()
 	db := sqltest.NewCockroachDBForTestsWithProductionSchema(ctx, t)
