@@ -233,7 +233,7 @@ func TestUpdateCycle_UnparsableCL_Success(t *testing.T) {
 	assert.Empty(t, cls)
 }
 
-func TestCheckForLandedCycle_CLsWithNoExpectationsLand_MarkedAsLanded(t *testing.T) {
+func TestUpdateCycle_CLsWithNoExpectationsLand_MarkedAsLanded(t *testing.T) {
 	ctx, db := setupForTest(t)
 
 	existingData := schema.Tables{
@@ -865,3 +865,74 @@ const (
 	roundRectGrouping = `{"name":"round rect","source_type":"round"}`
 	sevenGrouping     = `{"name":"seven","source_type":"text"}`
 )
+
+func Test_extractReviewedLine(t *testing.T) {
+	tests := []struct {
+		name string // description of this test case
+		// Named input parameters for target function.
+		clBody string
+		want   string
+	}{
+		{
+			name:   "Standard Reviewed-on line",
+			clBody: "Some commit message\n\nReviewed-on: https://example.com/c/my-repo/+/12345\nMore text",
+			want:   "12345",
+		},
+		{
+			name:   "No Reviewed-on line",
+			clBody: "Some commit message without the keyword.",
+			want:   "",
+		},
+		{
+			name:   "Multiple Reviewed-on lines",
+			clBody: "Reviewed-on: https://example.com/c/my-repo/+/11111\nReviewed-on: https://example.com/c/my-repo/+/22222",
+			want:   "11111", // Expect the first one.
+		},
+		{
+			name:   "Ignore if the Reviewed-on line is part of a revert message",
+			clBody: "> Reviewed-on:    https://example.com/c/my-repo/+/33333   ",
+			want:   "",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := extractReviewedLine(tt.clBody)
+			if got != tt.want {
+				t.Errorf("extractReviewedLine() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_extractFromSubject(t *testing.T) {
+	tests := []struct {
+		name string // description of this test case
+		// Named input parameters for target function.
+		subject string
+		want    string
+	}{
+		{
+			name:    "Standard subject with CL number",
+			subject: "Implement new feature (#6789)",
+			want:    "6789",
+		},
+		{
+			name:    "Subject without CL number",
+			subject: "Fix critical bug",
+			want:    "",
+		},
+		{
+			name:    "Multiple CL numbers in subject",
+			subject: "Revert \"Add experimental feature (#1234)\" (#5678)",
+			want:    "5678", // Expect the last one.
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := extractFromSubject(tt.subject)
+			if got != tt.want {
+				t.Errorf("extractFromSubject() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
