@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/mohae/deepcopy"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -105,7 +106,6 @@ func TestUpdateCycle_EmptyDB_UsesInitialCommit(t *testing.T) {
 	// This cycle shouldn't touch the Changelists tables
 	cls := sqltest.GetAllRows(ctx, t, db, "Changelists", &schema.ChangelistRow{}).([]schema.ChangelistRow)
 	assert.Empty(t, cls)
-
 }
 
 var existingDataThreeCommits = schema.Tables{GitCommits: []schema.GitCommitRow{{
@@ -232,6 +232,30 @@ func TestUpdateCycle_UpToDate_Success(t *testing.T) {
 		Repo:        "https://example.com/my-repo.git",
 		LastGitHash: "4444444444444444444444444444444444444444",
 	}}, actualRows)
+}
+
+func TestUpdateCycle_UnparsableCL_Success(t *testing.T) {
+	ctx, db := setupForTest(t)
+
+	commits := deepcopy.Copy(firstThreeCommitsForGitProviderMock).([]provider.Commit)
+	commits[1].Body = "This body doesn't match the pattern!"
+
+	gitp := createGitProviderMock(t, "1111111111111111111111111111111111111111", commits)
+	rfc := repoFollowerConfig{
+		Common: config.Common{
+			GitRepoBranch: "main",
+		},
+		InitialCommit: "1111111111111111111111111111111111111111",
+	}
+	require.NoError(t, updateCycle(ctx, db, gitp, rfc))
+
+	assertDBContainsFirstThreeCommits(t, ctx, db)
+	// The initial commit is not stored in the DB nor queried, but is implicitly has id
+	// equal to initialID.
+
+	// This cycle shouldn't touch the Changelists tables
+	cls := sqltest.GetAllRows(ctx, t, db, "Changelists", &schema.ChangelistRow{}).([]schema.ChangelistRow)
+	assert.Empty(t, cls)
 }
 
 /*
