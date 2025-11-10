@@ -8,6 +8,7 @@ import (
 
 	iSchema "github.com/invopop/jsonschema"
 	cli "github.com/urfave/cli/v2"
+	"go.goldmine.build/go/git/provider"
 	"go.goldmine.build/go/skerr"
 	"go.goldmine.build/perf/go/notifytypes"
 )
@@ -235,47 +236,14 @@ type IngestionConfig struct {
 	FileIngestionTopicName string `json:"file_ingestion_pubsub_topic_name"`
 }
 
-// GitAuthType is the type of authentication Git should use, if any.
-type GitAuthType string
-
-const (
-	// GitAuthNone implies no authentication is needed when cloning/pulling a
-	// Git repo, i.e. it is public. The value is the empty string so that the
-	// default is no authentication.
-	GitAuthNone GitAuthType = ""
-
-	// GitAuthGerrit is for repos that are hosted by Gerrit and require
-	// authentication. This setting implies that a
-	// GOOGLE_APPLICATION_CREDENTIALS environment variable will be set and the
-	// associated service account has read access to the Gerrit repo.
-	GitAuthGerrit GitAuthType = "gerrit"
-)
-
-// GitProvider is the method used to interrogate git repos.
-type GitProvider string
-
-const (
-	// GitProviderCLI uses a local copy of git to checkout the repo.
-	GitProviderCLI GitProvider = "git"
-
-	// GitProviderGitiles uses the Gitiles API.
-	GitProviderGitiles GitProvider = "gitiles"
-)
-
-// AllGitProviders is a slice of all valid GitProviders.
-var AllGitProviders []GitProvider = []GitProvider{
-	GitProviderCLI,
-	GitProviderGitiles,
-}
-
 // GitRepoConfig is the config for the git repo.
 type GitRepoConfig struct {
 	// GitAuthType is the type of authentication the repo requires. Defaults to
 	// GitAuthNone.
-	GitAuthType GitAuthType `json:"git_auth_type,omitempty"`
+	GitAuthType provider.GitAuthType `json:"git_auth_type,omitempty"`
 
 	// Provider is the method used to interrogate git repos.
-	Provider GitProvider `json:"provider"`
+	Provider provider.GitProvider `json:"provider"`
 
 	// StartCommit is the commit in the repo where we start tracking commits,
 	// i.e. StartCommit will have a Commit Number of 0. If not supplied then

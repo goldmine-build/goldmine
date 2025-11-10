@@ -8,7 +8,8 @@ go_library(
     visibility = ["//visibility:private"],
     deps = [
         "//go/common",
-        "//go/gitiles",
+        "//go/git/provider",
+        "//go/git/provider/providers",
         "//go/httputils",
         "//go/skerr",
         "//go/sklog",
@@ -24,7 +25,6 @@ go_library(
         "@com_github_jackc_pgx_v4//:pgx",
         "@com_github_jackc_pgx_v4//pgxpool",
         "@io_opencensus_go//trace",
-        "@org_golang_x_oauth2//google",
     ],
 )
 

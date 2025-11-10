@@ -7,6 +7,7 @@ go_library(
     importpath = "go.goldmine.build/perf/go/config",
     visibility = ["//visibility:public"],
     deps = [
+        "//go/git/provider",
         "//go/skerr",
         "//perf/go/notifytypes",
         "@com_github_invopop_jsonschema//:jsonschema",

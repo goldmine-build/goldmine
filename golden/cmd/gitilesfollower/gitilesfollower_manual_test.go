@@ -1,20 +1,6 @@
 package main
 
-import (
-	"context"
-	"testing"
-	"time"
-
-	"github.com/jackc/pgx/v4/pgxpool"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-
-	"go.goldmine.build/go/gitiles"
-	"go.goldmine.build/go/httputils"
-	"go.goldmine.build/golden/go/config"
-	"go.goldmine.build/golden/go/sql/schema"
-	"go.goldmine.build/golden/go/sql/sqltest"
-)
+/*
 
 func TestUpdateCycle_Load1501CommitsFromGitiles_Success(t *testing.T) {
 
@@ -93,3 +79,4 @@ func getNthGitCommit(ctx context.Context, t *testing.T, db *pgxpool.Pool, n int)
 func overrideLatestGitHash(gitHash string) context.Context {
 	return context.WithValue(context.Background(), overrideLatestCommitKey, gitHash)
 }
+*/

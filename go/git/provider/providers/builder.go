@@ -9,23 +9,22 @@ import (
 	"go.goldmine.build/go/git/provider/providers/gitiles"
 	"go.goldmine.build/go/skerr"
 	"go.goldmine.build/go/util"
-	"go.goldmine.build/perf/go/config"
 )
 
 // New builds a Provider based on the instance config.
 func New(
 	ctx context.Context,
-	provider config.GitProvider,
+	prov provider.GitProvider,
 	url string,
 	branch string,
 	startCommit string,
-	authType config.GitAuthType, // Only used for git_checkout provider.
+	authType provider.GitAuthType, // Only used for git_checkout provider.
 	dir string, // Only used for git_checkout provider.
 ) (provider.Provider, error) {
-	if util.In(string(provider), []string{"", string(config.GitProviderCLI)}) {
+	if util.In(string(prov), []string{"", string(provider.GitProviderCLI)}) {
 		return git_checkout.New(ctx, authType, url, branch, startCommit, dir)
-	} else if provider == config.GitProviderGitiles {
+	} else if prov == provider.GitProviderGitiles {
 		return gitiles.New(ctx, url, branch, startCommit)
 	}
-	return nil, skerr.Fmt("invalid type of Provider selected: %q expected one of %q", provider, config.AllGitProviders)
+	return nil, skerr.Fmt("invalid type of Provider selected: %q expected one of %q", prov, provider.AllGitProviders)
 }

@@ -13,7 +13,6 @@ go_library(
         "//go/gitauth",
         "//go/skerr",
         "//go/sklog",
-        "//perf/go/config",
         "//perf/go/types",
         "@io_opencensus_go//trace",
         "@org_golang_x_oauth2//google",

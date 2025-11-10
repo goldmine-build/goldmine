@@ -6,12 +6,6 @@ filename: mocks.go
 template-data:
   unroll-variadic: true
 packages:
-  go.goldmine.build/docsyserver/go/codereview:
-    interfaces:
-      CodeReview: {}
-  go.goldmine.build/docsyserver/go/docsy:
-    interfaces:
-      Docsy: {}
   go.goldmine.build/fiddlek/go/store:
     interfaces:
       Store: {}
@@ -33,6 +27,9 @@ packages:
   go.goldmine.build/go/gerrit:
     interfaces:
       GerritInterface: {}
+  go.goldmine.build/go/git/provider:
+    interfaces:
+      Provider: {}
   go.goldmine.build/go/gitiles:
     interfaces:
       GitilesRepo: {}
@@ -90,9 +87,6 @@ packages:
   go.goldmine.build/gold-client/go/imgmatching:
     interfaces:
       Matcher: {}
-  go.goldmine.build/golden/cmd/gitilesfollower:
-    interfaces:
-      GitilesLogger: {}
   go.goldmine.build/golden/go/code_review:
     interfaces:
       ChangelistLandedUpdater: {}
@@ -126,14 +120,6 @@ packages:
   go.goldmine.build/kube/go/authproxy/auth:
     interfaces:
       Auth: {}
-  go.goldmine.build/npm-audit-mirror/go/types:
-    interfaces:
-      Check: {}
-      ChecksManager: {}
-      IIssueTrackerService: {}
-      NpmDB: {}
-      ProjectAudit: {}
-      ProjectMirror: {}
   go.goldmine.build/perf/go/alerts:
     config:
       dir: '{{.InterfaceDir}}/mock'

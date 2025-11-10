@@ -21,10 +21,10 @@ import (
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"go.opencensus.io/trace"
-	"golang.org/x/oauth2/google"
 
 	"go.goldmine.build/go/common"
-	"go.goldmine.build/go/gitiles"
+	"go.goldmine.build/go/git/provider"
+	"go.goldmine.build/go/git/provider/providers"
 	"go.goldmine.build/go/httputils"
 	"go.goldmine.build/go/skerr"
 	"go.goldmine.build/go/sklog"
@@ -62,34 +62,19 @@ type repoFollowerConfig struct {
 	// in time, we can sort our commit_ids without resorting to negative numbers.
 	InitialCommit string `json:"initial_commit"`
 
-	// ReposToMonitorCLs is a list of all repos that we need to monitor for commits that could
-	// correspond to CLs. When those CLs land, we need to merge in the expectations associated
-	// with that CL to the primary branch.
-	ReposToMonitorCLs []monitorConfig `json:"repos_to_monitor_cls"`
-
-	// PollPeriod is how often we should poll the source of truth.
-	PollPeriod config.Duration `json:"poll_period"`
-}
-
-// monitorConfig houses the data we need to track a repo and determine which CLs a landed commit
-// corresponds to.
-type monitorConfig struct {
-	// RepoURL is the url that will be polled via gitiles.
-	RepoURL string `json:"repo_url"`
 	// ExtractionTechnique codifies the methods for linking (via a commit message/body) to a CL.
 	ExtractionTechnique extractionTechnique `json:"extraction_technique"`
-	// InitialCommit that we will used if there is no monitoring progress stored in the DB.
-	// It should be before/at the point where we migrated expectations.
-	InitialCommit string `json:"initial_commit"`
+
 	// SystemName is the abbreviation that is given to a given CodeReviewSystem.
 	SystemName string `json:"system_name"`
+
 	// LegacyUpdaterInUse indicates the status of the CLs should not be changed because the source
 	// of truth for expectations is still Firestore, which is controlled by gold_frontend.
 	// This should be able to be removed after the SQL migration is complete.
 	LegacyUpdaterInUse bool `json:"legacy_updater_in_use"`
-	// branch is the git branch of the repo that we will poll for the latest commit. It is set to
-	// the primary branch of this repo.
-	branch string
+
+	// PollPeriod is how often we should poll the source of truth.
+	PollPeriod config.Duration `json:"poll_period"`
 }
 
 type extractionTechnique string
@@ -100,13 +85,6 @@ const (
 	// FromSubject corresponds to looking at the title for a CL ID in square brackets.
 	FromSubject = extractionTechnique("FromSubject")
 )
-
-// GitilesLogger is a subset of the gitiles client library that we need. This allows us to mock
-// it out during tests.
-type GitilesLogger interface {
-	Log(ctx context.Context, logExpr string, opts ...gitiles.LogOption) ([]*vcsinfo.LongCommit, error)
-	LogFirstParent(ctx context.Context, from, to string, opts ...gitiles.LogOption) ([]*vcsinfo.LongCommit, error)
-}
 
 func main() {
 	// Command line flags.
@@ -141,19 +119,14 @@ func main() {
 	ctx := context.Background()
 	db := mustInitSQLDatabase(ctx, rfc)
 
-	ts, err := google.DefaultTokenSource(ctx)
+	gitp, err := providers.New(ctx, rfc.Provider, rfc.GitRepoURL, rfc.GitRepoBranch, rfc.InitialCommit, rfc.GitAuthType, "")
 	if err != nil {
-		sklog.Fatalf("Problem setting up default token source: %s", err)
+		sklog.Fatalf("Could not set up git provider: %s", err)
 	}
-	client := httputils.DefaultClientConfig().WithTokenSource(ts).Client()
-	var gitilesClient GitilesLogger
-	gitilesClient = gitiles.NewRepo(rfc.GitRepoURL, client)
+
 	// This starts a goroutine in the background
-	if err := pollRepo(ctx, db, gitilesClient, rfc); err != nil {
+	if err := pollRepo(ctx, db, gitp, rfc); err != nil {
 		sklog.Fatalf("Could not do initial update: %s", err)
-	}
-	if err := checkForLanded(ctx, db, client, rfc); err != nil {
-		sklog.Fatalf("Could not do initial scan of landed CLs: %s", err)
 	}
 	sklog.Infof("Initial update complete")
 	http.HandleFunc("/healthz", httputils.ReadyHandleFunc)
@@ -181,9 +154,9 @@ func mustInitSQLDatabase(ctx context.Context, fcc repoFollowerConfig) *pgxpool.P
 
 // pollRepo does an initial updateCycle and starts a goroutine to continue updating according
 // to the provided duration for as long as the context remains ok.
-func pollRepo(ctx context.Context, db *pgxpool.Pool, client GitilesLogger, rfc repoFollowerConfig) error {
+func pollRepo(ctx context.Context, db *pgxpool.Pool, gitp provider.Provider, rfc repoFollowerConfig) error {
 	sklog.Infof("Doing initial update")
-	err := updateCycle(ctx, db, client, rfc)
+	err := updateCycle(ctx, db, gitp, rfc)
 	if err != nil {
 		return skerr.Wrap(err)
 	}
@@ -197,7 +170,7 @@ func pollRepo(ctx context.Context, db *pgxpool.Pool, client GitilesLogger, rfc r
 				sklog.Errorf("Stopping polling due to context error: %s", ctx.Err())
 				return
 			case <-ct.C:
-				err := updateCycle(ctx, db, client, rfc)
+				err := updateCycle(ctx, db, gitp, rfc)
 				if err != nil {
 					sklog.Errorf("Error on this cycle for talking to %s: %s", rfc.GitRepoURL, err)
 				}
@@ -210,66 +183,78 @@ func pollRepo(ctx context.Context, db *pgxpool.Pool, client GitilesLogger, rfc r
 // updateCycle polls the gitiles repo for the latest commit and the database for the previously
 // seen commit. If those are different, it polls gitiles for all commits that happened between
 // those two points and stores them to the DB.
-func updateCycle(ctx context.Context, db *pgxpool.Pool, client GitilesLogger, rfc repoFollowerConfig) error {
+func updateCycle(ctx context.Context, db *pgxpool.Pool, gitp provider.Provider, rfc repoFollowerConfig) error {
 	ctx, span := trace.StartSpan(ctx, "gitilesfollower_updateCycle")
 	defer span.End()
-	latestHash, err := getLatestCommitFromRepo(ctx, client, rfc.GitRepoBranch)
-	if err != nil {
-		return skerr.Wrap(err)
-	}
 
 	previousHash, previousID, err := getPreviousCommitFromDB(ctx, db)
 	if err != nil {
 		return skerr.Wrapf(err, "getting recent commits from DB")
 	}
 
-	if previousHash == latestHash {
-		sklog.Infof("no updates - latest seen commit %s", previousHash)
-		return nil
-	}
 	if previousHash == "" {
+		sklog.Infof("No previous commits in DB, starting from initial commit %q", rfc.InitialCommit)
 		previousHash = rfc.InitialCommit
+	}
+
+	if previousID == 0 {
 		previousID = initialID
 	}
 
-	sklog.Infof("Getting git history from %s to %s", previousHash, latestHash)
-	commits, err := client.LogFirstParent(ctx, previousHash, latestHash)
+	commits := []*vcsinfo.LongCommit{}
+	err = gitp.CommitsFromMostRecentGitHashToHead(ctx, previousHash, func(c provider.Commit) error {
+		lc := &vcsinfo.LongCommit{
+			ShortCommit: &vcsinfo.ShortCommit{},
+		}
+		lc.ShortCommit.Hash = c.GitHash
+		lc.ShortCommit.Author = c.Author
+		lc.ShortCommit.Subject = c.Subject
+		lc.Body = c.Body
+		lc.Timestamp = time.Unix(c.Timestamp, 0)
+		commits = append(commits, lc)
+		return nil
+	})
 	if err != nil {
-		return skerr.Wrapf(err, "getting backlog of commits from %s..%s", previousHash, latestHash)
+		return skerr.Wrapf(err, "getting commits from git provider")
 	}
-	// commits is backwards and LogFirstParent does not respect gitiles.LogReverse()
-	reverse(commits)
-	sklog.Infof("Got %d commits to store", len(commits))
+
+	if len(commits) == 0 {
+		sklog.Infof("No new commits since last seen commit %q", previousHash)
+		return nil
+	}
+
 	if err := storeCommits(ctx, db, previousID, commits); err != nil {
 		return skerr.Wrapf(err, "storing %d commits to GitCommits table", len(commits))
 	}
+
+	if err := checkForCommitsWithExpectations(ctx, db, commits, rfc); err != nil {
+		return skerr.Wrapf(err, "checking for commits with expectations")
+	}
+
 	return nil
 }
 
-// reverses the order of the slice.
-func reverse(commits []*vcsinfo.LongCommit) {
-	total := len(commits)
-	for i := 0; i < total/2; i++ {
-		commits[i], commits[total-i-1] = commits[total-i-1], commits[i]
+func checkForCommitsWithExpectations(ctx context.Context, db *pgxpool.Pool, commits []*vcsinfo.LongCommit, rfc repoFollowerConfig) error {
+	sklog.Infof("Found %d commits to check for a CL", len(commits))
+	for _, c := range commits {
+		var clID string
+		switch rfc.ExtractionTechnique {
+		case ReviewedLine:
+			clID = extractReviewedLine(c.Body)
+		case FromSubject:
+			clID = extractFromSubject(c.Subject)
+		}
+		if clID == "" {
+			sklog.Infof("No CL detected for %#v", c)
+			continue
+		}
+		if err := migrateExpectationsToPrimaryBranch(ctx, db, rfc.SystemName, clID, c.Timestamp, !rfc.LegacyUpdaterInUse); err != nil {
+			return skerr.Wrapf(err, "migrating cl %s-%s", rfc.SystemName, clID)
+		}
+		sklog.Infof("Commit %s landed at %s", c.Hash[:12], c.Timestamp)
 	}
-}
-
-// getLatestCommitFromRepo returns the git hash of the latest git commit known on the configured
-// branch. If overrideLatestCommitKey has a value set, that will be used instead.
-func getLatestCommitFromRepo(ctx context.Context, client GitilesLogger, branch string) (string, error) {
-	if hash := ctx.Value(overrideLatestCommitKey); hash != nil {
-		return hash.(string), nil
-	}
-	ctx, span := trace.StartSpan(ctx, "gitilesfollower_getLatestCommitFromRepo")
-	defer span.End()
-	latestCommit, err := client.Log(ctx, branch, gitiles.LogLimit(1))
-	if err != nil {
-		return "", skerr.Wrapf(err, "getting last commit")
-	}
-	if len(latestCommit) < 1 {
-		return "", skerr.Fmt("No commits returned")
-	}
-	return latestCommit[0].Hash, nil
+	_, err := db.Exec(ctx, `UPSERT INTO TrackingCommits (repo, last_git_hash) VALUES ($1, $2)`, rfc.GitRepoURL, commits[len(commits)-1].Hash)
+	return skerr.Wrap(err)
 }
 
 // getPreviousCommitFromDB returns the git_hash and the commit_id of the most recently stored
@@ -327,121 +312,6 @@ func storeCommits(ctx context.Context, db *pgxpool.Pool, lastCommitID int64, com
 		return nil
 	})
 	return skerr.Wrap(err)
-}
-
-// checkForLanded will check all recent commits in the ReposToMonitor for any references to CLs
-// that have landed. Then, it starts a go routine to continue this periodically.
-func checkForLanded(ctx context.Context, db *pgxpool.Pool, client *http.Client, rfc repoFollowerConfig) error {
-	if len(rfc.ReposToMonitorCLs) == 0 {
-		sklog.Infof("No repos to monitor landed CLs")
-		return nil
-	}
-	sklog.Infof("Doing initial check for landed CLs")
-	var gClients []GitilesLogger
-	for _, repo := range rfc.ReposToMonitorCLs {
-		gClients = append(gClients, gitiles.NewRepo(repo.RepoURL, client))
-	}
-	for i, client := range gClients {
-		cfg := rfc.ReposToMonitorCLs[i]
-		cfg.branch = rfc.GitRepoBranch
-		err := checkForLandedCycle(ctx, db, client, cfg)
-		if err != nil {
-			return skerr.Wrap(err)
-		}
-	}
-	go func() {
-		ct := time.NewTicker(rfc.PollPeriod.Duration)
-		defer ct.Stop()
-		sklog.Infof("Checking for landed CLs every %s", rfc.PollPeriod.Duration)
-		for {
-			select {
-			case <-ctx.Done():
-				sklog.Errorf("Stopping landed check due to context error: %s", ctx.Err())
-				return
-			case <-ct.C:
-				for i, client := range gClients {
-					err := checkForLandedCycle(ctx, db, client, rfc.ReposToMonitorCLs[i])
-					if err != nil {
-						sklog.Errorf("Error checking for landed commits with configuration %s", rfc.ReposToMonitorCLs[i], err)
-					}
-				}
-				sklog.Infof("Checked %d repos for landed CLs", len(gClients))
-			}
-		}
-	}()
-	return nil
-}
-
-// checkForLandedCycle will see if there are any recent commits for the given repo. If there are,
-// it will find any corresponding CLs for them and migrate the expectations associated with them
-// to the primary branch and mark them as "landed" in the DB.
-func checkForLandedCycle(ctx context.Context, db *pgxpool.Pool, client GitilesLogger, m monitorConfig) error {
-	ctx, span := trace.StartSpan(ctx, "gitilesfollower_checkForLandedCycle")
-	span.AddAttributes(trace.StringAttribute("repo", m.RepoURL))
-	defer span.End()
-	latestHash, err := getLatestCommitFromRepo(ctx, client, m.branch)
-	if err != nil {
-		return skerr.Wrap(err)
-	}
-	previousHash, err := getPreviouslyLandedCommit(ctx, db, m.RepoURL)
-	if err != nil {
-		return skerr.Wrapf(err, "getting recently landed commit from DB for repo %s", m.RepoURL)
-	}
-	if previousHash == latestHash {
-		sklog.Infof("no updates - latest seen commit %s", previousHash)
-		return nil
-	}
-	if previousHash == "" {
-		previousHash = m.InitialCommit
-	}
-
-	sklog.Infof("Getting git history from %s to %s", previousHash, latestHash)
-	commits, err := client.LogFirstParent(ctx, previousHash, latestHash)
-	if err != nil {
-		return skerr.Wrapf(err, "getting backlog of commits from %s..%s", previousHash, latestHash)
-	}
-	if len(commits) == 0 {
-		sklog.Warningf("No commits between %s and %s", previousHash, latestHash)
-		return nil
-	}
-	// commits is backwards and LogFirstParent does not respect gitiles.LogReverse()
-	reverse(commits)
-	sklog.Infof("Found %d commits to check for a CL", len(commits))
-	for _, c := range commits {
-		var clID string
-		switch m.ExtractionTechnique {
-		case ReviewedLine:
-			clID = extractReviewedLine(c.Body)
-		case FromSubject:
-			clID = extractFromSubject(c.Subject)
-		}
-		if clID == "" {
-			sklog.Infof("No CL detected for %#v", c)
-			continue
-		}
-		if err := migrateExpectationsToPrimaryBranch(ctx, db, m.SystemName, clID, c.Timestamp, !m.LegacyUpdaterInUse); err != nil {
-			return skerr.Wrapf(err, "migrating cl %s-%s", m.SystemName, clID)
-		}
-		sklog.Infof("Commit %s landed at %s", c.Hash[:12], c.Timestamp)
-	}
-	_, err = db.Exec(ctx, `UPSERT INTO TrackingCommits (repo, last_git_hash) VALUES ($1, $2)`, m.RepoURL, latestHash)
-	return skerr.Wrap(err)
-}
-
-// getPreviouslyLandedCommit returns the git hash of the last commit we checked for a CL in the
-// given repo.
-func getPreviouslyLandedCommit(ctx context.Context, db *pgxpool.Pool, repoURL string) (string, error) {
-	ctx, span := trace.StartSpan(ctx, "getPreviouslyLandedCommit")
-	defer span.End()
-	row := db.QueryRow(ctx, `SELECT last_git_hash FROM TrackingCommits WHERE repo = $1`, repoURL)
-	var rv string
-	if err := row.Scan(&rv); err != nil {
-		if err == pgx.ErrNoRows {
-			return "", nil // No data in TrackingCommits
-		}
-		return "", skerr.Wrap(err)
-	}
-	return rv, nil
 }
 
 var reviewedLineRegex = regexp.MustCompile(`(^|\n)Reviewed-on: .+/(?P<clID>\S+?)($|\n)`)

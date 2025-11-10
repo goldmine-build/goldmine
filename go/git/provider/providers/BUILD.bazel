@@ -11,6 +11,5 @@ go_library(
         "//go/git/provider/providers/gitiles",
         "//go/skerr",
         "//go/util",
-        "//perf/go/config",
     ],
 )

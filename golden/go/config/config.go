@@ -6,6 +6,7 @@ import (
 
 	"github.com/flynn/json5"
 	"go.goldmine.build/go/config"
+	"go.goldmine.build/go/git/provider"
 	"go.goldmine.build/go/skerr"
 	"go.goldmine.build/go/util"
 )
@@ -29,6 +30,13 @@ type Common struct {
 
 	// The URL to the git repo that this instance tracks.
 	GitRepoURL string `json:"git_repo_url"`
+
+	// GitAuthType is the type of authentication the repo requires. Defaults to
+	// GitAuthNone.
+	GitAuthType provider.GitAuthType `json:"git_auth_type,omitempty"`
+
+	// Provider is the method used to interrogate git repos.
+	Provider provider.GitProvider `json:"provider"`
 
 	// GCS path, where the known hashes file should be stored. Format: <bucket>/<path>.
 	KnownHashesGCSPath string `json:"known_hashes_gcs_path"`

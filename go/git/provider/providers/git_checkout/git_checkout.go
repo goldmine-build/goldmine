@@ -18,7 +18,6 @@ import (
 	"go.goldmine.build/go/gitauth"
 	"go.goldmine.build/go/skerr"
 	"go.goldmine.build/go/sklog"
-	"go.goldmine.build/perf/go/config"
 	"go.goldmine.build/perf/go/types"
 	"go.opencensus.io/trace"
 	"golang.org/x/oauth2/google"
@@ -41,7 +40,7 @@ type Impl struct {
 // New returns a new instance of Impl, which implements provider.Provider.
 func New(
 	ctx context.Context,
-	authType config.GitAuthType,
+	authType provider.GitAuthType,
 	url string,
 	branch string,
 	startCommit string,
@@ -49,7 +48,7 @@ func New(
 ) (*Impl, error) {
 
 	// Do git authentication if required.
-	if authType == config.GitAuthGerrit {
+	if authType == provider.GitAuthGerrit {
 		sklog.Info("Authenticating to Gerrit.")
 		ts, err := google.DefaultTokenSource(ctx, auth.ScopeGerrit)
 		if err != nil {
@@ -74,6 +73,14 @@ func New(
 
 	// Example command to clone a single branch:
 	// git clone --single-branch --branch <branchname> <remote-repo> <target-dir>
+
+	if dir == "" {
+		// Create a temp dir for the git repo.
+		dir, err = os.MkdirTemp("", "git_checkout_repo")
+		if err != nil {
+			return nil, skerr.Wrapf(err, "creating temp dir for git repo")
+		}
+	}
 
 	// Clone the git repo if necessary.
 	sklog.Infof("Cloning repo.")

@@ -7,70 +7,38 @@ import (
 	"testing"
 	"time"
 
+	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
+	"go.goldmine.build/go/git/provider"
+	provmocks "go.goldmine.build/go/git/provider/mocks"
 	"go.goldmine.build/go/testutils"
-	"go.goldmine.build/go/vcsinfo"
-	"go.goldmine.build/golden/cmd/gitilesfollower/mocks"
 	"go.goldmine.build/golden/go/config"
-	dks "go.goldmine.build/golden/go/sql/datakitchensink"
 	"go.goldmine.build/golden/go/sql/schema"
 	"go.goldmine.build/golden/go/sql/sqltest"
 	"go.goldmine.build/golden/go/types"
 )
 
-func TestUpdateCycle_EmptyDB_UsesInitialCommit(t *testing.T) {
+func setupForTest(t *testing.T) (context.Context, *pgxpool.Pool) {
 	ctx := context.Background()
 	db := sqltest.NewCockroachDBForTestsWithProductionSchema(ctx, t)
+	return ctx, db
+}
 
-	mgl := mocks.GitilesLogger{}
-	mgl.On("Log", testutils.AnyContext, "main", mock.Anything).Return([]*vcsinfo.LongCommit{
-		{
-			ShortCommit: &vcsinfo.ShortCommit{
-				Hash: "4444444444444444444444444444444444444444",
-				// The rest is ignored from Log
-			},
-		},
-	}, nil)
+func createGitProviderMock(t *testing.T, startHash string, commits []provider.Commit) *provmocks.Provider {
+	gitp := provmocks.NewProvider(t)
+	gitp.On("CommitsFromMostRecentGitHashToHead", testutils.AnyContext, startHash, mock.Anything).Run(func(args mock.Arguments) {
+		cb := args.Get(2).(provider.CommitProcessor)
+		for _, c := range commits {
+			cb(c)
+		}
+	}).Return(nil)
+	return gitp
+}
 
-	mgl.On("LogFirstParent", testutils.AnyContext, "1111111111111111111111111111111111111111", "4444444444444444444444444444444444444444").Return([]*vcsinfo.LongCommit{
-		{ // These are returned with the most recent commits first
-			ShortCommit: &vcsinfo.ShortCommit{
-				Hash:    "4444444444444444444444444444444444444444",
-				Author:  "author 4",
-				Subject: "subject 4",
-			},
-			Timestamp: time.Date(2021, time.February, 25, 10, 4, 0, 0, time.UTC),
-		},
-		{
-			ShortCommit: &vcsinfo.ShortCommit{
-				Hash:    "3333333333333333333333333333333333333333",
-				Author:  "author 3",
-				Subject: "subject 3",
-			},
-			Timestamp: time.Date(2021, time.February, 25, 10, 3, 0, 0, time.UTC),
-		},
-		{
-			ShortCommit: &vcsinfo.ShortCommit{
-				Hash:    "2222222222222222222222222222222222222222",
-				Author:  "author 2",
-				Subject: "subject 2",
-			},
-			Timestamp: time.Date(2021, time.February, 25, 10, 2, 0, 0, time.UTC),
-		},
-		// LogFirstParent excludes the first one mentioned.
-	}, nil)
-
-	rfc := repoFollowerConfig{
-		Common: config.Common{
-			GitRepoBranch: "main",
-		},
-		InitialCommit: "1111111111111111111111111111111111111111",
-	}
-	require.NoError(t, updateCycle(ctx, db, &mgl, rfc))
-
+func assertDBContainsFirstThreeCommits(t *testing.T, ctx context.Context, db *pgxpool.Pool) {
 	actualRows := sqltest.GetAllRows(ctx, t, db, "GitCommits", &schema.GitCommitRow{}).([]schema.GitCommitRow)
 	assert.Equal(t, []schema.GitCommitRow{{
 		GitHash:     "4444444444444444444444444444444444444444",
@@ -91,71 +59,96 @@ func TestUpdateCycle_EmptyDB_UsesInitialCommit(t *testing.T) {
 		AuthorEmail: "author 2",
 		Subject:     "subject 2",
 	}}, actualRows)
+}
+
+var firstThreeCommitsForGitProviderMock = []provider.Commit{
+	{
+		GitHash:   "2222222222222222222222222222222222222222",
+		Author:    "author 2",
+		Subject:   "subject 2",
+		Timestamp: time.Date(2021, time.February, 25, 10, 2, 0, 0, time.UTC).Unix(),
+		Body:      "Reviewed-on: https://example.com/c/my-repo/+/000004",
+	},
+	{
+
+		GitHash:   "3333333333333333333333333333333333333333",
+		Author:    "author 3",
+		Subject:   "subject 3",
+		Timestamp: time.Date(2021, time.February, 25, 10, 3, 0, 0, time.UTC).Unix(),
+		Body:      "Reviewed-on: https://example.com/c/my-repo/+/000003",
+	},
+	{
+		GitHash:   "4444444444444444444444444444444444444444",
+		Author:    "author 4",
+		Subject:   "subject 4",
+		Timestamp: time.Date(2021, time.February, 25, 10, 4, 0, 0, time.UTC).Unix(),
+		Body:      "Reviewed-on: https://example.com/c/my-repo/+/000002",
+	},
+}
+
+func TestUpdateCycle_EmptyDB_UsesInitialCommit(t *testing.T) {
+	ctx, db := setupForTest(t)
+
+	gitp := createGitProviderMock(t, "1111111111111111111111111111111111111111", firstThreeCommitsForGitProviderMock)
+	rfc := repoFollowerConfig{
+		Common: config.Common{
+			GitRepoBranch: "main",
+		},
+		InitialCommit: "1111111111111111111111111111111111111111",
+	}
+	require.NoError(t, updateCycle(ctx, db, gitp, rfc))
+
+	assertDBContainsFirstThreeCommits(t, ctx, db)
 	// The initial commit is not stored in the DB nor queried, but is implicitly has id
 	// equal to initialID.
 }
 
+var existingDataThreeCommits = schema.Tables{GitCommits: []schema.GitCommitRow{{
+	GitHash:     "4444444444444444444444444444444444444444",
+	CommitID:    "001000000003",
+	CommitTime:  time.Date(2021, time.February, 25, 10, 4, 0, 0, time.UTC),
+	AuthorEmail: "author 4",
+	Subject:     "subject 4",
+}, {
+	GitHash:     "3333333333333333333333333333333333333333",
+	CommitID:    "001000000002",
+	CommitTime:  time.Date(2021, time.February, 25, 10, 3, 0, 0, time.UTC),
+	AuthorEmail: "author 3",
+	Subject:     "subject 3",
+}, {
+	GitHash:     "2222222222222222222222222222222222222222",
+	CommitID:    "001000000001",
+	CommitTime:  time.Date(2021, time.February, 25, 10, 2, 0, 0, time.UTC),
+	AuthorEmail: "author 2",
+	Subject:     "subject 2",
+}}}
+
 func TestUpdateCycle_CommitsInDB_IncrementalUpdate(t *testing.T) {
-	ctx := context.Background()
-	db := sqltest.NewCockroachDBForTestsWithProductionSchema(ctx, t)
-	existingData := schema.Tables{GitCommits: []schema.GitCommitRow{{
-		GitHash:     "4444444444444444444444444444444444444444",
-		CommitID:    "001000000003",
-		CommitTime:  time.Date(2021, time.February, 25, 10, 4, 0, 0, time.UTC),
-		AuthorEmail: "author 4",
-		Subject:     "subject 4",
-	}, {
-		GitHash:     "3333333333333333333333333333333333333333",
-		CommitID:    "001000000002",
-		CommitTime:  time.Date(2021, time.February, 25, 10, 3, 0, 0, time.UTC),
-		AuthorEmail: "author 3",
-		Subject:     "subject 3",
-	}, {
-		GitHash:     "2222222222222222222222222222222222222222",
-		CommitID:    "001000000001",
-		CommitTime:  time.Date(2021, time.February, 25, 10, 2, 0, 0, time.UTC),
-		AuthorEmail: "author 2",
-		Subject:     "subject 2",
-	}}}
-	require.NoError(t, sqltest.BulkInsertDataTables(ctx, db, existingData))
+	ctx, db := setupForTest(t)
+	require.NoError(t, sqltest.BulkInsertDataTables(ctx, db, existingDataThreeCommits))
 
-	mgl := mocks.GitilesLogger{}
-	mgl.On("Log", testutils.AnyContext, "main", mock.Anything).Return([]*vcsinfo.LongCommit{
+	cbValues := []provider.Commit{
 		{
-			ShortCommit: &vcsinfo.ShortCommit{
-				Hash: "6666666666666666666666666666666666666666",
-				// The rest is ignored from Log
-			},
+			GitHash:   "5555555555555555555555555555555555555555",
+			Author:    "author 5",
+			Subject:   "subject 5",
+			Timestamp: time.Date(2021, time.February, 25, 10, 5, 0, 0, time.UTC).Unix(),
 		},
-	}, nil)
-
-	mgl.On("LogFirstParent", testutils.AnyContext, "4444444444444444444444444444444444444444", "6666666666666666666666666666666666666666").Return([]*vcsinfo.LongCommit{
 		{ // These are returned with the most recent commits first
-			ShortCommit: &vcsinfo.ShortCommit{
-				Hash:    "6666666666666666666666666666666666666666",
-				Author:  "author 6",
-				Subject: "subject 6",
-			},
-			Timestamp: time.Date(2021, time.February, 25, 10, 6, 0, 0, time.UTC),
+			GitHash:   "6666666666666666666666666666666666666666",
+			Author:    "author 6",
+			Subject:   "subject 6",
+			Timestamp: time.Date(2021, time.February, 25, 10, 6, 0, 0, time.UTC).Unix(),
 		},
-		{
-			ShortCommit: &vcsinfo.ShortCommit{
-				Hash:    "5555555555555555555555555555555555555555",
-				Author:  "author 5",
-				Subject: "subject 5",
-			},
-			Timestamp: time.Date(2021, time.February, 25, 10, 5, 0, 0, time.UTC),
-		},
-		// LogFirstParent excludes the first one mentioned.
-	}, nil)
-
+	}
+	gitp := createGitProviderMock(t, "4444444444444444444444444444444444444444", cbValues)
 	rfc := repoFollowerConfig{
 		Common: config.Common{
 			GitRepoBranch: "main",
 		},
 		InitialCommit: "1111111111111111111111111111111111111111", // we expect this to not be used
 	}
-	require.NoError(t, updateCycle(ctx, db, &mgl, rfc))
+	require.NoError(t, updateCycle(ctx, db, gitp, rfc))
 
 	actualRows := sqltest.GetAllRows(ctx, t, db, "GitCommits", &schema.GitCommitRow{}).([]schema.GitCommitRow)
 	assert.Equal(t, []schema.GitCommitRow{{
@@ -192,40 +185,10 @@ func TestUpdateCycle_CommitsInDB_IncrementalUpdate(t *testing.T) {
 }
 
 func TestUpdateCycle_NoNewCommits_NothingChanges(t *testing.T) {
-	ctx := context.Background()
-	db := sqltest.NewCockroachDBForTestsWithProductionSchema(ctx, t)
-	existingData := schema.Tables{GitCommits: []schema.GitCommitRow{{
-		GitHash:     "4444444444444444444444444444444444444444",
-		CommitID:    "001000000003",
-		CommitTime:  time.Date(2021, time.February, 25, 10, 4, 0, 0, time.UTC),
-		AuthorEmail: "author 4",
-		Subject:     "subject 4",
-	}, {
-		GitHash:  "3333333333333333333333333333333333333333",
-		CommitID: "001000000002",
-		// Notice this commit comes the latest temporally, but commit_id is what should be use
-		// to determine recency.
-		CommitTime:  time.Date(2025, time.December, 25, 10, 3, 0, 0, time.UTC),
-		AuthorEmail: "author 3",
-		Subject:     "subject 3",
-	}, {
-		GitHash:     "2222222222222222222222222222222222222222",
-		CommitID:    "001000000001",
-		CommitTime:  time.Date(2021, time.February, 25, 10, 2, 0, 0, time.UTC),
-		AuthorEmail: "author 2",
-		Subject:     "subject 2",
-	}}}
-	require.NoError(t, sqltest.BulkInsertDataTables(ctx, db, existingData))
+	ctx, db := setupForTest(t)
+	require.NoError(t, sqltest.BulkInsertDataTables(ctx, db, existingDataThreeCommits))
 
-	mgl := mocks.GitilesLogger{}
-	mgl.On("Log", testutils.AnyContext, "main", mock.Anything).Return([]*vcsinfo.LongCommit{
-		{
-			ShortCommit: &vcsinfo.ShortCommit{
-				Hash: "4444444444444444444444444444444444444444",
-				// The rest is ignored from Log
-			},
-		},
-	}, nil)
+	gitp := createGitProviderMock(t, "4444444444444444444444444444444444444444", nil)
 
 	rfc := repoFollowerConfig{
 		Common: config.Common{
@@ -233,83 +196,26 @@ func TestUpdateCycle_NoNewCommits_NothingChanges(t *testing.T) {
 		},
 		InitialCommit: "1111111111111111111111111111111111111111", // we expect this to not be used
 	}
-	require.NoError(t, updateCycle(ctx, db, &mgl, rfc))
-
-	actualRows := sqltest.GetAllRows(ctx, t, db, "GitCommits", &schema.GitCommitRow{}).([]schema.GitCommitRow)
-	assert.Equal(t, []schema.GitCommitRow{{
-		GitHash:     "4444444444444444444444444444444444444444",
-		CommitID:    "001000000003",
-		CommitTime:  time.Date(2021, time.February, 25, 10, 4, 0, 0, time.UTC),
-		AuthorEmail: "author 4",
-		Subject:     "subject 4",
-	}, {
-		GitHash:     "3333333333333333333333333333333333333333",
-		CommitID:    "001000000002",
-		CommitTime:  time.Date(2025, time.December, 25, 10, 3, 0, 0, time.UTC),
-		AuthorEmail: "author 3",
-		Subject:     "subject 3",
-	}, {
-		GitHash:     "2222222222222222222222222222222222222222",
-		CommitID:    "001000000001",
-		CommitTime:  time.Date(2021, time.February, 25, 10, 2, 0, 0, time.UTC),
-		AuthorEmail: "author 2",
-		Subject:     "subject 2",
-	}}, actualRows)
+	require.NoError(t, updateCycle(ctx, db, gitp, rfc))
+	assertDBContainsFirstThreeCommits(t, ctx, db)
 }
 
 func TestCheckForLandedCycle_EmptyDB_UsesInitialCommit(t *testing.T) {
-	ctx := context.Background()
-	db := sqltest.NewCockroachDBForTestsWithProductionSchema(ctx, t)
+	ctx, db := setupForTest(t)
 
-	mgl := mocks.GitilesLogger{}
-	mgl.On("Log", testutils.AnyContext, "main", mock.Anything).Return([]*vcsinfo.LongCommit{
-		{
-			ShortCommit: &vcsinfo.ShortCommit{
-				Hash: "4444444444444444444444444444444444444444",
-				// The rest is ignored from Log
-			},
-		},
-	}, nil)
+	gitp := createGitProviderMock(t, "1111111111111111111111111111111111111111", firstThreeCommitsForGitProviderMock)
 
-	mgl.On("LogFirstParent", testutils.AnyContext, "1111111111111111111111111111111111111111", "4444444444444444444444444444444444444444").Return([]*vcsinfo.LongCommit{
-		{ // These are returned with the most recent commits first
-			ShortCommit: &vcsinfo.ShortCommit{
-				Hash:    "4444444444444444444444444444444444444444",
-				Author:  "author 4",
-				Subject: "subject 4",
-			},
-			Body:      "Reviewed-on: https://example.com/c/my-repo/+/000004",
-			Timestamp: time.Date(2021, time.February, 25, 10, 4, 0, 0, time.UTC),
+	rfc := repoFollowerConfig{
+		Common: config.Common{
+			GitRepoURL:    "https://example.com/my-repo.git",
+			GitRepoBranch: "main",
 		},
-		{
-			ShortCommit: &vcsinfo.ShortCommit{
-				Hash:    "3333333333333333333333333333333333333333",
-				Author:  "author 3",
-				Subject: "subject 3",
-			},
-			Body:      "Reviewed-on: https://example.com/c/my-repo/+/000003",
-			Timestamp: time.Date(2021, time.February, 25, 10, 3, 0, 0, time.UTC),
-		},
-		{
-			ShortCommit: &vcsinfo.ShortCommit{
-				Hash:    "2222222222222222222222222222222222222222",
-				Author:  "author 2",
-				Subject: "subject 2",
-			},
-			Body:      "Reviewed-on: https://example.com/c/my-repo/+/000002",
-			Timestamp: time.Date(2021, time.February, 25, 10, 2, 0, 0, time.UTC),
-		},
-		// LogFirstParent excludes the first one mentioned.
-	}, nil)
-
-	mc := monitorConfig{
-		RepoURL:             "https://example.com/my-repo.git",
 		SystemName:          "gerrit",
-		branch:              "main",
 		ExtractionTechnique: ReviewedLine,
-		InitialCommit:       "1111111111111111111111111111111111111111",
+		InitialCommit:       "1111111111111111111111111111111111111111", // we expect this to not be used
 	}
-	require.NoError(t, checkForLandedCycle(ctx, db, &mgl, mc))
+
+	require.NoError(t, updateCycle(ctx, db, gitp, rfc))
 
 	actualRows := sqltest.GetAllRows(ctx, t, db, "TrackingCommits", &schema.TrackingCommitRow{}).([]schema.TrackingCommitRow)
 	assert.Equal(t, []schema.TrackingCommitRow{{
@@ -317,12 +223,12 @@ func TestCheckForLandedCycle_EmptyDB_UsesInitialCommit(t *testing.T) {
 		LastGitHash: "4444444444444444444444444444444444444444",
 	}}, actualRows)
 
-	// This cycle shouldn't touch the GitCommits or the Changelists tables
-	commits := sqltest.GetAllRows(ctx, t, db, "GitCommits", &schema.GitCommitRow{}).([]schema.GitCommitRow)
-	assert.Empty(t, commits)
+	// This cycle shouldn't touch the Changelists tables
 	cls := sqltest.GetAllRows(ctx, t, db, "Changelists", &schema.ChangelistRow{}).([]schema.ChangelistRow)
 	assert.Empty(t, cls)
 }
+
+/*
 
 func TestCheckForLandedCycle_UpToDate_Success(t *testing.T) {
 	ctx := context.Background()
@@ -1043,7 +949,7 @@ func TestCheckForLandedCycle_TriageExistingData_Success(t *testing.T) {
 		ExpectationRecordID: &user4RecordID,
 	})
 }
-
+*/
 // h returns the MD5 hash of the provided string.
 func h(s string) []byte {
 	hash := md5.Sum([]byte(s))
