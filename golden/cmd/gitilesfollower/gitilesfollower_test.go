@@ -28,6 +28,8 @@ func setupForTest(t *testing.T) (context.Context, *pgxpool.Pool) {
 	return ctx, db
 }
 
+// createGitProviderMock creates a mock GitProvider that returns the given commits
+// when CommitsFromMostRecentGitHashToHead is called with the given startHash.
 func createGitProviderMock(t *testing.T, startHash string, commits []provider.Commit) *provmocks.Provider {
 	gitp := provmocks.NewProvider(t)
 	gitp.On("CommitsFromMostRecentGitHashToHead", testutils.AnyContext, startHash, mock.Anything).Run(func(args mock.Arguments) {
@@ -39,29 +41,9 @@ func createGitProviderMock(t *testing.T, startHash string, commits []provider.Co
 	return gitp
 }
 
-func assertDBContainsFirstThreeCommits(t *testing.T, ctx context.Context, db *pgxpool.Pool) {
-	actualRows := sqltest.GetAllRows(ctx, t, db, "GitCommits", &schema.GitCommitRow{}).([]schema.GitCommitRow)
-	assert.Equal(t, []schema.GitCommitRow{{
-		GitHash:     "4444444444444444444444444444444444444444",
-		CommitID:    "001000000003",
-		CommitTime:  time.Date(2021, time.February, 25, 10, 4, 0, 0, time.UTC),
-		AuthorEmail: "author 4",
-		Subject:     "subject 4",
-	}, {
-		GitHash:     "3333333333333333333333333333333333333333",
-		CommitID:    "001000000002",
-		CommitTime:  time.Date(2021, time.February, 25, 10, 3, 0, 0, time.UTC),
-		AuthorEmail: "author 3",
-		Subject:     "subject 3",
-	}, {
-		GitHash:     "2222222222222222222222222222222222222222",
-		CommitID:    "001000000001",
-		CommitTime:  time.Date(2021, time.February, 25, 10, 2, 0, 0, time.UTC),
-		AuthorEmail: "author 2",
-		Subject:     "subject 2",
-	}}, actualRows)
-}
+// Utilities that deduplicate code in the tests below.
 
+// Three commits that are returned from the git provider mock.
 var firstThreeCommitsForGitProviderMock = []provider.Commit{
 	{
 		GitHash:   "2222222222222222222222222222222222222222",
@@ -87,6 +69,37 @@ var firstThreeCommitsForGitProviderMock = []provider.Commit{
 	},
 }
 
+// How the existing data in the DB looks like for the three commits above.
+var firstThreeCommitsAsSchemaRows = []schema.GitCommitRow{{
+	GitHash:     "4444444444444444444444444444444444444444",
+	CommitID:    "001000000003",
+	CommitTime:  time.Date(2021, time.February, 25, 10, 4, 0, 0, time.UTC),
+	AuthorEmail: "author 4",
+	Subject:     "subject 4",
+}, {
+	GitHash:     "3333333333333333333333333333333333333333",
+	CommitID:    "001000000002",
+	CommitTime:  time.Date(2021, time.February, 25, 10, 3, 0, 0, time.UTC),
+	AuthorEmail: "author 3",
+	Subject:     "subject 3",
+}, {
+	GitHash:     "2222222222222222222222222222222222222222",
+	CommitID:    "001000000001",
+	CommitTime:  time.Date(2021, time.February, 25, 10, 2, 0, 0, time.UTC),
+	AuthorEmail: "author 2",
+	Subject:     "subject 2",
+}}
+
+// Asserts that the GitCommits table in the given db contains exactly the first
+// three commits as defined in firstThreeCommitsForGitProviderMock.
+func assertDBContainsFirstThreeCommits(t *testing.T, ctx context.Context, db *pgxpool.Pool) {
+	actualRows := sqltest.GetAllRows(ctx, t, db, "GitCommits", &schema.GitCommitRow{}).([]schema.GitCommitRow)
+	assert.Equal(t, firstThreeCommitsAsSchemaRows, actualRows)
+}
+
+// The existing data in the DB for the three commits above as a schema.Tables struct.
+var firstThreeCommitsAsSchema = schema.Tables{GitCommits: firstThreeCommitsAsSchemaRows}
+
 func TestUpdateCycle_EmptyDB_UsesInitialCommit(t *testing.T) {
 	ctx, db := setupForTest(t)
 
@@ -108,29 +121,9 @@ func TestUpdateCycle_EmptyDB_UsesInitialCommit(t *testing.T) {
 	assert.Empty(t, cls)
 }
 
-var existingDataThreeCommits = schema.Tables{GitCommits: []schema.GitCommitRow{{
-	GitHash:     "4444444444444444444444444444444444444444",
-	CommitID:    "001000000003",
-	CommitTime:  time.Date(2021, time.February, 25, 10, 4, 0, 0, time.UTC),
-	AuthorEmail: "author 4",
-	Subject:     "subject 4",
-}, {
-	GitHash:     "3333333333333333333333333333333333333333",
-	CommitID:    "001000000002",
-	CommitTime:  time.Date(2021, time.February, 25, 10, 3, 0, 0, time.UTC),
-	AuthorEmail: "author 3",
-	Subject:     "subject 3",
-}, {
-	GitHash:     "2222222222222222222222222222222222222222",
-	CommitID:    "001000000001",
-	CommitTime:  time.Date(2021, time.February, 25, 10, 2, 0, 0, time.UTC),
-	AuthorEmail: "author 2",
-	Subject:     "subject 2",
-}}}
-
 func TestUpdateCycle_CommitsInDB_IncrementalUpdate(t *testing.T) {
 	ctx, db := setupForTest(t)
-	require.NoError(t, sqltest.BulkInsertDataTables(ctx, db, existingDataThreeCommits))
+	require.NoError(t, sqltest.BulkInsertDataTables(ctx, db, firstThreeCommitsAsSchema))
 
 	cbValues := []provider.Commit{
 		{
@@ -191,7 +184,7 @@ func TestUpdateCycle_CommitsInDB_IncrementalUpdate(t *testing.T) {
 
 func TestUpdateCycle_NoNewCommits_NothingChanges(t *testing.T) {
 	ctx, db := setupForTest(t)
-	require.NoError(t, sqltest.BulkInsertDataTables(ctx, db, existingDataThreeCommits))
+	require.NoError(t, sqltest.BulkInsertDataTables(ctx, db, firstThreeCommitsAsSchema))
 
 	gitp := createGitProviderMock(t, "4444444444444444444444444444444444444444", nil)
 
