@@ -16,6 +16,8 @@ import (
 	"go.goldmine.build/go/git/provider"
 	provmocks "go.goldmine.build/go/git/provider/mocks"
 	"go.goldmine.build/go/testutils"
+	"go.goldmine.build/go/vcsinfo"
+	"go.goldmine.build/golden/cmd/gitilesfollower/mocks"
 	"go.goldmine.build/golden/go/config"
 	"go.goldmine.build/golden/go/sql/schema"
 	"go.goldmine.build/golden/go/sql/sqltest"
@@ -41,7 +43,9 @@ func createGitProviderMock(t *testing.T, startHash string, commits []provider.Co
 	return gitp
 }
 
+// ******************************************************
 // Utilities that deduplicate code in the tests below.
+// ******************************************************
 
 // Three commits that are returned from the git provider mock.
 var firstThreeCommitsForGitProviderMock = []provider.Commit{
@@ -100,16 +104,24 @@ func assertDBContainsFirstThreeCommits(t *testing.T, ctx context.Context, db *pg
 // The existing data in the DB for the three commits above as a schema.Tables struct.
 var firstThreeCommitsAsSchema = schema.Tables{GitCommits: firstThreeCommitsAsSchemaRows}
 
+// A repoFollowerConfig that can be used in tests.
+var rfc = repoFollowerConfig{
+	Common: config.Common{
+		GitRepoURL:    "https://example.com/my-repo.git",
+		GitRepoBranch: "main",
+	},
+	SystemName:          "gerrit",
+	ExtractionTechnique: ReviewedLine,
+	InitialCommit:       "1111111111111111111111111111111111111111", // we expect this to not be used
+}
+
+// ******************************************************
+// End Utilities
+// ******************************************************
+
 func TestUpdateCycle_EmptyDB_UsesInitialCommit(t *testing.T) {
 	ctx, db := setupForTest(t)
-
 	gitp := createGitProviderMock(t, "1111111111111111111111111111111111111111", firstThreeCommitsForGitProviderMock)
-	rfc := repoFollowerConfig{
-		Common: config.Common{
-			GitRepoBranch: "main",
-		},
-		InitialCommit: "1111111111111111111111111111111111111111",
-	}
 	require.NoError(t, updateCycle(ctx, db, gitp, rfc))
 
 	assertDBContainsFirstThreeCommits(t, ctx, db)
@@ -140,12 +152,6 @@ func TestUpdateCycle_CommitsInDB_IncrementalUpdate(t *testing.T) {
 		},
 	}
 	gitp := createGitProviderMock(t, "4444444444444444444444444444444444444444", cbValues)
-	rfc := repoFollowerConfig{
-		Common: config.Common{
-			GitRepoBranch: "main",
-		},
-		InitialCommit: "1111111111111111111111111111111111111111", // we expect this to not be used
-	}
 	require.NoError(t, updateCycle(ctx, db, gitp, rfc))
 
 	actualRows := sqltest.GetAllRows(ctx, t, db, "GitCommits", &schema.GitCommitRow{}).([]schema.GitCommitRow)
@@ -185,15 +191,7 @@ func TestUpdateCycle_CommitsInDB_IncrementalUpdate(t *testing.T) {
 func TestUpdateCycle_NoNewCommits_NothingChanges(t *testing.T) {
 	ctx, db := setupForTest(t)
 	require.NoError(t, sqltest.BulkInsertDataTables(ctx, db, firstThreeCommitsAsSchema))
-
 	gitp := createGitProviderMock(t, "4444444444444444444444444444444444444444", nil)
-
-	rfc := repoFollowerConfig{
-		Common: config.Common{
-			GitRepoBranch: "main",
-		},
-		InitialCommit: "1111111111111111111111111111111111111111", // we expect this to not be used
-	}
 	require.NoError(t, updateCycle(ctx, db, gitp, rfc))
 	assertDBContainsFirstThreeCommits(t, ctx, db)
 }
@@ -209,15 +207,6 @@ func TestUpdateCycle_UpToDate_Success(t *testing.T) {
 	}
 	require.NoError(t, sqltest.BulkInsertDataTables(ctx, db, existingData))
 
-	rfc := repoFollowerConfig{
-		Common: config.Common{
-			GitRepoURL:    "https://example.com/my-repo.git",
-			GitRepoBranch: "main",
-		},
-		SystemName:          "gerrit",
-		ExtractionTechnique: ReviewedLine,
-		InitialCommit:       "1111111111111111111111111111111111111111", // we expect this to not be used
-	}
 	require.NoError(t, updateCycle(ctx, db, gitp, rfc))
 
 	actualRows := sqltest.GetAllRows(ctx, t, db, "TrackingCommits", &schema.TrackingCommitRow{}).([]schema.TrackingCommitRow)
@@ -230,98 +219,23 @@ func TestUpdateCycle_UpToDate_Success(t *testing.T) {
 func TestUpdateCycle_UnparsableCL_Success(t *testing.T) {
 	ctx, db := setupForTest(t)
 
+	// Modify the second commit so that its body doesn't match the expected pattern.
 	commits := deepcopy.Copy(firstThreeCommitsForGitProviderMock).([]provider.Commit)
 	commits[1].Body = "This body doesn't match the pattern!"
 
 	gitp := createGitProviderMock(t, "1111111111111111111111111111111111111111", commits)
-	rfc := repoFollowerConfig{
-		Common: config.Common{
-			GitRepoBranch: "main",
-		},
-		InitialCommit: "1111111111111111111111111111111111111111",
-	}
 	require.NoError(t, updateCycle(ctx, db, gitp, rfc))
 
 	assertDBContainsFirstThreeCommits(t, ctx, db)
-	// The initial commit is not stored in the DB nor queried, but is implicitly has id
-	// equal to initialID.
 
 	// This cycle shouldn't touch the Changelists tables
 	cls := sqltest.GetAllRows(ctx, t, db, "Changelists", &schema.ChangelistRow{}).([]schema.ChangelistRow)
 	assert.Empty(t, cls)
 }
 
-/*
-func TestCheckForLandedCycle_UnparsableCL_Success(t *testing.T) {
-	ctx := context.Background()
-	db := sqltest.NewCockroachDBForTestsWithProductionSchema(ctx, t)
-
-	mgl := mocks.GitilesLogger{}
-	mgl.On("Log", testutils.AnyContext, "main", mock.Anything).Return([]*vcsinfo.LongCommit{
-		{
-			ShortCommit: &vcsinfo.ShortCommit{
-				Hash: "4444444444444444444444444444444444444444",
-				// The rest is ignored from Log
-			},
-		},
-	}, nil)
-
-	mgl.On("LogFirstParent", testutils.AnyContext, "1111111111111111111111111111111111111111", "4444444444444444444444444444444444444444").Return([]*vcsinfo.LongCommit{
-		{ // These are returned with the most recent commits first
-			ShortCommit: &vcsinfo.ShortCommit{
-				Hash:    "4444444444444444444444444444444444444444",
-				Author:  "author 4",
-				Subject: "subject 4",
-			},
-			Body:      "Reviewed-on: https://example.com/c/my-repo/+/000004",
-			Timestamp: time.Date(2021, time.February, 25, 10, 4, 0, 0, time.UTC),
-		},
-		{
-			ShortCommit: &vcsinfo.ShortCommit{
-				Hash:    "3333333333333333333333333333333333333333",
-				Author:  "author 3",
-				Subject: "subject 3",
-			},
-			Body:      "This body doesn't match the pattern!",
-			Timestamp: time.Date(2021, time.February, 25, 10, 3, 0, 0, time.UTC),
-		},
-		{
-			ShortCommit: &vcsinfo.ShortCommit{
-				Hash:    "2222222222222222222222222222222222222222",
-				Author:  "author 2",
-				Subject: "subject 2",
-			},
-			Body:      "Reviewed-on: https://example.com/c/my-repo/+/000002",
-			Timestamp: time.Date(2021, time.February, 25, 10, 2, 0, 0, time.UTC),
-		},
-		// LogFirstParent excludes the first one mentioned.
-	}, nil)
-
-	mc := monitorConfig{
-		RepoURL:             "https://example.com/my-repo.git",
-		SystemName:          "gerrit",
-		branch:              "main",
-		ExtractionTechnique: ReviewedLine,
-		InitialCommit:       "1111111111111111111111111111111111111111",
-	}
-	require.NoError(t, checkForLandedCycle(ctx, db, &mgl, mc))
-
-	actualRows := sqltest.GetAllRows(ctx, t, db, "TrackingCommits", &schema.TrackingCommitRow{}).([]schema.TrackingCommitRow)
-	assert.Equal(t, []schema.TrackingCommitRow{{
-		Repo:        "https://example.com/my-repo.git",
-		LastGitHash: "4444444444444444444444444444444444444444",
-	}}, actualRows)
-
-	// This cycle shouldn't touch the GitCommits or the Changelists tables
-	commits := sqltest.GetAllRows(ctx, t, db, "GitCommits", &schema.GitCommitRow{}).([]schema.GitCommitRow)
-	assert.Empty(t, commits)
-	cls := sqltest.GetAllRows(ctx, t, db, "Changelists", &schema.ChangelistRow{}).([]schema.ChangelistRow)
-	assert.Empty(t, cls)
-}
-
 func TestCheckForLandedCycle_CLsWithNoExpectationsLand_MarkedAsLanded(t *testing.T) {
-	ctx := context.Background()
-	db := sqltest.NewCockroachDBForTestsWithProductionSchema(ctx, t)
+	ctx, db := setupForTest(t)
+
 	existingData := schema.Tables{
 		TrackingCommits: []schema.TrackingCommitRow{{
 			Repo:        "https://example.com/my-repo.git",
@@ -390,14 +304,10 @@ Commit-Queue: User One <user1@google.com>`,
 		// LogFirstParent excludes the first one mentioned.
 	}, nil)
 
-	mc := monitorConfig{
-		RepoURL:             "https://example.com/my-repo.git",
-		SystemName:          "gerrit",
-		branch:              "main",
-		ExtractionTechnique: ReviewedLine,
-		InitialCommit:       "1111111111111111111111111111111111111111", // should be ignored
-	}
-	require.NoError(t, checkForLandedCycle(ctx, db, &mgl, mc))
+	gitp := createGitProviderMock(t, "1111111111111111111111111111111111111111", firstThreeCommitsForGitProviderMock)
+	require.NoError(t, updateCycle(ctx, db, gitp, rfc))
+
+	assertDBContainsFirstThreeCommits(t, ctx, db)
 
 	actualRows := sqltest.GetAllRows(ctx, t, db, "TrackingCommits", &schema.TrackingCommitRow{}).([]schema.TrackingCommitRow)
 	assert.Equal(t, []schema.TrackingCommitRow{{
@@ -421,11 +331,9 @@ Commit-Queue: User One <user1@google.com>`,
 		Subject:          "subject 4",
 		LastIngestedData: time.Date(2021, time.March, 1, 1, 1, 1, 0, time.UTC),
 	}}, cls)
-
-	// This cycle shouldn't touch the GitCommits tables
-	commits := sqltest.GetAllRows(ctx, t, db, "GitCommits", &schema.GitCommitRow{}).([]schema.GitCommitRow)
-	assert.Empty(t, commits)
 }
+
+/*
 
 func TestCheckForLandedCycle_CLExpectations_MergedIntoPrimaryBranch(t *testing.T) {
 	ctx := context.Background()
