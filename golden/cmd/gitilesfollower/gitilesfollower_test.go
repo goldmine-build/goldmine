@@ -335,8 +335,7 @@ Commit-Queue: User One <user1@google.com>`,
 }
 
 func TestCheckForLandedCycle_CLExpectations_MergedIntoPrimaryBranch(t *testing.T) {
-	ctx := context.Background()
-	db := sqltest.NewCockroachDBForTestsWithProductionSchema(ctx, t)
+	ctx, db := setupForTest(t)
 	existingData := dks.Build()
 	require.NoError(t, sqltest.BulkInsertDataTables(ctx, db, existingData))
 
@@ -470,12 +469,8 @@ func TestCheckForLandedCycle_CLExpectations_MergedIntoPrimaryBranch(t *testing.T
 	})
 }
 
-/*
-
-
 func TestCheckForLandedCycle_ExtractsCLFromSubject_Success(t *testing.T) {
-	ctx := context.Background()
-	db := sqltest.NewCockroachDBForTestsWithProductionSchema(ctx, t)
+	ctx, db := setupForTest(t)
 	existingData := schema.Tables{
 		TrackingCommits: []schema.TrackingCommitRow{{
 			Repo:        "https://example.com/my-repo.git",
@@ -498,46 +493,27 @@ func TestCheckForLandedCycle_ExtractsCLFromSubject_Success(t *testing.T) {
 	}
 	require.NoError(t, sqltest.BulkInsertDataTables(ctx, db, existingData))
 
-	mgl := mocks.GitilesLogger{}
-	mgl.On("Log", testutils.AnyContext, "main", mock.Anything).Return([]*vcsinfo.LongCommit{
+	gitp := createGitProviderMock(t, "1111111111111111111111111111111111111111", []provider.Commit{
 		{
-			ShortCommit: &vcsinfo.ShortCommit{
-				Hash: "4444444444444444444444444444444444444444",
-				// The rest is ignored from Log
-			},
-		},
-	}, nil)
-
-	mgl.On("LogFirstParent", testutils.AnyContext, "2222222222222222222222222222222222222222", "4444444444444444444444444444444444444444").Return([]*vcsinfo.LongCommit{
-		{ // These are returned with the most recent commits first
-			ShortCommit: &vcsinfo.ShortCommit{
-				Hash:    "4444444444444444444444444444444444444444",
-				Author:  "author 4",
-				Subject: "subject 4 (#000004)",
-			},
+			GitHash:   "3333333333333333333333333333333333333333",
+			Author:    "author 3",
+			Subject:   `Revert "risky change (#000002)" (#000003)`,
 			Body:      "Does not matter",
-			Timestamp: time.Date(2021, time.February, 25, 10, 4, 0, 0, time.UTC),
+			Timestamp: time.Date(2021, time.February, 25, 10, 3, 0, 0, time.UTC).Unix(),
 		},
 		{
-			ShortCommit: &vcsinfo.ShortCommit{
-				Hash:    "3333333333333333333333333333333333333333",
-				Author:  "author 3",
-				Subject: `Revert "risky change (#000002)" (#000003)`,
-			},
+			GitHash:   "4444444444444444444444444444444444444444",
+			Author:    "author 4",
+			Subject:   "subject 4 (#000004)",
 			Body:      "Does not matter",
-			Timestamp: time.Date(2021, time.February, 25, 10, 3, 0, 0, time.UTC),
+			Timestamp: time.Date(2021, time.February, 25, 10, 4, 0, 0, time.UTC).Unix(),
 		},
-		// LogFirstParent excludes the first one mentioned.
-	}, nil)
+	})
 
-	mc := monitorConfig{
-		RepoURL:             "https://example.com/my-repo.git",
-		SystemName:          "github",
-		branch:              "main",
-		ExtractionTechnique: FromSubject,
-		InitialCommit:       "1111111111111111111111111111111111111111", // should be ignored
-	}
-	require.NoError(t, checkForLandedCycle(ctx, db, &mgl, mc))
+	rfc2 := deepcopy.Copy(rfc).(repoFollowerConfig)
+	rfc2.SystemName = "github"
+	rfc2.ExtractionTechnique = FromSubject
+	require.NoError(t, updateCycle(ctx, db, gitp, rfc2))
 
 	actualRows := sqltest.GetAllRows(ctx, t, db, "TrackingCommits", &schema.TrackingCommitRow{}).([]schema.TrackingCommitRow)
 	assert.Equal(t, []schema.TrackingCommitRow{{
@@ -561,110 +537,10 @@ func TestCheckForLandedCycle_ExtractsCLFromSubject_Success(t *testing.T) {
 		Subject:          "subject 4", // unchanged
 		LastIngestedData: time.Date(2021, time.March, 1, 1, 1, 1, 0, time.UTC),
 	}}, cls)
-
-	// This cycle shouldn't touch the GitCommits tables
-	commits := sqltest.GetAllRows(ctx, t, db, "GitCommits", &schema.GitCommitRow{}).([]schema.GitCommitRow)
-	assert.Empty(t, commits)
-}
-
-func TestCheckForLandedCycle_LegacyMode_StatusNotChanged(t *testing.T) {
-	ctx := context.Background()
-	db := sqltest.NewCockroachDBForTestsWithProductionSchema(ctx, t)
-	existingData := schema.Tables{
-		TrackingCommits: []schema.TrackingCommitRow{{
-			Repo:        "https://example.com/my-repo.git",
-			LastGitHash: "2222222222222222222222222222222222222222",
-		}}, Changelists: []schema.ChangelistRow{{
-			ChangelistID:     "github_000004",
-			System:           "github",
-			Status:           schema.StatusOpen,
-			OwnerEmail:       "whomever@example.com",
-			Subject:          "subject 4",
-			LastIngestedData: time.Date(2021, time.March, 1, 1, 1, 1, 0, time.UTC),
-		}, {
-			ChangelistID:     "github_000003",
-			System:           "github",
-			Status:           schema.StatusOpen,
-			OwnerEmail:       "user1@example.com",
-			Subject:          `Revert "risky change (#000002)"`,
-			LastIngestedData: time.Date(2021, time.March, 1, 1, 1, 1, 0, time.UTC),
-		}},
-	}
-	require.NoError(t, sqltest.BulkInsertDataTables(ctx, db, existingData))
-
-	mgl := mocks.GitilesLogger{}
-	mgl.On("Log", testutils.AnyContext, "main", mock.Anything).Return([]*vcsinfo.LongCommit{
-		{
-			ShortCommit: &vcsinfo.ShortCommit{
-				Hash: "4444444444444444444444444444444444444444",
-				// The rest is ignored from Log
-			},
-		},
-	}, nil)
-
-	mgl.On("LogFirstParent", testutils.AnyContext, "2222222222222222222222222222222222222222", "4444444444444444444444444444444444444444").Return([]*vcsinfo.LongCommit{
-		{ // These are returned with the most recent commits first
-			ShortCommit: &vcsinfo.ShortCommit{
-				Hash:    "4444444444444444444444444444444444444444",
-				Author:  "author 4",
-				Subject: "subject 4 (#000004)",
-			},
-			Body:      "Does not matter",
-			Timestamp: time.Date(2021, time.February, 25, 10, 4, 0, 0, time.UTC),
-		},
-		{
-			ShortCommit: &vcsinfo.ShortCommit{
-				Hash:    "3333333333333333333333333333333333333333",
-				Author:  "author 3",
-				Subject: `Revert "risky change (#000002)" (#000003)`,
-			},
-			Body:      "Does not matter",
-			Timestamp: time.Date(2021, time.February, 25, 10, 3, 0, 0, time.UTC),
-		},
-		// LogFirstParent excludes the first one mentioned.
-	}, nil)
-
-	mc := monitorConfig{
-		RepoURL:             "https://example.com/my-repo.git",
-		SystemName:          "github",
-		branch:              "main",
-		ExtractionTechnique: FromSubject,
-		InitialCommit:       "1111111111111111111111111111111111111111", // should be ignored
-		LegacyUpdaterInUse:  true,
-	}
-	require.NoError(t, checkForLandedCycle(ctx, db, &mgl, mc))
-
-	actualRows := sqltest.GetAllRows(ctx, t, db, "TrackingCommits", &schema.TrackingCommitRow{}).([]schema.TrackingCommitRow)
-	assert.Equal(t, []schema.TrackingCommitRow{{
-		Repo:        "https://example.com/my-repo.git",
-		LastGitHash: "4444444444444444444444444444444444444444",
-	}}, actualRows)
-
-	cls := sqltest.GetAllRows(ctx, t, db, "Changelists", &schema.ChangelistRow{}).([]schema.ChangelistRow)
-	assert.Equal(t, []schema.ChangelistRow{{
-		ChangelistID:     "github_000003",
-		System:           "github",
-		Status:           schema.StatusOpen, // not set
-		OwnerEmail:       "user1@example.com",
-		Subject:          `Revert "risky change (#000002)"`, // unchanged
-		LastIngestedData: time.Date(2021, time.March, 1, 1, 1, 1, 0, time.UTC),
-	}, {
-		ChangelistID:     "github_000004",
-		System:           "github",
-		Status:           schema.StatusOpen, // not set
-		OwnerEmail:       "whomever@example.com",
-		Subject:          "subject 4", // unchanged
-		LastIngestedData: time.Date(2021, time.March, 1, 1, 1, 1, 0, time.UTC),
-	}}, cls)
-
-	// This cycle shouldn't touch the GitCommits tables
-	commits := sqltest.GetAllRows(ctx, t, db, "GitCommits", &schema.GitCommitRow{}).([]schema.GitCommitRow)
-	assert.Empty(t, commits)
 }
 
 func TestCheckForLandedCycle_TriageExistingData_Success(t *testing.T) {
-	ctx := context.Background()
-	db := sqltest.NewCockroachDBForTestsWithProductionSchema(ctx, t)
+	ctx, db := setupForTest(t)
 	existingData := dks.Build()
 	existingData.Expectations = append(existingData.Expectations, []schema.ExpectationRow{{
 		GroupingID: h(roundRectGrouping),
@@ -683,37 +559,20 @@ func TestCheckForLandedCycle_TriageExistingData_Success(t *testing.T) {
 
 	clLandedTime := time.Date(2021, time.April, 1, 1, 1, 1, 0, time.UTC)
 
-	mgl := mocks.GitilesLogger{}
-	mgl.On("Log", testutils.AnyContext, "main", mock.Anything).Return([]*vcsinfo.LongCommit{
+	gitp := createGitProviderMock(t, "0111011101110111011101110111011101110111", []provider.Commit{
 		{
-			ShortCommit: &vcsinfo.ShortCommit{
-				Hash: "2222222222222222222222222222222222222222",
-				// The rest is ignored from Log
-			},
-		},
-	}, nil)
-
-	mgl.On("LogFirstParent", testutils.AnyContext, "1111111111111111111111111111111111111111", "2222222222222222222222222222222222222222").Return([]*vcsinfo.LongCommit{
-		{
-			ShortCommit: &vcsinfo.ShortCommit{
-				Hash:    "2222222222222222222222222222222222222222",
-				Author:  dks.UserTwo,
-				Subject: "Increase test coverage",
-			},
+			GitHash:   "2222222222222222222222222222222222222222",
+			Author:    dks.UserTwo,
+			Subject:   "Increase test coverage",
 			Body:      "Reviewed-on: https://example.com/c/my-repo/+/CL_new_tests",
-			Timestamp: clLandedTime,
+			Timestamp: clLandedTime.Unix(),
 		},
-		// LogFirstParent excludes the first one mentioned.
-	}, nil)
+	})
 
-	mc := monitorConfig{
-		RepoURL:             "https://example.com/my-repo.git",
-		SystemName:          dks.GerritInternalCRS,
-		branch:              "main",
-		ExtractionTechnique: ReviewedLine,
-		InitialCommit:       "1111111111111111111111111111111111111111",
-	}
-	require.NoError(t, checkForLandedCycle(ctx, db, &mgl, mc))
+	rfc2 := deepcopy.Copy(rfc).(repoFollowerConfig)
+	rfc2.SystemName = dks.GerritInternalCRS
+
+	require.NoError(t, updateCycle(ctx, db, gitp, rfc2))
 
 	actualRows := sqltest.GetAllRows(ctx, t, db, "TrackingCommits", &schema.TrackingCommitRow{}).([]schema.TrackingCommitRow)
 	assert.Equal(t, []schema.TrackingCommitRow{{
@@ -827,7 +686,7 @@ func TestCheckForLandedCycle_TriageExistingData_Success(t *testing.T) {
 		ExpectationRecordID: &user4RecordID,
 	})
 }
-*/
+
 // h returns the MD5 hash of the provided string.
 func h(s string) []byte {
 	hash := md5.Sum([]byte(s))
@@ -877,6 +736,11 @@ func Test_extractReviewedLine(t *testing.T) {
 			name:   "Ignore if the Reviewed-on line is part of a revert message",
 			clBody: "> Reviewed-on:    https://example.com/c/my-repo/+/33333   ",
 			want:   "",
+		},
+		{
+			name:   "Non-numeric CL ID",
+			clBody: "Reviewed-on: https://example.com/c/my-repo/+/CL_new_tests",
+			want:   "CL_new_tests",
 		},
 	}
 	for _, tt := range tests {
