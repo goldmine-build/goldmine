@@ -1,11 +1,14 @@
 package repo_root
 
 import (
+	"context"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
 	"go.goldmine.build/bazel/go/bazel"
+	"go.goldmine.build/go/git/git_common"
 	"go.goldmine.build/go/skerr"
 )
 
@@ -19,25 +22,29 @@ import (
 // Note that this will return an error if the CWD is not inside a checkout, so
 // this cannot run on production servers.
 func Get() (string, error) {
+	ctx := context.Background()
 	if bazel.InBazelTest() {
 		return bazel.RunfilesDir(), nil
 	}
 
-	dir, err := os.Getwd()
+	// Find the path to the git executable, which might be relative to working dir.
+	gitFullPath, _, _, err := git_common.FindGit(ctx)
 	if err != nil {
-		return "", skerr.Wrap(err)
+		return "", skerr.Wrapf(err, "Failed to find git.")
 	}
-	prefixes := []string{"go.goldmine.build", "buildbot"}
-	for _, prefix := range prefixes {
-		if strings.Contains(dir, prefix) {
-			return strings.Split(dir, prefix)[0] + prefix, nil
-		}
+
+	// Force the path to be absolute.
+	gitFullPath, err = filepath.Abs(gitFullPath)
+	if err != nil {
+		return "", skerr.Wrapf(err, "Failed to get absolute path to git.")
 	}
-	// If this function is used outside of tests, please remove the following.
-	if d := os.Getenv("WORKSPACE_DIR"); d != "" {
-		return d, nil
+
+	cmd := exec.CommandContext(ctx, gitFullPath, "rev-parse", "--show-toplevel")
+	b, err := cmd.CombinedOutput()
+	if err != nil {
+		return "", skerr.Wrapf(err, "No repo root found; are we running inside a checkout?: %s - %s", err, string(b))
 	}
-	return "", skerr.Fmt("No repo root found; are we running inside a checkout?")
+	return strings.TrimSpace(string(b)), nil
 }
 
 // GetLocal returns the path to the root of the current Git repo. Only intended

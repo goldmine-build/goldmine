@@ -19,6 +19,7 @@ import (
 	"go.goldmine.build/go/vcsinfo"
 	"go.goldmine.build/golden/cmd/gitilesfollower/mocks"
 	"go.goldmine.build/golden/go/config"
+	dks "go.goldmine.build/golden/go/sql/datakitchensink"
 	"go.goldmine.build/golden/go/sql/schema"
 	"go.goldmine.build/golden/go/sql/sqltest"
 	"go.goldmine.build/golden/go/types"
@@ -333,8 +334,6 @@ Commit-Queue: User One <user1@google.com>`,
 	}}, cls)
 }
 
-/*
-
 func TestCheckForLandedCycle_CLExpectations_MergedIntoPrimaryBranch(t *testing.T) {
 	ctx := context.Background()
 	db := sqltest.NewCockroachDBForTestsWithProductionSchema(ctx, t)
@@ -343,37 +342,20 @@ func TestCheckForLandedCycle_CLExpectations_MergedIntoPrimaryBranch(t *testing.T
 
 	clLandedTime := time.Date(2021, time.April, 1, 1, 1, 1, 0, time.UTC)
 
-	mgl := mocks.GitilesLogger{}
-	mgl.On("Log", testutils.AnyContext, "main", mock.Anything).Return([]*vcsinfo.LongCommit{
+	gitp := createGitProviderMock(t, "0111011101110111011101110111011101110111", []provider.Commit{
 		{
-			ShortCommit: &vcsinfo.ShortCommit{
-				Hash: "2222222222222222222222222222222222222222",
-				// The rest is ignored from Log
-			},
-		},
-	}, nil)
-
-	mgl.On("LogFirstParent", testutils.AnyContext, "1111111111111111111111111111111111111111", "2222222222222222222222222222222222222222").Return([]*vcsinfo.LongCommit{
-		{
-			ShortCommit: &vcsinfo.ShortCommit{
-				Hash:    "2222222222222222222222222222222222222222",
-				Author:  dks.UserTwo,
-				Subject: "Increase test coverage",
-			},
+			GitHash:   "2222222222222222222222222222222222222222",
+			Author:    dks.UserTwo,
+			Subject:   "Increase test coverage",
 			Body:      "Reviewed-on: https://example.com/c/my-repo/+/CL_new_tests",
-			Timestamp: clLandedTime,
+			Timestamp: clLandedTime.Unix(),
 		},
-		// LogFirstParent excludes the first one mentioned.
-	}, nil)
+	})
 
-	mc := monitorConfig{
-		RepoURL:             "https://example.com/my-repo.git",
-		SystemName:          dks.GerritInternalCRS,
-		branch:              "main",
-		ExtractionTechnique: ReviewedLine,
-		InitialCommit:       "1111111111111111111111111111111111111111",
-	}
-	require.NoError(t, checkForLandedCycle(ctx, db, &mgl, mc))
+	rfc2 := deepcopy.Copy(rfc).(repoFollowerConfig)
+	rfc2.SystemName = dks.GerritInternalCRS
+
+	require.NoError(t, updateCycle(ctx, db, gitp, rfc2))
 
 	actualRows := sqltest.GetAllRows(ctx, t, db, "TrackingCommits", &schema.TrackingCommitRow{}).([]schema.TrackingCommitRow)
 	assert.Equal(t, []schema.TrackingCommitRow{{
@@ -487,6 +469,9 @@ func TestCheckForLandedCycle_CLExpectations_MergedIntoPrimaryBranch(t *testing.T
 		ExpectationRecordID: &user4RecordID,
 	})
 }
+
+/*
+
 
 func TestCheckForLandedCycle_ExtractsCLFromSubject_Success(t *testing.T) {
 	ctx := context.Background()
