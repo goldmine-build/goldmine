@@ -11,6 +11,58 @@ import (
 	"go.goldmine.build/go/util"
 )
 
+type IngestionServerConfig struct {
+
+	// As of 2019, the primary way to ingest data is event-driven. That is, when
+	// new files are put into a GCS bucket, PubSub fires an event and that is the
+	// primary way for an ingester to be notified about a file.
+	// The 2 parameters below configure the manual polling of the source, which
+	// is a backup way to ingest data in the unlikely case that a PubSub event is
+	// dropped (PubSub will try and re-try to send events for up to seven days by default).
+	// BackupPollInterval is how often to do a scan.
+	BackupPollInterval config.Duration `json:"backup_poll_interval"`
+	// BackupPollScope is how far back in time to scan. It should be longer than BackupPollInterval.
+	BackupPollScope config.Duration `json:"backup_poll_scope"`
+
+	// IngestionFilesTopic is the PubSub topic on which messages will be placed that correspond
+	// to files to ingest.
+	IngestionFilesTopic string `json:"ingestion_files_topic"`
+
+	// IngestionSubscription is the subscription ID used by all replicas. By setting the
+	// subscriber ID to be the same on all replicas, only one of the replicas will get each
+	// event (usually). We like our subscription names to be unique and keyed to the instance,
+	// for easier following up on "Why are there so many backed up messages?"
+	IngestionSubscription string `json:"ingestion_subscription"`
+
+	// FilesProcessedInParallel controls how many goroutines are used to process PubSub messages.
+	// The default is 4, but if instances are handling lots of small files, this can be increased.
+	FilesProcessedInParallel int `json:"files_processed_in_parallel" optional:"true"`
+
+	// PrimaryBranchConfig describes how the primary branch ingestion should be configured.
+	PrimaryBranchConfig IngesterConfig `json:"primary_branch_config"`
+
+	// PubSubFetchSize is how many worker messages to ask PubSub for. This defaults to 10, but for
+	// instances that have many small files ingested, this can be higher for better utilization
+	// and throughput.
+	PubSubFetchSize int `json:"pubsub_fetch_size" optional:"true"`
+}
+
+// IngesterConfig is the configuration for a single ingester.
+type IngesterConfig struct {
+	// Type describes the backend type of the ingester.
+	Type string `json:"type"`
+	// Source is where the ingester will read files from.
+	Source GCSSourceConfig `json:"gcs_source"`
+	// ExtraParams help configure the ingester and are specific to the backend type.
+	ExtraParams map[string]string `json:"extra_configuration"`
+}
+
+// GCSSourceConfig is the configuration needed to ingest from files in a GCS bucket.
+type GCSSourceConfig struct {
+	Bucket string `json:"bucket"`
+	Prefix string `json:"prefix"`
+}
+
 type ExtractionTechnique string
 
 const (
@@ -110,6 +162,9 @@ type Common struct {
 
 	// RepoFollowerConfig contains settings specific to the repo follower, i.e. the commits ingestion.
 	RepoFollowerConfig RepoFollowerConfig `json:"repo_follower_config"`
+
+	// IngestionServerConfig contains settings specific to the ingestion server.
+	IngestionServerConfig IngestionServerConfig `json:"ingestion_server_config"`
 }
 
 // CodeReviewSystem represents the details needed to interact with a CodeReviewSystem (e.g.

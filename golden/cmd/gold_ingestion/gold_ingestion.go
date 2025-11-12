@@ -36,74 +36,11 @@ const (
 	maxSQLConnections = 20
 )
 
-type ingestionServerConfig struct {
-	config.Common
-
-	// As of 2019, the primary way to ingest data is event-driven. That is, when
-	// new files are put into a GCS bucket, PubSub fires an event and that is the
-	// primary way for an ingester to be notified about a file.
-	// The 2 parameters below configure the manual polling of the source, which
-	// is a backup way to ingest data in the unlikely case that a PubSub event is
-	// dropped (PubSub will try and re-try to send events for up to seven days by default).
-	// BackupPollInterval is how often to do a scan.
-	BackupPollInterval config.Duration `json:"backup_poll_interval"`
-	// BackupPollScope is how far back in time to scan. It should be longer than BackupPollInterval.
-	BackupPollScope config.Duration `json:"backup_poll_scope"`
-
-	// IngestionFilesTopic is the PubSub topic on which messages will be placed that correspond
-	// to files to ingest.
-	IngestionFilesTopic string `json:"ingestion_files_topic"`
-
-	// IngestionSubscription is the subscription ID used by all replicas. By setting the
-	// subscriber ID to be the same on all replicas, only one of the replicas will get each
-	// event (usually). We like our subscription names to be unique and keyed to the instance,
-	// for easier following up on "Why are there so many backed up messages?"
-	IngestionSubscription string `json:"ingestion_subscription"`
-
-	// FilesProcessedInParallel controls how many goroutines are used to process PubSub messages.
-	// The default is 4, but if instances are handling lots of small files, this can be increased.
-	FilesProcessedInParallel int `json:"files_processed_in_parallel" optional:"true"`
-
-	// PrimaryBranchConfig describes how the primary branch ingestion should be configured.
-	PrimaryBranchConfig ingesterConfig `json:"primary_branch_config"`
-
-	// PubSubFetchSize is how many worker messages to ask PubSub for. This defaults to 10, but for
-	// instances that have many small files ingested, this can be higher for better utilization
-	// and throughput.
-	PubSubFetchSize int `json:"pubsub_fetch_size" optional:"true"`
-
-	// SecondaryBranchConfig is the optional config for ingestion on secondary branches (e.g. Tryjobs).
-	SecondaryBranchConfig *ingesterConfig `json:"secondary_branch_config" optional:"true"`
-
-	// TODO(kjlubick) Restore this functionality. Without it, we cannot ingest from internal jobs.
-	// URL of the secondary repo that has GitRepoURL as a dependency.
-	SecondaryRepoURL string `json:"secondary_repo_url" optional:"true"`
-	// Regular expression to extract the commit hash from the DEPS file.
-	SecondaryRepoRegEx string `json:"secondary_repo_regex" optional:"true"`
-}
-
-// ingesterConfig is the configuration for a single ingester.
-type ingesterConfig struct {
-	// Type describes the backend type of the ingester.
-	Type string `json:"type"`
-	// Source is where the ingester will read files from.
-	Source gcsSourceConfig `json:"gcs_source"`
-	// ExtraParams help configure the ingester and are specific to the backend type.
-	ExtraParams map[string]string `json:"extra_configuration"`
-}
-
-// gcsSourceConfig is the configuration needed to ingest from files in a GCS bucket.
-type gcsSourceConfig struct {
-	Bucket string `json:"bucket"`
-	Prefix string `json:"prefix"`
-}
-
 func main() {
 	// Command line flags.
 	var (
-		commonInstanceConfig = flag.String("common_instance_config", "", "Path to the json5 file containing the configuration that needs to be the same across all services for a given instance.")
-		thisConfig           = flag.String("config", "", "Path to the json5 file containing the configuration specific to baseline server.")
-		hang                 = flag.Bool("hang", false, "Stop and do nothing after reading the flags. Good for debugging containers.")
+		configPath = flag.String("config", "", "Path to the json5 file containing the instance configuration.")
+		hang       = flag.Bool("hang", false, "Stop and do nothing after reading the flags. Good for debugging containers.")
 	)
 
 	// Parse the options. So we can configure logging.
@@ -114,8 +51,9 @@ func main() {
 		select {}
 	}
 
-	var isc ingestionServerConfig
-	if err := config.LoadFromJSON5(&isc, commonInstanceConfig, thisConfig); err != nil {
+	var isc config.Common
+	isc, err := config.LoadConfigFromJSON5(*configPath)
+	if err != nil {
 		sklog.Fatalf("Reading config: %s", err)
 	}
 	sklog.Infof("Loaded config %#v", isc)
@@ -149,17 +87,11 @@ func main() {
 	ingestionStore := sqlingestionstore.New(sqlDB)
 	sklog.Infof("Using new SQL ingestion store")
 
-	// Instantiate the secondary repo if one was specified.
-	// TODO(kjlubick): skbug.com/9553
-	if isc.SecondaryRepoURL != "" {
-		sklog.Fatalf("Not yet implemented to have a secondary repo url")
-	}
-
 	gcsClient, err := storage.NewClient(ctx)
 	if err != nil {
 		sklog.Fatalf("Could not create GCS Client")
 	}
-	primaryBranchProcessor, src, err := getPrimaryBranchIngester(ctx, isc.PrimaryBranchConfig, gcsClient, sqlDB)
+	primaryBranchProcessor, src, err := getPrimaryBranchIngester(ctx, isc.IngestionServerConfig.PrimaryBranchConfig, gcsClient, sqlDB)
 	if err != nil {
 		sklog.Fatalf("Setting up primary branch ingestion: %s", err)
 	}
@@ -190,7 +122,7 @@ func main() {
 	sklog.Fatalf("Listening for files to ingest %s", listen(ctx, isc, pss))
 }
 
-func getPrimaryBranchIngester(ctx context.Context, conf ingesterConfig, gcsClient *storage.Client, db *pgxpool.Pool) (ingestion.Processor, ingestion.FileSearcher, error) {
+func getPrimaryBranchIngester(ctx context.Context, conf config.IngesterConfig, gcsClient *storage.Client, db *pgxpool.Pool) (ingestion.Processor, ingestion.FileSearcher, error) {
 	src := &ingestion.GCSSource{
 		Client: gcsClient,
 		Bucket: conf.Source.Bucket,
@@ -214,41 +146,41 @@ func getPrimaryBranchIngester(ctx context.Context, conf ingesterConfig, gcsClien
 
 // listen begins listening to the PubSub topic with the configured PubSub subscription. It will
 // fail if the topic or subscription have not been created or PubSub fails.
-func listen(ctx context.Context, isc ingestionServerConfig, p *pubSubSource) error {
+func listen(ctx context.Context, isc config.Common, p *pubSubSource) error {
 	psc, err := pubsub.NewClient(ctx, isc.PubsubProjectID)
 	if err != nil {
 		return skerr.Wrapf(err, "initializing pubsub client for project %s", isc.PubsubProjectID)
 	}
 
 	// Check that the topic exists. Fail if it does not.
-	t := psc.Topic(isc.IngestionFilesTopic)
+	t := psc.Topic(isc.IngestionServerConfig.IngestionFilesTopic)
 	if exists, err := t.Exists(ctx); err != nil {
-		return skerr.Wrapf(err, "checking for existing topic %s", isc.IngestionFilesTopic)
+		return skerr.Wrapf(err, "checking for existing topic %s", isc.IngestionServerConfig.IngestionFilesTopic)
 	} else if !exists {
-		return skerr.Fmt("Diff work topic %s does not exist in project %s", isc.IngestionFilesTopic, isc.PubsubProjectID)
+		return skerr.Fmt("Diff work topic %s does not exist in project %s", isc.IngestionServerConfig.IngestionFilesTopic, isc.PubsubProjectID)
 	}
 
 	// Check that the subscription exists. Fail if it does not.
-	sub := psc.Subscription(isc.IngestionSubscription)
+	sub := psc.Subscription(isc.IngestionServerConfig.IngestionSubscription)
 	if exists, err := sub.Exists(ctx); err != nil {
-		return skerr.Wrapf(err, "checking for existing subscription %s", isc.IngestionSubscription)
+		return skerr.Wrapf(err, "checking for existing subscription %s", isc.IngestionServerConfig.IngestionSubscription)
 	} else if !exists {
-		return skerr.Fmt("subscription %s does not exist in project %s", isc.IngestionSubscription, isc.PubsubProjectID)
+		return skerr.Fmt("subscription %s does not exist in project %s", isc.IngestionServerConfig.IngestionSubscription, isc.PubsubProjectID)
 	}
 
 	// This is a limit of how many messages to fetch when PubSub has no work. Waiting for PubSub
 	// to give us messages can take a second or two, so we choose a small, but not too small
 	// batch size.
-	if isc.PubSubFetchSize == 0 {
+	if isc.IngestionServerConfig.PubSubFetchSize == 0 {
 		sub.ReceiveSettings.MaxOutstandingMessages = 10
 	} else {
-		sub.ReceiveSettings.MaxOutstandingMessages = isc.PubSubFetchSize
+		sub.ReceiveSettings.MaxOutstandingMessages = isc.IngestionServerConfig.PubSubFetchSize
 	}
 
-	if isc.FilesProcessedInParallel == 0 {
+	if isc.IngestionServerConfig.FilesProcessedInParallel == 0 {
 		sub.ReceiveSettings.NumGoroutines = 4
 	} else {
-		sub.ReceiveSettings.NumGoroutines = isc.FilesProcessedInParallel
+		sub.ReceiveSettings.NumGoroutines = isc.IngestionServerConfig.FilesProcessedInParallel
 	}
 
 	// Blocks until context cancels or PubSub fails in a non retryable way.
@@ -324,8 +256,8 @@ func (p *pubSubSource) ingestFile(ctx context.Context, name string) bool {
 	return true
 }
 
-func startBackupPolling(ctx context.Context, isc ingestionServerConfig, sourcesToScan []ingestion.FileSearcher, pss *pubSubSource) {
-	if isc.BackupPollInterval.Duration <= 0 {
+func startBackupPolling(ctx context.Context, isc config.Common, sourcesToScan []ingestion.FileSearcher, pss *pubSubSource) {
+	if isc.IngestionServerConfig.BackupPollInterval.Duration <= 0 {
 		sklog.Infof("Skipping backup polling")
 		return
 	}
@@ -335,10 +267,10 @@ func startBackupPolling(ctx context.Context, isc ingestionServerConfig, sourcesT
 		"source": "combined",
 	})
 
-	go util.RepeatCtx(ctx, isc.BackupPollInterval.Duration, func(ctx context.Context) {
+	go util.RepeatCtx(ctx, isc.IngestionServerConfig.BackupPollInterval.Duration, func(ctx context.Context) {
 		ctx, span := trace.StartSpan(ctx, "ingestion_backupPollingCycle", trace.WithSampler(trace.AlwaysSample()))
 		defer span.End()
-		startTime, endTime := getTimesToPoll(ctx, isc.BackupPollScope.Duration)
+		startTime, endTime := getTimesToPoll(ctx, isc.IngestionServerConfig.BackupPollScope.Duration)
 		totalIgnored, totalProcessed := 0, 0
 		sklog.Infof("Starting backup polling for %d sources in time range [%s,%s]", len(sourcesToScan), startTime, endTime)
 		for _, src := range sourcesToScan {

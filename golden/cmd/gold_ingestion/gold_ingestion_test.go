@@ -115,9 +115,11 @@ func TestStartBackupPolling_TwoSources_Success(t *testing.T) {
 	fakeNow := time.Date(2021, time.March, 3, 4, 5, 6, 0, time.UTC)
 	ctx = context.WithValue(ctx, now.ContextKey, fakeNow)
 
-	isc := ingestionServerConfig{
-		BackupPollInterval: config.Duration{Duration: time.Hour},
-		BackupPollScope:    config.Duration{Duration: 2 * time.Hour},
+	isc := config.Common{
+		IngestionServerConfig: config.IngestionServerConfig{
+			BackupPollInterval: config.Duration{Duration: time.Hour},
+			BackupPollScope:    config.Duration{Duration: 2 * time.Hour},
+		},
 	}
 
 	mfs1 := &mocks.FileSearcher{}

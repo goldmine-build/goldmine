@@ -51,8 +51,8 @@ const (
 func main() {
 	// Command line flags.
 	var (
-		commonInstanceConfig = flag.String("common_instance_config", "", "Path to the json5 file containing the instance configuration.")
-		hang                 = flag.Bool("hang", false, "Stop and do nothing after reading the flags. Good for debugging containers.")
+		config = flag.String("config", "", "Path to the json5 file containing the instance configuration.")
+		hang   = flag.Bool("hang", false, "Stop and do nothing after reading the flags. Good for debugging containers.")
 	)
 
 	// Parse the options. So we can configure logging.
