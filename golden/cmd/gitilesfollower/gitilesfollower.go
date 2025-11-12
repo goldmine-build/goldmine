@@ -51,8 +51,8 @@ const (
 func main() {
 	// Command line flags.
 	var (
-		config = flag.String("config", "", "Path to the json5 file containing the instance configuration.")
-		hang   = flag.Bool("hang", false, "Stop and do nothing after reading the flags. Good for debugging containers.")
+		configPath = flag.String("config", "", "Path to the json5 file containing the instance configuration.")
+		hang       = flag.Bool("hang", false, "Stop and do nothing after reading the flags. Good for debugging containers.")
 	)
 
 	// Parse the options. So we can configure logging.
@@ -64,7 +64,7 @@ func main() {
 	}
 
 	var cfg config.Common
-	cfg, err := config.LoadConfigFromJSON5(*commonInstanceConfig)
+	cfg, err := config.LoadConfigFromJSON5(*configPath)
 	if err != nil {
 		sklog.Fatalf("Reading config: %s", err)
 	}

@@ -21,6 +21,7 @@ type IngestionServerConfig struct {
 	// dropped (PubSub will try and re-try to send events for up to seven days by default).
 	// BackupPollInterval is how often to do a scan.
 	BackupPollInterval config.Duration `json:"backup_poll_interval"`
+
 	// BackupPollScope is how far back in time to scan. It should be longer than BackupPollInterval.
 	BackupPollScope config.Duration `json:"backup_poll_scope"`
 
@@ -49,10 +50,13 @@ type IngestionServerConfig struct {
 
 // IngesterConfig is the configuration for a single ingester.
 type IngesterConfig struct {
+
 	// Type describes the backend type of the ingester.
 	Type string `json:"type"`
+
 	// Source is where the ingester will read files from.
 	Source GCSSourceConfig `json:"gcs_source"`
+
 	// ExtraParams help configure the ingester and are specific to the backend type.
 	ExtraParams map[string]string `json:"extra_configuration"`
 }
@@ -68,6 +72,7 @@ type ExtractionTechnique string
 const (
 	// ReviewedLine corresponds to looking for a Reviewed-on line in the commit message.
 	ReviewedLine = ExtractionTechnique("ReviewedLine")
+
 	// FromSubject corresponds to looking at the title for a CL ID in square brackets.
 	FromSubject = ExtractionTechnique("FromSubject")
 )

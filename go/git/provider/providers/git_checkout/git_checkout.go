@@ -80,7 +80,9 @@ func New(
 		if err != nil {
 			return nil, skerr.Wrapf(err, "creating temp dir for git repo")
 		}
+		dir = filepath.Join(dir, "checkout")
 	}
+	sklog.Infof("repo checking out to: %s", dir)
 
 	// Clone the git repo if necessary.
 	sklog.Infof("Cloning repo.")
@@ -108,7 +110,7 @@ func New(
 // Used in defers.
 func cmdWaitAndLog(cmd *exec.Cmd) {
 	if err := cmd.Wait(); err != nil {
-		sklog.Errorf("running git log: %q", err)
+		sklog.Errorf("running git log %s: %q", cmd.Args, err)
 	}
 }
 
