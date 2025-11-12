@@ -1,4 +1,4 @@
-name: jsdoc
+name: Run all the UI tests and upload the results to Gold.
 
 on:
   push:

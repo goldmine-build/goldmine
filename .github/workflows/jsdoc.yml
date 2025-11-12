@@ -1,4 +1,4 @@
-name: jsdoc
+name: Build and push jsdoc container and update k8s-config. 
 
 on:
   push:
@@ -41,6 +41,10 @@ jobs:
     - name: Build and push jsdoc to the container registry.
       working-directory: ./main
       run: bazelisk run --stamp //jsdoc:jsdoc_push
+
+    - name: Make sure k8s-config repo is up to date.
+      working-directory: ./k8s-config
+      run: git pull origin main
 
     - name: Update the image reference in the k8s-config repo.
       working-directory: ./k8s-config/jsdoc
