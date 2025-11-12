@@ -54,43 +54,10 @@ const (
 
 type contextKey string // See advice in https://golang.org/pkg/context/#WithValue
 
-type repoFollowerConfig struct {
-	config.Common
-
-	// InitialCommit that we will use if there are no existing commits in the DB. It will be counted
-	// like a "commit zero", which we actually assign to commit 1 billion in case we need to go back
-	// in time, we can sort our commit_ids without resorting to negative numbers.
-	InitialCommit string `json:"initial_commit"`
-
-	// ExtractionTechnique codifies the methods for linking (via a commit message/body) to a CL.
-	ExtractionTechnique extractionTechnique `json:"extraction_technique"`
-
-	// SystemName is the abbreviation that is given to a given CodeReviewSystem.
-	SystemName string `json:"system_name"`
-
-	// LegacyUpdaterInUse indicates the status of the CLs should not be changed because the source
-	// of truth for expectations is still Firestore, which is controlled by gold_frontend.
-	// This should be able to be removed after the SQL migration is complete.
-	LegacyUpdaterInUse bool `json:"legacy_updater_in_use"`
-
-	// PollPeriod is how often we should poll the source of truth.
-	PollPeriod config.Duration `json:"poll_period"`
-}
-
-type extractionTechnique string
-
-const (
-	// ReviewedLine corresponds to looking for a Reviewed-on line in the commit message.
-	ReviewedLine = extractionTechnique("ReviewedLine")
-	// FromSubject corresponds to looking at the title for a CL ID in square brackets.
-	FromSubject = extractionTechnique("FromSubject")
-)
-
 func main() {
 	// Command line flags.
 	var (
 		commonInstanceConfig = flag.String("common_instance_config", "", "Path to the json5 file containing the configuration that needs to be the same across all services for a given instance.")
-		thisConfig           = flag.String("config", "", "Path to the json5 file containing the configuration specific to gitiles follower server.")
 		hang                 = flag.Bool("hang", false, "Stop and do nothing after reading the flags. Good for debugging containers.")
 	)
 
@@ -102,8 +69,9 @@ func main() {
 		select {}
 	}
 
-	var rfc repoFollowerConfig
-	if err := config.LoadFromJSON5(&rfc, commonInstanceConfig, thisConfig); err != nil {
+	var rfc config.Common
+	rfc, err := config.LoadConfigFromJSON5(*commonInstanceConfig)
+	if err != nil {
 		sklog.Fatalf("Reading config: %s", err)
 	}
 	sklog.Infof("Loaded config %#v", rfc)
@@ -119,7 +87,7 @@ func main() {
 	ctx := context.Background()
 	db := mustInitSQLDatabase(ctx, rfc)
 
-	gitp, err := providers.New(ctx, rfc.Provider, rfc.GitRepoURL, rfc.GitRepoBranch, rfc.InitialCommit, rfc.GitAuthType, "")
+	gitp, err := providers.New(ctx, rfc.Provider, rfc.GitRepoURL, rfc.GitRepoBranch, rfc.RepoFollowerConfig.InitialCommit, rfc.GitAuthType, "")
 	if err != nil {
 		sklog.Fatalf("Could not set up git provider: %s", err)
 	}
@@ -133,7 +101,7 @@ func main() {
 	sklog.Fatal(http.ListenAndServe(rfc.ReadyPort, nil))
 }
 
-func mustInitSQLDatabase(ctx context.Context, fcc repoFollowerConfig) *pgxpool.Pool {
+func mustInitSQLDatabase(ctx context.Context, fcc config.Common) *pgxpool.Pool {
 	if fcc.SQLDatabaseName == "" {
 		sklog.Fatalf("Must have SQL Database Information")
 	}
@@ -154,16 +122,16 @@ func mustInitSQLDatabase(ctx context.Context, fcc repoFollowerConfig) *pgxpool.P
 
 // pollRepo does an initial updateCycle and starts a goroutine to continue updating according
 // to the provided duration for as long as the context remains ok.
-func pollRepo(ctx context.Context, db *pgxpool.Pool, gitp provider.Provider, rfc repoFollowerConfig) error {
+func pollRepo(ctx context.Context, db *pgxpool.Pool, gitp provider.Provider, rfc config.Common) error {
 	sklog.Infof("Doing initial update")
 	err := updateCycle(ctx, db, gitp, rfc)
 	if err != nil {
 		return skerr.Wrap(err)
 	}
 	go func() {
-		ct := time.NewTicker(rfc.PollPeriod.Duration)
+		ct := time.NewTicker(rfc.RepoFollowerConfig.PollPeriod.Duration)
 		defer ct.Stop()
-		sklog.Infof("Polling every %s", rfc.PollPeriod.Duration)
+		sklog.Infof("Polling every %s", rfc.RepoFollowerConfig.PollPeriod.Duration)
 		for {
 			select {
 			case <-ctx.Done():
@@ -183,7 +151,7 @@ func pollRepo(ctx context.Context, db *pgxpool.Pool, gitp provider.Provider, rfc
 // updateCycle polls the gitiles repo for the latest commit and the database for the previously
 // seen commit. If those are different, it polls gitiles for all commits that happened between
 // those two points and stores them to the DB.
-func updateCycle(ctx context.Context, db *pgxpool.Pool, gitp provider.Provider, rfc repoFollowerConfig) error {
+func updateCycle(ctx context.Context, db *pgxpool.Pool, gitp provider.Provider, rfc config.Common) error {
 	ctx, span := trace.StartSpan(ctx, "gitilesfollower_updateCycle")
 	defer span.End()
 
@@ -193,8 +161,8 @@ func updateCycle(ctx context.Context, db *pgxpool.Pool, gitp provider.Provider, 
 	}
 
 	if previousHash == "" {
-		sklog.Infof("No previous commits in DB, starting from initial commit %q", rfc.InitialCommit)
-		previousHash = rfc.InitialCommit
+		sklog.Infof("No previous commits in DB, starting from initial commit %q", rfc.RepoFollowerConfig.InitialCommit)
+		previousHash = rfc.RepoFollowerConfig.InitialCommit
 	}
 
 	if previousID == 0 {
@@ -234,22 +202,22 @@ func updateCycle(ctx context.Context, db *pgxpool.Pool, gitp provider.Provider, 
 	return nil
 }
 
-func checkForCommitsWithExpectations(ctx context.Context, db *pgxpool.Pool, commits []*vcsinfo.LongCommit, rfc repoFollowerConfig) error {
+func checkForCommitsWithExpectations(ctx context.Context, db *pgxpool.Pool, commits []*vcsinfo.LongCommit, rfc config.Common) error {
 	sklog.Infof("Found %d commits to check for a CL", len(commits))
 	for _, c := range commits {
 		var clID string
-		switch rfc.ExtractionTechnique {
-		case ReviewedLine:
+		switch rfc.RepoFollowerConfig.ExtractionTechnique {
+		case config.ReviewedLine:
 			clID = extractReviewedLine(c.Body)
-		case FromSubject:
+		case config.FromSubject:
 			clID = extractFromSubject(c.Subject)
 		}
 		if clID == "" {
 			sklog.Infof("No CL detected for %#v", c)
 			continue
 		}
-		if err := migrateExpectationsToPrimaryBranch(ctx, db, rfc.SystemName, clID, c.Timestamp, !rfc.LegacyUpdaterInUse); err != nil {
-			return skerr.Wrapf(err, "migrating cl %s-%s", rfc.SystemName, clID)
+		if err := migrateExpectationsToPrimaryBranch(ctx, db, rfc.RepoFollowerConfig.SystemName, clID, c.Timestamp, !rfc.RepoFollowerConfig.LegacyUpdaterInUse); err != nil {
+			return skerr.Wrapf(err, "migrating cl %s-%s", rfc.RepoFollowerConfig.SystemName, clID)
 		}
 		sklog.Infof("Commit %s landed at %s", c.Hash[:12], c.Timestamp)
 	}

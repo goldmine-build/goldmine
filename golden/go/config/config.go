@@ -11,6 +11,37 @@ import (
 	"go.goldmine.build/go/util"
 )
 
+type ExtractionTechnique string
+
+const (
+	// ReviewedLine corresponds to looking for a Reviewed-on line in the commit message.
+	ReviewedLine = ExtractionTechnique("ReviewedLine")
+	// FromSubject corresponds to looking at the title for a CL ID in square brackets.
+	FromSubject = ExtractionTechnique("FromSubject")
+)
+
+type RepoFollowerConfig struct {
+
+	// InitialCommit that we will use if there are no existing commits in the DB. It will be counted
+	// like a "commit zero", which we actually assign to commit 1 billion in case we need to go back
+	// in time, we can sort our commit_ids without resorting to negative numbers.
+	InitialCommit string `json:"initial_commit"`
+
+	// ExtractionTechnique codifies the methods for linking (via a commit message/body) to a CL.
+	ExtractionTechnique ExtractionTechnique `json:"extraction_technique"`
+
+	// SystemName is the abbreviation that is given to a given CodeReviewSystem.
+	SystemName string `json:"system_name"`
+
+	// LegacyUpdaterInUse indicates the status of the CLs should not be changed because the source
+	// of truth for expectations is still Firestore, which is controlled by gold_frontend.
+	// This should be able to be removed after the SQL migration is complete.
+	LegacyUpdaterInUse bool `json:"legacy_updater_in_use"`
+
+	// PollPeriod is how often we should poll the source of truth.
+	PollPeriod config.Duration `json:"poll_period"`
+}
+
 // The Common struct is a set of configuration values that are the same across all instances.
 // Not all instances will use every field in Common, but every field in Common is used in at least
 // two instances (otherwise, it can be deferred to the config specific to its only user). Common
@@ -76,6 +107,9 @@ type Common struct {
 	// GroupingParamKeysByCorpus is a map from corpus name to the list of keys that comprise the
 	// corpus' grouping.
 	GroupingParamKeysByCorpus map[string][]string `json:"grouping_param_keys_by_corpus"`
+
+	// RepoFollowerConfig contains settings specific to the repo follower, i.e. the commits ingestion.
+	RepoFollowerConfig RepoFollowerConfig `json:"repo_follower_config"`
 }
 
 // CodeReviewSystem represents the details needed to interact with a CodeReviewSystem (e.g.
@@ -126,6 +160,17 @@ func LoadFromJSON5(dst interface{}, commonConfigPath, specificConfigPath *string
 
 	rValue := reflect.Indirect(reflect.ValueOf(dst))
 	return checkRequired(rValue)
+}
+
+func LoadConfigFromJSON5(configPath string) (Common, error) {
+	var ret Common
+	err := util.WithReadFile(configPath, func(r io.Reader) error {
+		return json5.NewDecoder(r).Decode(&ret)
+	})
+	if err != nil {
+		return ret, skerr.Wrapf(err, "reading config at %s", configPath)
+	}
+	return ret, nil
 }
 
 // checkRequired returns an error if any non-struct, non-bool fields of the given value have a zero

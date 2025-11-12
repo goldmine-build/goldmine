@@ -106,14 +106,14 @@ func assertDBContainsFirstThreeCommits(t *testing.T, ctx context.Context, db *pg
 var firstThreeCommitsAsSchema = schema.Tables{GitCommits: firstThreeCommitsAsSchemaRows}
 
 // A repoFollowerConfig that can be used in tests.
-var rfc = repoFollowerConfig{
-	Common: config.Common{
-		GitRepoURL:    "https://example.com/my-repo.git",
-		GitRepoBranch: "main",
+var rfc = config.Common{
+	GitRepoURL:    "https://example.com/my-repo.git",
+	GitRepoBranch: "main",
+	RepoFollowerConfig: config.RepoFollowerConfig{
+		SystemName:          "gerrit",
+		ExtractionTechnique: config.ReviewedLine,
+		InitialCommit:       "1111111111111111111111111111111111111111", // we expect this to not be used
 	},
-	SystemName:          "gerrit",
-	ExtractionTechnique: ReviewedLine,
-	InitialCommit:       "1111111111111111111111111111111111111111", // we expect this to not be used
 }
 
 // ******************************************************
@@ -351,8 +351,8 @@ func TestCheckForLandedCycle_CLExpectations_MergedIntoPrimaryBranch(t *testing.T
 		},
 	})
 
-	rfc2 := deepcopy.Copy(rfc).(repoFollowerConfig)
-	rfc2.SystemName = dks.GerritInternalCRS
+	rfc2 := deepcopy.Copy(rfc).(config.Common)
+	rfc2.RepoFollowerConfig.SystemName = dks.GerritInternalCRS
 
 	require.NoError(t, updateCycle(ctx, db, gitp, rfc2))
 
@@ -510,9 +510,9 @@ func TestCheckForLandedCycle_ExtractsCLFromSubject_Success(t *testing.T) {
 		},
 	})
 
-	rfc2 := deepcopy.Copy(rfc).(repoFollowerConfig)
-	rfc2.SystemName = "github"
-	rfc2.ExtractionTechnique = FromSubject
+	rfc2 := deepcopy.Copy(rfc).(config.Common)
+	rfc2.RepoFollowerConfig.SystemName = "github"
+	rfc2.RepoFollowerConfig.ExtractionTechnique = config.FromSubject
 	require.NoError(t, updateCycle(ctx, db, gitp, rfc2))
 
 	actualRows := sqltest.GetAllRows(ctx, t, db, "TrackingCommits", &schema.TrackingCommitRow{}).([]schema.TrackingCommitRow)
@@ -569,8 +569,8 @@ func TestCheckForLandedCycle_TriageExistingData_Success(t *testing.T) {
 		},
 	})
 
-	rfc2 := deepcopy.Copy(rfc).(repoFollowerConfig)
-	rfc2.SystemName = dks.GerritInternalCRS
+	rfc2 := deepcopy.Copy(rfc).(config.Common)
+	rfc2.RepoFollowerConfig.SystemName = dks.GerritInternalCRS
 
 	require.NoError(t, updateCycle(ctx, db, gitp, rfc2))
 
