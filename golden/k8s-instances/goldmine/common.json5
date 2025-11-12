@@ -1,0 +1,35 @@
+{
+  code_review_systems: [
+    {
+      id: "github",
+      flavor: "github",
+      github_cred_path: "/var/secrets/github/github_token",
+      github_repo: "goldmine-build/goldmine",
+      url_template: "https://github.com/goldmine-build/goldmine/pull/%s"
+    },
+  ],
+  gcs_bucket: "goldmine-build-private",
+  git_repo_branch: "main",
+  git_repo_url: "https://github.com/goldmine-build/goldmine",
+  pubsub_project_id: "api-project-146332866891",
+  site_url: "http://goldmine-prime:8080/",
+  sql_connection: "root@cockroachdb:26257",
+  sql_database: "gold",
+  known_hashes_gcs_path: "unknown_hashes/file.txt",
+  window_size: 200,
+  prom_port: ":20000",
+  ready_port: ":8000",
+  grouping_param_keys_by_corpus: {
+    "goldmine": [
+      "name",
+      "source_type"
+    ],
+  },
+  repo_follower_config: {
+    // First commit when goldmine-build was forked from skia buildbot.
+    initial_commit: "82495c217ef2433a931382d2299840f48a0ca30c",
+    extraction_technique: "FromSubject",
+    poll_period: "1m",
+    system_name: "github",
+  }
+}
