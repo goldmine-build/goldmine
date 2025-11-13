@@ -1133,7 +1133,7 @@
     "@@rules_oci+//oci:extensions.bzl%oci": {
       "general": {
         "bzlTransitiveDigest": "wpnwi989JUEReiBka08jrHl/G2W0T5K62RMgH2FZ4c4=",
-        "usagesDigest": "UEhdMDchuNPCfWbkFQpfQErSMrV+N514m82ChrdcPmA=",
+        "usagesDigest": "VODzAzmGffXMwDMJyi8QUARCrHX95jdNrKZ8Fny9GlY=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -1203,7 +1203,7 @@
               "scheme": "https",
               "registry": "ghcr.io",
               "repository": "goldmine-build/base",
-              "identifier": "sha256:f95aeb8e5a0b5a0a42dff55a34f8fa48c2f87762a512f9c07186b26cc02b93ca",
+              "identifier": "sha256:204ec4a20bfdd9f83fc4ca071f8160152d2917df7a5269bf7716728d6d1976f9",
               "platform": "linux/amd64",
               "target_name": "base_linux_amd64",
               "bazel_tags": []
@@ -1217,7 +1217,7 @@
               "scheme": "https",
               "registry": "ghcr.io",
               "repository": "goldmine-build/base",
-              "identifier": "sha256:f95aeb8e5a0b5a0a42dff55a34f8fa48c2f87762a512f9c07186b26cc02b93ca",
+              "identifier": "sha256:204ec4a20bfdd9f83fc4ca071f8160152d2917df7a5269bf7716728d6d1976f9",
               "platforms": {
                 "@@platforms//cpu:x86_64": "@base_linux_amd64"
               },
