@@ -1,5 +1,6 @@
-// The diffcalculator executable listens to the Pub/Sub topic and processes diffs based on the
-// messages passed in. For an overview of Pub/Sub, see https://cloud.google.com/pubsub/docs
+// The diffcalculator processes diffs. It continuously looks for work to do either
+// on the primary branch or on secondary branches (CLs) and computes the diffs
+// for them.
 package main
 
 import (
@@ -52,20 +53,11 @@ const (
 	groupingCacheSize = 100_000
 )
 
-type diffCalculatorConfig struct {
-	config.Common
-
-	// HighContentionMode indicates to use fewer transactions when getting diff work. This can help
-	// for instances with high amounts of secondary branches.
-	HighContentionMode bool `json:"high_contention_mode"`
-}
-
 func main() {
 	// Command line flags.
 	var (
-		commonInstanceConfig = flag.String("common_instance_config", "", "Path to the json5 file containing the configuration that needs to be the same across all services for a given instance.")
-		thisConfig           = flag.String("config", "", "Path to the json5 file containing the configuration specific to baseline server.")
-		hang                 = flag.Bool("hang", false, "Stop and do nothing after reading the flags. Good for debugging containers.")
+		configPath = flag.String("config", "", "Path to the json5 file containing the configuration.")
+		hang       = flag.Bool("hang", false, "Stop and do nothing after reading the flags. Good for debugging containers.")
 	)
 
 	// Parse the options. So we can configure logging.
@@ -76,41 +68,41 @@ func main() {
 		select {}
 	}
 
-	var dcc diffCalculatorConfig
-	if err := config.LoadFromJSON5(&dcc, commonInstanceConfig, thisConfig); err != nil {
+	cfg, err := config.LoadConfigFromJSON5(*configPath)
+	if err != nil {
 		sklog.Fatalf("Reading config: %s", err)
 	}
-	sklog.Infof("Loaded config %#v", dcc)
+	sklog.Infof("Loaded config %#v", cfg)
 
 	common.InitWithMust(
 		"diffcalculator",
-		common.PrometheusOpt(&dcc.PromPort),
+		common.PrometheusOpt(&cfg.PromPort),
 	)
 	// We expect there to be a lot of diff work, so we sample 1% of them by default
 	// to avoid incurring too much overhead.
 	tp := 0.01
-	if dcc.TracingProportion > tp {
-		tp = dcc.TracingProportion
+	if cfg.TracingProportion > tp {
+		tp = cfg.TracingProportion
 	}
-	if err := tracing.Initialize(tp, dcc.SQLDatabaseName); err != nil {
+	if err := tracing.Initialize(tp, cfg.SQLDatabaseName); err != nil {
 		sklog.Fatalf("Could not set up tracing: %s", err)
 	}
 
 	ctx := context.Background()
-	db := mustInitSQLDatabase(ctx, dcc)
-	gis := mustMakeGCSImageSource(ctx, dcc)
+	db := mustInitSQLDatabase(ctx, cfg)
+	gis := mustMakeGCSImageSource(ctx, cfg)
 	gc, err := lru.New(groupingCacheSize)
 	if err != nil {
 		sklog.Fatalf("Could not initialize cache: %s", err)
 	}
 
 	sqlProcessor := &processor{
-		calculator:         worker.New(db, gis, dcc.WindowSize),
+		calculator:         worker.New(db, gis, cfg.WindowSize),
 		db:                 db,
 		groupingCache:      gc,
 		primaryCounter:     metrics2.GetCounter("diffcalculator_primarybranch_processed"),
 		clsCounter:         metrics2.GetCounter("diffcalculator_cls_processed"),
-		highContentionMode: dcc.HighContentionMode,
+		highContentionMode: cfg.HighContentionMode,
 	}
 	sqlProcessor.startMetrics(ctx)
 
@@ -119,7 +111,7 @@ func main() {
 		// we are healthy.
 		time.Sleep(5 * time.Second)
 		http.HandleFunc("/healthz", httputils.ReadyHandleFunc)
-		sklog.Fatal(http.ListenAndServe(dcc.ReadyPort, nil))
+		sklog.Fatal(http.ListenAndServe(cfg.ReadyPort, nil))
 	}()
 
 	sklog.Fatalf("Stopped while polling for work %s", beginPolling(ctx, sqlProcessor))
@@ -127,7 +119,6 @@ func main() {
 
 // beginPolling will continuously try to find work to compute either from CLs or the primary branch.
 func beginPolling(ctx context.Context, sqlProcessor *processor) error {
-	rand.Seed(time.Now().UnixNano())
 	var secondaryShouldSleepUntil time.Time
 	var primaryShouldSleepUntil time.Time
 	const sleepDuration = 10 * time.Second
@@ -189,11 +180,11 @@ func beginPolling(ctx context.Context, sqlProcessor *processor) error {
 	}
 }
 
-func mustInitSQLDatabase(ctx context.Context, dcc diffCalculatorConfig) *pgxpool.Pool {
-	if dcc.SQLDatabaseName == "" {
+func mustInitSQLDatabase(ctx context.Context, cfg config.Common) *pgxpool.Pool {
+	if cfg.SQLDatabaseName == "" {
 		sklog.Fatalf("Must have SQL Database Information")
 	}
-	url := sql.GetConnectionURL(dcc.SQLConnection, dcc.SQLDatabaseName)
+	url := sql.GetConnectionURL(cfg.SQLConnection, cfg.SQLDatabaseName)
 	conf, err := pgxpool.ParseConfig(url)
 	if err != nil {
 		sklog.Fatalf("error getting postgres config %s: %s", url, err)
@@ -204,11 +195,11 @@ func mustInitSQLDatabase(ctx context.Context, dcc diffCalculatorConfig) *pgxpool
 	if err != nil {
 		sklog.Fatalf("error connecting to the database: %s", err)
 	}
-	sklog.Infof("Connected to SQL database %s", dcc.SQLDatabaseName)
+	sklog.Infof("Connected to SQL database %s", cfg.SQLDatabaseName)
 	return db
 }
 
-func mustMakeGCSImageSource(ctx context.Context, dcc diffCalculatorConfig) worker.ImageSource {
+func mustMakeGCSImageSource(ctx context.Context, cfg config.Common) worker.ImageSource {
 	// Reads credentials from the env variable GOOGLE_APPLICATION_CREDENTIALS.
 	storageClient, err := gstorage.NewClient(ctx)
 	if err != nil {
@@ -216,7 +207,7 @@ func mustMakeGCSImageSource(ctx context.Context, dcc diffCalculatorConfig) worke
 	}
 	return &gcsImageDownloader{
 		client: storageClient,
-		bucket: dcc.GCSBucket,
+		bucket: cfg.GCSBucket,
 	}
 }
 

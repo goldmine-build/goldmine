@@ -165,6 +165,10 @@ type Common struct {
 	// corpus' grouping.
 	GroupingParamKeysByCorpus map[string][]string `json:"grouping_param_keys_by_corpus"`
 
+	// HighContentionMode indicates to use fewer transactions when getting diff work. This can help
+	// for instances with high amounts of secondary branches.
+	HighContentionMode bool `json:"high_contention_mode"`
+
 	// RepoFollowerConfig contains settings specific to the repo follower, i.e. the commits ingestion.
 	RepoFollowerConfig RepoFollowerConfig `json:"repo_follower_config"`
 
