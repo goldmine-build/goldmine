@@ -36,16 +36,11 @@ const (
 	maxSQLConnections = 12
 )
 
-type baselineServerConfig struct {
-	config.Common
-}
-
 func main() {
 	// Command line flags.
 	var (
-		commonInstanceConfig = flag.String("common_instance_config", "", "Path to the json5 file containing the configuration that needs to be the same across all services for a given instance.")
-		thisConfig           = flag.String("config", "", "Path to the json5 file containing the configuration specific to baseline server.")
-		hang                 = flag.Bool("hang", false, "Stop and do nothing after reading the flags. Good for debugging containers.")
+		configPath = flag.String("config", "", "Path to the json5 file containing the configuration.")
+		hang       = flag.Bool("hang", false, "Stop and do nothing after reading the flags. Good for debugging containers.")
 	)
 
 	// Parse the flags, so we can load the configuration files.
@@ -56,8 +51,8 @@ func main() {
 		select {}
 	}
 
-	var bsc baselineServerConfig
-	if err := config.LoadFromJSON5(&bsc, commonInstanceConfig, thisConfig); err != nil {
+	bsc, err := config.LoadConfigFromJSON5(*configPath)
+	if err != nil {
 		sklog.Fatalf("Reading config: %s", err)
 	}
 	sklog.Infof("Loaded config %#v", bsc)
@@ -169,7 +164,7 @@ func main() {
 	sklog.Fatal(http.ListenAndServe(bsc.ReadyPort, router))
 }
 
-func mustInitSQLDatabase(ctx context.Context, bsc baselineServerConfig) *pgxpool.Pool {
+func mustInitSQLDatabase(ctx context.Context, bsc config.Common) *pgxpool.Pool {
 	if bsc.SQLDatabaseName == "" {
 		sklog.Fatalf("Must have SQL Database Information")
 	}

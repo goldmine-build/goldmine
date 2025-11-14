@@ -34,18 +34,13 @@ skia_app_container(
     repository = "skia-public/gold-frontend",
 )
 
-skia_app_container(
+app_container(
     name = "baseline_server_container",
-    dirs = {
-        "/usr/local/bin": [
-            [
-                "//golden/cmd/baseline_server:baseline_server",
-                "0755",
-            ],
-        ],
-    },
+    base = "@base",
+    cmd = [],
     entrypoint = "/usr/local/bin/baseline_server",
-    repository = "skia-public/gold-baseline-server",
+    exe = "//golden/cmd/baseline_server:baseline_server",
+    repository = "ghcr.io/goldmine-build/gold_baseline_server",
 )
 
 app_container(
