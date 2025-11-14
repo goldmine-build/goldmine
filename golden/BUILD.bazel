@@ -75,18 +75,13 @@ app_container(
     repository = "ghcr.io/goldmine-build/gold_ingestion",
 )
 
-skia_app_container(
+app_container(
     name = "periodictasks_container",
-    dirs = {
-        "/usr/local/bin": [
-            [
-                "//golden/cmd/periodictasks:periodictasks",
-                "0755",
-            ],
-        ],
-    },
+    base = "@base",
+    cmd = [],
     entrypoint = "/usr/local/bin/periodictasks",
-    repository = "skia-public/gold-periodictasks",
+    exe = "//golden/cmd/periodictasks:periodictasks",
+    repository = "ghcr.io/goldmine-build/gold_periodictasks",
 )
 
 # Runs a local Gold instance that mirrors http://gold.skia.org. It might have write access to the
