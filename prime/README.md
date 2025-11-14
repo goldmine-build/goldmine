@@ -45,6 +45,7 @@ Then run the following to do the initialization:
 | alertmanager                    | 8004          | http://goldmine-prime:8004
 | grafana                         | 8005          | http://goldmine-prime:8005
 | gold-goldmine-ingestion         | 8006          | http://goldmine-prime:8006
+| gold-goldmine-baseline_server   | 8007          | http://goldmine-prime:8007
 | cockroachdb cli                 | 26257         | cockroach  sql --url postgres://root@goldmine-prime:26257/ --insecure
 
 Run on k3s:
