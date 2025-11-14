@@ -17,6 +17,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"go.goldmine.build/go/now"
+	"go.goldmine.build/golden/go/config"
 	dks "go.goldmine.build/golden/go/sql/datakitchensink"
 	"go.goldmine.build/golden/go/sql/schema"
 	"go.goldmine.build/golden/go/sql/sqltest"
@@ -812,7 +813,7 @@ func TestSummarizeTraces_Success(t *testing.T) {
 		uploadedFiles[actualName] = string(actualBytes)
 	}).Return(nil)
 
-	cfg := perfSummariesConfig{
+	cfg := config.PerfSummariesConfig{
 		AgeOutCommits:      100,
 		CorporaToSummarize: []string{dks.CornersCorpus},
 		KeysToSummarize:    []string{dks.DeviceKey, dks.OSKey},

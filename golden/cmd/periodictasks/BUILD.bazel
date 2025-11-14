@@ -57,6 +57,7 @@ go_test(
         "//go/gcs/mocks",
         "//go/now",
         "//go/testutils",
+        "//golden/go/config",
         "//golden/go/sql/datakitchensink",
         "//golden/go/sql/schema",
         "//golden/go/sql/sqltest",

@@ -174,6 +174,47 @@ type Common struct {
 
 	// IngestionServerConfig contains settings specific to the ingestion server.
 	IngestionServerConfig IngestionServerConfig `json:"ingestion_server_config"`
+
+	// PeriodicTasksConfig contains settings for periodic tasks run by periodictasks.go.
+	PeriodicTasksConfig PeriodicTasksConfig `json:"periodic_tasks_config"`
+}
+
+type PeriodicTasksConfig struct {
+
+	// ChangelistDiffPeriod is how often to look at recently updated CLs and tabulate the diffs
+	// for the digests produced.
+	// The diffs are not calculated in this service, but the tasks are generated here and
+	// processed in the diffcalculator process.
+	ChangelistDiffPeriod config.Duration `json:"changelist_diff_period"`
+
+	// CLCommentTemplate is a string with placeholders for generating a comment message. See
+	// commenter.commentTemplateContext for the exact fields.
+	CLCommentTemplate string `json:"cl_comment_template" optional:"true"`
+
+	// CommentOnCLsPeriod, if positive, is how often to check recent CLs and Patchsets for
+	// untriaged digests and comment on them if appropriate.
+	CommentOnCLsPeriod config.Duration `json:"comment_on_cls_period" optional:"true"`
+
+	// PerfSummaries configures summary data (e.g. triage status, ignore count) that is fed into
+	// a GCS bucket which an instance of Perf can ingest from.
+	PerfSummaries *PerfSummariesConfig `json:"perf_summaries" optional:"true"`
+
+	// PrimaryBranchDiffPeriod is how often to look at the most recent window of commits and
+	// tabulate diffs between all groupings based on the digests produced on the primary branch.
+	// The diffs are not calculated in this service, but sent via Pub/Sub to the appropriate workers.
+	PrimaryBranchDiffPeriod config.Duration `json:"primary_branch_diff_period"`
+
+	// UpdateIgnorePeriod is how often we should try to apply the ignore rules to all traces.
+	UpdateIgnorePeriod config.Duration `json:"update_traces_ignore_period"` // TODO(kjlubick) change JSON
+}
+
+type PerfSummariesConfig struct {
+	AgeOutCommits      int             `json:"age_out_commits"`
+	CorporaToSummarize []string        `json:"corpora_to_summarize"`
+	GCSBucket          string          `json:"perf_gcs_bucket"`
+	KeysToSummarize    []string        `json:"keys_to_summarize"`
+	Period             config.Duration `json:"period"`
+	ValuesToIgnore     []string        `json:"values_to_ignore"`
 }
 
 // CodeReviewSystem represents the details needed to interact with a CodeReviewSystem (e.g.

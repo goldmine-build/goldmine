@@ -54,51 +54,11 @@ const (
 
 // TODO(kjlubick) Add a task to check for abandoned CLs.
 
-type periodicTasksConfig struct {
-	config.Common
-
-	// ChangelistDiffPeriod is how often to look at recently updated CLs and tabulate the diffs
-	// for the digests produced.
-	// The diffs are not calculated in this service, but the tasks are generated here and
-	// processed in the diffcalculator process.
-	ChangelistDiffPeriod config.Duration `json:"changelist_diff_period"`
-
-	// CLCommentTemplate is a string with placeholders for generating a comment message. See
-	// commenter.commentTemplateContext for the exact fields.
-	CLCommentTemplate string `json:"cl_comment_template" optional:"true"`
-
-	// CommentOnCLsPeriod, if positive, is how often to check recent CLs and Patchsets for
-	// untriaged digests and comment on them if appropriate.
-	CommentOnCLsPeriod config.Duration `json:"comment_on_cls_period" optional:"true"`
-
-	// PerfSummaries configures summary data (e.g. triage status, ignore count) that is fed into
-	// a GCS bucket which an instance of Perf can ingest from.
-	PerfSummaries *perfSummariesConfig `json:"perf_summaries" optional:"true"`
-
-	// PrimaryBranchDiffPeriod is how often to look at the most recent window of commits and
-	// tabulate diffs between all groupings based on the digests produced on the primary branch.
-	// The diffs are not calculated in this service, but sent via Pub/Sub to the appropriate workers.
-	PrimaryBranchDiffPeriod config.Duration `json:"primary_branch_diff_period"`
-
-	// UpdateIgnorePeriod is how often we should try to apply the ignore rules to all traces.
-	UpdateIgnorePeriod config.Duration `json:"update_traces_ignore_period"` // TODO(kjlubick) change JSON
-}
-
-type perfSummariesConfig struct {
-	AgeOutCommits      int             `json:"age_out_commits"`
-	CorporaToSummarize []string        `json:"corpora_to_summarize"`
-	GCSBucket          string          `json:"perf_gcs_bucket"`
-	KeysToSummarize    []string        `json:"keys_to_summarize"`
-	Period             config.Duration `json:"period"`
-	ValuesToIgnore     []string        `json:"values_to_ignore"`
-}
-
 func main() {
 	// Command line flags.
 	var (
-		commonInstanceConfig = flag.String("common_instance_config", "", "Path to the json5 file containing the configuration that needs to be the same across all services for a given instance.")
-		thisConfig           = flag.String("config", "", "Path to the json5 file containing the configuration specific to the periodic tasks server.")
-		hang                 = flag.Bool("hang", false, "Stop and do nothing after reading the flags. Good for debugging containers.")
+		configPath = flag.String("config", "", "Path to the json5 file containing the configuration.")
+		hang       = flag.Bool("hang", false, "Stop and do nothing after reading the flags. Good for debugging containers.")
 	)
 
 	// Parse the options. So we can configure logging.
@@ -109,55 +69,55 @@ func main() {
 		select {}
 	}
 
-	var ptc periodicTasksConfig
-	if err := config.LoadFromJSON5(&ptc, commonInstanceConfig, thisConfig); err != nil {
+	cfg, err := config.LoadConfigFromJSON5(*configPath)
+	if err != nil {
 		sklog.Fatalf("Reading config: %s", err)
 	}
-	sklog.Infof("Loaded config %#v", ptc)
+	sklog.Infof("Loaded config %#v", cfg)
 
 	tp := 0.01
-	if ptc.TracingProportion > 0 {
-		tp = ptc.TracingProportion
+	if cfg.TracingProportion > 0 {
+		tp = cfg.TracingProportion
 	}
 	common.InitWithMust(
 		"periodictasks",
-		common.PrometheusOpt(&ptc.PromPort),
+		common.PrometheusOpt(&cfg.PromPort),
 	)
-	if err := tracing.Initialize(tp, ptc.SQLDatabaseName); err != nil {
+	if err := tracing.Initialize(tp, cfg.SQLDatabaseName); err != nil {
 		sklog.Fatalf("Could not set up tracing: %s", err)
 	}
 
 	ctx := context.Background()
-	db := mustInitSQLDatabase(ctx, ptc)
+	db := mustInitSQLDatabase(ctx, cfg)
 
-	startUpdateTracesIgnoreStatus(ctx, db, ptc)
+	startUpdateTracesIgnoreStatus(ctx, db, cfg)
 
-	startCommentOnCLs(ctx, db, ptc)
+	startCommentOnCLs(ctx, db, cfg)
 
 	gatherer := &diffWorkGatherer{
 		db:               db,
-		windowSize:       ptc.WindowSize,
+		windowSize:       cfg.WindowSize,
 		mostRecentCLScan: now.Now(ctx).Add(-clScanRange),
 	}
-	startPrimaryBranchDiffWork(ctx, gatherer, ptc)
-	startChangelistsDiffWork(ctx, gatherer, ptc)
+	startPrimaryBranchDiffWork(ctx, gatherer, cfg)
+	startChangelistsDiffWork(ctx, gatherer, cfg)
 	startDiffWorkMetrics(ctx, db)
-	startBackupStatusCheck(ctx, db, ptc)
-	startKnownDigestsSync(ctx, db, ptc)
-	if ptc.PerfSummaries != nil {
-		startPerfSummarization(ctx, db, ptc.PerfSummaries)
+	startBackupStatusCheck(ctx, db, cfg)
+	startKnownDigestsSync(ctx, db, cfg)
+	if cfg.PeriodicTasksConfig.PerfSummaries != nil {
+		startPerfSummarization(ctx, db, cfg.PeriodicTasksConfig.PerfSummaries)
 	}
 
 	sklog.Infof("periodic tasks have been started")
 	http.HandleFunc("/healthz", httputils.ReadyHandleFunc)
-	sklog.Fatal(http.ListenAndServe(ptc.ReadyPort, nil))
+	sklog.Fatal(http.ListenAndServe(cfg.ReadyPort, nil))
 }
 
-func mustInitSQLDatabase(ctx context.Context, ptc periodicTasksConfig) *pgxpool.Pool {
-	if ptc.SQLDatabaseName == "" {
+func mustInitSQLDatabase(ctx context.Context, cfg config.Common) *pgxpool.Pool {
+	if cfg.SQLDatabaseName == "" {
 		sklog.Fatalf("Must have SQL Database Information")
 	}
-	url := sql.GetConnectionURL(ptc.SQLConnection, ptc.SQLDatabaseName)
+	url := sql.GetConnectionURL(cfg.SQLConnection, cfg.SQLDatabaseName)
 	conf, err := pgxpool.ParseConfig(url)
 	if err != nil {
 		sklog.Fatalf("error getting postgres config %s: %s", url, err)
@@ -168,15 +128,15 @@ func mustInitSQLDatabase(ctx context.Context, ptc periodicTasksConfig) *pgxpool.
 	if err != nil {
 		sklog.Fatalf("error connecting to the database: %s", err)
 	}
-	sklog.Infof("Connected to SQL database %s", ptc.SQLDatabaseName)
+	sklog.Infof("Connected to SQL database %s", cfg.SQLDatabaseName)
 	return db
 }
 
-func startUpdateTracesIgnoreStatus(ctx context.Context, db *pgxpool.Pool, ptc periodicTasksConfig) {
+func startUpdateTracesIgnoreStatus(ctx context.Context, db *pgxpool.Pool, cfg config.Common) {
 	liveness := metrics2.NewLiveness("periodic_tasks", map[string]string{
 		"task": "updateTracesIgnoreStatus",
 	})
-	go util.RepeatCtx(ctx, ptc.UpdateIgnorePeriod.Duration, func(ctx context.Context) {
+	go util.RepeatCtx(ctx, cfg.PeriodicTasksConfig.UpdateIgnorePeriod.Duration, func(ctx context.Context) {
 		sklog.Infof("Updating traces and values at head with ignore status")
 		ctx, span := trace.StartSpan(ctx, "periodic_updateTracesIgnoreStatus")
 		defer span.End()
@@ -189,20 +149,20 @@ func startUpdateTracesIgnoreStatus(ctx context.Context, db *pgxpool.Pool, ptc pe
 	})
 }
 
-func startCommentOnCLs(ctx context.Context, db *pgxpool.Pool, ptc periodicTasksConfig) {
-	if ptc.CommentOnCLsPeriod.Duration <= 0 {
+func startCommentOnCLs(ctx context.Context, db *pgxpool.Pool, cfg config.Common) {
+	if cfg.PeriodicTasksConfig.CommentOnCLsPeriod.Duration <= 0 {
 		sklog.Infof("Not commenting on CLs because duration was zero.")
 		return
 	}
-	systems := mustInitializeSystems(ctx, ptc)
-	cmntr, err := commenter.New(db, systems, ptc.CLCommentTemplate, ptc.SiteURL, ptc.WindowSize)
+	systems := mustInitializeSystems(ctx, cfg)
+	cmntr, err := commenter.New(db, systems, cfg.PeriodicTasksConfig.CLCommentTemplate, cfg.SiteURL, cfg.WindowSize)
 	if err != nil {
 		sklog.Fatalf("Could not initialize commenting: %s", err)
 	}
 	liveness := metrics2.NewLiveness("periodic_tasks", map[string]string{
 		"task": "commentOnCLs",
 	})
-	go util.RepeatCtx(ctx, ptc.CommentOnCLsPeriod.Duration, func(ctx context.Context) {
+	go util.RepeatCtx(ctx, cfg.PeriodicTasksConfig.CommentOnCLsPeriod.Duration, func(ctx context.Context) {
 		sklog.Infof("Checking CLs for untriaged results and commenting if necessary")
 		ctx, span := trace.StartSpan(ctx, "periodic_commentOnCLsWithUntriagedDigests")
 		defer span.End()
@@ -217,14 +177,14 @@ func startCommentOnCLs(ctx context.Context, db *pgxpool.Pool, ptc periodicTasksC
 
 // mustInitializeSystems creates code_review.Clients and returns them wrapped as a ReviewSystem.
 // It panics if any part of configuration fails.
-func mustInitializeSystems(ctx context.Context, ptc periodicTasksConfig) []commenter.ReviewSystem {
+func mustInitializeSystems(ctx context.Context, cfg config.Common) []commenter.ReviewSystem {
 	tokenSource, err := google.DefaultTokenSource(ctx, auth.ScopeGerrit)
 	if err != nil {
 		sklog.Fatalf("Failed to authenticate service account: %s", err)
 	}
 	gerritHTTPClient := httputils.DefaultClientConfig().WithTokenSource(tokenSource).Client()
-	rv := make([]commenter.ReviewSystem, 0, len(ptc.CodeReviewSystems))
-	for _, cfg := range ptc.CodeReviewSystems {
+	rv := make([]commenter.ReviewSystem, 0, len(cfg.CodeReviewSystems))
+	for _, cfg := range cfg.CodeReviewSystems {
 		var crs code_review.Client
 		if cfg.Flavor == "gerrit" {
 			if cfg.GerritURL == "" {
@@ -267,11 +227,11 @@ type diffWorkGatherer struct {
 
 // startPrimaryBranchDiffWork starts the process that periodically creates rows in the SQL DB for
 // diff workers to calculate diffs for images on the primary branch.
-func startPrimaryBranchDiffWork(ctx context.Context, gatherer *diffWorkGatherer, ptc periodicTasksConfig) {
+func startPrimaryBranchDiffWork(ctx context.Context, gatherer *diffWorkGatherer, cfg config.Common) {
 	liveness := metrics2.NewLiveness("periodic_tasks", map[string]string{
 		"task": "calculatePrimaryBranchDiffWork",
 	})
-	go util.RepeatCtx(ctx, ptc.PrimaryBranchDiffPeriod.Duration, func(ctx context.Context) {
+	go util.RepeatCtx(ctx, cfg.PeriodicTasksConfig.PrimaryBranchDiffPeriod.Duration, func(ctx context.Context) {
 		sklog.Infof("Calculating diffs for images seen recently")
 		ctx, span := trace.StartSpan(ctx, "periodic_PrimaryBranchDiffWork")
 		defer span.End()
@@ -405,11 +365,11 @@ func (g *diffWorkGatherer) addNewGroupingsForProcessing(ctx context.Context, gro
 
 // startChangelistsDiffWork starts the process that periodically creates rows in the SQL DB for
 // /diff workers to calculate diffs for images produced by CLs.
-func startChangelistsDiffWork(ctx context.Context, gatherer *diffWorkGatherer, ptc periodicTasksConfig) {
+func startChangelistsDiffWork(ctx context.Context, gatherer *diffWorkGatherer, cfg config.Common) {
 	liveness := metrics2.NewLiveness("periodic_tasks", map[string]string{
 		"task": "calculateChangelistsDiffWork",
 	})
-	go util.RepeatCtx(ctx, ptc.ChangelistDiffPeriod.Duration, func(ctx context.Context) {
+	go util.RepeatCtx(ctx, cfg.PeriodicTasksConfig.ChangelistDiffPeriod.Duration, func(ctx context.Context) {
 		sklog.Infof("Calculating diffs for images produced on CLs")
 		ctx, span := trace.StartSpan(ctx, "periodic_ChangelistsDiffWork")
 		defer span.End()
@@ -661,10 +621,10 @@ FROM PrimaryBranchDiffCalculationWork`
 // not 3 schedules, each with a success, this raises an error. The schedules are created via
 // //golden/cmd/sqlinit. If the tables change, those will need to be re-created.
 // https://www.cockroachlabs.com/docs/stable/create-schedule-for-backup.html
-func startBackupStatusCheck(ctx context.Context, db *pgxpool.Pool, ptc periodicTasksConfig) {
+func startBackupStatusCheck(ctx context.Context, db *pgxpool.Pool, cfg config.Common) {
 	go func() {
 		const backupError = "periodictasks_backup_error"
-		backupMetric := metrics2.GetInt64Metric(backupError, map[string]string{"database": ptc.SQLDatabaseName})
+		backupMetric := metrics2.GetInt64Metric(backupError, map[string]string{"database": cfg.SQLDatabaseName})
 		backupMetric.Update(0)
 
 		for range time.Tick(time.Hour) {
@@ -672,7 +632,7 @@ func startBackupStatusCheck(ctx context.Context, db *pgxpool.Pool, ptc periodicT
 				return
 			}
 			statement := `SELECT id, label, state FROM [SHOW SCHEDULES] WHERE label LIKE '` +
-				ptc.SQLDatabaseName + `\_%'`
+				cfg.SQLDatabaseName + `\_%'`
 			rows, err := db.Query(ctx, statement)
 			if err != nil {
 				sklog.Errorf("Could not check backup schedules: %s", err)
@@ -721,14 +681,14 @@ func startBackupStatusCheck(ctx context.Context, db *pgxpool.Pool, ptc periodicT
 // can be used by clients (we know it is used by Skia) to make tests not have to decoded and output
 // images that match the given hash. This optimization becomes important when tests are putting out
 // many many images.
-func startKnownDigestsSync(ctx context.Context, db *pgxpool.Pool, ptc periodicTasksConfig) {
+func startKnownDigestsSync(ctx context.Context, db *pgxpool.Pool, cfg config.Common) {
 	liveness := metrics2.NewLiveness("periodic_tasks", map[string]string{
 		"task": "syncKnownDigests",
 	})
 
 	storageClient, err := storage.NewGCSClient(ctx, nil, storage.GCSClientOptions{
-		Bucket:             ptc.GCSBucket,
-		KnownHashesGCSPath: ptc.KnownHashesGCSPath,
+		Bucket:             cfg.GCSBucket,
+		KnownHashesGCSPath: cfg.KnownHashesGCSPath,
 	})
 	if err != nil {
 		sklog.Errorf("Could not start syncing known digests: %s", err)
@@ -736,13 +696,13 @@ func startKnownDigestsSync(ctx context.Context, db *pgxpool.Pool, ptc periodicTa
 	}
 
 	go util.RepeatCtx(ctx, 20*time.Minute, func(ctx context.Context) {
-		sklog.Infof("Syncing all recently seen digests to %s", ptc.KnownHashesGCSPath)
+		sklog.Infof("Syncing all recently seen digests to %s", cfg.KnownHashesGCSPath)
 		ctx, span := trace.StartSpan(ctx, "periodic_SyncKnownDigests")
 		defer span.End()
 
 		// We grab digests from twice our window length to be overly thorough to avoid excess
 		// uploads from clients who use this.
-		digests, err := getAllRecentDigests(ctx, db, ptc.WindowSize*2)
+		digests, err := getAllRecentDigests(ctx, db, cfg.WindowSize*2)
 		if err != nil {
 			sklog.Errorf("Error getting recent digests: %s", err)
 			return
@@ -802,7 +762,7 @@ ORDER BY 1
 // Perf. It assumes the config is non-nil, and will panic if the minimally set data is not done so.
 // It starts a go routine that will immediately being summarizing and then repeat the process at
 // the configured time period.
-func startPerfSummarization(ctx context.Context, db *pgxpool.Pool, sCfg *perfSummariesConfig) {
+func startPerfSummarization(ctx context.Context, db *pgxpool.Pool, sCfg *config.PerfSummariesConfig) {
 	sklog.Infof("Perf summary config %+v", *sCfg)
 	if sCfg.AgeOutCommits <= 0 {
 		panic("Must have a positive, non-zero age_out_commits")
@@ -840,7 +800,7 @@ func startPerfSummarization(ctx context.Context, db *pgxpool.Pool, sCfg *perfSum
 // how many are ignored. This data is uploaded to Perf's GCS bucket in a streaming fashion, that is
 // each tuple's data is uploaded on its own, not as one big blob. The entire process could take
 // a while, as the summarization may involve full table scans.
-func summarizeTraces(ctx context.Context, db *pgxpool.Pool, cfg *perfSummariesConfig, client gcs.GCSClient) error {
+func summarizeTraces(ctx context.Context, db *pgxpool.Pool, cfg *config.PerfSummariesConfig, client gcs.GCSClient) error {
 	oldestCommitID, latestCommitID, err := getWindowCommitBounds(ctx, db, cfg.AgeOutCommits)
 	if err != nil {
 		return skerr.Wrap(err)
