@@ -56,50 +56,12 @@ const (
 	maxSQLConnections = 32
 )
 
-type frontendServerConfig struct {
-	config.Common
-
-	// Force the user to be authenticated for all requests.
-	ForceLogin bool `json:"force_login"`
-
-	// Configuration settings that will get passed to the frontend (see modules/settings.ts)
-	FrontendConfig frontendConfig `json:"frontend"`
-
-	// If this instance is simply a mirror of another instance's data.
-	IsPublicView bool `json:"is_public_view"`
-
-	// MaterializedViewCorpora is the optional list of corpora that should have a materialized
-	// view created and refreshed to speed up search results.
-	MaterializedViewCorpora []string `json:"materialized_view_corpora" optional:"true"`
-
-	// If non empty, this map of rules will be applied to traces to see if they can be showed on
-	// this instance.
-	PubliclyAllowableParams publicparams.MatchingRules `json:"publicly_allowed_params" optional:"true"`
-
-	// Path to a directory with static assets that should be served to the frontend (JS, CSS, etc.).
-	ResourcesPath string `json:"resources_path"`
-}
-
-// IsAuthoritative indicates that this instance can write to known_hashes, update CL statuses, etc.
-func (fsc *frontendServerConfig) IsAuthoritative() bool {
-	return !fsc.Local && !fsc.IsPublicView
-}
-
-type frontendConfig struct {
-	BaseRepoURL                 string `json:"baseRepoURL"`
-	DefaultCorpus               string `json:"defaultCorpus"`
-	Title                       string `json:"title"`
-	CustomTriagingDisallowedMsg string `json:"customTriagingDisallowedMsg,omitempty" optional:"true"`
-	IsPublic                    bool   `json:"isPublic"`
-}
-
 func main() {
 	// Command line flags.
 	var (
-		commonInstanceConfig = flag.String("common_instance_config", "", "Path to the json5 file containing the configuration that needs to be the same across all services for a given instance.")
-		thisConfig           = flag.String("config", "", "Path to the json5 file containing the configuration specific to baseline server.")
-		hang                 = flag.Bool("hang", false, "Stop and do nothing after reading the flags. Good for debugging containers.")
-		logSQLQueries        = flag.Bool("log_sql_queries", false, "Log all SQL statements. For debugging only; do not use in production.")
+		configPath    = flag.String("config", "", "Path to the json5 file containing the configuration.")
+		hang          = flag.Bool("hang", false, "Stop and do nothing after reading the flags. Good for debugging containers.")
+		logSQLQueries = flag.Bool("log_sql_queries", false, "Log all SQL statements. For debugging only; do not use in production.")
 	)
 
 	// Parse the flags, so we can load the configuration files.
@@ -111,7 +73,7 @@ func main() {
 	}
 
 	// Load configuration from common and instance-specific JSON files.
-	fsc := mustLoadFrontendServerConfig(commonInstanceConfig, thisConfig)
+	fsc := mustLoadFrontendServerConfig(configPath)
 
 	// Speculative memory usage fix? https://github.com/googleapis/google-cloud-go/issues/375
 	grpc.EnableTracing = false
@@ -163,7 +125,7 @@ func main() {
 	sklog.Fatal(http.ListenAndServe(fsc.ReadyPort, rootRouter))
 }
 
-func mustLoadSearchAPI(ctx context.Context, fsc *frontendServerConfig, sqlDB *pgxpool.Pool, publiclyViewableParams publicparams.Matcher, systems []clstore.ReviewSystem) *search.Impl {
+func mustLoadSearchAPI(ctx context.Context, fsc config.Common, sqlDB *pgxpool.Pool, publiclyViewableParams publicparams.Matcher, systems []clstore.ReviewSystem) *search.Impl {
 	templates := map[string]string{}
 	for _, crs := range systems {
 		templates[crs.ID] = crs.URLTemplate
@@ -176,10 +138,10 @@ func mustLoadSearchAPI(ctx context.Context, fsc *frontendServerConfig, sqlDB *pg
 	if err != nil {
 		sklog.Fatalf("Cannot load caches for search2 backend: %s", err)
 	}
-	if err := s2a.StartMaterializedViews(ctx, fsc.MaterializedViewCorpora, 5*time.Minute); err != nil {
-		sklog.Fatalf("Cannot create materialized views %s: %s", fsc.MaterializedViewCorpora, err)
+	if err := s2a.StartMaterializedViews(ctx, fsc.FrontendServerConfig.MaterializedViewCorpora, 5*time.Minute); err != nil {
+		sklog.Fatalf("Cannot create materialized views %s: %s", fsc.FrontendServerConfig.MaterializedViewCorpora, err)
 	}
-	if fsc.IsPublicView {
+	if fsc.FrontendServerConfig.IsPublicView {
 		if err := s2a.StartApplyingPublicParams(ctx, publiclyViewableParams, 5*time.Minute); err != nil {
 			sklog.Fatalf("Could not apply public params: %s", err)
 		}
@@ -190,17 +152,18 @@ func mustLoadSearchAPI(ctx context.Context, fsc *frontendServerConfig, sqlDB *pg
 }
 
 // mustLoadFrontendServerConfig parses the common and instance-specific JSON configuration files.
-func mustLoadFrontendServerConfig(commonInstanceConfig *string, thisConfig *string) *frontendServerConfig {
-	var fsc frontendServerConfig
-	if err := config.LoadFromJSON5(&fsc, commonInstanceConfig, thisConfig); err != nil {
+func mustLoadFrontendServerConfig(configPath *string) config.Common {
+	var fsc config.Common
+	fsc, err := config.LoadConfigFromJSON5(*configPath)
+	if err != nil {
 		sklog.Fatalf("Reading config: %s", err)
 	}
 	sklog.Infof("Loaded config %#v", fsc)
-	return &fsc
+	return fsc
 }
 
 // mustStartDebugServer starts an internal HTTP server for debugging purposes if requested.
-func mustStartDebugServer(fsc *frontendServerConfig) {
+func mustStartDebugServer(fsc config.Common) {
 	// Start the internal server on the internal port if requested.
 	if fsc.DebugPort != "" {
 		// Add the profiling endpoints to the internal router.
@@ -243,7 +206,7 @@ func (l crdbLogger) Log(ctx context.Context, level pgx.LogLevel, msg string, dat
 
 // mustInitSQLDatabase initializes a SQL database. If there are any errors, it will panic via
 // sklog.Fatal.
-func mustInitSQLDatabase(ctx context.Context, fsc *frontendServerConfig, logSQLQueries bool) *pgxpool.Pool {
+func mustInitSQLDatabase(ctx context.Context, fsc config.Common, logSQLQueries bool) *pgxpool.Pool {
 	if fsc.SQLDatabaseName == "" {
 		sklog.Fatalf("Must have SQL Database Information")
 	}
@@ -267,7 +230,7 @@ func mustInitSQLDatabase(ctx context.Context, fsc *frontendServerConfig, logSQLQ
 // mustMakeGCSClient returns a storage.GCSClient that uses the given http.Client. If the Gold
 // instance is not authoritative (e.g. when running locally) the client won't actually write any
 // files.
-func mustMakeGCSClient(ctx context.Context, fsc *frontendServerConfig, client *http.Client) storage.GCSClient {
+func mustMakeGCSClient(ctx context.Context, fsc config.Common, client *http.Client) storage.GCSClient {
 	gsClientOpt := storage.GCSClientOptions{
 		Bucket:             fsc.GCSBucket,
 		KnownHashesGCSPath: fsc.KnownHashesGCSPath,
@@ -284,19 +247,19 @@ func mustMakeGCSClient(ctx context.Context, fsc *frontendServerConfig, client *h
 
 // mustMakePubliclyViewableParams validates and computes a publicparams.Matcher from the publicly
 // allowed params specified in the JSON configuration files.
-func mustMakePubliclyViewableParams(fsc *frontendServerConfig) publicparams.Matcher {
+func mustMakePubliclyViewableParams(fsc config.Common) publicparams.Matcher {
 	var publiclyViewableParams publicparams.Matcher
 	var err error
 
 	// Load the publiclyViewable params if configured and disable querying for issues.
-	if len(fsc.PubliclyAllowableParams) > 0 {
-		if publiclyViewableParams, err = publicparams.MatcherFromRules(fsc.PubliclyAllowableParams); err != nil {
+	if len(fsc.FrontendServerConfig.PubliclyAllowableParams) > 0 {
+		if publiclyViewableParams, err = publicparams.MatcherFromRules(fsc.FrontendServerConfig.PubliclyAllowableParams); err != nil {
 			sklog.Fatalf("Could not load list of public params: %s", err)
 		}
 	}
 
 	// Check if this is public instance. If so, make sure we have a non-nil Matcher.
-	if fsc.IsPublicView && publiclyViewableParams == nil {
+	if fsc.FrontendServerConfig.IsPublicView && publiclyViewableParams == nil {
 		sklog.Fatal("A non-empty map of publiclyViewableParams must be provided if is public view.")
 	}
 
@@ -316,7 +279,7 @@ func mustMakeIgnoreStore(ctx context.Context, db *pgxpool.Pool) ignore.Store {
 
 // mustInitializeReviewSystems validates and instantiates one clstore.ReviewSystem for each CRS
 // specified via the JSON configuration files.
-func mustInitializeReviewSystems(fsc *frontendServerConfig, hc *http.Client) []clstore.ReviewSystem {
+func mustInitializeReviewSystems(fsc config.Common, hc *http.Client) []clstore.ReviewSystem {
 	rs := make([]clstore.ReviewSystem, 0, len(fsc.CodeReviewSystems))
 	for _, cfg := range fsc.CodeReviewSystems {
 		var crs code_review.Client
@@ -359,7 +322,7 @@ func mustInitializeReviewSystems(fsc *frontendServerConfig, hc *http.Client) []c
 }
 
 // mustMakeWebHandlers returns a new web.Handlers.
-func mustMakeWebHandlers(ctx context.Context, fsc *frontendServerConfig, db *pgxpool.Pool, gsClient storage.GCSClient, ignoreStore ignore.Store, reviewSystems []clstore.ReviewSystem, s2a search.API, alogin alogin.Login) *web.Handlers {
+func mustMakeWebHandlers(ctx context.Context, fsc config.Common, db *pgxpool.Pool, gsClient storage.GCSClient, ignoreStore ignore.Store, reviewSystems []clstore.ReviewSystem, s2a search.API, alogin alogin.Login) *web.Handlers {
 	handlers, err := web.NewHandlers(web.HandlersConfig{
 		DB:                        db,
 		GCSClient:                 gsClient,
@@ -377,7 +340,7 @@ func mustMakeWebHandlers(ctx context.Context, fsc *frontendServerConfig, db *pgx
 }
 
 // mustMakeRootRouter returns a chi.Router that can be used to serve Gold's web UI and JSON API.
-func mustMakeRootRouter(fsc *frontendServerConfig, handlers *web.Handlers, plogin alogin.Login) chi.Router {
+func mustMakeRootRouter(fsc config.Common, handlers *web.Handlers, plogin alogin.Login) chi.Router {
 	rootRouter := chi.NewRouter()
 	rootRouter.HandleFunc("/healthz", httputils.ReadyHandleFunc)
 
@@ -412,34 +375,34 @@ func mustMakeRootRouter(fsc *frontendServerConfig, handlers *web.Handlers, plogi
 
 // addUIRoutes adds the necessary routes to serve Gold's web pages and static assets such as JS and
 // CSS bundles, static images (digest and diff images are handled elsewhere), etc.
-func addUIRoutes(router chi.Router, fsc *frontendServerConfig, handlers *web.Handlers, plogin alogin.Login) {
+func addUIRoutes(router chi.Router, fsc config.Common, handlers *web.Handlers, plogin alogin.Login) {
 	// Serve static assets (JS and CSS bundles, images, etc.).
 	//
 	// Note that this includes the raw HTML templates (e.g. /dist/byblame.html) with unpopulated
 	// placeholders such as {{.Title}}. These aren't used directly by client code. We should probably
 	// unexpose them and only serve the JS/CSS bundles from this route (and any other static assets
 	// such as the favicon).
-	router.Handle("/dist/*", http.StripPrefix("/dist/", http.HandlerFunc(makeResourceHandler(fsc.ResourcesPath))))
+	router.Handle("/dist/*", http.StripPrefix("/dist/", http.HandlerFunc(makeResourceHandler(fsc.FrontendServerConfig.ResourcesPath))))
 
 	var templates *template.Template
 
 	loadTemplates := func() {
-		templates = template.Must(template.New("").ParseGlob(filepath.Join(fsc.ResourcesPath, "*.html")))
+		templates = template.Must(template.New("").ParseGlob(filepath.Join(fsc.FrontendServerConfig.ResourcesPath, "*.html")))
 	}
 
 	loadTemplates()
 
-	fsc.FrontendConfig.BaseRepoURL = fsc.GitRepoURL
-	fsc.FrontendConfig.IsPublic = fsc.IsPublicView
+	fsc.FrontendServerConfig.FrontendConfig.BaseRepoURL = fsc.GitRepoURL
+	fsc.FrontendServerConfig.FrontendConfig.IsPublic = fsc.FrontendServerConfig.IsPublicView
 
-	frontendConfigBytes, err := json.Marshal(fsc.FrontendConfig)
+	frontendConfigBytes, err := json.Marshal(fsc.FrontendServerConfig.FrontendConfig)
 	if err != nil {
 		sklog.Error("Failed to marshal frontend config to JSON: %s", err)
 	}
 
 	templateHandler := func(name string) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
-			if fsc.ForceLogin && len(plogin.Roles(r)) == 0 {
+			if fsc.FrontendServerConfig.ForceLogin && len(plogin.Roles(r)) == 0 {
 				http.Redirect(w, r, plogin.LoginURL(r), http.StatusSeeOther)
 				return
 			}
@@ -454,7 +417,7 @@ func addUIRoutes(router chi.Router, fsc *frontendServerConfig, handlers *web.Han
 				Title        string
 				GoldSettings template.JS
 			}{
-				Title:        fsc.FrontendConfig.Title,
+				Title:        fsc.FrontendServerConfig.FrontendConfig.Title,
 				GoldSettings: template.JS(frontendConfigBytes),
 			}
 			if err := templates.ExecuteTemplate(w, name, templateData); err != nil {
@@ -481,7 +444,7 @@ func addUIRoutes(router chi.Router, fsc *frontendServerConfig, handlers *web.Han
 
 // addAuthenticatedJSONRoutes populates the given router with the subset of Gold's JSON RPC routes
 // that require authentication.
-func addAuthenticatedJSONRoutes(router chi.Router, fsc *frontendServerConfig, handlers *web.Handlers, plogin alogin.Login) {
+func addAuthenticatedJSONRoutes(router chi.Router, fsc config.Common, handlers *web.Handlers, plogin alogin.Login) {
 	// Set up a subrouter for the '/json' routes which make up the Gold API.
 	// This makes routing faster, but also returns a failure when an /json route is
 	// requested that doesn't exist. If we did this differently a call to a non-existing endpoint
@@ -493,7 +456,7 @@ func addAuthenticatedJSONRoutes(router chi.Router, fsc *frontendServerConfig, ha
 	add := func(jsonRoute string, handlerToProtect http.HandlerFunc, method string) {
 		wrappedHandler := func(w http.ResponseWriter, r *http.Request) {
 			// Any role is >= Viewer
-			if fsc.ForceLogin && len(plogin.Roles(r)) == 0 {
+			if fsc.FrontendServerConfig.ForceLogin && len(plogin.Roles(r)) == 0 {
 				http.Error(w, "You must be logged in as a viewer to complete this action.", http.StatusUnauthorized)
 				return
 			}
@@ -525,7 +488,7 @@ func addAuthenticatedJSONRoutes(router chi.Router, fsc *frontendServerConfig, ha
 
 	// Only expose these endpoints if this instance is not a public view. The reason we want to hide
 	// ignore rules is so that we don't leak params that might be in them.
-	if !fsc.IsPublicView {
+	if !fsc.FrontendServerConfig.IsPublicView {
 		add("/json/v2/ignores", handlers.ListIgnoreRules2, "GET")
 		add("/json/ignores/add/", handlers.AddIgnoreRule, "POST")
 		add("/json/v1/ignores/add/", handlers.AddIgnoreRule, "POST")
@@ -542,7 +505,7 @@ func addAuthenticatedJSONRoutes(router chi.Router, fsc *frontendServerConfig, ha
 
 // addUnauthenticatedJSONRoutes populates the given router with the subset of Gold's JSON RPC routes
 // that do not require authentication.
-func addUnauthenticatedJSONRoutes(router chi.Router, _ *frontendServerConfig, handlers *web.Handlers) {
+func addUnauthenticatedJSONRoutes(router chi.Router, _ config.Common, handlers *web.Handlers) {
 	add := func(jsonRoute string, handlerFunc http.HandlerFunc) {
 		addJSONRoute("GET", jsonRoute, httputils.CorsHandler(handlerFunc), router, "")
 	}

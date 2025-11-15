@@ -11,6 +11,7 @@ go_library(
         "//go/git/provider",
         "//go/skerr",
         "//go/util",
+        "//golden/go/publicparams",
         "@com_github_flynn_json5//:json5",
     ],
 )

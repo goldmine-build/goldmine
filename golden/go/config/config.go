@@ -9,6 +9,7 @@ import (
 	"go.goldmine.build/go/git/provider"
 	"go.goldmine.build/go/skerr"
 	"go.goldmine.build/go/util"
+	"go.goldmine.build/golden/go/publicparams"
 )
 
 type IngestionServerConfig struct {
@@ -177,6 +178,45 @@ type Common struct {
 
 	// PeriodicTasksConfig contains settings for periodic tasks run by periodictasks.go.
 	PeriodicTasksConfig PeriodicTasksConfig `json:"periodic_tasks_config"`
+
+	// FrontendServerConfig contains settings specific to the frontend server.
+	FrontendServerConfig FrontendServerConfig `json:"frontend_server_config"`
+}
+
+type FrontendServerConfig struct {
+
+	// Force the user to be authenticated for all requests.
+	ForceLogin bool `json:"force_login"`
+
+	// Configuration settings that will get passed to the frontend (see modules/settings.ts)
+	FrontendConfig FrontendConfig `json:"frontend"`
+
+	// If this instance is simply a mirror of another instance's data.
+	IsPublicView bool `json:"is_public_view"`
+
+	// MaterializedViewCorpora is the optional list of corpora that should have a materialized
+	// view created and refreshed to speed up search results.
+	MaterializedViewCorpora []string `json:"materialized_view_corpora" optional:"true"`
+
+	// If non empty, this map of rules will be applied to traces to see if they can be showed on
+	// this instance.
+	PubliclyAllowableParams publicparams.MatchingRules `json:"publicly_allowed_params" optional:"true"`
+
+	// Path to a directory with static assets that should be served to the frontend (JS, CSS, etc.).
+	ResourcesPath string `json:"resources_path"`
+}
+
+// IsAuthoritative indicates that this instance can write to known_hashes, update CL statuses, etc.
+func (c Common) IsAuthoritative() bool {
+	return !c.Local && !c.FrontendServerConfig.IsPublicView
+}
+
+type FrontendConfig struct {
+	BaseRepoURL                 string `json:"baseRepoURL"`
+	DefaultCorpus               string `json:"defaultCorpus"`
+	Title                       string `json:"title"`
+	CustomTriagingDisallowedMsg string `json:"customTriagingDisallowedMsg,omitempty" optional:"true"`
+	IsPublic                    bool   `json:"isPublic"`
 }
 
 type PeriodicTasksConfig struct {
