@@ -212,7 +212,6 @@ func (c Common) IsAuthoritative() bool {
 }
 
 type FrontendConfig struct {
-	BaseRepoURL                 string `json:"baseRepoURL"`
 	DefaultCorpus               string `json:"defaultCorpus"`
 	Title                       string `json:"title"`
 	CustomTriagingDisallowedMsg string `json:"customTriagingDisallowedMsg,omitempty" optional:"true"`

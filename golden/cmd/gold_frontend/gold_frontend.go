@@ -392,7 +392,6 @@ func addUIRoutes(router chi.Router, fsc config.Common, handlers *web.Handlers, p
 
 	loadTemplates()
 
-	fsc.FrontendServerConfig.FrontendConfig.BaseRepoURL = fsc.GitRepoURL
 	fsc.FrontendServerConfig.FrontendConfig.IsPublic = fsc.FrontendServerConfig.IsPublicView
 
 	frontendConfigBytes, err := json.Marshal(fsc.FrontendServerConfig.FrontendConfig)
