@@ -7,7 +7,6 @@ import (
 	"flag"
 	"fmt"
 	"html/template"
-	"math/rand"
 	"net/http"
 	"net/http/pprof"
 	"os"
@@ -86,8 +85,6 @@ func main() {
 		loggingtracer.Initialize()
 	}
 
-	// Needed to use TimeSortableKey(...) which relies on an RNG. See docs there.
-	rand.Seed(time.Now().UnixNano())
 	// Initialize service.
 	_, appName := filepath.Split(os.Args[0])
 	common.InitWithMust(
@@ -113,7 +110,13 @@ func main() {
 
 	s2a := mustLoadSearchAPI(ctx, fsc, sqlDB, publiclyViewableParams, reviewSystems)
 
-	plogin := proxylogin.NewWithDefaults()
+	plogin, err := proxylogin.New(
+		fsc.FrontendServerConfig.ProxyLoginHeaderName,
+		fsc.FrontendServerConfig.ProxyLoginEmailRegex,
+		fsc.FrontendServerConfig.BypassRoles)
+	if err != nil {
+		sklog.Fatalf("proxylogin configuration: %s", err)
+	}
 
 	handlers := mustMakeWebHandlers(ctx, fsc, sqlDB, gsClient, ignoreStore, reviewSystems, s2a, plogin)
 
