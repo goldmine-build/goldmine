@@ -188,6 +188,20 @@ type FrontendServerConfig struct {
 	// Force the user to be authenticated for all requests.
 	ForceLogin bool `json:"force_login"`
 
+	// ProxyLogingHeaderName is the name of the HTTP header that contains the
+	// authenticated user's email. If unset it uses the default in the proxy
+	// login package.
+	ProxyLogingHeaderName string `json:"proxy_login_header_name" optional:"true"`
+
+	// ProxyLoginEmailRegex is an optional regex to extract the email address from
+	// the header value. If unset it uses the default in the proxy login package.
+	ProxyLoginEmailRegex string `json:"proxy_login_email_regex" optional:"true"`
+
+	// BypassRoles indicates whether all roles should be allowed, that is, if
+	// any logged in user should be treated as having all roles. Useful where
+	// the only people accessing the instance are trusted.
+	BypassRoles bool `json:"bypass_roles" optional:"true"`
+
 	// Configuration settings that will get passed to the frontend (see modules/settings.ts)
 	FrontendConfig FrontendConfig `json:"frontend"`
 

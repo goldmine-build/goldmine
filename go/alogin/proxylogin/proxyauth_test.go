@@ -20,7 +20,7 @@ const (
 
 func TestLoggedInAs_HeaderIsMissing_ReturnsEmptyString(t *testing.T) {
 	r := httptest.NewRequest("GET", "/", nil)
-	login, err := New(unknownHeaderName, "")
+	login, err := New(unknownHeaderName, "", false)
 	require.NoError(t, err)
 	require.Equal(t, alogin.NotLoggedIn, login.LoggedInAs(r))
 }
@@ -28,15 +28,22 @@ func TestLoggedInAs_HeaderIsMissing_ReturnsEmptyString(t *testing.T) {
 func TestLoggedInAs_HeaderPresent_ReturnsUserEmail(t *testing.T) {
 	r := httptest.NewRequest("GET", "/", nil)
 	r.Header.Set(goodHeaderName, emailAsString)
-	login, err := New(goodHeaderName, "")
+	login, err := New(goodHeaderName, "", false)
 	require.NoError(t, err)
+	require.Equal(t, email, login.LoggedInAs(r))
+}
+
+func TestLoggedInAsWithNew_HeaderPresent_ReturnsUserEmail(t *testing.T) {
+	r := httptest.NewRequest("GET", "/", nil)
+	r.Header.Set(goodHeaderName, emailAsString)
+	login := NewWithDefaults()
 	require.Equal(t, email, login.LoggedInAs(r))
 }
 
 func TestLoggedInAs_RegexProvided_ReturnsUserEmail(t *testing.T) {
 	r := httptest.NewRequest("GET", "/", nil)
 	r.Header.Set(goodHeaderName, "accounts.google.com:"+emailAsString)
-	login, err := New(goodHeaderName, "accounts.google.com:(.*)")
+	login, err := New(goodHeaderName, "accounts.google.com:(.*)", false)
 	require.NoError(t, err)
 	require.Equal(t, email, login.LoggedInAs(r))
 }
@@ -44,7 +51,7 @@ func TestLoggedInAs_RegexProvided_ReturnsUserEmail(t *testing.T) {
 func TestLoggedInAs_RegexHasTooManySubGroups_ReturnsEmptyString(t *testing.T) {
 	r := httptest.NewRequest("GET", "/", nil)
 	r.Header.Set(goodHeaderName, emailAsString)
-	login, err := New(goodHeaderName, "(too)(many)(subgroups)")
+	login, err := New(goodHeaderName, "(too)(many)(subgroups)", false)
 	require.NoError(t, err)
 	require.Equal(t, alogin.NotLoggedIn, login.LoggedInAs(r))
 }
@@ -52,7 +59,7 @@ func TestLoggedInAs_RegexHasTooManySubGroups_ReturnsEmptyString(t *testing.T) {
 func TestNeedsAuthentication_EmitsStatusForbidden(t *testing.T) {
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest("GET", "/", nil)
-	login, err := New(goodHeaderName, "")
+	login, err := New(goodHeaderName, "", false)
 	require.NoError(t, err)
 	login.NeedsAuthentication(w, r)
 	require.Equal(t, http.StatusForbidden, w.Result().StatusCode)
@@ -66,27 +73,35 @@ func TestStatus_HeaderPresent_ReturnsUserEmail(t *testing.T) {
 		EMail: email,
 		Roles: roles.Roles{roles.Admin},
 	}
-	login, err := New(goodHeaderName, "")
+	login, err := New(goodHeaderName, "", false)
 	require.NoError(t, err)
 	require.Equal(t, expected, login.Status(r))
 }
 
 func TestNew_InvalidRegex_ReturnsError(t *testing.T) {
-	_, err := New(goodHeaderName, "\\y")
+	_, err := New(goodHeaderName, "\\y", false)
 	require.Error(t, err)
 }
 
 func TestRoles_HeaderPresent_ReturnAllRoles(t *testing.T) {
 	r := httptest.NewRequest("GET", "/", nil)
 	r.Header.Set(authproxy.WebAuthRoleHeaderName, roles.AllValidRoles.ToHeader())
-	login, err := New(goodHeaderName, "")
+	login, err := New(goodHeaderName, "", false)
+	require.NoError(t, err)
+	require.Equal(t, roles.AllValidRoles, login.Roles(r))
+}
+
+func TestRolesWithBypassRoles_HeaderPresent_ReturnAllRoles(t *testing.T) {
+	r := httptest.NewRequest("GET", "/", nil)
+	r.Header.Set(authproxy.WebAuthHeaderName, emailAsString)
+	login, err := New(goodHeaderName, "", true)
 	require.NoError(t, err)
 	require.Equal(t, roles.AllValidRoles, login.Roles(r))
 }
 
 func TestRoles_HeaderMissing_ReturnsEmptyListOfRoles(t *testing.T) {
 	r := httptest.NewRequest("GET", "/", nil)
-	login, err := New(goodHeaderName, "")
+	login, err := New(goodHeaderName, "", false)
 	require.NoError(t, err)
 	require.Empty(t, login.Roles(r))
 }
@@ -94,14 +109,24 @@ func TestRoles_HeaderMissing_ReturnsEmptyListOfRoles(t *testing.T) {
 func TestHasRoles_HeaderPresent_ReturnsTrue(t *testing.T) {
 	r := httptest.NewRequest("GET", "/", nil)
 	r.Header.Set(authproxy.WebAuthRoleHeaderName, roles.AllValidRoles.ToHeader())
-	login, err := New(goodHeaderName, "")
+	login, err := New(goodHeaderName, "", false)
 	require.NoError(t, err)
 	require.True(t, login.HasRole(r, roles.Admin))
 }
 
+func TestHasRolesWithBypassRoles_HeaderPresent_ReturnsTrue(t *testing.T) {
+	r := httptest.NewRequest("GET", "/", nil)
+	r.Header.Set(authproxy.WebAuthHeaderName, emailAsString)
+	login, err := New(goodHeaderName, "", true)
+	require.NoError(t, err)
+	for _, role := range roles.AllValidRoles {
+		require.True(t, login.HasRole(r, role))
+	}
+}
+
 func TestHasRoles_HeaderMissingPresent_ReturnsFalse(t *testing.T) {
 	r := httptest.NewRequest("GET", "/", nil)
-	login, err := New(goodHeaderName, "")
+	login, err := New(goodHeaderName, "", false)
 	require.NoError(t, err)
 	require.False(t, login.HasRole(r, roles.Admin))
 }
@@ -109,7 +134,7 @@ func TestHasRoles_HeaderMissingPresent_ReturnsFalse(t *testing.T) {
 func testLoginURL(t *testing.T, expected, domain string) {
 	t.Helper()
 
-	login, err := New(goodHeaderName, "")
+	login, err := New(goodHeaderName, "", false)
 	require.NoError(t, err)
 	r := httptest.NewRequest("GET", "/", nil)
 	r.Host = domain

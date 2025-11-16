@@ -45,7 +45,6 @@ import (
 	"go.goldmine.build/golden/go/search"
 	"go.goldmine.build/golden/go/sql"
 	"go.goldmine.build/golden/go/storage"
-	"go.goldmine.build/golden/go/tracing"
 	"go.goldmine.build/golden/go/web"
 	"go.goldmine.build/golden/go/web/frontend"
 )
@@ -78,9 +77,9 @@ func main() {
 	// Speculative memory usage fix? https://github.com/googleapis/google-cloud-go/issues/375
 	grpc.EnableTracing = false
 
-	if err := tracing.Initialize(0.01, fsc.SQLDatabaseName); err != nil {
-		sklog.Fatalf("Could not initialize tracing: %s", err)
-	}
+	//	if err := tracing.Initialize(0.01, fsc.SQLDatabaseName); err != nil {
+	//		sklog.Fatalf("Could not initialize tracing: %s", err)
+	//	}
 
 	// Log traces and their durations via sklog.Info() when running locally.
 	if fsc.Local {

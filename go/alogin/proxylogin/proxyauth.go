@@ -36,6 +36,10 @@ type ProxyLogin struct {
 
 	// emailRegex is an optional regex to extract the email address from the header value.
 	emailRegex *regexp.Regexp
+
+	// bypassRoles indicates whether all roles should be allowed, that is, if a
+	// any logged in user should be treated as having all roles.
+	bypassRoles bool
 }
 
 // New returns a new instance of proxyLogin.
@@ -50,7 +54,7 @@ type ProxyLogin struct {
 //
 // If supplied, the Regex must have a single subexpression that matches the email
 // address.
-func New(headerName, emailRegex string) (*ProxyLogin, error) {
+func New(headerName, emailRegex string, bypassRoles bool) (*ProxyLogin, error) {
 	var compiledRegex *regexp.Regexp = nil
 	var err error
 	if emailRegex != "" {
@@ -61,20 +65,14 @@ func New(headerName, emailRegex string) (*ProxyLogin, error) {
 	}
 
 	return &ProxyLogin{
-		headerName: headerName,
-		emailRegex: compiledRegex,
+		headerName:  headerName,
+		emailRegex:  compiledRegex,
+		bypassRoles: bypassRoles,
 	}, nil
 }
 
 // NewWithDefaults calls New() with reasonable default values.
 func NewWithDefaults() *ProxyLogin {
-	return &ProxyLogin{
-		headerName: authproxy.WebAuthHeaderName,
-		emailRegex: nil,
-	}
-}
-
-func NewWithDomain() *ProxyLogin {
 	return &ProxyLogin{
 		headerName: authproxy.WebAuthHeaderName,
 		emailRegex: nil,
@@ -111,11 +109,17 @@ func (p *ProxyLogin) Status(r *http.Request) alogin.Status {
 
 // Roles implements alogin.Login.
 func (p *ProxyLogin) Roles(r *http.Request) roles.Roles {
+	if p.bypassRoles {
+		return roles.AllValidRoles
+	}
 	return roles.FromHeader(r.Header.Get(authproxy.WebAuthRoleHeaderName))
 }
 
 // HasRole implements alogin.Login.
 func (p *ProxyLogin) HasRole(r *http.Request, wantedRole roles.Role) bool {
+	if p.bypassRoles {
+		return true
+	}
 	for _, role := range p.Roles(r) {
 		if role == wantedRole {
 			return true
