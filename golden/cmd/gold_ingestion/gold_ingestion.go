@@ -28,7 +28,6 @@ import (
 	"go.goldmine.build/golden/go/ingestion/sqlingestionstore"
 	"go.goldmine.build/golden/go/ingestion_processors"
 	"go.goldmine.build/golden/go/sql"
-	"go.goldmine.build/golden/go/tracing"
 )
 
 const (
@@ -64,9 +63,9 @@ func main() {
 	)
 	// We expect there to be a lot of ingestion work, so we sample 1% of them to avoid incurring
 	// too much overhead.
-	if err := tracing.Initialize(0.01, isc.SQLDatabaseName); err != nil {
-		sklog.Fatalf("Could not set up tracing: %s", err)
-	}
+	//	if err := tracing.Initialize(0.01, isc.SQLDatabaseName); err != nil {
+	//		sklog.Fatalf("Could not set up tracing: %s", err)
+	//	}
 
 	ctx := context.Background()
 

@@ -40,7 +40,7 @@ bazel run //puppeteer-tests/bazel/extract_puppeteer_screenshots -- --output_dir=
 # which uploads the individual images to the cloud storage bucket, and also
 # updates the local metadata in the WORKDIR.
 for filename in $EXTRACT_DIR/*.png; do
-  echo bazel run //gold-client/cmd/goldctl -- imgtest add --png-file $filename --test-name `echo $(basename $filename) | sed s/.png//` --work-dir $WORKDIR
+  bazel run //gold-client/cmd/goldctl -- imgtest add --png-file $filename --test-name `echo $(basename $filename) | sed s/.png//` --work-dir $WORKDIR
 done
 
 # Finalize the upload by uploading the metadata in the WORKDIR to the cloud
