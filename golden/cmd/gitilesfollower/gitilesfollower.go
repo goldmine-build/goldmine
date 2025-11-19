@@ -34,7 +34,6 @@ import (
 	"go.goldmine.build/golden/go/config"
 	"go.goldmine.build/golden/go/sql"
 	"go.goldmine.build/golden/go/sql/schema"
-	"go.goldmine.build/golden/go/tracing"
 )
 
 const (
@@ -74,9 +73,9 @@ func main() {
 		"gitilesfollower",
 		common.PrometheusOpt(&cfg.PromPort),
 	)
-	if err := tracing.Initialize(1, cfg.SQLDatabaseName); err != nil {
-		sklog.Fatalf("Could not set up tracing: %s", err)
-	}
+	//	if err := tracing.Initialize(1, cfg.SQLDatabaseName); err != nil {
+	//		sklog.Fatalf("Could not set up tracing: %s", err)
+	//	}
 
 	ctx := context.Background()
 	db := mustInitSQLDatabase(ctx, cfg)
