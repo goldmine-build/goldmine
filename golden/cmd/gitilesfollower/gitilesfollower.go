@@ -26,6 +26,7 @@ import (
 	"go.goldmine.build/go/git/provider"
 	"go.goldmine.build/go/git/provider/providers"
 	"go.goldmine.build/go/httputils"
+	"go.goldmine.build/go/metrics2"
 	"go.goldmine.build/go/skerr"
 	"go.goldmine.build/go/sklog"
 	"go.goldmine.build/go/sql/sqlutil"
@@ -121,6 +122,7 @@ func pollRepo(ctx context.Context, db *pgxpool.Pool, gitp provider.Provider, cfg
 	if err != nil {
 		return skerr.Wrap(err)
 	}
+	liveness := metrics2.NewLiveness("gitfollower_poll")
 	go func() {
 		ct := time.NewTicker(cfg.RepoFollowerConfig.PollPeriod.Duration)
 		defer ct.Stop()
@@ -134,6 +136,8 @@ func pollRepo(ctx context.Context, db *pgxpool.Pool, gitp provider.Provider, cfg
 				err := updateCycle(ctx, db, gitp, cfg)
 				if err != nil {
 					sklog.Errorf("Error on this cycle for talking to %s: %s", cfg.GitRepoURL, err)
+				} else {
+					liveness.Reset()
 				}
 			}
 		}

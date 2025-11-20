@@ -27,7 +27,6 @@ go_library(
         "//golden/go/search",
         "//golden/go/sql",
         "//golden/go/storage",
-        "//golden/go/tracing",
         "//golden/go/web",
         "//golden/go/web/frontend",
         "@com_github_go_chi_chi_v5//:chi",
