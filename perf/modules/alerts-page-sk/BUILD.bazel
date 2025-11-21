@@ -63,3 +63,4 @@ sk_demo_page_server(
     name = "demo_page_server",
     sk_page = ":alerts-page-sk-demo",
 )
+# test
