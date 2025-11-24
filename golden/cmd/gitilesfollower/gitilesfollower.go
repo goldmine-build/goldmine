@@ -81,15 +81,10 @@ func main() {
 	ctx := context.Background()
 	db := mustInitSQLDatabase(ctx, cfg)
 
-	gitp, err := providers.New(ctx, cfg.Provider, cfg.GitRepoURL, cfg.GitRepoBranch, cfg.RepoFollowerConfig.InitialCommit, cfg.GitAuthType, "")
-	if err != nil {
-		sklog.Fatalf("Could not set up git provider: %s", err)
+	if _, err := Impl(ctx, cfg, db); err != nil {
+		sklog.Fatalf("Could not start gitiles follower: %s", err)
 	}
 
-	// This starts a goroutine in the background
-	if err := pollRepo(ctx, db, gitp, cfg); err != nil {
-		sklog.Fatalf("Could not do initial update: %s", err)
-	}
 	sklog.Infof("Initial update complete")
 	http.HandleFunc("/healthz", httputils.ReadyHandleFunc)
 	sklog.Fatal(http.ListenAndServe(cfg.ReadyPort, nil))
@@ -112,6 +107,25 @@ func mustInitSQLDatabase(ctx context.Context, cfg config.Common) *pgxpool.Pool {
 	}
 	sklog.Infof("Connected to SQL database %s", cfg.SQLDatabaseName)
 	return db
+}
+
+// CheckForNewCommitsFunc is a function that checks for new commits in the repo being tracked.
+type CheckForNewCommitsFunc func() error
+
+// Impl sets up and starts the gitiles follower. It returns a function that can be called to
+// manually check for new commits outside of the normal polling cycle.
+func Impl(ctx context.Context, cfg config.Common, db *pgxpool.Pool) (CheckForNewCommitsFunc, error) {
+	gitp, err := providers.New(ctx, cfg.Provider, cfg.GitRepoURL, cfg.GitRepoBranch, cfg.RepoFollowerConfig.InitialCommit, cfg.GitAuthType, "")
+	if err != nil {
+		sklog.Fatalf("Could not set up git provider: %s", err)
+	}
+
+	checkForNewCommits := func() error {
+		return updateCycle(ctx, db, gitp, cfg)
+	}
+
+	// This starts a goroutine in the background
+	return checkForNewCommits, pollRepo(ctx, db, gitp, cfg)
 }
 
 // pollRepo does an initial updateCycle and starts a goroutine to continue updating according
