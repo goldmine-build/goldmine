@@ -50,16 +50,16 @@ func main() {
 		select {}
 	}
 
-	var isc config.Common
-	isc, err := config.LoadConfigFromJSON5(*configPath)
+	var cfg config.Common
+	cfg, err := config.LoadConfigFromJSON5(*configPath)
 	if err != nil {
 		sklog.Fatalf("Reading config: %s", err)
 	}
-	sklog.Infof("Loaded config %#v", isc)
+	sklog.Infof("Loaded config %#v", cfg)
 
 	common.InitWithMust(
 		"gold-ingestion",
-		common.PrometheusOpt(&isc.PromPort),
+		common.PrometheusOpt(&cfg.PromPort),
 	)
 	// We expect there to be a lot of ingestion work, so we sample 1% of them to avoid incurring
 	// too much overhead.
@@ -69,10 +69,10 @@ func main() {
 
 	ctx := context.Background()
 
-	if isc.SQLDatabaseName == "" {
+	if cfg.SQLDatabaseName == "" {
 		sklog.Fatalf("Must have SQL database config")
 	}
-	url := sql.GetConnectionURL(isc.SQLConnection, isc.SQLDatabaseName)
+	url := sql.GetConnectionURL(cfg.SQLConnection, cfg.SQLDatabaseName)
 	conf, err := pgxpool.ParseConfig(url)
 	if err != nil {
 		sklog.Fatalf("error getting postgres config %s: %s", url, err)
@@ -90,7 +90,7 @@ func main() {
 	if err != nil {
 		sklog.Fatalf("Could not create GCS Client")
 	}
-	primaryBranchProcessor, src, err := getPrimaryBranchIngester(ctx, isc.IngestionServerConfig.PrimaryBranchConfig, gcsClient, sqlDB)
+	primaryBranchProcessor, src, err := getPrimaryBranchIngester(ctx, cfg.IngestionServerConfig.PrimaryBranchConfig, gcsClient, sqlDB)
 	if err != nil {
 		sklog.Fatalf("Setting up primary branch ingestion: %s", err)
 	}
@@ -112,13 +112,13 @@ func main() {
 		// we are healthy.
 		time.Sleep(5 * time.Second)
 		http.HandleFunc("/healthz", httputils.ReadyHandleFunc)
-		sklog.Fatal(http.ListenAndServe(isc.ReadyPort, nil))
+		sklog.Fatal(http.ListenAndServe(cfg.ReadyPort, nil))
 	}()
 
-	startBackupPolling(ctx, isc, sourcesToScan, pss)
+	startBackupPolling(ctx, cfg, sourcesToScan, pss)
 	startMetrics(ctx, pss)
 
-	sklog.Fatalf("Listening for files to ingest %s", listen(ctx, isc, pss))
+	sklog.Fatalf("Listening for files to ingest %s", listen(ctx, cfg, pss))
 }
 
 func getPrimaryBranchIngester(ctx context.Context, conf config.IngesterConfig, gcsClient *storage.Client, db *pgxpool.Pool) (ingestion.Processor, ingestion.FileSearcher, error) {
@@ -145,41 +145,41 @@ func getPrimaryBranchIngester(ctx context.Context, conf config.IngesterConfig, g
 
 // listen begins listening to the PubSub topic with the configured PubSub subscription. It will
 // fail if the topic or subscription have not been created or PubSub fails.
-func listen(ctx context.Context, isc config.Common, p *pubSubSource) error {
-	psc, err := pubsub.NewClient(ctx, isc.PubsubProjectID)
+func listen(ctx context.Context, cfg config.Common, p *pubSubSource) error {
+	psc, err := pubsub.NewClient(ctx, cfg.PubsubProjectID)
 	if err != nil {
-		return skerr.Wrapf(err, "initializing pubsub client for project %s", isc.PubsubProjectID)
+		return skerr.Wrapf(err, "initializing pubsub client for project %s", cfg.PubsubProjectID)
 	}
 
 	// Check that the topic exists. Fail if it does not.
-	t := psc.Topic(isc.IngestionServerConfig.IngestionFilesTopic)
+	t := psc.Topic(cfg.IngestionServerConfig.IngestionFilesTopic)
 	if exists, err := t.Exists(ctx); err != nil {
-		return skerr.Wrapf(err, "checking for existing topic %s", isc.IngestionServerConfig.IngestionFilesTopic)
+		return skerr.Wrapf(err, "checking for existing topic %s", cfg.IngestionServerConfig.IngestionFilesTopic)
 	} else if !exists {
-		return skerr.Fmt("Diff work topic %s does not exist in project %s", isc.IngestionServerConfig.IngestionFilesTopic, isc.PubsubProjectID)
+		return skerr.Fmt("Diff work topic %s does not exist in project %s", cfg.IngestionServerConfig.IngestionFilesTopic, cfg.PubsubProjectID)
 	}
 
 	// Check that the subscription exists. Fail if it does not.
-	sub := psc.Subscription(isc.IngestionServerConfig.IngestionSubscription)
+	sub := psc.Subscription(cfg.IngestionServerConfig.IngestionSubscription)
 	if exists, err := sub.Exists(ctx); err != nil {
-		return skerr.Wrapf(err, "checking for existing subscription %s", isc.IngestionServerConfig.IngestionSubscription)
+		return skerr.Wrapf(err, "checking for existing subscription %s", cfg.IngestionServerConfig.IngestionSubscription)
 	} else if !exists {
-		return skerr.Fmt("subscription %s does not exist in project %s", isc.IngestionServerConfig.IngestionSubscription, isc.PubsubProjectID)
+		return skerr.Fmt("subscription %s does not exist in project %s", cfg.IngestionServerConfig.IngestionSubscription, cfg.PubsubProjectID)
 	}
 
 	// This is a limit of how many messages to fetch when PubSub has no work. Waiting for PubSub
 	// to give us messages can take a second or two, so we choose a small, but not too small
 	// batch size.
-	if isc.IngestionServerConfig.PubSubFetchSize == 0 {
+	if cfg.IngestionServerConfig.PubSubFetchSize == 0 {
 		sub.ReceiveSettings.MaxOutstandingMessages = 10
 	} else {
-		sub.ReceiveSettings.MaxOutstandingMessages = isc.IngestionServerConfig.PubSubFetchSize
+		sub.ReceiveSettings.MaxOutstandingMessages = cfg.IngestionServerConfig.PubSubFetchSize
 	}
 
-	if isc.IngestionServerConfig.FilesProcessedInParallel == 0 {
+	if cfg.IngestionServerConfig.FilesProcessedInParallel == 0 {
 		sub.ReceiveSettings.NumGoroutines = 4
 	} else {
-		sub.ReceiveSettings.NumGoroutines = isc.IngestionServerConfig.FilesProcessedInParallel
+		sub.ReceiveSettings.NumGoroutines = cfg.IngestionServerConfig.FilesProcessedInParallel
 	}
 
 	// Blocks until context cancels or PubSub fails in a non retryable way.
@@ -255,8 +255,8 @@ func (p *pubSubSource) ingestFile(ctx context.Context, name string) bool {
 	return true
 }
 
-func startBackupPolling(ctx context.Context, isc config.Common, sourcesToScan []ingestion.FileSearcher, pss *pubSubSource) {
-	if isc.IngestionServerConfig.BackupPollInterval.Duration <= 0 {
+func startBackupPolling(ctx context.Context, cfg config.Common, sourcesToScan []ingestion.FileSearcher, pss *pubSubSource) {
+	if cfg.IngestionServerConfig.BackupPollInterval.Duration <= 0 {
 		sklog.Infof("Skipping backup polling")
 		return
 	}
@@ -266,10 +266,10 @@ func startBackupPolling(ctx context.Context, isc config.Common, sourcesToScan []
 		"source": "combined",
 	})
 
-	go util.RepeatCtx(ctx, isc.IngestionServerConfig.BackupPollInterval.Duration, func(ctx context.Context) {
+	go util.RepeatCtx(ctx, cfg.IngestionServerConfig.BackupPollInterval.Duration, func(ctx context.Context) {
 		ctx, span := trace.StartSpan(ctx, "ingestion_backupPollingCycle", trace.WithSampler(trace.AlwaysSample()))
 		defer span.End()
-		startTime, endTime := getTimesToPoll(ctx, isc.IngestionServerConfig.BackupPollScope.Duration)
+		startTime, endTime := getTimesToPoll(ctx, cfg.IngestionServerConfig.BackupPollScope.Duration)
 		totalIgnored, totalProcessed := 0, 0
 		sklog.Infof("Starting backup polling for %d sources in time range [%s,%s]", len(sourcesToScan), startTime, endTime)
 		for _, src := range sourcesToScan {
