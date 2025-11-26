@@ -34,8 +34,6 @@ go_test(
         "//go/git/provider",
         "//go/git/provider/mocks",
         "//go/testutils",
-        "//go/vcsinfo",
-        "//golden/cmd/gitilesfollower/mocks",
         "//golden/go/config",
         "//golden/go/sql/datakitchensink",
         "//golden/go/sql/schema",

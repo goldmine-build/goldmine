@@ -16,8 +16,6 @@ import (
 	"go.goldmine.build/go/git/provider"
 	provmocks "go.goldmine.build/go/git/provider/mocks"
 	"go.goldmine.build/go/testutils"
-	"go.goldmine.build/go/vcsinfo"
-	"go.goldmine.build/golden/cmd/gitilesfollower/mocks"
 	"go.goldmine.build/golden/go/config"
 	dks "go.goldmine.build/golden/go/sql/datakitchensink"
 	"go.goldmine.build/golden/go/sql/schema"
@@ -258,52 +256,6 @@ func TestUpdateCycle_CLsWithNoExpectationsLand_MarkedAsLanded(t *testing.T) {
 		}},
 	}
 	require.NoError(t, sqltest.BulkInsertDataTables(ctx, db, existingData))
-
-	mgl := mocks.GitilesLogger{}
-	mgl.On("Log", testutils.AnyContext, "main", mock.Anything).Return([]*vcsinfo.LongCommit{
-		{
-			ShortCommit: &vcsinfo.ShortCommit{
-				Hash: "4444444444444444444444444444444444444444",
-				// The rest is ignored from Log
-			},
-		},
-	}, nil)
-
-	mgl.On("LogFirstParent", testutils.AnyContext, "2222222222222222222222222222222222222222", "4444444444444444444444444444444444444444").Return([]*vcsinfo.LongCommit{
-		{ // These are returned with the most recent commits first
-			ShortCommit: &vcsinfo.ShortCommit{
-				Hash:    "4444444444444444444444444444444444444444",
-				Author:  "author 4",
-				Subject: "subject 4",
-			},
-			Body:      "Reviewed-on: https://example.com/c/my-repo/+/000004",
-			Timestamp: time.Date(2021, time.February, 25, 10, 4, 0, 0, time.UTC),
-		},
-		{
-			ShortCommit: &vcsinfo.ShortCommit{
-				Hash:    "3333333333333333333333333333333333333333",
-				Author:  "author 3",
-				Subject: "Revert commit 2",
-			},
-			Body: `Revert commit 2
-
-Original change's description:
-> Do something risky
->
-> Change-Id: I5901f005c2758a92692e5cd70ba46a2b5ad797fd
-> Reviewed-on: https://example.com/c/my-repo/+/000002
-> Commit-Queue: User One <user1@google.com>
-> Reviewed-by: User Two <user2@google.com>
-
-TBR=user1@example.com
-
-Reviewed-on: https://example.com/c/my-repo/+/000003
-Reviewed-by: User One <user1@google.com>
-Commit-Queue: User One <user1@google.com>`,
-			Timestamp: time.Date(2021, time.February, 25, 10, 3, 0, 0, time.UTC),
-		},
-		// LogFirstParent excludes the first one mentioned.
-	}, nil)
 
 	gitp := createGitProviderMock(t, "1111111111111111111111111111111111111111", firstThreeCommitsForGitProviderMock)
 	require.NoError(t, UpdateCycle(ctx, db, gitp, cfg))
