@@ -1,4 +1,4 @@
-package main
+package impl
 
 import (
 	"context"
@@ -123,7 +123,7 @@ var cfg = config.Common{
 func TestUpdateCycle_EmptyDB_UsesInitialCommit(t *testing.T) {
 	ctx, db := setupForTest(t)
 	gitp := createGitProviderMock(t, "1111111111111111111111111111111111111111", firstThreeCommitsForGitProviderMock)
-	require.NoError(t, updateCycle(ctx, db, gitp, cfg))
+	require.NoError(t, UpdateCycle(ctx, db, gitp, cfg))
 
 	assertDBContainsFirstThreeCommits(t, ctx, db)
 	// The initial commit is not stored in the DB nor queried, but is implicitly has id
@@ -153,7 +153,7 @@ func TestUpdateCycle_CommitsInDB_IncrementalUpdate(t *testing.T) {
 		},
 	}
 	gitp := createGitProviderMock(t, "4444444444444444444444444444444444444444", cbValues)
-	require.NoError(t, updateCycle(ctx, db, gitp, cfg))
+	require.NoError(t, UpdateCycle(ctx, db, gitp, cfg))
 
 	actualRows := sqltest.GetAllRows(ctx, t, db, "GitCommits", &schema.GitCommitRow{}).([]schema.GitCommitRow)
 	assert.Equal(t, []schema.GitCommitRow{{
@@ -193,7 +193,7 @@ func TestUpdateCycle_NoNewCommits_NothingChanges(t *testing.T) {
 	ctx, db := setupForTest(t)
 	require.NoError(t, sqltest.BulkInsertDataTables(ctx, db, firstThreeCommitsAsSchema))
 	gitp := createGitProviderMock(t, "4444444444444444444444444444444444444444", nil)
-	require.NoError(t, updateCycle(ctx, db, gitp, cfg))
+	require.NoError(t, UpdateCycle(ctx, db, gitp, cfg))
 	assertDBContainsFirstThreeCommits(t, ctx, db)
 }
 
@@ -208,7 +208,7 @@ func TestUpdateCycle_UpToDate_Success(t *testing.T) {
 	}
 	require.NoError(t, sqltest.BulkInsertDataTables(ctx, db, existingData))
 
-	require.NoError(t, updateCycle(ctx, db, gitp, cfg))
+	require.NoError(t, UpdateCycle(ctx, db, gitp, cfg))
 
 	actualRows := sqltest.GetAllRows(ctx, t, db, "TrackingCommits", &schema.TrackingCommitRow{}).([]schema.TrackingCommitRow)
 	assert.Equal(t, []schema.TrackingCommitRow{{
@@ -225,7 +225,7 @@ func TestUpdateCycle_UnparsableCL_Success(t *testing.T) {
 	commits[1].Body = "This body doesn't match the pattern!"
 
 	gitp := createGitProviderMock(t, "1111111111111111111111111111111111111111", commits)
-	require.NoError(t, updateCycle(ctx, db, gitp, cfg))
+	require.NoError(t, UpdateCycle(ctx, db, gitp, cfg))
 
 	assertDBContainsFirstThreeCommits(t, ctx, db)
 
@@ -306,7 +306,7 @@ Commit-Queue: User One <user1@google.com>`,
 	}, nil)
 
 	gitp := createGitProviderMock(t, "1111111111111111111111111111111111111111", firstThreeCommitsForGitProviderMock)
-	require.NoError(t, updateCycle(ctx, db, gitp, cfg))
+	require.NoError(t, UpdateCycle(ctx, db, gitp, cfg))
 
 	assertDBContainsFirstThreeCommits(t, ctx, db)
 
@@ -354,7 +354,7 @@ func TestCheckForLandedCycle_CLExpectations_MergedIntoPrimaryBranch(t *testing.T
 	cfg2 := deepcopy.Copy(cfg).(config.Common)
 	cfg2.RepoFollowerConfig.SystemName = dks.GerritInternalCRS
 
-	require.NoError(t, updateCycle(ctx, db, gitp, cfg2))
+	require.NoError(t, UpdateCycle(ctx, db, gitp, cfg2))
 
 	actualRows := sqltest.GetAllRows(ctx, t, db, "TrackingCommits", &schema.TrackingCommitRow{}).([]schema.TrackingCommitRow)
 	assert.Equal(t, []schema.TrackingCommitRow{{
@@ -513,7 +513,7 @@ func TestCheckForLandedCycle_ExtractsCLFromSubject_Success(t *testing.T) {
 	cfg2 := deepcopy.Copy(cfg).(config.Common)
 	cfg2.RepoFollowerConfig.SystemName = "github"
 	cfg2.RepoFollowerConfig.ExtractionTechnique = config.FromSubject
-	require.NoError(t, updateCycle(ctx, db, gitp, cfg2))
+	require.NoError(t, UpdateCycle(ctx, db, gitp, cfg2))
 
 	actualRows := sqltest.GetAllRows(ctx, t, db, "TrackingCommits", &schema.TrackingCommitRow{}).([]schema.TrackingCommitRow)
 	assert.Equal(t, []schema.TrackingCommitRow{{
@@ -572,7 +572,7 @@ func TestCheckForLandedCycle_TriageExistingData_Success(t *testing.T) {
 	cfg2 := deepcopy.Copy(cfg).(config.Common)
 	cfg2.RepoFollowerConfig.SystemName = dks.GerritInternalCRS
 
-	require.NoError(t, updateCycle(ctx, db, gitp, cfg2))
+	require.NoError(t, UpdateCycle(ctx, db, gitp, cfg2))
 
 	actualRows := sqltest.GetAllRows(ctx, t, db, "TrackingCommits", &schema.TrackingCommitRow{}).([]schema.TrackingCommitRow)
 	assert.Equal(t, []schema.TrackingCommitRow{{
@@ -745,7 +745,7 @@ func Test_extractReviewedLine(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := extractReviewedLine(tt.clBody)
+			got := ExtractReviewedLine(tt.clBody)
 			if got != tt.want {
 				t.Errorf("extractReviewedLine() = %v, want %v", got, tt.want)
 			}
@@ -778,7 +778,7 @@ func Test_extractFromSubject(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := extractFromSubject(tt.subject)
+			got := ExtractFromSubject(tt.subject)
 			if got != tt.want {
 				t.Errorf("extractFromSubject() = %v, want %v", got, tt.want)
 			}

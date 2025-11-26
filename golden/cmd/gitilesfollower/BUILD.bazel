@@ -8,23 +8,12 @@ go_library(
     visibility = ["//visibility:private"],
     deps = [
         "//go/common",
-        "//go/git/provider",
-        "//go/git/provider/providers",
         "//go/httputils",
-        "//go/metrics2",
-        "//go/skerr",
         "//go/sklog",
-        "//go/sql/sqlutil",
-        "//go/util",
-        "//go/vcsinfo",
+        "//golden/cmd/gitilesfollower/impl",
         "//golden/go/config",
         "//golden/go/sql",
-        "//golden/go/sql/schema",
-        "@com_github_cockroachdb_cockroach_go_v2//crdb/crdbpgx",
-        "@com_github_google_uuid//:uuid",
-        "@com_github_jackc_pgx_v4//:pgx",
         "@com_github_jackc_pgx_v4//pgxpool",
-        "@io_opencensus_go//trace",
     ],
 )
 
@@ -36,26 +25,6 @@ go_binary(
 
 go_test(
     name = "gitilesfollower_test",
-    srcs = [
-        "gitilesfollower_manual_test.go",
-        "gitilesfollower_test.go",
-    ],
+    srcs = ["gitilesfollower_manual_test.go"],
     embed = [":gitilesfollower_lib"],
-    deps = [
-        "//go/git/provider",
-        "//go/git/provider/mocks",
-        "//go/testutils",
-        "//go/vcsinfo",
-        "//golden/cmd/gitilesfollower/mocks",
-        "//golden/go/config",
-        "//golden/go/sql/datakitchensink",
-        "//golden/go/sql/schema",
-        "//golden/go/sql/sqltest",
-        "//golden/go/types",
-        "@com_github_jackc_pgx_v4//pgxpool",
-        "@com_github_mohae_deepcopy//:deepcopy",
-        "@com_github_stretchr_testify//assert",
-        "@com_github_stretchr_testify//mock",
-        "@com_github_stretchr_testify//require",
-    ],
 )

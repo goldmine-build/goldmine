@@ -14,6 +14,7 @@ go_library(
         "//go/skerr",
         "//go/sklog",
         "//go/util",
+        "//golden/cmd/gitilesfollower/impl",
         "//golden/go/config",
         "//golden/go/ingestion",
         "//golden/go/ingestion/sqlingestionstore",

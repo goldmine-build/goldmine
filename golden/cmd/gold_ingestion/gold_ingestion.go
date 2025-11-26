@@ -23,6 +23,7 @@ import (
 	"go.goldmine.build/go/skerr"
 	"go.goldmine.build/go/sklog"
 	"go.goldmine.build/go/util"
+	"go.goldmine.build/golden/cmd/gitilesfollower/impl"
 	"go.goldmine.build/golden/go/config"
 	"go.goldmine.build/golden/go/ingestion"
 	"go.goldmine.build/golden/go/ingestion/sqlingestionstore"
@@ -90,7 +91,12 @@ func main() {
 	if err != nil {
 		sklog.Fatalf("Could not create GCS Client")
 	}
-	primaryBranchProcessor, src, err := getPrimaryBranchIngester(ctx, cfg.IngestionServerConfig.PrimaryBranchConfig, gcsClient, sqlDB)
+	checkForNewCommits, err := impl.StartGitFollower(ctx, cfg, sqlDB)
+	if err != nil {
+		sklog.Fatalf("Could not start gitiles follower: %s", err)
+	}
+
+	primaryBranchProcessor, src, err := getPrimaryBranchIngester(ctx, cfg.IngestionServerConfig.PrimaryBranchConfig, gcsClient, sqlDB, checkForNewCommits)
 	if err != nil {
 		sklog.Fatalf("Setting up primary branch ingestion: %s", err)
 	}
@@ -121,7 +127,7 @@ func main() {
 	sklog.Fatalf("Listening for files to ingest %s", listen(ctx, cfg, pss))
 }
 
-func getPrimaryBranchIngester(ctx context.Context, conf config.IngesterConfig, gcsClient *storage.Client, db *pgxpool.Pool) (ingestion.Processor, ingestion.FileSearcher, error) {
+func getPrimaryBranchIngester(ctx context.Context, conf config.IngesterConfig, gcsClient *storage.Client, db *pgxpool.Pool, checkForNewCommits impl.CheckForNewCommitsFunc) (ingestion.Processor, ingestion.FileSearcher, error) {
 	src := &ingestion.GCSSource{
 		Client: gcsClient,
 		Bucket: conf.Source.Bucket,
@@ -133,7 +139,7 @@ func getPrimaryBranchIngester(ctx context.Context, conf config.IngesterConfig, g
 
 	var primaryBranchProcessor ingestion.Processor
 	if conf.Type == ingestion_processors.SQLPrimaryBranch {
-		sqlProcessor := ingestion_processors.PrimaryBranchSQL(src, conf.ExtraParams, db)
+		sqlProcessor := ingestion_processors.PrimaryBranchSQL(src, conf.ExtraParams, db, checkForNewCommits)
 		sqlProcessor.MonitorCacheMetrics(ctx)
 		primaryBranchProcessor = sqlProcessor
 		sklog.Infof("Configured SQL primary branch ingestion")
@@ -189,6 +195,7 @@ func listen(ctx context.Context, cfg config.Common, p *pubSubSource) error {
 type pubSubSource struct {
 	IngestionStore         ingestion.Store
 	PrimaryBranchProcessor ingestion.Processor
+
 	// PrimaryBranchStreamingLiveness lets us have a metric to monitor the successful
 	// streaming of data. It will be reset after each successful ingestion of a file from
 	// the primary branch.

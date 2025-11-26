@@ -21,6 +21,7 @@ import (
 	"go.goldmine.build/go/sklog"
 	"go.goldmine.build/go/sql/sqlutil"
 	"go.goldmine.build/go/util"
+	"go.goldmine.build/golden/cmd/gitilesfollower/impl"
 	"go.goldmine.build/golden/go/ingestion"
 	"go.goldmine.build/golden/go/jsonio"
 	"go.goldmine.build/golden/go/sql"
@@ -57,11 +58,13 @@ type sqlPrimaryIngester struct {
 	filesProcessed  metrics2.Counter
 	filesSuccess    metrics2.Counter
 	resultsIngested metrics2.Counter
+
+	checkForNewCommits impl.CheckForNewCommitsFunc
 }
 
 // PrimaryBranchSQL creates a Processor that writes to the SQL backend and returns it.
 // It panics if configuration is invalid.
-func PrimaryBranchSQL(src ingestion.Source, configParams map[string]string, db *pgxpool.Pool) *sqlPrimaryIngester {
+func PrimaryBranchSQL(src ingestion.Source, configParams map[string]string, db *pgxpool.Pool, checkForNewCommits impl.CheckForNewCommitsFunc) *sqlPrimaryIngester {
 	tw := configParams[sqlTileWidthConfig]
 	tileWidth := 10
 	if tw != "" {
@@ -101,6 +104,8 @@ func PrimaryBranchSQL(src ingestion.Source, configParams map[string]string, db *
 		optionGroupingCache: ogCache,
 		paramsCache:         paramsCache,
 		traceCache:          tCache,
+
+		checkForNewCommits: checkForNewCommits,
 
 		filesProcessed:  metrics2.GetCounter("gold_primarysqlingestion_files_processed"),
 		filesSuccess:    metrics2.GetCounter("gold_primarysqlingestion_files_success"),
@@ -189,7 +194,15 @@ func (s *sqlPrimaryIngester) getCommitAndTileID(ctx context.Context, gr *jsonio.
 		// Cache miss - go to DB; We can't assume it's in the CommitsWithData table yet.
 		row := s.db.QueryRow(ctx, `SELECT commit_id FROM GitCommits WHERE git_hash = $1`, gr.GitHash)
 		if err := row.Scan(&commitID); err != nil {
-			return "", 0, skerr.Wrapf(err, "looking up git_hash = %q", gr.GitHash)
+			// We failed to find the git hash, so trigger an update to get the latest commits and try again.
+			err := s.checkForNewCommits(ctx)
+			if err != nil {
+				return "", 0, skerr.Wrapf(err, "updating commits for git_hash = %q", gr.GitHash)
+			}
+			row = s.db.QueryRow(ctx, `SELECT commit_id FROM GitCommits WHERE git_hash = $1`, gr.GitHash)
+			if err := row.Scan(&commitID); err != nil {
+				return "", 0, skerr.Wrapf(err, "looking up git_hash = %q", gr.GitHash)
+			}
 		}
 	} else if gr.CommitID != "" && gr.CommitMetadata != "" {
 		key = gr.CommitID
