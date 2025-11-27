@@ -43,6 +43,9 @@ type IngestionServerConfig struct {
 	// PrimaryBranchConfig describes how the primary branch ingestion should be configured.
 	PrimaryBranchConfig IngesterConfig `json:"primary_branch_config"`
 
+	// SecondaryBranchConfig is the optional config for ingestion on secondary branches (e.g. Tryjobs).
+	SecondaryBranchConfig *IngesterConfig `json:"secondary_branch_config" optional:"true"`
+
 	// PubSubFetchSize is how many worker messages to ask PubSub for. This defaults to 10, but for
 	// instances that have many small files ingested, this can be higher for better utilization
 	// and throughput.
