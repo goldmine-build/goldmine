@@ -23,9 +23,9 @@ jobs:
       working-directory: ./main
       run: pwd 
 
-    - name: ls -al
+    - name: log
       working-directory: ./main
-      run: ls -al 
+      run: "git log --oneline | head"
 
     - name: Grab and echo the HEAD commit hash for debugging.
       working-directory: ./main
