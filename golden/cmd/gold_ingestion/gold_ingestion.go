@@ -102,15 +102,30 @@ func main() {
 	}
 	sourcesToScan := []ingestion.FileSearcher{src}
 
+	var secondaryBranchLiveness metrics2.Liveness
+	tryjobProcessor, src, err := getSecondaryBranchIngester(ctx, isc.SecondaryBranchConfig, gcsClient, client, sqlDB)
+	if err != nil {
+		sklog.Fatalf("Setting up secondary branch ingestion: %s", err)
+	}
+	if src != nil {
+		sourcesToScan = append(sourcesToScan, src)
+		secondaryBranchLiveness = metrics2.NewLiveness("gold_ingestion", map[string]string{
+			"metric": "since_last_successful_streaming_result",
+			"source": "secondary_branch",
+		})
+	}
+
 	pss := &pubSubSource{
 		IngestionStore:         ingestionStore,
 		PrimaryBranchProcessor: primaryBranchProcessor,
+		TryjobProcessor:        tryjobProcessor,
 		PrimaryBranchStreamingLiveness: metrics2.NewLiveness("gold_ingestion", map[string]string{
 			"metric": "since_last_successful_streaming_result",
 			"source": "primary_branch",
 		}),
-		SuccessCounter: metrics2.GetCounter("gold_ingestion_success"),
-		FailedCounter:  metrics2.GetCounter("gold_ingestion_failure"),
+		SecondaryBranchStreamingLiveness: secondaryBranchLiveness,
+		SuccessCounter:                   metrics2.GetCounter("gold_ingestion_success"),
+		FailedCounter:                    metrics2.GetCounter("gold_ingestion_failure"),
 	}
 
 	go func() {
@@ -195,11 +210,17 @@ func listen(ctx context.Context, cfg config.Common, p *pubSubSource) error {
 type pubSubSource struct {
 	IngestionStore         ingestion.Store
 	PrimaryBranchProcessor ingestion.Processor
+	TryjobProcessor        ingestion.Processor
 
 	// PrimaryBranchStreamingLiveness lets us have a metric to monitor the successful
 	// streaming of data. It will be reset after each successful ingestion of a file from
 	// the primary branch.
 	PrimaryBranchStreamingLiveness metrics2.Liveness
+
+	// SecondaryBranchStreamingLiveness lets us have a metric to monitor the successful
+	// streaming of data. It will be reset after each successful ingestion of a file from
+	// the secondary branch.
+	SecondaryBranchStreamingLiveness metrics2.Liveness
 
 	SuccessCounter metrics2.Counter
 	FailedCounter  metrics2.Counter
