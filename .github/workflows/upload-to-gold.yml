@@ -32,9 +32,9 @@ jobs:
       working-directory: ./main
       run: git rev-parse HEAD
 
-    - name: Grab and echo the HEAD^ commit hash for debugging.
+    - name: Grab and echo the $GITHUB_SHA^ commit hash for debugging.
       working-directory: ./main
-      run: "git rev-parse HEAD^"
+      run: "git rev-parse $GITHUB_SHA^"
 
     - name: Run all the UI tests and upload the results to Gold.
       env:
