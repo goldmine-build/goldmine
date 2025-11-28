@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "main" ]
   pull_request:
-    branches: [ ]
+    types: [opened, reopened]
 
 jobs:
   build:
@@ -15,6 +15,9 @@ jobs:
       uses: actions/checkout@v5
       with:
         path: main
+
+    - name: Dump all the environment variables for debugging.
+      run: printenv | sort
 
     - name: Run all the UI tests and upload the results to Gold.
       env:
