@@ -19,6 +19,10 @@ jobs:
     - name: Dump all the environment variables for debugging.
       run: printenv | sort
 
+    - name: Grab and echo the HEAD^ commit hash for debugging.
+      working-directory: ./main
+      run: git rev-parse HEAD^
+
     - name: Run all the UI tests and upload the results to Gold.
       env:
         GCP_GCS_SERVICE_ACCT : ${{secrets.GOLDMINE_PRIVATE_GOLD_SERVICE_ACCOUNT_KEY}}
