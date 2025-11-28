@@ -32,9 +32,9 @@ jobs:
       working-directory: ./main
       run: git rev-parse HEAD
 
-    - name: Grab and echo the $GITHUB_SHA^ commit hash for debugging.
+    - name: Show all the parent hashes for the merge commit.
       working-directory: ./main
-      run: "git rev-parse $GITHUB_SHA^"
+      run: "git log --pretty=%P -n 1 $GITHUB_SHA"
 
     - name: Run all the UI tests and upload the results to Gold.
       env:
