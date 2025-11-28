@@ -3,6 +3,7 @@ package ingestion_processors
 // Rando update to PR.
 // Second rando update to PR.
 // Third time is the charm.
+// Now looking for git rev-parse HEAD^
 
 import (
 	"context"
