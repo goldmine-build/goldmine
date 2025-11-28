@@ -19,9 +19,17 @@ jobs:
     - name: Dump all the environment variables for debugging.
       run: printenv | sort
 
+    - name: PWD
+      working-directory: ./main
+      run: pwd 
+
+    - name: ls -al
+      working-directory: ./main
+      run: ls -al 
+
     - name: Grab and echo the HEAD^ commit hash for debugging.
       working-directory: ./main
-      run: git rev-parse ${GITHUB_SHA}^
+      run: git rev-parse HEAD
 
     - name: Run all the UI tests and upload the results to Gold.
       env:
