@@ -6,6 +6,7 @@ package ingestion_processors
 // Now looking for git rev-parse HEAD^
 // Sixth?
 // Seventh time's the charm.
+// Eight
 
 import (
 	"context"
