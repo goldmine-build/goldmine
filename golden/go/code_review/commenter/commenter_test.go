@@ -32,27 +32,25 @@ func TestCommentOnCLs_MultiplePatchsetsNeedComments_CommentsMade(t *testing.T) {
 	db := sqltest.NewCockroachDBForTestsWithProductionSchema(ctx, t)
 	require.NoError(t, sqltest.BulkInsertDataTables(ctx, db, dks.Build()))
 
-	gerritClient := &mock_codereview.Client{}
-	gerritInternalClient := &mock_codereview.Client{}
+	githubClient := mock_codereview.NewClient(t)
 
-	gerritClient.On("GetChangelist", testutils.AnyContext, dks.ChangelistIDThatAttemptsToFixIOS).Return(
+	githubClient.On("GetChangelist", testutils.AnyContext, dks.ChangelistIDThatAttemptsToFixIOS).Return(
 		code_review.Changelist{Status: code_review.Open}, nil)
-	gerritClient.On("CommentOn", testutils.AnyContext, dks.ChangelistIDThatAttemptsToFixIOS,
-		"Gold has detected about 2 new digest(s) on patchset 3.\nPlease triage them at gold.skia.org/cl/gerrit/CL_fix_ios.").Return(nil)
+	githubClient.On("CommentOn", testutils.AnyContext, dks.ChangelistIDThatAttemptsToFixIOS,
+		"Gold has detected about 2 new digest(s) on patchset 3.\nPlease triage them at gold.skia.org/cl/github/CL_fix_ios.").Return(nil)
 
-	gerritClient.On("GetChangelist", testutils.AnyContext, dks.ChangelistIDWithDisallowTriagingTest).Return(
+	githubClient.On("GetChangelist", testutils.AnyContext, dks.ChangelistIDThatAddsNewTests).Return(
 		code_review.Changelist{Status: code_review.Open}, nil)
-	gerritClient.On("CommentOn", testutils.AnyContext, dks.ChangelistIDWithDisallowTriagingTest,
-		"Gold has detected about 1 new digest(s) on patchset 1.\nPlease triage them at gold.skia.org/cl/gerrit/CLdisallowtriaging.").Return(nil)
+	githubClient.On("CommentOn", testutils.AnyContext, dks.ChangelistIDThatAddsNewTests,
+		"Gold has detected about 4 new digest(s) on patchset 4.\nPlease triage them at gold.skia.org/cl/github/CL_new_tests.").Return(nil)
 
-	gerritInternalClient.On("GetChangelist", testutils.AnyContext, dks.ChangelistIDThatAddsNewTests).Return(
+	githubClient.On("GetChangelist", testutils.AnyContext, dks.ChangelistIDWithDisallowTriagingTest).Return(
 		code_review.Changelist{Status: code_review.Open}, nil)
-	gerritInternalClient.On("CommentOn", testutils.AnyContext, dks.ChangelistIDThatAddsNewTests,
-		"Gold has detected about 4 new digest(s) on patchset 4.\nPlease triage them at gold.skia.org/cl/gerrit-internal/CL_new_tests.").Return(nil)
+	githubClient.On("CommentOn", testutils.AnyContext, dks.ChangelistIDWithDisallowTriagingTest,
+		"Gold has detected about 1 new digest(s) on patchset 1.\nPlease triage them at gold.skia.org/cl/github/CLdisallowtriaging.").Return(nil)
 
 	c, err := New(db, []ReviewSystem{
-		{ID: dks.GitHubCRS, Client: gerritClient},
-		{ID: dks.GerritInternalCRS, Client: gerritInternalClient},
+		{ID: dks.GitHubCRS, Client: githubClient},
 	}, basicTemplate, instanceURL, 100)
 	require.NoError(t, err)
 
@@ -62,105 +60,109 @@ func TestCommentOnCLs_MultiplePatchsetsNeedComments_CommentsMade(t *testing.T) {
 	err = c.CommentOnChangelistsWithUntriagedDigests(ctx)
 	require.NoError(t, err)
 
-	gerritClient.AssertExpectations(t)
-	gerritInternalClient.AssertExpectations(t)
-
 	actualPatchsets := sqltest.GetAllRows(ctx, t, db, "Patchsets", &schema.PatchsetRow{}).([]schema.PatchsetRow)
 	assert.Equal(t, []schema.PatchsetRow{{
-		PatchsetID:    "gerrit-internal_PS_adds_new_corpus",
-		System:        dks.GerritInternalCRS,
-		ChangelistID:  "gerrit-internal_CL_new_tests",
+		PatchsetID:    "github_PS_adds_new_corpus",
+		System:        dks.GitHubCRS,
+		ChangelistID:  "github_CL_new_tests",
 		Order:         1,
 		GitHash:       "eeee222222222222222222222222222222222222",
 		CommentedOnCL: false,
 	}, {
-		PatchsetID:    "gerrit-internal_PS_adds_new_corpus_and_test",
-		System:        dks.GerritInternalCRS,
-		ChangelistID:  "gerrit-internal_CL_new_tests",
+		PatchsetID:    "github_PS_adds_new_corpus_and_test",
+		System:        dks.GitHubCRS,
+		ChangelistID:  "github_CL_new_tests",
 		Order:         4,
 		GitHash:       "eeee333333333333333333333333333333333333",
 		CommentedOnCL: true,
 	}, {
-		PatchsetID:    "gerrit_PS_fixes_ipad_but_not_iphone",
+		PatchsetID:    "github_PS_fixes_ipad_but_not_iphone",
 		System:        dks.GitHubCRS,
-		ChangelistID:  "gerrit_CL_fix_ios",
+		ChangelistID:  "github_CL_fix_ios",
 		Order:         3,
 		GitHash:       "ffff111111111111111111111111111111111111",
 		CommentedOnCL: true,
 	}, {
-		PatchsetID:    "gerrit_PSdisallowtriaging",
-		System:        "gerrit",
-		ChangelistID:  "gerrit_CLdisallowtriaging",
+		PatchsetID:    "github_PSdisallowtriaging",
+		System:        "github",
+		ChangelistID:  "github_CLdisallowtriaging",
 		Order:         1,
 		GitHash:       "ddddddddddddddddddddddddddddddddddd77777",
 		CommentedOnCL: true,
 	}, {
-		PatchsetID:    "gerrit_PShaslanded",
+		PatchsetID:    "github_PShaslanded",
 		System:        dks.GitHubCRS,
-		ChangelistID:  "gerrit_CLhaslanded",
+		ChangelistID:  "github_CLhaslanded",
 		Order:         1,
 		GitHash:       "aaaaa11111111111111111111111111111111111",
 		CommentedOnCL: false,
 	}, {
-		PatchsetID:    "gerrit_PSisabandoned",
-		System:        "gerrit",
-		ChangelistID:  "gerrit_CLisabandoned",
+		PatchsetID:    "github_PSisabandoned",
+		System:        "github",
+		ChangelistID:  "github_CLisabandoned",
 		Order:         1,
 		GitHash:       "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb55555",
 		CommentedOnCL: false,
 	}, {
-		PatchsetID:    "gerrit_PSmultipledatapoints",
-		System:        "gerrit",
-		ChangelistID:  "gerrit_CLmultipledatapoints",
+		PatchsetID:    "github_PSmultipledatapoints",
+		System:        "github",
+		ChangelistID:  "github_CLmultipledatapoints",
 		Order:         1,
 		GitHash:       "ccccccccccccccccccccccccccccccccccc66666",
 		CommentedOnCL: false,
 	}}, actualPatchsets)
 
 	actualChangelists := sqltest.GetAllRows(ctx, t, db, "Changelists", &schema.ChangelistRow{}).([]schema.ChangelistRow)
-	assert.Equal(t, []schema.ChangelistRow{{
-		ChangelistID:     "gerrit-internal_CL_new_tests",
-		System:           dks.GerritInternalCRS,
-		Status:           schema.StatusOpen, // This shouldn't be modified
-		OwnerEmail:       dks.UserTwo,
-		Subject:          "Increase test coverage",
-		LastIngestedData: time.Date(2020, time.December, 12, 9, 20, 33, 0, time.UTC),
-	}, {
-		ChangelistID:     "gerrit_CL_fix_ios",
-		System:           dks.GitHubCRS,
-		Status:           schema.StatusOpen, // This shouldn't be modified
-		OwnerEmail:       dks.UserOne,
-		Subject:          "Fix iOS",
-		LastIngestedData: time.Date(2020, time.December, 10, 4, 5, 6, 0, time.UTC),
-	}, {
-		ChangelistID:     "gerrit_CLdisallowtriaging",
-		System:           dks.GitHubCRS,
-		Status:           schema.StatusOpen,
-		OwnerEmail:       dks.UserOne,
-		Subject:          "add test with disallow triaging",
-		LastIngestedData: time.Date(2020, time.December, 12, 16, 0, 0, 0, time.UTC),
-	}, {
-		ChangelistID:     "gerrit_CLhaslanded",
-		System:           dks.GitHubCRS,
-		Status:           schema.StatusLanded,
-		OwnerEmail:       dks.UserTwo,
-		Subject:          "was landed",
-		LastIngestedData: time.Date(2020, time.May, 5, 5, 5, 0, 0, time.UTC),
-	}, {
-		ChangelistID:     "gerrit_CLisabandoned",
-		System:           dks.GitHubCRS,
-		Status:           schema.StatusAbandoned,
-		OwnerEmail:       dks.UserOne,
-		Subject:          "was abandoned",
-		LastIngestedData: time.Date(2020, time.June, 6, 6, 6, 0, 0, time.UTC),
-	}, {
-		ChangelistID:     "gerrit_CLmultipledatapoints",
-		System:           dks.GitHubCRS,
-		Status:           schema.StatusOpen,
-		OwnerEmail:       dks.UserOne,
-		Subject:          "multiple datapoints",
-		LastIngestedData: time.Date(2020, time.December, 12, 14, 0, 0, 0, time.UTC),
-	}}, actualChangelists)
+	assert.Equal(t, []schema.ChangelistRow{
+		{
+			ChangelistID:     "github_CL_fix_ios",
+			System:           dks.GitHubCRS,
+			Status:           schema.StatusOpen, // This shouldn't be modified
+			OwnerEmail:       dks.UserOne,
+			Subject:          "Fix iOS",
+			LastIngestedData: time.Date(2020, time.December, 10, 4, 5, 6, 0, time.UTC),
+		},
+		{
+			ChangelistID:     "github_CL_new_tests",
+			System:           dks.GitHubCRS,
+			Status:           schema.StatusOpen, // This shouldn't be modified
+			OwnerEmail:       dks.UserTwo,
+			Subject:          "Increase test coverage",
+			LastIngestedData: time.Date(2020, time.December, 12, 9, 20, 33, 0, time.UTC),
+		},
+		{
+			ChangelistID:     "github_CLdisallowtriaging",
+			System:           dks.GitHubCRS,
+			Status:           schema.StatusOpen,
+			OwnerEmail:       dks.UserOne,
+			Subject:          "add test with disallow triaging",
+			LastIngestedData: time.Date(2020, time.December, 12, 16, 0, 0, 0, time.UTC),
+		},
+		{
+			ChangelistID:     "github_CLhaslanded",
+			System:           dks.GitHubCRS,
+			Status:           schema.StatusLanded,
+			OwnerEmail:       dks.UserTwo,
+			Subject:          "was landed",
+			LastIngestedData: time.Date(2020, time.May, 5, 5, 5, 0, 0, time.UTC),
+		},
+		{
+			ChangelistID:     "github_CLisabandoned",
+			System:           dks.GitHubCRS,
+			Status:           schema.StatusAbandoned,
+			OwnerEmail:       dks.UserOne,
+			Subject:          "was abandoned",
+			LastIngestedData: time.Date(2020, time.June, 6, 6, 6, 0, 0, time.UTC),
+		},
+		{
+			ChangelistID:     "github_CLmultipledatapoints",
+			System:           dks.GitHubCRS,
+			Status:           schema.StatusOpen,
+			OwnerEmail:       dks.UserOne,
+			Subject:          "multiple datapoints",
+			LastIngestedData: time.Date(2020, time.December, 12, 14, 0, 0, 0, time.UTC),
+		},
+	}, actualChangelists)
 
 	assert.Equal(t, c.lastCheck, afterCLs)
 }
@@ -178,7 +180,7 @@ func TestCommentOnCLs_NoPatchsetsNeedComments_Success(t *testing.T) {
 
 	c, err := New(db, []ReviewSystem{
 		{ID: dks.GitHubCRS, Client: nil}, // This test doesn't talk to the clients
-		{ID: dks.GerritInternalCRS, Client: nil},
+		{ID: dks.GitHubCRS, Client: nil},
 	}, basicTemplate, instanceURL, 100)
 	require.NoError(t, err)
 
@@ -190,51 +192,51 @@ func TestCommentOnCLs_NoPatchsetsNeedComments_Success(t *testing.T) {
 
 	actualPatchsets := sqltest.GetAllRows(ctx, t, db, "Patchsets", &schema.PatchsetRow{}).([]schema.PatchsetRow)
 	assert.Equal(t, []schema.PatchsetRow{{
-		PatchsetID:    "gerrit-internal_PS_adds_new_corpus",
-		System:        dks.GerritInternalCRS,
-		ChangelistID:  "gerrit-internal_CL_new_tests",
+		PatchsetID:    "github_PS_adds_new_corpus",
+		System:        dks.GitHubCRS,
+		ChangelistID:  "github_CL_new_tests",
 		Order:         1,
 		GitHash:       "eeee222222222222222222222222222222222222",
 		CommentedOnCL: true,
 	}, {
-		PatchsetID:    "gerrit-internal_PS_adds_new_corpus_and_test",
-		System:        dks.GerritInternalCRS,
-		ChangelistID:  "gerrit-internal_CL_new_tests",
+		PatchsetID:    "github_PS_adds_new_corpus_and_test",
+		System:        dks.GitHubCRS,
+		ChangelistID:  "github_CL_new_tests",
 		Order:         4,
 		GitHash:       "eeee333333333333333333333333333333333333",
 		CommentedOnCL: true,
 	}, {
-		PatchsetID:    "gerrit_PS_fixes_ipad_but_not_iphone",
+		PatchsetID:    "github_PS_fixes_ipad_but_not_iphone",
 		System:        dks.GitHubCRS,
-		ChangelistID:  "gerrit_CL_fix_ios",
+		ChangelistID:  "github_CL_fix_ios",
 		Order:         3,
 		GitHash:       "ffff111111111111111111111111111111111111",
 		CommentedOnCL: true,
 	}, {
-		PatchsetID:    "gerrit_PSdisallowtriaging",
-		System:        "gerrit",
-		ChangelistID:  "gerrit_CLdisallowtriaging",
+		PatchsetID:    "github_PSdisallowtriaging",
+		System:        "github",
+		ChangelistID:  "github_CLdisallowtriaging",
 		Order:         1,
 		GitHash:       "ddddddddddddddddddddddddddddddddddd77777",
 		CommentedOnCL: true,
 	}, {
-		PatchsetID:    "gerrit_PShaslanded",
+		PatchsetID:    "github_PShaslanded",
 		System:        dks.GitHubCRS,
-		ChangelistID:  "gerrit_CLhaslanded",
+		ChangelistID:  "github_CLhaslanded",
 		Order:         1,
 		GitHash:       "aaaaa11111111111111111111111111111111111",
 		CommentedOnCL: true,
 	}, {
-		PatchsetID:    "gerrit_PSisabandoned",
-		System:        "gerrit",
-		ChangelistID:  "gerrit_CLisabandoned",
+		PatchsetID:    "github_PSisabandoned",
+		System:        "github",
+		ChangelistID:  "github_CLisabandoned",
 		Order:         1,
 		GitHash:       "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb55555",
 		CommentedOnCL: true,
 	}, {
-		PatchsetID:    "gerrit_PSmultipledatapoints",
-		System:        "gerrit",
-		ChangelistID:  "gerrit_CLmultipledatapoints",
+		PatchsetID:    "github_PSmultipledatapoints",
+		System:        "github",
+		ChangelistID:  "github_CLmultipledatapoints",
 		Order:         1,
 		GitHash:       "ccccccccccccccccccccccccccccccccccc66666",
 		CommentedOnCL: true,
@@ -248,7 +250,7 @@ func TestCommentOnCLs_OnePatchsetNeedsComment_Success(t *testing.T) {
 	existingData := dks.Build()
 	// Pretend we commented on an earlier patchset for this CL
 	for i, ps := range existingData.Patchsets {
-		if ps.PatchsetID != "gerrit-internal_PS_adds_new_corpus_and_test" {
+		if ps.PatchsetID != "github_PS_adds_new_corpus_and_test" {
 			existingData.Patchsets[i].CommentedOnCL = true
 		}
 	}
@@ -259,11 +261,11 @@ func TestCommentOnCLs_OnePatchsetNeedsComment_Success(t *testing.T) {
 	gerritInternalClient.On("GetChangelist", testutils.AnyContext, dks.ChangelistIDThatAddsNewTests).Return(
 		code_review.Changelist{Status: code_review.Open}, nil)
 	gerritInternalClient.On("CommentOn", testutils.AnyContext, dks.ChangelistIDThatAddsNewTests,
-		"Gold has detected about 4 new digest(s) on patchset 4.\nPlease triage them at gold.skia.org/cl/gerrit-internal/CL_new_tests.").Return(nil)
+		"Gold has detected about 4 new digest(s) on patchset 4.\nPlease triage them at gold.skia.org/cl/github/CL_new_tests.").Return(nil)
 
 	c, err := New(db, []ReviewSystem{
 		{ID: dks.GitHubCRS, Client: nil},
-		{ID: dks.GerritInternalCRS, Client: gerritInternalClient},
+		{ID: dks.GitHubCRS, Client: gerritInternalClient},
 	}, basicTemplate, instanceURL, 100)
 	require.NoError(t, err)
 
@@ -277,51 +279,51 @@ func TestCommentOnCLs_OnePatchsetNeedsComment_Success(t *testing.T) {
 
 	actualPatchsets := sqltest.GetAllRows(ctx, t, db, "Patchsets", &schema.PatchsetRow{}).([]schema.PatchsetRow)
 	assert.Equal(t, []schema.PatchsetRow{{
-		PatchsetID:    "gerrit-internal_PS_adds_new_corpus",
-		System:        dks.GerritInternalCRS,
-		ChangelistID:  "gerrit-internal_CL_new_tests",
+		PatchsetID:    "github_PS_adds_new_corpus",
+		System:        dks.GitHubCRS,
+		ChangelistID:  "github_CL_new_tests",
 		Order:         1,
 		GitHash:       "eeee222222222222222222222222222222222222",
 		CommentedOnCL: true,
 	}, {
-		PatchsetID:    "gerrit-internal_PS_adds_new_corpus_and_test",
-		System:        dks.GerritInternalCRS,
-		ChangelistID:  "gerrit-internal_CL_new_tests",
+		PatchsetID:    "github_PS_adds_new_corpus_and_test",
+		System:        dks.GitHubCRS,
+		ChangelistID:  "github_CL_new_tests",
 		Order:         4,
 		GitHash:       "eeee333333333333333333333333333333333333",
 		CommentedOnCL: true,
 	}, {
-		PatchsetID:    "gerrit_PS_fixes_ipad_but_not_iphone",
+		PatchsetID:    "github_PS_fixes_ipad_but_not_iphone",
 		System:        dks.GitHubCRS,
-		ChangelistID:  "gerrit_CL_fix_ios",
+		ChangelistID:  "github_CL_fix_ios",
 		Order:         3,
 		GitHash:       "ffff111111111111111111111111111111111111",
 		CommentedOnCL: true,
 	}, {
-		PatchsetID:    "gerrit_PSdisallowtriaging",
-		System:        "gerrit",
-		ChangelistID:  "gerrit_CLdisallowtriaging",
+		PatchsetID:    "github_PSdisallowtriaging",
+		System:        "github",
+		ChangelistID:  "github_CLdisallowtriaging",
 		Order:         1,
 		GitHash:       "ddddddddddddddddddddddddddddddddddd77777",
 		CommentedOnCL: true,
 	}, {
-		PatchsetID:    "gerrit_PShaslanded",
+		PatchsetID:    "github_PShaslanded",
 		System:        dks.GitHubCRS,
-		ChangelistID:  "gerrit_CLhaslanded",
+		ChangelistID:  "github_CLhaslanded",
 		Order:         1,
 		GitHash:       "aaaaa11111111111111111111111111111111111",
 		CommentedOnCL: true,
 	}, {
-		PatchsetID:    "gerrit_PSisabandoned",
-		System:        "gerrit",
-		ChangelistID:  "gerrit_CLisabandoned",
+		PatchsetID:    "github_PSisabandoned",
+		System:        "github",
+		ChangelistID:  "github_CLisabandoned",
 		Order:         1,
 		GitHash:       "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb55555",
 		CommentedOnCL: true,
 	}, {
-		PatchsetID:    "gerrit_PSmultipledatapoints",
-		System:        "gerrit",
-		ChangelistID:  "gerrit_CLmultipledatapoints",
+		PatchsetID:    "github_PSmultipledatapoints",
+		System:        "github",
+		ChangelistID:  "github_CLmultipledatapoints",
 		Order:         1,
 		GitHash:       "ccccccccccccccccccccccccccccccccccc66666",
 		CommentedOnCL: true,
@@ -336,7 +338,7 @@ func TestCommentOnCLs_NoCLsInWindow_NothingUpdated(t *testing.T) {
 
 	c, err := New(db, []ReviewSystem{
 		{ID: dks.GitHubCRS, Client: nil}, // This test doesn't talk to the clients
-		{ID: dks.GerritInternalCRS, Client: nil},
+		{ID: dks.GitHubCRS, Client: nil},
 	}, basicTemplate, instanceURL, 100)
 	require.NoError(t, err)
 
@@ -348,51 +350,51 @@ func TestCommentOnCLs_NoCLsInWindow_NothingUpdated(t *testing.T) {
 	// Make sure no patchset was modified.
 	actualPatchsets := sqltest.GetAllRows(ctx, t, db, "Patchsets", &schema.PatchsetRow{}).([]schema.PatchsetRow)
 	assert.Equal(t, []schema.PatchsetRow{{
-		PatchsetID:    "gerrit-internal_PS_adds_new_corpus",
-		System:        dks.GerritInternalCRS,
-		ChangelistID:  "gerrit-internal_CL_new_tests",
+		PatchsetID:    "github_PS_adds_new_corpus",
+		System:        dks.GitHubCRS,
+		ChangelistID:  "github_CL_new_tests",
 		Order:         1,
 		GitHash:       "eeee222222222222222222222222222222222222",
 		CommentedOnCL: false,
 	}, {
-		PatchsetID:    "gerrit-internal_PS_adds_new_corpus_and_test",
-		System:        dks.GerritInternalCRS,
-		ChangelistID:  "gerrit-internal_CL_new_tests",
+		PatchsetID:    "github_PS_adds_new_corpus_and_test",
+		System:        dks.GitHubCRS,
+		ChangelistID:  "github_CL_new_tests",
 		Order:         4,
 		GitHash:       "eeee333333333333333333333333333333333333",
 		CommentedOnCL: false,
 	}, {
-		PatchsetID:    "gerrit_PS_fixes_ipad_but_not_iphone",
+		PatchsetID:    "github_PS_fixes_ipad_but_not_iphone",
 		System:        dks.GitHubCRS,
-		ChangelistID:  "gerrit_CL_fix_ios",
+		ChangelistID:  "github_CL_fix_ios",
 		Order:         3,
 		GitHash:       "ffff111111111111111111111111111111111111",
 		CommentedOnCL: false,
 	}, {
-		PatchsetID:    "gerrit_PSdisallowtriaging",
-		System:        "gerrit",
-		ChangelistID:  "gerrit_CLdisallowtriaging",
+		PatchsetID:    "github_PSdisallowtriaging",
+		System:        "github",
+		ChangelistID:  "github_CLdisallowtriaging",
 		Order:         1,
 		GitHash:       "ddddddddddddddddddddddddddddddddddd77777",
 		CommentedOnCL: false,
 	}, {
-		PatchsetID:    "gerrit_PShaslanded",
+		PatchsetID:    "github_PShaslanded",
 		System:        dks.GitHubCRS,
-		ChangelistID:  "gerrit_CLhaslanded",
+		ChangelistID:  "github_CLhaslanded",
 		Order:         1,
 		GitHash:       "aaaaa11111111111111111111111111111111111",
 		CommentedOnCL: false,
 	}, {
-		PatchsetID:    "gerrit_PSisabandoned",
-		System:        "gerrit",
-		ChangelistID:  "gerrit_CLisabandoned",
+		PatchsetID:    "github_PSisabandoned",
+		System:        "github",
+		ChangelistID:  "github_CLisabandoned",
 		Order:         1,
 		GitHash:       "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb55555",
 		CommentedOnCL: false,
 	}, {
-		PatchsetID:    "gerrit_PSmultipledatapoints",
-		System:        "gerrit",
-		ChangelistID:  "gerrit_CLmultipledatapoints",
+		PatchsetID:    "github_PSmultipledatapoints",
+		System:        "github",
+		ChangelistID:  "github_CLmultipledatapoints",
 		Order:         1,
 		GitHash:       "ccccccccccccccccccccccccccccccccccc66666",
 		CommentedOnCL: false,
@@ -411,7 +413,7 @@ func TestCommentOnCLs_CLWasAbandoned_DBNotUpdated(t *testing.T) {
 		code_review.Changelist{Status: code_review.Abandoned}, nil)
 
 	c, err := New(db, []ReviewSystem{
-		{ID: dks.GerritInternalCRS, Client: gerritInternalClient},
+		{ID: dks.GitHubCRS, Client: gerritInternalClient},
 	}, basicTemplate, instanceURL, 100)
 	require.NoError(t, err)
 
@@ -425,51 +427,51 @@ func TestCommentOnCLs_CLWasAbandoned_DBNotUpdated(t *testing.T) {
 
 	actualPatchsets := sqltest.GetAllRows(ctx, t, db, "Patchsets", &schema.PatchsetRow{}).([]schema.PatchsetRow)
 	assert.Equal(t, []schema.PatchsetRow{{
-		PatchsetID:    "gerrit-internal_PS_adds_new_corpus",
-		System:        dks.GerritInternalCRS,
-		ChangelistID:  "gerrit-internal_CL_new_tests",
+		PatchsetID:    "github_PS_adds_new_corpus",
+		System:        dks.GitHubCRS,
+		ChangelistID:  "github_CL_new_tests",
 		Order:         1,
 		GitHash:       "eeee222222222222222222222222222222222222",
 		CommentedOnCL: false,
 	}, {
-		PatchsetID:    "gerrit-internal_PS_adds_new_corpus_and_test",
-		System:        dks.GerritInternalCRS,
-		ChangelistID:  "gerrit-internal_CL_new_tests",
+		PatchsetID:    "github_PS_adds_new_corpus_and_test",
+		System:        dks.GitHubCRS,
+		ChangelistID:  "github_CL_new_tests",
 		Order:         4,
 		GitHash:       "eeee333333333333333333333333333333333333",
 		CommentedOnCL: false, // should not be updated
 	}, {
-		PatchsetID:    "gerrit_PS_fixes_ipad_but_not_iphone",
+		PatchsetID:    "github_PS_fixes_ipad_but_not_iphone",
 		System:        dks.GitHubCRS,
-		ChangelistID:  "gerrit_CL_fix_ios",
+		ChangelistID:  "github_CL_fix_ios",
 		Order:         3,
 		GitHash:       "ffff111111111111111111111111111111111111",
 		CommentedOnCL: false,
 	}, {
-		PatchsetID:    "gerrit_PSdisallowtriaging",
-		System:        "gerrit",
-		ChangelistID:  "gerrit_CLdisallowtriaging",
+		PatchsetID:    "github_PSdisallowtriaging",
+		System:        "github",
+		ChangelistID:  "github_CLdisallowtriaging",
 		Order:         1,
 		GitHash:       "ddddddddddddddddddddddddddddddddddd77777",
 		CommentedOnCL: false,
 	}, {
-		PatchsetID:    "gerrit_PShaslanded",
+		PatchsetID:    "github_PShaslanded",
 		System:        dks.GitHubCRS,
-		ChangelistID:  "gerrit_CLhaslanded",
+		ChangelistID:  "github_CLhaslanded",
 		Order:         1,
 		GitHash:       "aaaaa11111111111111111111111111111111111",
 		CommentedOnCL: false,
 	}, {
-		PatchsetID:    "gerrit_PSisabandoned",
-		System:        "gerrit",
-		ChangelistID:  "gerrit_CLisabandoned",
+		PatchsetID:    "github_PSisabandoned",
+		System:        "github",
+		ChangelistID:  "github_CLisabandoned",
 		Order:         1,
 		GitHash:       "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb55555",
 		CommentedOnCL: false,
 	}, {
-		PatchsetID:    "gerrit_PSmultipledatapoints",
-		System:        "gerrit",
-		ChangelistID:  "gerrit_CLmultipledatapoints",
+		PatchsetID:    "github_PSmultipledatapoints",
+		System:        "github",
+		ChangelistID:  "github_CLmultipledatapoints",
 		Order:         1,
 		GitHash:       "ccccccccccccccccccccccccccccccccccc66666",
 		CommentedOnCL: false,
@@ -480,42 +482,42 @@ func TestCommentOnCLs_CLWasAbandoned_DBNotUpdated(t *testing.T) {
 	// CLs.
 	actualChangelists := sqltest.GetAllRows(ctx, t, db, "Changelists", &schema.ChangelistRow{}).([]schema.ChangelistRow)
 	assert.Equal(t, []schema.ChangelistRow{{
-		ChangelistID:     "gerrit-internal_CL_new_tests",
-		System:           dks.GerritInternalCRS,
+		ChangelistID:     "github_CL_new_tests",
+		System:           dks.GitHubCRS,
 		Status:           schema.StatusOpen, // This shouldn't be modified
 		OwnerEmail:       dks.UserTwo,
 		Subject:          "Increase test coverage",
 		LastIngestedData: time.Date(2020, time.December, 12, 9, 20, 33, 0, time.UTC),
 	}, {
-		ChangelistID:     "gerrit_CL_fix_ios",
+		ChangelistID:     "github_CL_fix_ios",
 		System:           dks.GitHubCRS,
 		Status:           schema.StatusOpen, // This shouldn't be modified
 		OwnerEmail:       dks.UserOne,
 		Subject:          "Fix iOS",
 		LastIngestedData: time.Date(2020, time.December, 10, 4, 5, 6, 0, time.UTC),
 	}, {
-		ChangelistID:     "gerrit_CLdisallowtriaging",
+		ChangelistID:     "github_CLdisallowtriaging",
 		System:           dks.GitHubCRS,
 		Status:           schema.StatusOpen,
 		OwnerEmail:       dks.UserOne,
 		Subject:          "add test with disallow triaging",
 		LastIngestedData: time.Date(2020, time.December, 12, 16, 0, 0, 0, time.UTC),
 	}, {
-		ChangelistID:     "gerrit_CLhaslanded",
+		ChangelistID:     "github_CLhaslanded",
 		System:           dks.GitHubCRS,
 		Status:           schema.StatusLanded,
 		OwnerEmail:       dks.UserTwo,
 		Subject:          "was landed",
 		LastIngestedData: time.Date(2020, time.May, 5, 5, 5, 0, 0, time.UTC),
 	}, {
-		ChangelistID:     "gerrit_CLisabandoned",
+		ChangelistID:     "github_CLisabandoned",
 		System:           dks.GitHubCRS,
 		Status:           schema.StatusAbandoned,
 		OwnerEmail:       dks.UserOne,
 		Subject:          "was abandoned",
 		LastIngestedData: time.Date(2020, time.June, 6, 6, 6, 0, 0, time.UTC),
 	}, {
-		ChangelistID:     "gerrit_CLmultipledatapoints",
+		ChangelistID:     "github_CLmultipledatapoints",
 		System:           dks.GitHubCRS,
 		Status:           schema.StatusOpen,
 		OwnerEmail:       dks.UserOne,
@@ -539,7 +541,7 @@ func TestCommentOnCLs_CommentingResultsInError_ErrorLoggedNotReturned(t *testing
 	gerritInternalClient.On("CommentOn", testutils.AnyContext, mock.Anything, mock.Anything).Return(errors.New("internet down"))
 
 	c, err := New(db, []ReviewSystem{
-		{ID: dks.GerritInternalCRS, Client: gerritInternalClient},
+		{ID: dks.GitHubCRS, Client: gerritInternalClient},
 	}, basicTemplate, instanceURL, 100)
 	require.NoError(t, err)
 
@@ -553,72 +555,71 @@ func TestCommentOnCLs_CommentingResultsInError_ErrorLoggedNotReturned(t *testing
 
 	actualPatchsets := sqltest.GetAllRows(ctx, t, db, "Patchsets", &schema.PatchsetRow{}).([]schema.PatchsetRow)
 	assert.Equal(t, []schema.PatchsetRow{{
-		PatchsetID:    "gerrit-internal_PS_adds_new_corpus",
-		System:        dks.GerritInternalCRS,
-		ChangelistID:  "gerrit-internal_CL_new_tests",
+		PatchsetID:    "github_PS_adds_new_corpus",
+		System:        dks.GitHubCRS,
+		ChangelistID:  "github_CL_new_tests",
 		Order:         1,
 		GitHash:       "eeee222222222222222222222222222222222222",
 		CommentedOnCL: false,
 	}, {
-		PatchsetID:    "gerrit-internal_PS_adds_new_corpus_and_test",
-		System:        dks.GerritInternalCRS,
-		ChangelistID:  "gerrit-internal_CL_new_tests",
+		PatchsetID:    "github_PS_adds_new_corpus_and_test",
+		System:        dks.GitHubCRS,
+		ChangelistID:  "github_CL_new_tests",
 		Order:         4,
 		GitHash:       "eeee333333333333333333333333333333333333",
 		CommentedOnCL: false, // should not be updated
 	}, {
-		PatchsetID:    "gerrit_PS_fixes_ipad_but_not_iphone",
+		PatchsetID:    "github_PS_fixes_ipad_but_not_iphone",
 		System:        dks.GitHubCRS,
-		ChangelistID:  "gerrit_CL_fix_ios",
+		ChangelistID:  "github_CL_fix_ios",
 		Order:         3,
 		GitHash:       "ffff111111111111111111111111111111111111",
 		CommentedOnCL: false,
 	}, {
-		PatchsetID:    "gerrit_PSdisallowtriaging",
-		System:        "gerrit",
-		ChangelistID:  "gerrit_CLdisallowtriaging",
+		PatchsetID:    "github_PSdisallowtriaging",
+		System:        "github",
+		ChangelistID:  "github_CLdisallowtriaging",
 		Order:         1,
 		GitHash:       "ddddddddddddddddddddddddddddddddddd77777",
 		CommentedOnCL: false,
 	}, {
-		PatchsetID:    "gerrit_PShaslanded",
+		PatchsetID:    "github_PShaslanded",
 		System:        dks.GitHubCRS,
-		ChangelistID:  "gerrit_CLhaslanded",
+		ChangelistID:  "github_CLhaslanded",
 		Order:         1,
 		GitHash:       "aaaaa11111111111111111111111111111111111",
 		CommentedOnCL: false,
 	}, {
-		PatchsetID:    "gerrit_PSisabandoned",
-		System:        "gerrit",
-		ChangelistID:  "gerrit_CLisabandoned",
+		PatchsetID:    "github_PSisabandoned",
+		System:        "github",
+		ChangelistID:  "github_CLisabandoned",
 		Order:         1,
 		GitHash:       "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb55555",
 		CommentedOnCL: false,
 	}, {
-		PatchsetID:    "gerrit_PSmultipledatapoints",
-		System:        "gerrit",
-		ChangelistID:  "gerrit_CLmultipledatapoints",
+		PatchsetID:    "github_PSmultipledatapoints",
+		System:        "github",
+		ChangelistID:  "github_CLmultipledatapoints",
 		Order:         1,
 		GitHash:       "ccccccccccccccccccccccccccccccccccc66666",
 		CommentedOnCL: false,
 	}}, actualPatchsets)
 }
 
-// TestCommentOnCLs_CLNotFound_NoError does not return an error when a CL is not found, as this
-// can happen if a CL is made private and we don't want to erroring continuously.
+// TestCommentOnCLs_CLNotFound_NoError does not return an error when a CL is not
+// found, as this can happen if a CL is made private and we don't want it
+// erroring continuously.
 func TestCommentOnCLs_CLNotFound_NoError(t *testing.T) {
-
 	ctx := context.Background()
 	db := sqltest.NewCockroachDBForTestsWithProductionSchema(ctx, t)
 	require.NoError(t, sqltest.BulkInsertDataTables(ctx, db, dks.Build()))
 
-	gerritInternalClient := &mock_codereview.Client{}
-
-	gerritInternalClient.On("GetChangelist", testutils.AnyContext, dks.ChangelistIDThatAddsNewTests).Return(
-		code_review.Changelist{}, code_review.ErrNotFound)
+	gerritInternalClient := mock_codereview.NewClient(t)
+	gerritInternalClient.On("GetChangelist", testutils.AnyContext, mock.AnythingOfType("string")).Return(
+		code_review.Changelist{}, code_review.ErrNotFound).Times(2)
 
 	c, err := New(db, []ReviewSystem{
-		{ID: dks.GerritInternalCRS, Client: gerritInternalClient},
+		{ID: dks.GitHubCRS, Client: gerritInternalClient},
 	}, basicTemplate, instanceURL, 100)
 	require.NoError(t, err)
 
@@ -628,55 +629,53 @@ func TestCommentOnCLs_CLNotFound_NoError(t *testing.T) {
 	err = c.CommentOnChangelistsWithUntriagedDigests(ctx)
 	require.NoError(t, err)
 
-	gerritInternalClient.AssertExpectations(t)
-
 	actualPatchsets := sqltest.GetAllRows(ctx, t, db, "Patchsets", &schema.PatchsetRow{}).([]schema.PatchsetRow)
 	assert.Equal(t, []schema.PatchsetRow{{
-		PatchsetID:    "gerrit-internal_PS_adds_new_corpus",
-		System:        dks.GerritInternalCRS,
-		ChangelistID:  "gerrit-internal_CL_new_tests",
+		PatchsetID:    "github_PS_adds_new_corpus",
+		System:        dks.GitHubCRS,
+		ChangelistID:  "github_CL_new_tests",
 		Order:         1,
 		GitHash:       "eeee222222222222222222222222222222222222",
 		CommentedOnCL: false,
 	}, {
-		PatchsetID:    "gerrit-internal_PS_adds_new_corpus_and_test",
-		System:        dks.GerritInternalCRS,
-		ChangelistID:  "gerrit-internal_CL_new_tests",
+		PatchsetID:    "github_PS_adds_new_corpus_and_test",
+		System:        dks.GitHubCRS,
+		ChangelistID:  "github_CL_new_tests",
 		Order:         4,
 		GitHash:       "eeee333333333333333333333333333333333333",
 		CommentedOnCL: false, // should not be updated
 	}, {
-		PatchsetID:    "gerrit_PS_fixes_ipad_but_not_iphone",
+		PatchsetID:    "github_PS_fixes_ipad_but_not_iphone",
 		System:        dks.GitHubCRS,
-		ChangelistID:  "gerrit_CL_fix_ios",
+		ChangelistID:  "github_CL_fix_ios",
 		Order:         3,
 		GitHash:       "ffff111111111111111111111111111111111111",
 		CommentedOnCL: false,
 	}, {
-		PatchsetID:    "gerrit_PSdisallowtriaging",
-		System:        "gerrit",
-		ChangelistID:  "gerrit_CLdisallowtriaging",
+		PatchsetID:    "github_PSdisallowtriaging",
+		System:        "github",
+		ChangelistID:  "github_CLdisallowtriaging",
 		Order:         1,
 		GitHash:       "ddddddddddddddddddddddddddddddddddd77777",
 		CommentedOnCL: false,
 	}, {
-		PatchsetID:    "gerrit_PShaslanded",
+		PatchsetID:    "github_PShaslanded",
 		System:        dks.GitHubCRS,
-		ChangelistID:  "gerrit_CLhaslanded",
+		ChangelistID:  "github_CLhaslanded",
 		Order:         1,
 		GitHash:       "aaaaa11111111111111111111111111111111111",
 		CommentedOnCL: false,
 	}, {
-		PatchsetID:    "gerrit_PSisabandoned",
-		System:        "gerrit",
-		ChangelistID:  "gerrit_CLisabandoned",
+		PatchsetID:    "github_PSisabandoned",
+		System:        "github",
+		ChangelistID:  "github_CLisabandoned",
 		Order:         1,
 		GitHash:       "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb55555",
 		CommentedOnCL: false,
 	}, {
-		PatchsetID:    "gerrit_PSmultipledatapoints",
-		System:        "gerrit",
-		ChangelistID:  "gerrit_CLmultipledatapoints",
+		PatchsetID:    "github_PSmultipledatapoints",
+		System:        "github",
+		ChangelistID:  "github_CLmultipledatapoints",
 		Order:         1,
 		GitHash:       "ccccccccccccccccccccccccccccccccccc66666",
 		CommentedOnCL: false,
