@@ -70,6 +70,18 @@ func main() {
 
 	ctx := context.Background()
 
+	// Initialize client and start the ingesters.
+
+	// Set up authenticated HTTP client.
+	// TODO(jcgregorio): Uncomment and configure authentication as needed for GitHub API access.
+	//
+	// tokenSrc, err := google.DefaultTokenSource(ctx)
+	// if err != nil {
+	// 	sklog.Fatalf("Failed to auth: %s", err)
+	// }
+	//client := httputils.DefaultClientConfig().WithTokenSource(tokenSrc).With2xxOnly().WithDialTimeout(time.Second * 10).Client()
+	client := httputils.DefaultClientConfig().With2xxOnly().WithDialTimeout(time.Second * 10).Client()
+
 	if cfg.SQLDatabaseName == "" {
 		sklog.Fatalf("Must have SQL database config")
 	}
@@ -103,7 +115,7 @@ func main() {
 	sourcesToScan := []ingestion.FileSearcher{src}
 
 	var secondaryBranchLiveness metrics2.Liveness
-	tryjobProcessor, src, err := getSecondaryBranchIngester(ctx, isc.SecondaryBranchConfig, gcsClient, client, sqlDB)
+	tryjobProcessor, src, err := getSecondaryBranchIngester(ctx, cfg.IngestionServerConfig.SecondaryBranchConfig, gcsClient, client, sqlDB)
 	if err != nil {
 		sklog.Fatalf("Setting up secondary branch ingestion: %s", err)
 	}
@@ -162,6 +174,32 @@ func getPrimaryBranchIngester(ctx context.Context, conf config.IngesterConfig, g
 		return nil, nil, skerr.Fmt("unknown ingestion backend: %q", conf.Type)
 	}
 	return primaryBranchProcessor, src, nil
+}
+
+func getSecondaryBranchIngester(ctx context.Context, conf *config.IngesterConfig, gcsClient *storage.Client, hClient *http.Client, db *pgxpool.Pool) (ingestion.Processor, ingestion.FileSearcher, error) {
+	if conf == nil { // not configured for secondary branch (e.g. tryjob) ingestion.
+		return nil, nil, nil
+	}
+	src := &ingestion.GCSSource{
+		Client: gcsClient,
+		Bucket: conf.Source.Bucket,
+		Prefix: conf.Source.Prefix,
+	}
+	if ok := src.Validate(); !ok {
+		return nil, nil, skerr.Fmt("Invalid GCS Source %#v", src)
+	}
+	var sbProcessor ingestion.Processor
+	var err error
+	if conf.Type == ingestion_processors.SQLSecondaryBranch {
+		sbProcessor, err = ingestion_processors.TryjobSQL(ctx, src, conf.ExtraParams, hClient, db)
+		if err != nil {
+			return nil, nil, skerr.Wrap(err)
+		}
+		sklog.Infof("Configured SQL-backed secondary branch ingestion")
+	} else {
+		return nil, nil, skerr.Fmt("unknown ingestion backend: %q", conf.Type)
+	}
+	return sbProcessor, src, nil
 }
 
 // listen begins listening to the PubSub topic with the configured PubSub subscription. It will

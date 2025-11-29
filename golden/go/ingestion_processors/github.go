@@ -1,25 +1,48 @@
 package ingestion_processors
 
-import "context"
-
-// This should be an implementation of the _ interface.
-
-type LookupSystem interface {
-	// Lookup returns the given CRS system, CL ID, PS Order or an error if it could not lookup
-	// the CL information.
-	Lookup(ctx context.Context, tjID string) (string, string, int, error)
+/*
+// githubLookupSystem implements the LookupSystem interface for GitHub PRs.
+type githubLookupSystem struct {
+	crsClient *github_crs.CRSImpl
 }
+
+// NewGitHubLookupSystem returns a new instance of githubLookupSystem.
+func NewGitHubLookupSystem(crsClient *github_crs.CRSImpl) *githubLookupSystem {
+	return &githubLookupSystem{
+		crsClient: crsClient,
+	}
+}
+
+// Lookup implements the LookupSystem interface.
+func (g *githubLookupSystem) Lookup(ctx context.Context, trybotJobID string) (string, string, int, error) {
+	// The trybotJobID is expected to be in the format <PR#>-<COMMIT HASH>.
+	parts := strings.SplitN(trybotJobID, "-", 2)
+	if len(parts) != 2 {
+		return "", "", 0, skerr.Fmt("invalid trybotJobID format: %s", trybotJobID)
+	}
+	clID := parts[0]
+	psID := parts[1]
+
+	// We don't have a reliable way to get psOrder from psID alone, so we set it to 0.
+	psOrder := 0
+	ps, err := g.crsClient.GetPatchset(ctx, clID, psID, psOrder)
+	if err != nil {
+		return "", "", 0, skerr.Wrapf(err, "looking up patchset for trybotJobID %s", trybotJobID)
+	}
+	return "github", clID, ps.Order, nil
+}
+
+*/
 
 /*
 
-To fetch GitHub PR data for tryjobs, first pull the PR info:
+To fetch GitHub PR data for a tryjob, first pull the PR info:
 
     curl -L   -H "Accept: application/vnd.github+json"   -H "X-GitHub-Api-Version: 2022-11-28"   https://api.github.com/repos/goldmine-build/goldmine/pulls/1 > pull.json
 
 Note that we don't need authentication for this as the goldmine repo is public.
 
-That will return JSON like this, note we elide a bunch, what really matters is
-the sha of head:
+That will return JSON like this, note we elide a bunch:
 
     {
         "url": "https://api.github.com/repos/goldmine-build/goldmine/pulls/1",
@@ -80,22 +103,15 @@ the sha of head:
             "login": "goldmine-build",
             "id": 232705022,
 
-So `head.sha` is what we need to identify the commit for the tryjob in other API
-calls. In this case `55ab257a68a8f523fb25bcfc30d9ed53a2d5edda`.
 
-
-We also need to record `merge_commit_sha` which is the sha of the commit that
-gets supplied to the workflow when it runs the tryjob and is supplied as
-`GITHUB_SHA`. In this case that is `a23fca2fc99206cbcabc36e7a875c09cc101dae6`.
-
-Then to get the patchset number, we can fetch the full PR commits data:
+To get the patchset number, we can fetch the full PR commits data:
 
     curl -L   -H "Accept: application/vnd.github+json"   -H "X-GitHub-Api-Version: 2022-11-28"   https://api.github.com/repos/goldmine-build/goldmine/pulls/1/commits > commits.json
 
 Which will return JSON like this, again eliding a bunch. Note that the commits
-are an array, and we need to find the one that matches the head.sha from above
-to get the patchset number (1-based index in the array). Note also we can pull
-out the commit message, author, date, etc. from here as well.
+are an array, and we need to find the one that matches the commit we ran the
+tryjob at to get the patchset number (1-based index in the array). Note also we
+can pull out the commit message, author, date, etc. from here as well.
 
 [
     {},
@@ -185,91 +201,48 @@ out the commit message, author, date, etc. from here as well.
     }
 ]
 
-So during a workflow run we record the pull request number (1 in this case),
-and the merge_commit_sha, supplied in the following environment variables:
+So during a workflow run we record the pull request number (1 in this case), and
+the merge_commit_sha, supplied in the following environment variables:
 
-	GITHUB_REF_NAME=1/merge
-	GITHUB_SHA=a23fca2fc99206cbcabc36e7a875c09cc101dae6
-	GITHUB_REPOSITORY=goldmine-build/goldmine
+    GITHUB_REF_NAME=1/merge
+    GITHUB_SHA=a23fca2fc99206cbcabc36e7a875c09cc101dae6
+    GITHUB_REPOSITORY=goldmine-build/goldmine
 
+We can extract the pull request number like this:
 
-	PULL_NUMBER=$(echo $GITHUB_REF_NAME | cut -d'/' -f1)
-
-With the pull request number of `1` we can fetch the PR data to get
-
-	https://api.github.com/repos/goldmine-build/goldmine/pulls/1
-
-i.e.
-
-	https://api.github.com/repos/$GITHUB_REPOSITORY/pulls/$PULL_NUMBER
-
-Confirm that GITHUB_SHA matches merge_commit_sha in the PR data.
-Then get head.sha from the PR data in this case `55ab257a68a8f523fb25bcfc30d9ed53a2d5edda`.
-
-Then pull the commits data for the PR:
-
-	https://api.github.com/repos/goldmine-build/goldmine/pulls/1/commits
-
-i.e.
-
-	https://api.github.com/repos/$GITHUB_REPOSITORY/pulls/$PULL_NUMBER/commits
-
-
-Then find the commit in the array that matches head.sha to get the patchset number
-(which is the 1-based index in the array).
-
+    PULL_NUMBER=$(echo $GITHUB_REF_NAME | cut -d'/' -f1)
 
 In the workflow we can then record GITHUB_SHA (the merge commit sha) and the
 GITHUB_WORKFLOW.
 
-
-	GITHUB_SHA=a23fca2fc99206cbcabc36e7a875c09cc101dae6
-	GITHUB_WORKFLOW=Run all the UI tests and upload the results to Gold.
+    GITHUB_SHA=a23fca2fc99206cbcabc36e7a875c09cc101dae6
+    GITHUB_WORKFLOW=Run all the UI tests and upload the results to Gold.
 
 Note that GITHUB_SHA is the merge commit sha, so we actually want to record
 
-	PR_PATCHES_PARENTS=git log --pretty=%P -n 1 $GITHUB_SHA
+    PR_PATCHES_PARENTS=git log --pretty=%P -n 1 $GITHUB_SHA
 
-Note that will return 2 SHAs separated by a space in the case of a merge commit, e.g.:
+Note that will return 2 SHAs separated by a space in the case of a merge commit,
+e.g.:
 
-	Run git log --pretty=%P -n 1 $GITHUB_SHA
-	5ae561f50219876d62d50f41b3d2f7c9c094106d 403e9b69508e292a06bc02be27cb5e4330a71c89
+    Run git log --pretty=%P -n 1 $GITHUB_SHA
+    5ae561f50219876d62d50f41b3d2f7c9c094106d 403e9b69508e292a06bc02be27cb5e4330a71c89
 
-In the goldctl upload we then supply the following keys in the metadata:
+We need the second one in this case, which is the actual commit that was
+introduced by the PR. We can get that with:
 
-  // These keys are required for tryjobs and can be omitted for non-tryjobs.
-  // GitHub support coming soon, Gerrit/googlesource support only at the moment.
-  change_list_id: '1',  # Pull Request number
-  patch_set_order: 4,  # Commit index in the PR commits array (1-based)
-  patch_set_id: $(git log --pretty=%P -n 1 $GITHUB_SHA | sed 's#.* ##'), # Commit index in the PR commits array (1-based)
+	PATCHSET_ID=$(git log --pretty=%P -n 1 $GITHUB_SHA | sed 's#.* ##')
 
-  github_merge_commit_parents: '5ae561f50219876d62d50f41b3d2f7c9c094106d 403e9b69508e292a06bc02be27cb5e4330a71c89',
-  github_workflow_name: $GITHUB_WORKFLOW,
+// This is how we distinguish tryjob uploads from non-tryjob uploads.
+GITHUB_REF_NAME=main # or 1/merge for PR 1
 
-  // These keys are optional, but can assist in debugging
+PULL_NUMBER=$(echo $GITHUB_REF_NAME | cut -d'/' -f1)
+PATCHSET_ID=$(git log --pretty=%P -n 1 $GITHUB_SHA | sed 's#.* ##')
 
-  builder: $GITHUB_WORKFLOW,
-
-  // This is how we distinguish tryjob uploads from non-tryjob uploads.
-  GITHUB_REF_NAME=main # or 1/merge for PR 1
-
-  PULL_NUMBER=$(echo $GITHUB_REF_NAME | cut -d'/' -f1)
-  PATCHSET_ID=$(git log --pretty=%P -n 1 $GITHUB_SHA | sed 's#.* ##')
-
-
-  				--crs=github
-				--cis=github
-				--changelist=$PULL_NUMBER
-				--patchset=0                # Using 0 here to indicate we are using patchset_id
-				--patchset_id=$PATCHSET_ID
-				--jobid=$PULL_NUMBER-$PATCHSET_ID # Add a lookupSystem that can map this to CL/PS.
-
-				$GITHUB_WORKFLOW
-
-
-
-How do we detect in a github workflow that we are running in a tryjob? or a commit on main branch?
-
-
-
+	--crs=github
+	--cis=github
+	--changelist=$PULL_NUMBER
+	--patchset=0                # Using 0 here to indicate we are using patchset_id
+	--patchset_id=$PATCHSET_ID
+	--jobid=$PULL_NUMBER-$PATCHSET_ID # Add a lookupSystem that can map this to CL/PS.
 */

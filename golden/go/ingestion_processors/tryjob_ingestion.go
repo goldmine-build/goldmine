@@ -25,7 +25,6 @@ import (
 	"golang.org/x/oauth2"
 	"golang.org/x/sync/errgroup"
 
-	"go.goldmine.build/go/gerrit"
 	"go.goldmine.build/go/httputils"
 	"go.goldmine.build/go/now"
 	"go.goldmine.build/go/paramtools"
@@ -36,7 +35,6 @@ import (
 	"go.goldmine.build/go/vcsinfo"
 	"go.goldmine.build/golden/go/clstore"
 	"go.goldmine.build/golden/go/code_review"
-	"go.goldmine.build/golden/go/code_review/gerrit_crs"
 	"go.goldmine.build/golden/go/code_review/github_crs"
 	"go.goldmine.build/golden/go/continuous_integration"
 	"go.goldmine.build/golden/go/continuous_integration/simple_cis"
@@ -59,17 +57,18 @@ const (
 
 	lookupParam = "LookupCLsIn"
 
-	gerritCRS = "gerrit"
 	githubCRS = "github"
-	cirrusCIS = "cirrus"
+	githubCIS = "github"
 
 	clCacheSize = 1000
 )
 
 // goldTryjobProcessor implements the ingestion.Processor interface to ingest tryjob results.
 type goldTryjobProcessor struct {
-	cisClients    map[string]continuous_integration.Client
-	reviewSystems []clstore.ReviewSystem
+	cisClients map[string]continuous_integration.Client
+
+	// Why isn't this a map?
+	reviewSystems map[string]clstore.ReviewSystem
 	source        ingestion.Source
 	db            *pgxpool.Pool
 
@@ -101,16 +100,16 @@ func TryjobSQL(ctx context.Context, src ingestion.Source, configParams map[strin
 		return nil, skerr.Fmt("missing CRS (e.g. 'gerrit')")
 	}
 
-	var reviewSystems []clstore.ReviewSystem
+	var reviewSystems map[string]clstore.ReviewSystem
 	for _, crsName := range crsNames {
 		crsClient, err := codeReviewSystemFactory(ctx, crsName, configParams, client)
 		if err != nil {
 			return nil, skerr.Wrapf(err, "could not create client for CRS %q", crsName)
 		}
-		reviewSystems = append(reviewSystems, clstore.ReviewSystem{
+		reviewSystems[crsName] = clstore.ReviewSystem{
 			ID:     crsName,
 			Client: crsClient,
-		})
+		}
 	}
 
 	ogCache, err := lru.New(optionsGroupingCacheSize)
@@ -149,23 +148,6 @@ func (g *goldTryjobProcessor) HandlesFile(name string) bool {
 }
 
 func codeReviewSystemFactory(ctx context.Context, crsName string, configParams map[string]string, client *http.Client) (code_review.Client, error) {
-	if crsName == gerritCRS {
-		gerritURL := configParams[gerritURLParam]
-		if strings.TrimSpace(gerritURL) == "" {
-			return nil, skerr.Fmt("missing URL for the Gerrit code review system")
-		}
-		gerritClient, err := gerrit.NewGerrit(gerritURL, client)
-		if err != nil {
-			return nil, skerr.Wrapf(err, "creating gerrit client for %s", gerritURL)
-		}
-		g := gerrit_crs.New(gerritClient)
-		email, err := g.LoggedInAs(ctx)
-		if err != nil {
-			return nil, skerr.Wrapf(err, "Getting logged in client to gerrit")
-		}
-		sklog.Infof("Logged into gerrit as %s", email)
-		return g, nil
-	}
 	if crsName == githubCRS {
 		githubRepo := configParams[githubRepoParam]
 		if strings.TrimSpace(githubRepo) == "" {
@@ -188,10 +170,8 @@ func codeReviewSystemFactory(ctx context.Context, crsName string, configParams m
 }
 
 func continuousIntegrationSystemFactory(cisName string, client *http.Client) (continuous_integration.Client, error) {
-	if cisName == cirrusCIS {
-		return simple_cis.New(cisName), nil
-	}
-	return nil, skerr.Fmt("ContinuousIntegrationSystem %q not recognized", cisName)
+	// Since we dropped support for BuildBucket, we only have simple_cis for now.
+	return simple_cis.New(cisName), nil
 }
 
 // Process take the tryjob data from the given file and writes it to the various SQL tables
@@ -296,39 +276,20 @@ WHERE changelist_id = $1 AND system = $2 AND (patchset_id = $3 OR ps_order = $4)
 	return qualifiedCLID, qualifiedPSID, nil
 }
 
-// getIDs returns the ReviewSystem, CL ID, PS ID, and PS Order from the given results. This could
-// result in looking that up using the lookupSystem (e.g. buildbucket).
+// getIDs returns the ReviewSystem, CL ID, PS ID, and PS Order from the given results.
 func (g *goldTryjobProcessor) getIDs(ctx context.Context, gr *jsonio.GoldResults) (clstore.ReviewSystem, string, string, int, error) {
 	ctx, span := trace.StartSpan(ctx, "getIDs")
 	defer span.End()
 	crsName := gr.CodeReviewSystem
 	if crsName == "" {
-		// Default to Gerrit; TODO(kjlubick) who uses this?
-		sklog.Warningf("Using default CRS (this may go away soon)")
-		crsName = gerritCRS
+		sklog.Errorf("CodeReviewSystem not specified")
+		return clstore.ReviewSystem{}, "", "", 0, skerr.Fmt("CodeReviewSystem not specified")
 	}
-	if crsName != "lookup" {
-		system, ok := g.getCodeReviewSystem(crsName)
-		if !ok {
-			return clstore.ReviewSystem{}, "", "", 0, skerr.Fmt("unsupported CRS: %s", crsName)
-		}
-		return system, gr.ChangelistID, gr.PatchsetID, gr.PatchsetOrder, nil
+	system, ok := g.reviewSystems[crsName]
+	if !ok {
+		return clstore.ReviewSystem{}, "", "", 0, skerr.Fmt("unsupported CodeReviewSystem: %s", crsName)
 	}
-	return clstore.ReviewSystem{}, "", "", 0, skerr.Fmt("Lookup of CL/PS is not configured")
-}
-
-// getCodeReviewSystem returns the ReviewSystem associated with the crs, or false if there was no
-// match.
-func (g *goldTryjobProcessor) getCodeReviewSystem(crs string) (clstore.ReviewSystem, bool) {
-	var system clstore.ReviewSystem
-	found := false
-	for _, rs := range g.reviewSystems {
-		if rs.ID == crs {
-			system = rs
-			found = true
-		}
-	}
-	return system, found
+	return system, gr.ChangelistID, gr.PatchsetID, gr.PatchsetOrder, nil
 }
 
 // lookupAndCreateCL finds the changelist with the given id and creates an entry in the SQL DB
@@ -437,9 +398,7 @@ func (g *goldTryjobProcessor) lookupTryjob(ctx context.Context, gr *jsonio.GoldR
 	defer span.End()
 	cisName := gr.ContinuousIntegrationSystem
 	if cisName == "" {
-		// Default to BuildBucket; TODO(kjlubick) who uses this?
-		sklog.Warningf("Using default CIS (this may go away soon)")
-		cisName = buildbucketCIS
+		return "", skerr.Fmt("ContinuousIntegrationSystem not specified")
 	}
 	system, ok := g.cisClients[cisName]
 	if !ok {
