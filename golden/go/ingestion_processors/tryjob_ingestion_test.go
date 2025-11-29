@@ -100,7 +100,7 @@ func TestTryjobSQL_Process_FirstFileForCL_Success_cdb(t *testing.T) {
 	const qualifiedCL = "github_CL_fix_ios"
 	const qualifiedPS = "github_PS_fixes_ipad_but_not_iphone"
 	const qualifiedTJ = "github_tryjob_01_iphonergb"
-	mcrs := &mock_crs.Client{}
+	mcrs := mock_crs.NewClient(t)
 	mcrs.On("GetChangelist", testutils.AnyContext, clID).Return(code_review.Changelist{
 		SystemID: clID,
 		Owner:    dks.UserOne,
@@ -301,12 +301,14 @@ func TestTryjobSQL_Process_FirstFileForCL_Success_cdb(t *testing.T) {
 }
 
 func TestTryjobSQL_Process_SomeDataExists_Success_cdb(t *testing.T) {
-
 	ctx := context.Background()
 	db := sqltest.NewCockroachDBForTestsWithProductionSchema(ctx, t)
-	const qualifiedCL = "gerrit_CL_fix_ios"
-	const qualifiedPS = "gerrit_PS_fixes_ipad_but_not_iphone"
-	const qualifiedTJ = "buildbucket_tryjob_01_iphonergb"
+	const clID = dks.ChangelistIDThatAttemptsToFixIOS
+	const psID = dks.PatchSetIDFixesIPadButNotIPhone
+	const tjID = dks.Tryjob01IPhoneRGB
+	const qualifiedCL = "github_CL_fix_ios"
+	const qualifiedPS = "github_PS_fixes_ipad_but_not_iphone"
+	const qualifiedTJ = "github_tryjob_01_iphonergb"
 	const squareTraceKeys = `{"color mode":"RGB","device":"iPhone12,1","name":"square","os":"iOS","source_type":"corners"}`
 	const triangleTraceKeys = `{"color mode":"RGB","device":"iPhone12,1","name":"triangle","os":"iOS","source_type":"corners"}`
 	const circleTraceKeys = `{"color mode":"RGB","device":"iPhone12,1","name":"circle","os":"iOS","source_type":"round"}`
@@ -387,7 +389,7 @@ func TestTryjobSQL_Process_SomeDataExists_Success_cdb(t *testing.T) {
 	}
 	require.NoError(t, sqltest.BulkInsertDataTables(ctx, db, existingData))
 
-	mcrs := &mock_crs.Client{}
+	mcrs := mock_crs.NewClient(t)
 
 	// This file has data from 3 traces across 2 corpora. The data is for the patchset with order 3.
 	src := fakeGCSSourceFromFile(t, "from_goldctl_recent_fields.json")
@@ -572,8 +574,8 @@ func TestTryjobSQL_Process_TryjobRerunAtSameCLPS_MultipleDatapointsForTraceAtSam
 	db := sqltest.NewCockroachDBForTestsWithProductionSchema(ctx, t)
 	const qualifiedCL = "github_" + dks.ChangelistIDWithMultipleDatapointsPerTrace
 	const qualifiedPS = "github_" + dks.PatchsetIDWithMultipleDatapointsPerTrace
-	const qualifiedTJ = "buildbucket_" + dks.Tryjob09Windows
-	const qualifiedTJRerun = "buildbucket_" + dks.Tryjob10Windows
+	const qualifiedTJ = "github_" + dks.Tryjob09Windows
+	const qualifiedTJRerun = "github_" + dks.Tryjob10Windows
 	const squareTraceKeys = `{"color mode":"RGB","device":"QuadroP400","name":"square","os":"Windows10.3","source_type":"corners"}`
 
 	// Load all the tables we write to with one existing row.
@@ -653,14 +655,13 @@ func TestTryjobSQL_Process_TryjobRerunAtSameCLPS_MultipleDatapointsForTraceAtSam
 	}
 	require.NoError(t, sqltest.BulkInsertDataTables(ctx, db, existingData))
 
-	mcrs := &mock_crs.Client{}
-	mcis := &mock_cis.Client{}
+	mcrs := mock_crs.NewClient(t)
+	mcis := mock_cis.NewClient(t)
 	mcis.On("GetTryJob", testutils.AnyContext, dks.Tryjob10Windows).Return(ci.TryJob{
 		SystemID:    dks.Tryjob10Windows,
 		System:      dks.GitHubCIS,
 		DisplayName: "Test-Windows10.3-Some",
 	}, nil)
-
 	// At this point the database has one CL with a single patchset. A tryjob ran and produced a
 	// single datapoint.
 	//
@@ -672,7 +673,7 @@ func TestTryjobSQL_Process_TryjobRerunAtSameCLPS_MultipleDatapointsForTraceAtSam
 			dks.GitHubCIS: mcis,
 		},
 		reviewSystems: map[string]clstore.ReviewSystem{
-			"github": clstore.ReviewSystem{
+			"github": {
 				ID:     githubCRS,
 				Client: mcrs,
 			},
@@ -815,9 +816,12 @@ func TestTryjobSQL_Process_PatchsetExistsAndSuppliedByOrder_Success_cdb(t *testi
 
 	ctx := context.Background()
 	db := sqltest.NewCockroachDBForTestsWithProductionSchema(ctx, t)
-	const qualifiedCL = "gerrit_CL_fix_ios"
-	const qualifiedPS = "gerrit_PS_fixes_ipad_but_not_iphone"
-	const qualifiedTJ = "buildbucket_tryjob_01_iphonergb"
+	const clID = dks.ChangelistIDThatAttemptsToFixIOS
+	const psID = dks.PatchSetIDFixesIPadButNotIPhone
+	const tjID = dks.Tryjob01IPhoneRGB
+	const qualifiedCL = "github_CL_fix_ios"
+	const qualifiedPS = "github_PS_fixes_ipad_but_not_iphone"
+	const qualifiedTJ = "github_tryjob_01_iphonergb"
 
 	// Load all the tables we write to with one existing row.
 	existingData := schema.Tables{
@@ -841,13 +845,29 @@ func TestTryjobSQL_Process_PatchsetExistsAndSuppliedByOrder_Success_cdb(t *testi
 	}
 	require.NoError(t, sqltest.BulkInsertDataTables(ctx, db, existingData))
 
-	mcrs := &mock_crs.Client{}
 	mcis := &mock_cis.Client{}
-
 	mcis.On("GetTryJob", testutils.AnyContext, dks.Tryjob01IPhoneRGB).Return(ci.TryJob{
 		SystemID:    dks.Tryjob01IPhoneRGB,
 		System:      dks.GitHubCIS,
 		DisplayName: "Test-iPhone-RGB",
+	}, nil)
+
+	mcrs := &mock_crs.Client{}
+	mcrs.On("GetChangelist", testutils.AnyContext, clID).Return(code_review.Changelist{
+		SystemID: clID,
+		Owner:    dks.UserOne,
+		Status:   code_review.Open,
+		Subject:  "Fix iOS [sentinel]",
+		// This time should get overwritten by the fakeIngestionTime
+		Updated: time.Date(2020, time.December, 5, 15, 0, 0, 0, time.UTC),
+	}, nil)
+
+	mcrs.On("GetPatchset", testutils.AnyContext, clID, "", 3).Return(code_review.Patchset{
+		SystemID:     psID,
+		ChangelistID: clID,
+		Order:        3,
+		GitHash:      "ffff111111111111111111111111111111111111",
+		Created:      time.Date(2020, time.December, 6, 6, 0, 0, 0, time.UTC),
 	}, nil)
 
 	// This file has data from 3 traces across 2 corpora. The data is for the patchset with order 3.
@@ -857,7 +877,7 @@ func TestTryjobSQL_Process_PatchsetExistsAndSuppliedByOrder_Success_cdb(t *testi
 			dks.GitHubCIS: mcis,
 		},
 		reviewSystems: map[string]clstore.ReviewSystem{
-			"github": clstore.ReviewSystem{
+			"github": {
 				ID:     githubCRS,
 				Client: mcrs,
 			},
