@@ -507,9 +507,6 @@ func TestBaselineHandlerV2_ValidChangelistWithNewTests_Success(t *testing.T) {
 				{
 					ID: dks.GitHubCRS,
 				},
-				{
-					ID: dks.GerritInternalCRS,
-				},
 			},
 		},
 		baselineCache: ttlcache.New(time.Minute, 10*time.Minute),
@@ -803,14 +800,14 @@ func TestGetActionableDigests_ReturnsCorrectResults(t *testing.T) {
 			// DigestC07Unt_CL is produced by the iPad
 			{Corpus: dks.RoundCorpus, Count: 1},
 		})
-	test(dks.GerritInternalCRS, dks.ChangelistIDThatAddsNewTests, dks.PatchsetIDAddsNewCorpus,
+	test(dks.GitHubCRS, dks.ChangelistIDThatAddsNewTests, dks.PatchsetIDAddsNewCorpus,
 		[]corpusAndCount{
 			// DigestC04Unt and DigestC03Unt are produced on this PS
 			{Corpus: dks.RoundCorpus, Count: 2},
 			// DigestBlank is produced by the text test on this PS
 			{Corpus: dks.TextCorpus, Count: 1},
 		})
-	test(dks.GerritInternalCRS, dks.ChangelistIDThatAddsNewTests, dks.PatchsetIDAddsNewCorpusAndTest,
+	test(dks.GitHubCRS, dks.ChangelistIDThatAddsNewTests, dks.PatchsetIDAddsNewCorpusAndTest,
 		[]corpusAndCount{
 			// DigestC04Unt, DigestC03Unt, and DigestE03Unt_CL are produced on this PS
 			{Corpus: dks.RoundCorpus, Count: 3},
@@ -1520,7 +1517,7 @@ func TestPatchsetsAndTryjobsForCL2_ExistingCL_Success(t *testing.T) {
 			DB: db,
 			ReviewSystems: []clstore.ReviewSystem{
 				{
-					ID:          dks.GerritInternalCRS,
+					ID:          dks.GitHubCRS,
 					URLTemplate: "www.example.com/gerrit/%s",
 				},
 			},
@@ -1532,7 +1529,7 @@ func TestPatchsetsAndTryjobsForCL2_ExistingCL_Success(t *testing.T) {
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodGet, "/json/v2/changelist/gerrit-internal/CL_fix_ios", nil)
 	r = setChiURLParams(r, map[string]string{
-		"system": dks.GerritInternalCRS,
+		"system": dks.GitHubCRS,
 		"id":     dks.ChangelistIDThatAddsNewTests,
 	})
 	wh.PatchsetsAndTryjobsForCL2(w, r)
@@ -3022,7 +3019,7 @@ func TestGetChangelistsHandler_AllChangelists_Success(t *testing.T) {
 				ID:          dks.GitHubCRS,
 				URLTemplate: "example.com/%s/gerrit",
 			}, {
-				ID:          dks.GerritInternalCRS,
+				ID:          dks.GitHubCRS,
 				URLTemplate: "example.com/%s/gerrit-internal",
 			}},
 		},
@@ -3054,7 +3051,7 @@ func TestGetChangelistsHandler_RespectsPagination_Success(t *testing.T) {
 				ID:          dks.GitHubCRS,
 				URLTemplate: "example.com/%s/gerrit",
 			}, {
-				ID:          dks.GerritInternalCRS,
+				ID:          dks.GitHubCRS,
 				URLTemplate: "example.com/%s/gerrit-internal",
 			}},
 		},
@@ -3082,7 +3079,7 @@ func TestGetChangelistsHandler_ActiveChangelists_Success(t *testing.T) {
 				ID:          dks.GitHubCRS,
 				URLTemplate: "example.com/%s/gerrit",
 			}, {
-				ID:          dks.GerritInternalCRS,
+				ID:          dks.GitHubCRS,
 				URLTemplate: "example.com/%s/gerrit-internal",
 			}},
 		},

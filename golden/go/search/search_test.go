@@ -94,7 +94,7 @@ func TestNewAndUntriagedSummaryForCL_TwoPatchsets_Success(t *testing.T) {
 
 	s := New(db, 100)
 	require.NoError(t, s.StartCacheProcess(ctx, time.Minute, 100))
-	rv, err := s.NewAndUntriagedSummaryForCL(ctx, sql.Qualify(dks.GerritInternalCRS, dks.ChangelistIDThatAddsNewTests))
+	rv, err := s.NewAndUntriagedSummaryForCL(ctx, sql.Qualify(dks.GitHubCRS, dks.ChangelistIDThatAddsNewTests))
 	require.NoError(t, err)
 	assert.Equal(t, NewAndUntriagedSummary{
 		ChangelistID: dks.ChangelistIDThatAddsNewTests,
@@ -194,7 +194,7 @@ func TestNewAndUntriagedSummaryForCL_CLDoesNotExist_ReturnsError(t *testing.T) {
 
 	s := New(db, 100)
 	require.NoError(t, s.StartCacheProcess(ctx, time.Minute, 100))
-	_, err := s.NewAndUntriagedSummaryForCL(ctx, sql.Qualify(dks.GerritInternalCRS, "does not exist"))
+	_, err := s.NewAndUntriagedSummaryForCL(ctx, sql.Qualify(dks.GitHubCRS, "does not exist"))
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "not found")
 }
@@ -507,7 +507,7 @@ func TestChangelistLastUpdated_ValidCL_ReturnsLatestTS(t *testing.T) {
 	db := useKitchenSinkData(ctx, t)
 
 	s := New(db, 100)
-	ts, err := s.ChangelistLastUpdated(ctx, sql.Qualify(dks.GerritInternalCRS, dks.ChangelistIDThatAddsNewTests))
+	ts, err := s.ChangelistLastUpdated(ctx, sql.Qualify(dks.GitHubCRS, dks.ChangelistIDThatAddsNewTests))
 	require.NoError(t, err)
 	assert.Equal(t, changelistTSForNewTests, ts)
 }
@@ -518,7 +518,7 @@ func TestChangelistLastUpdated_NonExistentCL_ReturnsZeroTime(t *testing.T) {
 	db := useKitchenSinkData(ctx, t)
 
 	s := New(db, 100)
-	ts, err := s.ChangelistLastUpdated(ctx, sql.Qualify(dks.GerritInternalCRS, "does not exist"))
+	ts, err := s.ChangelistLastUpdated(ctx, sql.Qualify(dks.GitHubCRS, "does not exist"))
 	require.NoError(t, err)
 	assert.True(t, ts.IsZero())
 }
@@ -3033,8 +3033,7 @@ func TestSearch_ReturnsCLData_ShowsOnlyDataNewToPrimaryBranch(t *testing.T) {
 
 	s := New(db, 100)
 	s.SetReviewSystemTemplates(map[string]string{
-		dks.GitHubCRS:         "http://example.com/public/%s",
-		dks.GerritInternalCRS: "http://example.com/internal/%s",
+		dks.GitHubCRS: "http://example.com/public/%s",
 	})
 	require.NoError(t, s.StartCacheProcess(ctx, time.Minute, 100))
 	res, err := s.Search(ctx, &query.Search{
@@ -3463,8 +3462,7 @@ func TestSearch_DisallowTriagingOnCL_DigestExcludedFromBulkTriageInfos(t *testin
 
 	s := New(db, 100)
 	s.SetReviewSystemTemplates(map[string]string{
-		dks.GitHubCRS:         "http://example.com/public/%s",
-		dks.GerritInternalCRS: "http://example.com/internal/%s",
+		dks.GitHubCRS: "http://example.com/public/%s",
 	})
 	require.NoError(t, s.StartCacheProcess(ctx, time.Minute, 100))
 	res, err := s.Search(ctx, &query.Search{
@@ -3585,8 +3583,7 @@ func TestSearch_CLAndPatchsetWithMultipleDatapointsOnSameTrace_ReturnsAllDatapoi
 
 	s := New(db, 100)
 	s.SetReviewSystemTemplates(map[string]string{
-		dks.GitHubCRS:         "http://example.com/public/%s",
-		dks.GerritInternalCRS: "http://example.com/internal/%s",
+		dks.GitHubCRS: "http://example.com/public/%s",
 	})
 	require.NoError(t, s.StartCacheProcess(ctx, time.Minute, 100))
 	res, err := s.Search(ctx, &query.Search{
@@ -3937,8 +3934,7 @@ func TestSearch_ReturnsFilteredCLData_Success(t *testing.T) {
 
 	s := New(db, 100)
 	s.SetReviewSystemTemplates(map[string]string{
-		dks.GitHubCRS:         "http://example.com/public/%s",
-		dks.GerritInternalCRS: "http://example.com/internal/%s",
+		dks.GitHubCRS: "http://example.com/public/%s",
 	})
 	require.NoError(t, s.StartCacheProcess(ctx, time.Minute, 100))
 	res, err := s.Search(ctx, &query.Search{
@@ -4176,8 +4172,7 @@ func TestSearch_ResultHasNoReferenceDiffsNorExistingTraces_Success(t *testing.T)
 
 	s := New(db, 100)
 	s.SetReviewSystemTemplates(map[string]string{
-		dks.GitHubCRS:         "http://example.com/public/%s",
-		dks.GerritInternalCRS: "http://example.com/internal/%s",
+		dks.GitHubCRS: "http://example.com/public/%s",
 	})
 	require.NoError(t, s.StartCacheProcess(ctx, time.Minute, 100))
 	res, err := s.Search(ctx, &query.Search{
@@ -4192,7 +4187,7 @@ func TestSearch_ResultHasNoReferenceDiffsNorExistingTraces_Success(t *testing.T)
 		RGBAMinFilter:                  0,
 		RGBAMaxFilter:                  255,
 		ChangelistID:                   dks.ChangelistIDThatAddsNewTests,
-		CodeReviewSystemID:             dks.GerritInternalCRS,
+		CodeReviewSystemID:             dks.GitHubCRS,
 		Patchsets:                      []int64{4}, // This is the second PS we have data for.
 		IncludeDigestsProducedOnMaster: false,
 	})
@@ -4362,7 +4357,7 @@ func TestGetChangelistParamset_ValidCLs_Success(t *testing.T) {
 		types.CorpusField:     []string{dks.CornersCorpus, dks.RoundCorpus},
 	}, ps)
 
-	ps, err = s.GetChangelistParamset(ctx, dks.GerritInternalCRS, dks.ChangelistIDThatAddsNewTests)
+	ps, err = s.GetChangelistParamset(ctx, dks.GitHubCRS, dks.ChangelistIDThatAddsNewTests)
 	require.NoError(t, err)
 	assert.Equal(t, paramtools.ReadOnlyParamSet{
 		dks.ColorModeKey:      []string{dks.GreyColorMode, dks.RGBColorMode},
@@ -4425,7 +4420,7 @@ func TestGetChangelistParamset_RespectsPublicView_Success(t *testing.T) {
 		types.CorpusField:     []string{dks.CornersCorpus, dks.RoundCorpus},
 	}, ps)
 
-	ps, err = s.GetChangelistParamset(ctx, dks.GerritInternalCRS, dks.ChangelistIDThatAddsNewTests)
+	ps, err = s.GetChangelistParamset(ctx, dks.GitHubCRS, dks.ChangelistIDThatAddsNewTests)
 	require.NoError(t, err)
 	assert.Equal(t, paramtools.ReadOnlyParamSet{
 		dks.ColorModeKey:      []string{dks.GreyColorMode, dks.RGBColorMode},
@@ -5267,8 +5262,7 @@ func TestSearch_SecondaryBranch_NoReferenceImages_ReturnsEmptyResult(t *testing.
 
 	s := New(db, 100)
 	s.SetReviewSystemTemplates(map[string]string{
-		dks.GitHubCRS:         "http://example.com/public/%s",
-		dks.GerritInternalCRS: "http://example.com/internal/%s",
+		dks.GitHubCRS: "http://example.com/public/%s",
 	})
 	require.NoError(t, s.StartCacheProcess(ctx, time.Minute, 100))
 	res, err := s.Search(ctx, &query.Search{
@@ -6872,8 +6866,7 @@ func TestGetDigestDetails_ValidDigestAndGroupingOnCL_Success(t *testing.T) {
 	})
 	s := New(db, 100)
 	s.SetReviewSystemTemplates(map[string]string{
-		dks.GitHubCRS:         "http://example.com/public/%s",
-		dks.GerritInternalCRS: "http://example.com/internal/%s",
+		dks.GitHubCRS: "http://example.com/public/%s",
 	})
 
 	details, err := s.GetDigestDetails(ctx, inputGrouping, dks.DigestC02Pos, dks.ChangelistIDThatAttemptsToFixIOS, dks.GitHubCRS)
@@ -6977,8 +6970,7 @@ func TestGetDigestDetails_ValidDigestAndGroupingOnCL_PublicView_SomeTracesMatchP
 	s := New(db, 100)
 	require.NoError(t, s.StartApplyingPublicParams(ctx, matcher, time.Minute))
 	s.SetReviewSystemTemplates(map[string]string{
-		dks.GitHubCRS:         "http://example.com/public/%s",
-		dks.GerritInternalCRS: "http://example.com/internal/%s",
+		dks.GitHubCRS: "http://example.com/public/%s",
 	})
 
 	details, err := s.GetDigestDetails(ctx, inputGrouping, dks.DigestC02Pos, dks.ChangelistIDThatAttemptsToFixIOS, dks.GitHubCRS)
@@ -7066,8 +7058,7 @@ func TestGetDigestDetails_ValidDigestAndGroupingOnCL_PublicView_NoTracesMatchPub
 	s := New(db, 100)
 	require.NoError(t, s.StartApplyingPublicParams(ctx, matcher, time.Minute))
 	s.SetReviewSystemTemplates(map[string]string{
-		dks.GitHubCRS:         "http://example.com/public/%s",
-		dks.GerritInternalCRS: "http://example.com/internal/%s",
+		dks.GitHubCRS: "http://example.com/public/%s",
 	})
 
 	_, err = s.GetDigestDetails(ctx, inputGrouping, dks.DigestC02Pos, dks.ChangelistIDThatAttemptsToFixIOS, dks.GitHubCRS)
@@ -7096,8 +7087,7 @@ func TestGetDigestDetails_ValidDigestAndGroupingOnCL_OnePatchsetWithMultipleData
 	})
 	s := New(db, 100)
 	s.SetReviewSystemTemplates(map[string]string{
-		dks.GitHubCRS:         "http://example.com/public/%s",
-		dks.GerritInternalCRS: "http://example.com/internal/%s",
+		dks.GitHubCRS: "http://example.com/public/%s",
 	})
 
 	// In this CL a tryjob was executed multiple times at the last patchset, generating multiple
@@ -7191,8 +7181,7 @@ func TestGetDigestDetails_InvalidDigestAndGroupingOnCL_ReturnsError(t *testing.T
 
 	s := New(db, 100)
 	s.SetReviewSystemTemplates(map[string]string{
-		dks.GitHubCRS:         "http://example.com/public/%s",
-		dks.GerritInternalCRS: "http://example.com/internal/%s",
+		dks.GitHubCRS: "http://example.com/public/%s",
 	})
 
 	_, err := s.GetDigestDetails(ctx, inputGrouping, dks.DigestE03Unt_CL, dks.ChangelistIDThatAttemptsToFixIOS, dks.GitHubCRS)

@@ -304,7 +304,7 @@ func TestCheckForLandedCycle_CLExpectations_MergedIntoPrimaryBranch(t *testing.T
 	})
 
 	cfg2 := deepcopy.Copy(cfg).(config.Common)
-	cfg2.RepoFollowerConfig.SystemName = dks.GerritInternalCRS
+	cfg2.RepoFollowerConfig.SystemName = dks.GitHubCRS
 
 	require.NoError(t, UpdateCycle(ctx, db, gitp, cfg2))
 
@@ -317,7 +317,7 @@ func TestCheckForLandedCycle_CLExpectations_MergedIntoPrimaryBranch(t *testing.T
 	cls := sqltest.GetAllRows(ctx, t, db, "Changelists", &schema.ChangelistRow{}).([]schema.ChangelistRow)
 	assert.Equal(t, []schema.ChangelistRow{{
 		ChangelistID:     "gerrit-internal_CL_new_tests",
-		System:           dks.GerritInternalCRS,
+		System:           dks.GitHubCRS,
 		Status:           schema.StatusLanded, // updated
 		OwnerEmail:       dks.UserTwo,
 		Subject:          "Increase test coverage",
@@ -522,7 +522,7 @@ func TestCheckForLandedCycle_TriageExistingData_Success(t *testing.T) {
 	})
 
 	cfg2 := deepcopy.Copy(cfg).(config.Common)
-	cfg2.RepoFollowerConfig.SystemName = dks.GerritInternalCRS
+	cfg2.RepoFollowerConfig.SystemName = dks.GitHubCRS
 
 	require.NoError(t, UpdateCycle(ctx, db, gitp, cfg2))
 
@@ -535,7 +535,7 @@ func TestCheckForLandedCycle_TriageExistingData_Success(t *testing.T) {
 	cls := sqltest.GetAllRows(ctx, t, db, "Changelists", &schema.ChangelistRow{}).([]schema.ChangelistRow)
 	assert.Equal(t, []schema.ChangelistRow{{
 		ChangelistID:     "gerrit-internal_CL_new_tests",
-		System:           dks.GerritInternalCRS,
+		System:           dks.GitHubCRS,
 		Status:           schema.StatusLanded, // updated
 		OwnerEmail:       dks.UserTwo,
 		Subject:          "Increase test coverage",

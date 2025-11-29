@@ -10,9 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.goldmine.build/go/gerrit"
 	"go.goldmine.build/go/gerrit/mocks"
-	"go.goldmine.build/go/skerr"
 	"go.goldmine.build/go/testutils"
-	"go.goldmine.build/go/vcsinfo"
 	"go.goldmine.build/golden/go/code_review"
 )
 
@@ -217,48 +215,6 @@ func TestGetPatchset_OtherError_ReturnsError(t *testing.T) {
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "fetching CL")
 	assert.Contains(t, err.Error(), "oops")
-}
-
-func TestGetChangelistForCommitSunnyDay(t *testing.T) {
-
-	mgi := &mocks.GerritInterface{}
-	defer mgi.AssertExpectations(t)
-
-	const id = "235460"
-	const clBody = `blah blah blah
-    Reviewed-on: https://chromium-review.googlesource.com/c/chromium/src/+/235460
-blah blah blah
-`
-
-	mgi.On("ExtractIssueFromCommit", clBody).Return(int64(235460), nil)
-
-	c := New(mgi)
-
-	clID, err := c.GetChangelistIDForCommit(context.Background(), &vcsinfo.LongCommit{
-		// This is the only field the implementation cares about.
-		Body: clBody,
-	})
-	require.NoError(t, err)
-	assert.Equal(t, id, clID)
-}
-
-func TestGetChangelistForCommitBadBody(t *testing.T) {
-
-	mgi := &mocks.GerritInterface{}
-	defer mgi.AssertExpectations(t)
-
-	const clBody = `malformed body`
-
-	mgi.On("ExtractIssueFromCommit", clBody).Return(int64(0), skerr.Fmt("nope"))
-
-	c := New(mgi)
-
-	_, err := c.GetChangelistIDForCommit(context.Background(), &vcsinfo.LongCommit{
-		// This is the only field the implementation cares about.
-		Body: clBody,
-	})
-	require.Error(t, err)
-	assert.Equal(t, err, code_review.ErrNotFound)
 }
 
 func TestCommentOnChangelistSunnyDay(t *testing.T) {
