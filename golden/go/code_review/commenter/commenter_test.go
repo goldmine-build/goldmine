@@ -51,7 +51,7 @@ func TestCommentOnCLs_MultiplePatchsetsNeedComments_CommentsMade(t *testing.T) {
 		"Gold has detected about 4 new digest(s) on patchset 4.\nPlease triage them at gold.skia.org/cl/gerrit-internal/CL_new_tests.").Return(nil)
 
 	c, err := New(db, []ReviewSystem{
-		{ID: dks.GerritCRS, Client: gerritClient},
+		{ID: dks.GitHubCRS, Client: gerritClient},
 		{ID: dks.GerritInternalCRS, Client: gerritInternalClient},
 	}, basicTemplate, instanceURL, 100)
 	require.NoError(t, err)
@@ -82,7 +82,7 @@ func TestCommentOnCLs_MultiplePatchsetsNeedComments_CommentsMade(t *testing.T) {
 		CommentedOnCL: true,
 	}, {
 		PatchsetID:    "gerrit_PS_fixes_ipad_but_not_iphone",
-		System:        dks.GerritCRS,
+		System:        dks.GitHubCRS,
 		ChangelistID:  "gerrit_CL_fix_ios",
 		Order:         3,
 		GitHash:       "ffff111111111111111111111111111111111111",
@@ -96,7 +96,7 @@ func TestCommentOnCLs_MultiplePatchsetsNeedComments_CommentsMade(t *testing.T) {
 		CommentedOnCL: true,
 	}, {
 		PatchsetID:    "gerrit_PShaslanded",
-		System:        dks.GerritCRS,
+		System:        dks.GitHubCRS,
 		ChangelistID:  "gerrit_CLhaslanded",
 		Order:         1,
 		GitHash:       "aaaaa11111111111111111111111111111111111",
@@ -127,35 +127,35 @@ func TestCommentOnCLs_MultiplePatchsetsNeedComments_CommentsMade(t *testing.T) {
 		LastIngestedData: time.Date(2020, time.December, 12, 9, 20, 33, 0, time.UTC),
 	}, {
 		ChangelistID:     "gerrit_CL_fix_ios",
-		System:           dks.GerritCRS,
+		System:           dks.GitHubCRS,
 		Status:           schema.StatusOpen, // This shouldn't be modified
 		OwnerEmail:       dks.UserOne,
 		Subject:          "Fix iOS",
 		LastIngestedData: time.Date(2020, time.December, 10, 4, 5, 6, 0, time.UTC),
 	}, {
 		ChangelistID:     "gerrit_CLdisallowtriaging",
-		System:           dks.GerritCRS,
+		System:           dks.GitHubCRS,
 		Status:           schema.StatusOpen,
 		OwnerEmail:       dks.UserOne,
 		Subject:          "add test with disallow triaging",
 		LastIngestedData: time.Date(2020, time.December, 12, 16, 0, 0, 0, time.UTC),
 	}, {
 		ChangelistID:     "gerrit_CLhaslanded",
-		System:           dks.GerritCRS,
+		System:           dks.GitHubCRS,
 		Status:           schema.StatusLanded,
 		OwnerEmail:       dks.UserTwo,
 		Subject:          "was landed",
 		LastIngestedData: time.Date(2020, time.May, 5, 5, 5, 0, 0, time.UTC),
 	}, {
 		ChangelistID:     "gerrit_CLisabandoned",
-		System:           dks.GerritCRS,
+		System:           dks.GitHubCRS,
 		Status:           schema.StatusAbandoned,
 		OwnerEmail:       dks.UserOne,
 		Subject:          "was abandoned",
 		LastIngestedData: time.Date(2020, time.June, 6, 6, 6, 0, 0, time.UTC),
 	}, {
 		ChangelistID:     "gerrit_CLmultipledatapoints",
-		System:           dks.GerritCRS,
+		System:           dks.GitHubCRS,
 		Status:           schema.StatusOpen,
 		OwnerEmail:       dks.UserOne,
 		Subject:          "multiple datapoints",
@@ -177,7 +177,7 @@ func TestCommentOnCLs_NoPatchsetsNeedComments_Success(t *testing.T) {
 	require.NoError(t, sqltest.BulkInsertDataTables(ctx, db, existingData))
 
 	c, err := New(db, []ReviewSystem{
-		{ID: dks.GerritCRS, Client: nil}, // This test doesn't talk to the clients
+		{ID: dks.GitHubCRS, Client: nil}, // This test doesn't talk to the clients
 		{ID: dks.GerritInternalCRS, Client: nil},
 	}, basicTemplate, instanceURL, 100)
 	require.NoError(t, err)
@@ -205,7 +205,7 @@ func TestCommentOnCLs_NoPatchsetsNeedComments_Success(t *testing.T) {
 		CommentedOnCL: true,
 	}, {
 		PatchsetID:    "gerrit_PS_fixes_ipad_but_not_iphone",
-		System:        dks.GerritCRS,
+		System:        dks.GitHubCRS,
 		ChangelistID:  "gerrit_CL_fix_ios",
 		Order:         3,
 		GitHash:       "ffff111111111111111111111111111111111111",
@@ -219,7 +219,7 @@ func TestCommentOnCLs_NoPatchsetsNeedComments_Success(t *testing.T) {
 		CommentedOnCL: true,
 	}, {
 		PatchsetID:    "gerrit_PShaslanded",
-		System:        dks.GerritCRS,
+		System:        dks.GitHubCRS,
 		ChangelistID:  "gerrit_CLhaslanded",
 		Order:         1,
 		GitHash:       "aaaaa11111111111111111111111111111111111",
@@ -262,7 +262,7 @@ func TestCommentOnCLs_OnePatchsetNeedsComment_Success(t *testing.T) {
 		"Gold has detected about 4 new digest(s) on patchset 4.\nPlease triage them at gold.skia.org/cl/gerrit-internal/CL_new_tests.").Return(nil)
 
 	c, err := New(db, []ReviewSystem{
-		{ID: dks.GerritCRS, Client: nil},
+		{ID: dks.GitHubCRS, Client: nil},
 		{ID: dks.GerritInternalCRS, Client: gerritInternalClient},
 	}, basicTemplate, instanceURL, 100)
 	require.NoError(t, err)
@@ -292,7 +292,7 @@ func TestCommentOnCLs_OnePatchsetNeedsComment_Success(t *testing.T) {
 		CommentedOnCL: true,
 	}, {
 		PatchsetID:    "gerrit_PS_fixes_ipad_but_not_iphone",
-		System:        dks.GerritCRS,
+		System:        dks.GitHubCRS,
 		ChangelistID:  "gerrit_CL_fix_ios",
 		Order:         3,
 		GitHash:       "ffff111111111111111111111111111111111111",
@@ -306,7 +306,7 @@ func TestCommentOnCLs_OnePatchsetNeedsComment_Success(t *testing.T) {
 		CommentedOnCL: true,
 	}, {
 		PatchsetID:    "gerrit_PShaslanded",
-		System:        dks.GerritCRS,
+		System:        dks.GitHubCRS,
 		ChangelistID:  "gerrit_CLhaslanded",
 		Order:         1,
 		GitHash:       "aaaaa11111111111111111111111111111111111",
@@ -335,7 +335,7 @@ func TestCommentOnCLs_NoCLsInWindow_NothingUpdated(t *testing.T) {
 	require.NoError(t, sqltest.BulkInsertDataTables(ctx, db, dks.Build()))
 
 	c, err := New(db, []ReviewSystem{
-		{ID: dks.GerritCRS, Client: nil}, // This test doesn't talk to the clients
+		{ID: dks.GitHubCRS, Client: nil}, // This test doesn't talk to the clients
 		{ID: dks.GerritInternalCRS, Client: nil},
 	}, basicTemplate, instanceURL, 100)
 	require.NoError(t, err)
@@ -363,7 +363,7 @@ func TestCommentOnCLs_NoCLsInWindow_NothingUpdated(t *testing.T) {
 		CommentedOnCL: false,
 	}, {
 		PatchsetID:    "gerrit_PS_fixes_ipad_but_not_iphone",
-		System:        dks.GerritCRS,
+		System:        dks.GitHubCRS,
 		ChangelistID:  "gerrit_CL_fix_ios",
 		Order:         3,
 		GitHash:       "ffff111111111111111111111111111111111111",
@@ -377,7 +377,7 @@ func TestCommentOnCLs_NoCLsInWindow_NothingUpdated(t *testing.T) {
 		CommentedOnCL: false,
 	}, {
 		PatchsetID:    "gerrit_PShaslanded",
-		System:        dks.GerritCRS,
+		System:        dks.GitHubCRS,
 		ChangelistID:  "gerrit_CLhaslanded",
 		Order:         1,
 		GitHash:       "aaaaa11111111111111111111111111111111111",
@@ -440,7 +440,7 @@ func TestCommentOnCLs_CLWasAbandoned_DBNotUpdated(t *testing.T) {
 		CommentedOnCL: false, // should not be updated
 	}, {
 		PatchsetID:    "gerrit_PS_fixes_ipad_but_not_iphone",
-		System:        dks.GerritCRS,
+		System:        dks.GitHubCRS,
 		ChangelistID:  "gerrit_CL_fix_ios",
 		Order:         3,
 		GitHash:       "ffff111111111111111111111111111111111111",
@@ -454,7 +454,7 @@ func TestCommentOnCLs_CLWasAbandoned_DBNotUpdated(t *testing.T) {
 		CommentedOnCL: false,
 	}, {
 		PatchsetID:    "gerrit_PShaslanded",
-		System:        dks.GerritCRS,
+		System:        dks.GitHubCRS,
 		ChangelistID:  "gerrit_CLhaslanded",
 		Order:         1,
 		GitHash:       "aaaaa11111111111111111111111111111111111",
@@ -488,35 +488,35 @@ func TestCommentOnCLs_CLWasAbandoned_DBNotUpdated(t *testing.T) {
 		LastIngestedData: time.Date(2020, time.December, 12, 9, 20, 33, 0, time.UTC),
 	}, {
 		ChangelistID:     "gerrit_CL_fix_ios",
-		System:           dks.GerritCRS,
+		System:           dks.GitHubCRS,
 		Status:           schema.StatusOpen, // This shouldn't be modified
 		OwnerEmail:       dks.UserOne,
 		Subject:          "Fix iOS",
 		LastIngestedData: time.Date(2020, time.December, 10, 4, 5, 6, 0, time.UTC),
 	}, {
 		ChangelistID:     "gerrit_CLdisallowtriaging",
-		System:           dks.GerritCRS,
+		System:           dks.GitHubCRS,
 		Status:           schema.StatusOpen,
 		OwnerEmail:       dks.UserOne,
 		Subject:          "add test with disallow triaging",
 		LastIngestedData: time.Date(2020, time.December, 12, 16, 0, 0, 0, time.UTC),
 	}, {
 		ChangelistID:     "gerrit_CLhaslanded",
-		System:           dks.GerritCRS,
+		System:           dks.GitHubCRS,
 		Status:           schema.StatusLanded,
 		OwnerEmail:       dks.UserTwo,
 		Subject:          "was landed",
 		LastIngestedData: time.Date(2020, time.May, 5, 5, 5, 0, 0, time.UTC),
 	}, {
 		ChangelistID:     "gerrit_CLisabandoned",
-		System:           dks.GerritCRS,
+		System:           dks.GitHubCRS,
 		Status:           schema.StatusAbandoned,
 		OwnerEmail:       dks.UserOne,
 		Subject:          "was abandoned",
 		LastIngestedData: time.Date(2020, time.June, 6, 6, 6, 0, 0, time.UTC),
 	}, {
 		ChangelistID:     "gerrit_CLmultipledatapoints",
-		System:           dks.GerritCRS,
+		System:           dks.GitHubCRS,
 		Status:           schema.StatusOpen,
 		OwnerEmail:       dks.UserOne,
 		Subject:          "multiple datapoints",
@@ -568,7 +568,7 @@ func TestCommentOnCLs_CommentingResultsInError_ErrorLoggedNotReturned(t *testing
 		CommentedOnCL: false, // should not be updated
 	}, {
 		PatchsetID:    "gerrit_PS_fixes_ipad_but_not_iphone",
-		System:        dks.GerritCRS,
+		System:        dks.GitHubCRS,
 		ChangelistID:  "gerrit_CL_fix_ios",
 		Order:         3,
 		GitHash:       "ffff111111111111111111111111111111111111",
@@ -582,7 +582,7 @@ func TestCommentOnCLs_CommentingResultsInError_ErrorLoggedNotReturned(t *testing
 		CommentedOnCL: false,
 	}, {
 		PatchsetID:    "gerrit_PShaslanded",
-		System:        dks.GerritCRS,
+		System:        dks.GitHubCRS,
 		ChangelistID:  "gerrit_CLhaslanded",
 		Order:         1,
 		GitHash:       "aaaaa11111111111111111111111111111111111",
@@ -647,7 +647,7 @@ func TestCommentOnCLs_CLNotFound_NoError(t *testing.T) {
 		CommentedOnCL: false, // should not be updated
 	}, {
 		PatchsetID:    "gerrit_PS_fixes_ipad_but_not_iphone",
-		System:        dks.GerritCRS,
+		System:        dks.GitHubCRS,
 		ChangelistID:  "gerrit_CL_fix_ios",
 		Order:         3,
 		GitHash:       "ffff111111111111111111111111111111111111",
@@ -661,7 +661,7 @@ func TestCommentOnCLs_CLNotFound_NoError(t *testing.T) {
 		CommentedOnCL: false,
 	}, {
 		PatchsetID:    "gerrit_PShaslanded",
-		System:        dks.GerritCRS,
+		System:        dks.GitHubCRS,
 		ChangelistID:  "gerrit_CLhaslanded",
 		Order:         1,
 		GitHash:       "aaaaa11111111111111111111111111111111111",

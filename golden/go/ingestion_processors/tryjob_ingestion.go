@@ -99,7 +99,7 @@ func TryjobSQL(ctx context.Context, src ingestion.Source, configParams map[strin
 		return nil, skerr.Fmt("missing CRS (e.g. 'gerrit')")
 	}
 
-	var reviewSystems map[string]clstore.ReviewSystem
+	reviewSystems := map[string]clstore.ReviewSystem{}
 	for _, crsName := range crsNames {
 		crsClient, err := codeReviewSystemFactory(ctx, crsName, configParams, client)
 		if err != nil {
@@ -152,16 +152,19 @@ func codeReviewSystemFactory(ctx context.Context, crsName string, configParams m
 		if strings.TrimSpace(githubRepo) == "" {
 			return nil, skerr.Fmt("missing repo for the GitHub code review system")
 		}
+		var githubTS oauth2.TokenSource = nil
 		githubCredPath := configParams[githubCredentialsPathParam]
-		if strings.TrimSpace(githubCredPath) == "" {
-			return nil, skerr.Fmt("missing credentials path for the GitHub code review system")
+		if strings.TrimSpace(githubCredPath) != "" {
+			gBody, err := os.ReadFile(githubCredPath)
+			if err != nil {
+				return nil, skerr.Wrapf(err, "reading githubToken in %s", githubCredPath)
+			}
+			gToken := strings.TrimSpace(string(gBody))
+			githubTS = oauth2.StaticTokenSource(&oauth2.Token{AccessToken: gToken})
+		} else {
+			sklog.Infof("No GitHub credentials path provided, proceeding unauthenticated which may be subject to rate limiting.")
 		}
-		gBody, err := os.ReadFile(githubCredPath)
-		if err != nil {
-			return nil, skerr.Wrapf(err, "reading githubToken in %s", githubCredPath)
-		}
-		gToken := strings.TrimSpace(string(gBody))
-		githubTS := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: gToken})
+
 		c := httputils.DefaultClientConfig().With2xxOnly().WithTokenSource(githubTS).Client()
 		return github_crs.New(c, githubRepo), nil
 	}

@@ -324,35 +324,35 @@ func TestCheckForLandedCycle_CLExpectations_MergedIntoPrimaryBranch(t *testing.T
 		LastIngestedData: time.Date(2020, time.December, 12, 9, 20, 33, 0, time.UTC),
 	}, {
 		ChangelistID:     "gerrit_CL_fix_ios",
-		System:           dks.GerritCRS,
+		System:           dks.GitHubCRS,
 		Status:           schema.StatusOpen, // not touched
 		OwnerEmail:       dks.UserOne,
 		Subject:          "Fix iOS",
 		LastIngestedData: time.Date(2020, time.December, 10, 4, 5, 6, 0, time.UTC),
 	}, {
 		ChangelistID:     "gerrit_CLdisallowtriaging",
-		System:           dks.GerritCRS,
+		System:           dks.GitHubCRS,
 		Status:           schema.StatusOpen, // not touched
 		OwnerEmail:       dks.UserOne,
 		Subject:          "add test with disallow triaging",
 		LastIngestedData: time.Date(2020, time.December, 12, 16, 0, 0, 0, time.UTC),
 	}, {
 		ChangelistID:     "gerrit_CLhaslanded",
-		System:           dks.GerritCRS,
+		System:           dks.GitHubCRS,
 		Status:           schema.StatusLanded,
 		OwnerEmail:       dks.UserTwo,
 		Subject:          "was landed",
 		LastIngestedData: time.Date(2020, time.May, 5, 5, 5, 0, 0, time.UTC),
 	}, {
 		ChangelistID:     "gerrit_CLisabandoned",
-		System:           dks.GerritCRS,
+		System:           dks.GitHubCRS,
 		Status:           schema.StatusAbandoned,
 		OwnerEmail:       dks.UserOne,
 		Subject:          "was abandoned",
 		LastIngestedData: time.Date(2020, time.June, 6, 6, 6, 0, 0, time.UTC),
 	}, {
 		ChangelistID:     "gerrit_CLmultipledatapoints",
-		System:           dks.GerritCRS,
+		System:           dks.GitHubCRS,
 		Status:           schema.StatusOpen,
 		OwnerEmail:       dks.UserOne,
 		Subject:          "multiple datapoints",
@@ -542,35 +542,35 @@ func TestCheckForLandedCycle_TriageExistingData_Success(t *testing.T) {
 		LastIngestedData: time.Date(2020, time.December, 12, 9, 20, 33, 0, time.UTC),
 	}, {
 		ChangelistID:     "gerrit_CL_fix_ios",
-		System:           dks.GerritCRS,
+		System:           dks.GitHubCRS,
 		Status:           schema.StatusOpen, // not touched
 		OwnerEmail:       dks.UserOne,
 		Subject:          "Fix iOS",
 		LastIngestedData: time.Date(2020, time.December, 10, 4, 5, 6, 0, time.UTC),
 	}, {
 		ChangelistID:     "gerrit_CLdisallowtriaging",
-		System:           dks.GerritCRS,
+		System:           dks.GitHubCRS,
 		Status:           schema.StatusOpen, // not touched
 		OwnerEmail:       dks.UserOne,
 		Subject:          "add test with disallow triaging",
 		LastIngestedData: time.Date(2020, time.December, 12, 16, 0, 0, 0, time.UTC),
 	}, {
 		ChangelistID:     "gerrit_CLhaslanded",
-		System:           dks.GerritCRS,
+		System:           dks.GitHubCRS,
 		Status:           schema.StatusLanded,
 		OwnerEmail:       dks.UserTwo,
 		Subject:          "was landed",
 		LastIngestedData: time.Date(2020, time.May, 5, 5, 5, 0, 0, time.UTC),
 	}, {
 		ChangelistID:     "gerrit_CLisabandoned",
-		System:           dks.GerritCRS,
+		System:           dks.GitHubCRS,
 		Status:           schema.StatusAbandoned,
 		OwnerEmail:       dks.UserOne,
 		Subject:          "was abandoned",
 		LastIngestedData: time.Date(2020, time.June, 6, 6, 6, 0, 0, time.UTC),
 	}, {
 		ChangelistID:     "gerrit_CLmultipledatapoints",
-		System:           dks.GerritCRS,
+		System:           dks.GitHubCRS,
 		Status:           schema.StatusOpen,
 		OwnerEmail:       dks.UserOne,
 		Subject:          "multiple datapoints",

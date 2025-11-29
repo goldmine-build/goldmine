@@ -42,7 +42,7 @@ func TestNewAndUntriagedSummaryForCL_OnePatchset_Success(t *testing.T) {
 
 	s := New(db, 100)
 	require.NoError(t, s.StartCacheProcess(ctx, time.Minute, 100))
-	rv, err := s.NewAndUntriagedSummaryForCL(ctx, sql.Qualify(dks.GerritCRS, dks.ChangelistIDThatAttemptsToFixIOS))
+	rv, err := s.NewAndUntriagedSummaryForCL(ctx, sql.Qualify(dks.GitHubCRS, dks.ChangelistIDThatAttemptsToFixIOS))
 	require.NoError(t, err)
 	assert.Equal(t, NewAndUntriagedSummary{
 		ChangelistID: dks.ChangelistIDThatAttemptsToFixIOS,
@@ -69,7 +69,7 @@ func TestNewAndUntriagedSummaryForCL_OnePatchsetWithMultipleDatapointsOnSameTrac
 
 	s := New(db, 100)
 	require.NoError(t, s.StartCacheProcess(ctx, time.Minute, 100))
-	rv, err := s.NewAndUntriagedSummaryForCL(ctx, sql.Qualify(dks.GerritCRS, dks.ChangelistIDWithMultipleDatapointsPerTrace))
+	rv, err := s.NewAndUntriagedSummaryForCL(ctx, sql.Qualify(dks.GitHubCRS, dks.ChangelistIDWithMultipleDatapointsPerTrace))
 	require.NoError(t, err)
 	assert.Equal(t, NewAndUntriagedSummary{
 		ChangelistID: dks.ChangelistIDWithMultipleDatapointsPerTrace,
@@ -132,7 +132,7 @@ func TestNewAndUntriagedSummaryForCL_NoNewDataForPS_Success(t *testing.T) {
 	const clID = "new_cl"
 	const ps1ID = "first_docs_ps"
 	const ps2ID = "second_docs_ps"
-	cl := b.AddChangelist(clID, dks.GerritCRS, dks.UserFour, "Update docs", schema.StatusAbandoned)
+	cl := b.AddChangelist(clID, dks.GitHubCRS, dks.UserFour, "Update docs", schema.StatusAbandoned)
 	ps1 := cl.AddPatchset(ps1ID, "5555555555555555555555555555555555555555", 2)
 	ps2 := cl.AddPatchset(ps2ID, "6666666666666666666666666666666666666666", 12)
 
@@ -145,7 +145,7 @@ func TestNewAndUntriagedSummaryForCL_NoNewDataForPS_Success(t *testing.T) {
 			{dks.ColorModeKey: dks.RGBColorMode, types.CorpusField: dks.CornersCorpus, types.PrimaryKeyField: dks.TriangleTest},
 			{dks.ColorModeKey: dks.RGBColorMode, types.CorpusField: dks.RoundCorpus, types.PrimaryKeyField: dks.CircleTest},
 		}).OptionsAll(paramtools.Params{"ext": "png"}).
-		FromTryjob("tryjob 1", dks.BuildBucketCIS, "My-Test", "whatever", "2021-03-30T23:59:59Z")
+		FromTryjob("tryjob 1", dks.GitHubCIS, "My-Test", "whatever", "2021-03-30T23:59:59Z")
 
 	ps2.DataWithCommonKeys(paramtools.Params{
 		dks.OSKey:     dks.AndroidOS,
@@ -156,14 +156,14 @@ func TestNewAndUntriagedSummaryForCL_NoNewDataForPS_Success(t *testing.T) {
 			{dks.ColorModeKey: dks.RGBColorMode, types.CorpusField: dks.CornersCorpus, types.PrimaryKeyField: dks.TriangleTest},
 			{dks.ColorModeKey: dks.RGBColorMode, types.CorpusField: dks.RoundCorpus, types.PrimaryKeyField: dks.CircleTest},
 		}).OptionsAll(paramtools.Params{"ext": "png"}).
-		FromTryjob("tryjob 2", dks.BuildBucketCIS, "My-Test", "whatever", "2021-04-01T02:03:04Z")
+		FromTryjob("tryjob 2", dks.GitHubCIS, "My-Test", "whatever", "2021-04-01T02:03:04Z")
 
 	require.NoError(t, sqltest.BulkInsertDataTables(ctx, db, b.Build()))
 	waitForSystemTime()
 
 	s := New(db, 100)
 	require.NoError(t, s.StartCacheProcess(ctx, time.Minute, 100))
-	rv, err := s.NewAndUntriagedSummaryForCL(ctx, sql.Qualify(dks.GerritCRS, clID))
+	rv, err := s.NewAndUntriagedSummaryForCL(ctx, sql.Qualify(dks.GitHubCRS, clID))
 	require.NoError(t, err)
 
 	assert.Equal(t, NewAndUntriagedSummary{
@@ -209,7 +209,7 @@ func TestNewAndUntriagedSummaryForCL_NewDeviceAdded_DigestsOnPrimaryBranchNotCou
 	const ps1ID = "ps has bug with circle"
 	const ps2ID = "ps has different bug with circle"
 	const ps3ID = "ps resolved bug with circle"
-	cl := b.AddChangelist(clID, dks.GerritCRS, dks.UserFour, "Add new device", schema.StatusLanded)
+	cl := b.AddChangelist(clID, dks.GitHubCRS, dks.UserFour, "Add new device", schema.StatusLanded)
 	ps1 := cl.AddPatchset(ps1ID, "5555555555555555555555555555555555555555", 2)
 	ps2 := cl.AddPatchset(ps2ID, "6666666666666666666666666666666666666666", 4)
 	ps3 := cl.AddPatchset(ps3ID, "7777777777777777777777777777777777777777", 7)
@@ -227,7 +227,7 @@ func TestNewAndUntriagedSummaryForCL_NewDeviceAdded_DigestsOnPrimaryBranchNotCou
 			{dks.ColorModeKey: dks.RGBColorMode, types.CorpusField: dks.CornersCorpus, types.PrimaryKeyField: dks.TriangleTest},
 			{dks.ColorModeKey: dks.RGBColorMode, types.CorpusField: dks.RoundCorpus, types.PrimaryKeyField: dks.CircleTest},
 		}).OptionsAll(paramtools.Params{"ext": "png"}).
-		FromTryjob("tryjob 1", dks.BuildBucketCIS, "My-Test", "whatever", "2021-03-30T00:00:00Z")
+		FromTryjob("tryjob 1", dks.GitHubCIS, "My-Test", "whatever", "2021-03-30T00:00:00Z")
 
 	ps2.DataWithCommonKeys(paramtools.Params{
 		dks.OSKey:     dks.AndroidOS,
@@ -241,7 +241,7 @@ func TestNewAndUntriagedSummaryForCL_NewDeviceAdded_DigestsOnPrimaryBranchNotCou
 			{dks.ColorModeKey: dks.RGBColorMode, types.CorpusField: dks.CornersCorpus, types.PrimaryKeyField: dks.TriangleTest},
 			{dks.ColorModeKey: dks.RGBColorMode, types.CorpusField: dks.RoundCorpus, types.PrimaryKeyField: dks.CircleTest},
 		}).OptionsAll(paramtools.Params{"ext": "png"}).
-		FromTryjob("tryjob 2", dks.BuildBucketCIS, "My-Test", "whatever", "2021-03-30T12:00:00Z")
+		FromTryjob("tryjob 2", dks.GitHubCIS, "My-Test", "whatever", "2021-03-30T12:00:00Z")
 
 	cl.AddTriageEvent(dks.UserFour, "2021-03-30T13:00:00Z").
 		ExpectationsForGrouping(paramtools.Params{
@@ -257,14 +257,14 @@ func TestNewAndUntriagedSummaryForCL_NewDeviceAdded_DigestsOnPrimaryBranchNotCou
 			{dks.ColorModeKey: dks.RGBColorMode, types.CorpusField: dks.CornersCorpus, types.PrimaryKeyField: dks.TriangleTest},
 			{dks.ColorModeKey: dks.RGBColorMode, types.CorpusField: dks.RoundCorpus, types.PrimaryKeyField: dks.CircleTest},
 		}).OptionsAll(paramtools.Params{"ext": "png"}).
-		FromTryjob("tryjob 3", dks.BuildBucketCIS, "My-Test", "whatever", "2021-04-01T02:03:04Z")
+		FromTryjob("tryjob 3", dks.GitHubCIS, "My-Test", "whatever", "2021-04-01T02:03:04Z")
 
 	require.NoError(t, sqltest.BulkInsertDataTables(ctx, db, b.Build()))
 	waitForSystemTime()
 
 	s := New(db, 100)
 	require.NoError(t, s.StartCacheProcess(ctx, time.Minute, 100))
-	rv, err := s.NewAndUntriagedSummaryForCL(ctx, sql.Qualify(dks.GerritCRS, clID))
+	rv, err := s.NewAndUntriagedSummaryForCL(ctx, sql.Qualify(dks.GitHubCRS, clID))
 	require.NoError(t, err)
 
 	assert.Equal(t, NewAndUntriagedSummary{
@@ -302,7 +302,7 @@ func TestNewAndUntriagedSummaryForCL_IgnoreRulesRespected(t *testing.T) {
 	const clID = "make everything blank"
 	const ps1ID = "blankity_blanket"
 	const ps2ID = "blankity_blanket_taimen"
-	cl := b.AddChangelist(clID, dks.GerritCRS, dks.UserFour, "Experiment with alpha=0", schema.StatusOpen)
+	cl := b.AddChangelist(clID, dks.GitHubCRS, dks.UserFour, "Experiment with alpha=0", schema.StatusOpen)
 	ps1 := cl.AddPatchset(ps1ID, "5555555555555555555555555555555555555555", 1)
 	ps2 := cl.AddPatchset(ps2ID, "5555555555555555555555555555555555555555", 2)
 
@@ -331,7 +331,7 @@ func TestNewAndUntriagedSummaryForCL_IgnoreRulesRespected(t *testing.T) {
 			{dks.DeviceKey: "new device", types.CorpusField: dks.CornersCorpus, types.PrimaryKeyField: dks.SquareTest},
 			{dks.DeviceKey: "new device", types.CorpusField: dks.RoundCorpus, types.PrimaryKeyField: dks.CircleTest},
 		}).OptionsAll(paramtools.Params{"ext": "png"}).
-		FromTryjob("tryjob 1", dks.BuildBucketCIS, "My-Test", "whatever", "2021-03-30T00:00:00Z")
+		FromTryjob("tryjob 1", dks.GitHubCIS, "My-Test", "whatever", "2021-03-30T00:00:00Z")
 
 	ps2.DataWithCommonKeys(paramtools.Params{
 		dks.OSKey:        dks.AndroidOS,
@@ -345,14 +345,14 @@ func TestNewAndUntriagedSummaryForCL_IgnoreRulesRespected(t *testing.T) {
 			{dks.DeviceKey: dks.TaimenDevice, types.CorpusField: dks.CornersCorpus, types.PrimaryKeyField: dks.SquareTest},
 			{dks.DeviceKey: dks.TaimenDevice, types.CorpusField: dks.RoundCorpus, types.PrimaryKeyField: dks.CircleTest},
 		}).OptionsAll(paramtools.Params{"ext": "png"}).
-		FromTryjob("tryjob 2", dks.BuildBucketCIS, "My-Test", "whatever", "2021-03-30T00:00:00Z")
+		FromTryjob("tryjob 2", dks.GitHubCIS, "My-Test", "whatever", "2021-03-30T00:00:00Z")
 
 	require.NoError(t, sqltest.BulkInsertDataTables(ctx, db, b.Build()))
 	waitForSystemTime()
 
 	s := New(db, 100)
 	require.NoError(t, s.StartCacheProcess(ctx, time.Minute, 100))
-	rv, err := s.NewAndUntriagedSummaryForCL(ctx, sql.Qualify(dks.GerritCRS, clID))
+	rv, err := s.NewAndUntriagedSummaryForCL(ctx, sql.Qualify(dks.GitHubCRS, clID))
 	require.NoError(t, err)
 
 	assert.Equal(t, NewAndUntriagedSummary{
@@ -385,7 +385,7 @@ func TestNewAndUntriagedSummaryForCL_TriageStatusAffectsAllPS(t *testing.T) {
 	const ps1ID = "ps has bug with circle"
 	const ps2ID = "ps has different bug with circle"
 	const ps3ID = "still bug with circle"
-	cl := b.AddChangelist(clID, dks.GerritCRS, dks.UserFour, "Add new device", schema.StatusLanded)
+	cl := b.AddChangelist(clID, dks.GitHubCRS, dks.UserFour, "Add new device", schema.StatusLanded)
 	ps1 := cl.AddPatchset(ps1ID, "5555555555555555555555555555555555555555", 2)
 	ps2 := cl.AddPatchset(ps2ID, "6666666666666666666666666666666666666666", 4)
 	ps3 := cl.AddPatchset(ps3ID, "7777777777777777777777777777777777777777", 7)
@@ -399,7 +399,7 @@ func TestNewAndUntriagedSummaryForCL_TriageStatusAffectsAllPS(t *testing.T) {
 			{dks.ColorModeKey: dks.RGBColorMode, types.CorpusField: dks.CornersCorpus, types.PrimaryKeyField: dks.TriangleTest},
 			{dks.ColorModeKey: dks.RGBColorMode, types.CorpusField: dks.RoundCorpus, types.PrimaryKeyField: dks.CircleTest},
 		}).OptionsAll(paramtools.Params{"ext": "png"}).
-		FromTryjob("tryjob 1", dks.BuildBucketCIS, "My-Test", "whatever", "2021-03-30T00:00:00Z")
+		FromTryjob("tryjob 1", dks.GitHubCIS, "My-Test", "whatever", "2021-03-30T00:00:00Z")
 
 	ps2.DataWithCommonKeys(paramtools.Params{
 		dks.OSKey:     dks.AndroidOS,
@@ -410,7 +410,7 @@ func TestNewAndUntriagedSummaryForCL_TriageStatusAffectsAllPS(t *testing.T) {
 			{dks.ColorModeKey: dks.RGBColorMode, types.CorpusField: dks.CornersCorpus, types.PrimaryKeyField: dks.TriangleTest},
 			{dks.ColorModeKey: dks.RGBColorMode, types.CorpusField: dks.RoundCorpus, types.PrimaryKeyField: dks.CircleTest},
 		}).OptionsAll(paramtools.Params{"ext": "png"}).
-		FromTryjob("tryjob 2", dks.BuildBucketCIS, "My-Test", "whatever", "2021-03-30T12:00:00Z")
+		FromTryjob("tryjob 2", dks.GitHubCIS, "My-Test", "whatever", "2021-03-30T12:00:00Z")
 
 	ps3.DataWithCommonKeys(paramtools.Params{
 		dks.OSKey:     dks.AndroidOS,
@@ -421,7 +421,7 @@ func TestNewAndUntriagedSummaryForCL_TriageStatusAffectsAllPS(t *testing.T) {
 			{dks.ColorModeKey: dks.RGBColorMode, types.CorpusField: dks.CornersCorpus, types.PrimaryKeyField: dks.TriangleTest},
 			{dks.ColorModeKey: dks.RGBColorMode, types.CorpusField: dks.RoundCorpus, types.PrimaryKeyField: dks.CircleTest},
 		}).OptionsAll(paramtools.Params{"ext": "png"}).
-		FromTryjob("tryjob 3", dks.BuildBucketCIS, "My-Test", "whatever", "2021-04-05T02:03:04Z")
+		FromTryjob("tryjob 3", dks.GitHubCIS, "My-Test", "whatever", "2021-04-05T02:03:04Z")
 
 	// The digest was triaged negative after data from PS 2 but before PS 3 was ingested. We want
 	// to see that the latest data impacts the timestamp.
@@ -435,7 +435,7 @@ func TestNewAndUntriagedSummaryForCL_TriageStatusAffectsAllPS(t *testing.T) {
 
 	s := New(db, 100)
 	require.NoError(t, s.StartCacheProcess(ctx, time.Minute, 100))
-	rv, err := s.NewAndUntriagedSummaryForCL(ctx, sql.Qualify(dks.GerritCRS, clID))
+	rv, err := s.NewAndUntriagedSummaryForCL(ctx, sql.Qualify(dks.GitHubCRS, clID))
 	require.NoError(t, err)
 
 	assert.Equal(t, NewAndUntriagedSummary{
@@ -479,7 +479,7 @@ func TestNewAndUntriagedSummaryForCL_MultipleThreadsAtOnce_NoRaces(t *testing.T)
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			rv, err := s.NewAndUntriagedSummaryForCL(ctx, sql.Qualify(dks.GerritCRS, dks.ChangelistIDThatAttemptsToFixIOS))
+			rv, err := s.NewAndUntriagedSummaryForCL(ctx, sql.Qualify(dks.GitHubCRS, dks.ChangelistIDThatAttemptsToFixIOS))
 			require.NoError(t, err)
 			assert.Equal(t, NewAndUntriagedSummary{
 				ChangelistID: dks.ChangelistIDThatAttemptsToFixIOS,
@@ -3033,7 +3033,7 @@ func TestSearch_ReturnsCLData_ShowsOnlyDataNewToPrimaryBranch(t *testing.T) {
 
 	s := New(db, 100)
 	s.SetReviewSystemTemplates(map[string]string{
-		dks.GerritCRS:         "http://example.com/public/%s",
+		dks.GitHubCRS:         "http://example.com/public/%s",
 		dks.GerritInternalCRS: "http://example.com/internal/%s",
 	})
 	require.NoError(t, s.StartCacheProcess(ctx, time.Minute, 100))
@@ -3049,7 +3049,7 @@ func TestSearch_ReturnsCLData_ShowsOnlyDataNewToPrimaryBranch(t *testing.T) {
 		RGBAMinFilter:                  0,
 		RGBAMaxFilter:                  255,
 		ChangelistID:                   dks.ChangelistIDThatAttemptsToFixIOS,
-		CodeReviewSystemID:             dks.GerritCRS,
+		CodeReviewSystemID:             dks.GitHubCRS,
 		Patchsets:                      []int64{3}, // The first data we have for is PS order 3.
 		IncludeDigestsProducedOnMaster: false,
 	})
@@ -3463,7 +3463,7 @@ func TestSearch_DisallowTriagingOnCL_DigestExcludedFromBulkTriageInfos(t *testin
 
 	s := New(db, 100)
 	s.SetReviewSystemTemplates(map[string]string{
-		dks.GerritCRS:         "http://example.com/public/%s",
+		dks.GitHubCRS:         "http://example.com/public/%s",
 		dks.GerritInternalCRS: "http://example.com/internal/%s",
 	})
 	require.NoError(t, s.StartCacheProcess(ctx, time.Minute, 100))
@@ -3479,7 +3479,7 @@ func TestSearch_DisallowTriagingOnCL_DigestExcludedFromBulkTriageInfos(t *testin
 		RGBAMinFilter:                  0,
 		RGBAMaxFilter:                  255,
 		ChangelistID:                   dks.ChangelistIDWithDisallowTriagingTest,
-		CodeReviewSystemID:             dks.GerritCRS,
+		CodeReviewSystemID:             dks.GitHubCRS,
 		Patchsets:                      []int64{1},
 		IncludeDigestsProducedOnMaster: false,
 	})
@@ -3585,7 +3585,7 @@ func TestSearch_CLAndPatchsetWithMultipleDatapointsOnSameTrace_ReturnsAllDatapoi
 
 	s := New(db, 100)
 	s.SetReviewSystemTemplates(map[string]string{
-		dks.GerritCRS:         "http://example.com/public/%s",
+		dks.GitHubCRS:         "http://example.com/public/%s",
 		dks.GerritInternalCRS: "http://example.com/internal/%s",
 	})
 	require.NoError(t, s.StartCacheProcess(ctx, time.Minute, 100))
@@ -3601,7 +3601,7 @@ func TestSearch_CLAndPatchsetWithMultipleDatapointsOnSameTrace_ReturnsAllDatapoi
 		RGBAMinFilter:                  0,
 		RGBAMaxFilter:                  255,
 		ChangelistID:                   dks.ChangelistIDWithMultipleDatapointsPerTrace,
-		CodeReviewSystemID:             dks.GerritCRS,
+		CodeReviewSystemID:             dks.GitHubCRS,
 		Patchsets:                      []int64{1}, // dks.PatchsetIDWithMultipleDatapointsPerTrace
 		IncludeDigestsProducedOnMaster: true,
 	})
@@ -3937,7 +3937,7 @@ func TestSearch_ReturnsFilteredCLData_Success(t *testing.T) {
 
 	s := New(db, 100)
 	s.SetReviewSystemTemplates(map[string]string{
-		dks.GerritCRS:         "http://example.com/public/%s",
+		dks.GitHubCRS:         "http://example.com/public/%s",
 		dks.GerritInternalCRS: "http://example.com/internal/%s",
 	})
 	require.NoError(t, s.StartCacheProcess(ctx, time.Minute, 100))
@@ -3955,7 +3955,7 @@ func TestSearch_ReturnsFilteredCLData_Success(t *testing.T) {
 		RGBAMinFilter:                  0,
 		RGBAMaxFilter:                  255,
 		ChangelistID:                   dks.ChangelistIDThatAttemptsToFixIOS,
-		CodeReviewSystemID:             dks.GerritCRS,
+		CodeReviewSystemID:             dks.GitHubCRS,
 		Patchsets:                      []int64{3}, // The first data we have for is PS order 3.
 		IncludeDigestsProducedOnMaster: true,
 	})
@@ -4176,7 +4176,7 @@ func TestSearch_ResultHasNoReferenceDiffsNorExistingTraces_Success(t *testing.T)
 
 	s := New(db, 100)
 	s.SetReviewSystemTemplates(map[string]string{
-		dks.GerritCRS:         "http://example.com/public/%s",
+		dks.GitHubCRS:         "http://example.com/public/%s",
 		dks.GerritInternalCRS: "http://example.com/internal/%s",
 	})
 	require.NoError(t, s.StartCacheProcess(ctx, time.Minute, 100))
@@ -4352,7 +4352,7 @@ func TestGetChangelistParamset_ValidCLs_Success(t *testing.T) {
 	db := useKitchenSinkData(ctx, t)
 
 	s := New(db, 100)
-	ps, err := s.GetChangelistParamset(ctx, dks.GerritCRS, dks.ChangelistIDThatAttemptsToFixIOS)
+	ps, err := s.GetChangelistParamset(ctx, dks.GitHubCRS, dks.ChangelistIDThatAttemptsToFixIOS)
 	require.NoError(t, err)
 	assert.Equal(t, paramtools.ReadOnlyParamSet{
 		dks.ColorModeKey:      []string{dks.GreyColorMode, dks.RGBColorMode},
@@ -4372,7 +4372,7 @@ func TestGetChangelistParamset_ValidCLs_Success(t *testing.T) {
 		types.CorpusField:     []string{dks.CornersCorpus, dks.RoundCorpus, dks.TextCorpus},
 	}, ps)
 
-	ps, err = s.GetChangelistParamset(ctx, dks.GerritCRS, dks.ChangelistIDWithMultipleDatapointsPerTrace)
+	ps, err = s.GetChangelistParamset(ctx, dks.GitHubCRS, dks.ChangelistIDWithMultipleDatapointsPerTrace)
 	require.NoError(t, err)
 	assert.Equal(t, paramtools.ReadOnlyParamSet{
 		dks.ColorModeKey:      []string{dks.RGBColorMode},
@@ -4415,7 +4415,7 @@ func TestGetChangelistParamset_RespectsPublicView_Success(t *testing.T) {
 
 	s := New(db, 100)
 	require.NoError(t, s.StartApplyingPublicParams(ctx, matcher, time.Minute))
-	ps, err := s.GetChangelistParamset(ctx, dks.GerritCRS, dks.ChangelistIDThatAttemptsToFixIOS)
+	ps, err := s.GetChangelistParamset(ctx, dks.GitHubCRS, dks.ChangelistIDThatAttemptsToFixIOS)
 	require.NoError(t, err)
 	assert.Equal(t, paramtools.ReadOnlyParamSet{
 		dks.ColorModeKey:      []string{dks.GreyColorMode, dks.RGBColorMode},
@@ -5267,13 +5267,13 @@ func TestSearch_SecondaryBranch_NoReferenceImages_ReturnsEmptyResult(t *testing.
 
 	s := New(db, 100)
 	s.SetReviewSystemTemplates(map[string]string{
-		dks.GerritCRS:         "http://example.com/public/%s",
+		dks.GitHubCRS:         "http://example.com/public/%s",
 		dks.GerritInternalCRS: "http://example.com/internal/%s",
 	})
 	require.NoError(t, s.StartCacheProcess(ctx, time.Minute, 100))
 	res, err := s.Search(ctx, &query.Search{
 		ChangelistID:               dks.ChangelistIDThatAttemptsToFixIOS,
-		CodeReviewSystemID:         dks.GerritCRS,
+		CodeReviewSystemID:         dks.GitHubCRS,
 		Patchsets:                  []int64{3}, // dks.PatchSetIDFixesIPadButNotIPhone
 		IncludePositiveDigests:     true,
 		MustIncludeReferenceFilter: true,
@@ -6872,11 +6872,11 @@ func TestGetDigestDetails_ValidDigestAndGroupingOnCL_Success(t *testing.T) {
 	})
 	s := New(db, 100)
 	s.SetReviewSystemTemplates(map[string]string{
-		dks.GerritCRS:         "http://example.com/public/%s",
+		dks.GitHubCRS:         "http://example.com/public/%s",
 		dks.GerritInternalCRS: "http://example.com/internal/%s",
 	})
 
-	details, err := s.GetDigestDetails(ctx, inputGrouping, dks.DigestC02Pos, dks.ChangelistIDThatAttemptsToFixIOS, dks.GerritCRS)
+	details, err := s.GetDigestDetails(ctx, inputGrouping, dks.DigestC02Pos, dks.ChangelistIDThatAttemptsToFixIOS, dks.GitHubCRS)
 	require.NoError(t, err)
 	// The results should be the similar to the the details on the primary branch, except the
 	// traces are only shown that actually drew the provided digest for the CL. As such, there will
@@ -6977,11 +6977,11 @@ func TestGetDigestDetails_ValidDigestAndGroupingOnCL_PublicView_SomeTracesMatchP
 	s := New(db, 100)
 	require.NoError(t, s.StartApplyingPublicParams(ctx, matcher, time.Minute))
 	s.SetReviewSystemTemplates(map[string]string{
-		dks.GerritCRS:         "http://example.com/public/%s",
+		dks.GitHubCRS:         "http://example.com/public/%s",
 		dks.GerritInternalCRS: "http://example.com/internal/%s",
 	})
 
-	details, err := s.GetDigestDetails(ctx, inputGrouping, dks.DigestC02Pos, dks.ChangelistIDThatAttemptsToFixIOS, dks.GerritCRS)
+	details, err := s.GetDigestDetails(ctx, inputGrouping, dks.DigestC02Pos, dks.ChangelistIDThatAttemptsToFixIOS, dks.GitHubCRS)
 	require.NoError(t, err)
 	// The results should be the similar to the the details on the primary branch, except the
 	// traces are only shown that actually drew the provided digest for the CL. As such, there will
@@ -7066,11 +7066,11 @@ func TestGetDigestDetails_ValidDigestAndGroupingOnCL_PublicView_NoTracesMatchPub
 	s := New(db, 100)
 	require.NoError(t, s.StartApplyingPublicParams(ctx, matcher, time.Minute))
 	s.SetReviewSystemTemplates(map[string]string{
-		dks.GerritCRS:         "http://example.com/public/%s",
+		dks.GitHubCRS:         "http://example.com/public/%s",
 		dks.GerritInternalCRS: "http://example.com/internal/%s",
 	})
 
-	_, err = s.GetDigestDetails(ctx, inputGrouping, dks.DigestC02Pos, dks.ChangelistIDThatAttemptsToFixIOS, dks.GerritCRS)
+	_, err = s.GetDigestDetails(ctx, inputGrouping, dks.DigestC02Pos, dks.ChangelistIDThatAttemptsToFixIOS, dks.GitHubCRS)
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "No results found")
 }
@@ -7096,14 +7096,14 @@ func TestGetDigestDetails_ValidDigestAndGroupingOnCL_OnePatchsetWithMultipleData
 	})
 	s := New(db, 100)
 	s.SetReviewSystemTemplates(map[string]string{
-		dks.GerritCRS:         "http://example.com/public/%s",
+		dks.GitHubCRS:         "http://example.com/public/%s",
 		dks.GerritInternalCRS: "http://example.com/internal/%s",
 	})
 
 	// In this CL a tryjob was executed multiple times at the last patchset, generating multiple
 	// datapoints for the same trace at the last patchset. DigestC03Unt was drawn twice: on the
 	// first tryjob run, and on the third tryjob run.
-	details, err := s.GetDigestDetails(ctx, inputGrouping, dks.DigestC03Unt, dks.ChangelistIDWithMultipleDatapointsPerTrace, dks.GerritCRS)
+	details, err := s.GetDigestDetails(ctx, inputGrouping, dks.DigestC03Unt, dks.ChangelistIDWithMultipleDatapointsPerTrace, dks.GitHubCRS)
 	require.NoError(t, err)
 	// The results should be the similar to the the details on the primary branch, except the
 	// traces are only shown that actually drew the provided digest for the CL. As such, there will
@@ -7191,11 +7191,11 @@ func TestGetDigestDetails_InvalidDigestAndGroupingOnCL_ReturnsError(t *testing.T
 
 	s := New(db, 100)
 	s.SetReviewSystemTemplates(map[string]string{
-		dks.GerritCRS:         "http://example.com/public/%s",
+		dks.GitHubCRS:         "http://example.com/public/%s",
 		dks.GerritInternalCRS: "http://example.com/internal/%s",
 	})
 
-	_, err := s.GetDigestDetails(ctx, inputGrouping, dks.DigestE03Unt_CL, dks.ChangelistIDThatAttemptsToFixIOS, dks.GerritCRS)
+	_, err := s.GetDigestDetails(ctx, inputGrouping, dks.DigestE03Unt_CL, dks.ChangelistIDThatAttemptsToFixIOS, dks.GitHubCRS)
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "No results found")
 }
@@ -7281,7 +7281,7 @@ func TestGetDigestsDiff_TwoKnownDigestsOnACL_Success(t *testing.T) {
 	}
 
 	s := New(db, 100)
-	rv, err := s.GetDigestsDiff(ctx, inputGrouping, dks.DigestC01Pos, dks.DigestC06Pos_CL, dks.ChangelistIDThatAttemptsToFixIOS, dks.GerritCRS)
+	rv, err := s.GetDigestsDiff(ctx, inputGrouping, dks.DigestC01Pos, dks.DigestC06Pos_CL, dks.ChangelistIDThatAttemptsToFixIOS, dks.GitHubCRS)
 	require.NoError(t, err)
 	assert.Equal(t, frontend.DigestComparison{
 		Left: frontend.LeftDiffInfo{
@@ -7325,7 +7325,7 @@ func TestGetDigestsDiff_UntriagedDigestOnKnownCL_ReturnsDiffAndParamset(t *testi
 	}
 
 	s := New(db, 100)
-	rv, err := s.GetDigestsDiff(ctx, inputGrouping, dks.DigestC01Pos, dks.DigestC07Unt_CL, dks.ChangelistIDThatAttemptsToFixIOS, dks.GerritCRS)
+	rv, err := s.GetDigestsDiff(ctx, inputGrouping, dks.DigestC01Pos, dks.DigestC07Unt_CL, dks.ChangelistIDThatAttemptsToFixIOS, dks.GitHubCRS)
 	require.NoError(t, err)
 	assert.Equal(t, frontend.DigestComparison{
 		Left: frontend.LeftDiffInfo{
@@ -7372,7 +7372,7 @@ func TestGetDigestsDiff_TwoKnownDigestsOnACL_OnePatchsetWithMultipleDatapointsOn
 	// In this CL a tryjob was executed multiple times at the last patchset, generating multiple
 	// datapoints for the same trace at the last patchset. DigestC01Pos was drawn on the last two
 	// tryjob runs.
-	rv, err := s.GetDigestsDiff(ctx, inputGrouping, dks.DigestC01Pos, dks.DigestA01Pos, dks.ChangelistIDWithMultipleDatapointsPerTrace, dks.GerritCRS)
+	rv, err := s.GetDigestsDiff(ctx, inputGrouping, dks.DigestC01Pos, dks.DigestA01Pos, dks.ChangelistIDWithMultipleDatapointsPerTrace, dks.GitHubCRS)
 	require.NoError(t, err)
 	assert.Equal(t, frontend.DigestComparison{
 		Left: frontend.LeftDiffInfo{
@@ -7419,7 +7419,7 @@ func TestGetDigestsDiff_DigestsExistOnPrimaryInvalidCL_ReturnDiffAndPrimaryParam
 	}
 
 	s := New(db, 100)
-	rv, err := s.GetDigestsDiff(ctx, inputGrouping, dks.DigestC01Pos, dks.DigestC03Unt, "not a real CL", dks.GerritCRS)
+	rv, err := s.GetDigestsDiff(ctx, inputGrouping, dks.DigestC01Pos, dks.DigestC03Unt, "not a real CL", dks.GitHubCRS)
 	require.NoError(t, err)
 	assert.Equal(t, frontend.DigestComparison{
 		Left: frontend.LeftDiffInfo{
@@ -7464,7 +7464,7 @@ func TestGetDigestsDiff_UntriagedDigestOnUnknownCL_ReturnsDiffButNoRightParamset
 	}
 
 	s := New(db, 100)
-	rv, err := s.GetDigestsDiff(ctx, inputGrouping, dks.DigestC01Pos, dks.DigestC06Pos_CL, "not a real CL", dks.GerritCRS)
+	rv, err := s.GetDigestsDiff(ctx, inputGrouping, dks.DigestC01Pos, dks.DigestC06Pos_CL, "not a real CL", dks.GitHubCRS)
 	require.NoError(t, err)
 	assert.Equal(t, frontend.DigestComparison{
 		Left: frontend.LeftDiffInfo{

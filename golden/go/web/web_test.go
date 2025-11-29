@@ -478,7 +478,7 @@ func TestBaselineHandlerV2_ValidChangelist_Success(t *testing.T) {
 			DB: db,
 			ReviewSystems: []clstore.ReviewSystem{
 				{
-					ID: dks.GerritCRS,
+					ID: dks.GitHubCRS,
 				},
 			},
 		},
@@ -505,7 +505,7 @@ func TestBaselineHandlerV2_ValidChangelistWithNewTests_Success(t *testing.T) {
 			DB: db,
 			ReviewSystems: []clstore.ReviewSystem{
 				{
-					ID: dks.GerritCRS,
+					ID: dks.GitHubCRS,
 				},
 				{
 					ID: dks.GerritInternalCRS,
@@ -534,7 +534,7 @@ func TestBaselineHandlerV2_InvalidCRS_ReturnsError(t *testing.T) {
 			DB: db,
 			ReviewSystems: []clstore.ReviewSystem{
 				{
-					ID: dks.GerritCRS,
+					ID: dks.GitHubCRS,
 				},
 			},
 		},
@@ -558,7 +558,7 @@ func TestBaselineHandlerV2_NewCL_ReturnsPrimaryBaseline(t *testing.T) {
 			DB: db,
 			ReviewSystems: []clstore.ReviewSystem{
 				{
-					ID: dks.GerritCRS,
+					ID: dks.GitHubCRS,
 				},
 			},
 		},
@@ -603,14 +603,14 @@ func TestBaselineHandlerV2_CachedChangelist_ReturnsCachedBaseline(t *testing.T) 
 		HandlersConfig: HandlersConfig{
 			ReviewSystems: []clstore.ReviewSystem{
 				{
-					ID: dks.GerritCRS,
+					ID: dks.GitHubCRS,
 				},
 			},
 		},
 		baselineCache: ttlcache.New(time.Minute, 10*time.Minute),
 	}
 	wh.baselineCache.Set("gerrit_CLID", frontend.BaselineV2Response{
-		CodeReviewSystem: dks.GerritCRS,
+		CodeReviewSystem: dks.GitHubCRS,
 		ChangelistID:     "CLID",
 		Expectations: expectations.Baseline{
 			dks.CircleTest: {
@@ -660,7 +660,7 @@ func TestChangelistSearchRedirect_CLHasUntriagedDigests_Success(t *testing.T) {
 			DB: db,
 			ReviewSystems: []clstore.ReviewSystem{
 				{
-					ID: dks.GerritCRS,
+					ID: dks.GitHubCRS,
 				},
 			},
 		},
@@ -670,7 +670,7 @@ func TestChangelistSearchRedirect_CLHasUntriagedDigests_Success(t *testing.T) {
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodGet, "/cl/gerrit/CL_fix_ios", nil)
 	r = setChiURLParams(r, map[string]string{
-		"system": dks.GerritCRS,
+		"system": dks.GitHubCRS,
 		"id":     dks.ChangelistIDThatAttemptsToFixIOS,
 	})
 	wh.ChangelistSearchRedirect(w, r)
@@ -691,7 +691,7 @@ func TestChangelistSearchRedirect_CLHasNoUntriagedDigests_Success(t *testing.T) 
 			DB: db,
 			ReviewSystems: []clstore.ReviewSystem{
 				{
-					ID: dks.GerritCRS,
+					ID: dks.GitHubCRS,
 				},
 			},
 		},
@@ -701,7 +701,7 @@ func TestChangelistSearchRedirect_CLHasNoUntriagedDigests_Success(t *testing.T) 
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodGet, "/cl/gerrit/CL_fix_ios", nil)
 	r = setChiURLParams(r, map[string]string{
-		"system": dks.GerritCRS,
+		"system": dks.GitHubCRS,
 		"id":     dks.ChangelistIDThatAttemptsToFixIOS,
 	})
 	wh.ChangelistSearchRedirect(w, r)
@@ -720,7 +720,7 @@ func TestChangelistSearchRedirect_CLDoesNotExist_404Error(t *testing.T) {
 			DB: db,
 			ReviewSystems: []clstore.ReviewSystem{
 				{
-					ID: dks.GerritCRS,
+					ID: dks.GitHubCRS,
 				},
 			},
 		},
@@ -730,7 +730,7 @@ func TestChangelistSearchRedirect_CLDoesNotExist_404Error(t *testing.T) {
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodGet, "/cl/gerrit/1234", nil)
 	r = setChiURLParams(r, map[string]string{
-		"system": dks.GerritCRS,
+		"system": dks.GitHubCRS,
 		"id":     "1234",
 	})
 	wh.ChangelistSearchRedirect(w, r)
@@ -747,7 +747,7 @@ func TestChangelistSearchRedirect_QueryParamAfterCLID_IncludedInRedirectURL(t *t
 			DB: db,
 			ReviewSystems: []clstore.ReviewSystem{
 				{
-					ID: dks.GerritCRS,
+					ID: dks.GitHubCRS,
 				},
 			},
 		},
@@ -758,7 +758,7 @@ func TestChangelistSearchRedirect_QueryParamAfterCLID_IncludedInRedirectURL(t *t
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodGet, "/cl/gerrit/CL_fix_ios&master=true", nil)
 	r = setChiURLParams(r, map[string]string{
-		"system": dks.GerritCRS,
+		"system": dks.GitHubCRS,
 		"id":     dks.ChangelistIDThatAttemptsToFixIOS + "&master=true",
 	})
 	wh.ChangelistSearchRedirect(w, r)
@@ -769,7 +769,7 @@ func TestChangelistSearchRedirect_QueryParamAfterCLID_IncludedInRedirectURL(t *t
 	w = httptest.NewRecorder()
 	r = httptest.NewRequest(http.MethodGet, "/cl/gerrit/CL_fix_ios?master=true", nil)
 	r = setChiURLParams(r, map[string]string{
-		"system": dks.GerritCRS,
+		"system": dks.GitHubCRS,
 		"id":     dks.ChangelistIDThatAttemptsToFixIOS + "?master=true",
 	})
 	wh.ChangelistSearchRedirect(w, r)
@@ -796,7 +796,7 @@ func TestGetActionableDigests_ReturnsCorrectResults(t *testing.T) {
 		assert.Equal(t, expected, corpora)
 	}
 
-	test(dks.GerritCRS, dks.ChangelistIDThatAttemptsToFixIOS, dks.PatchSetIDFixesIPadButNotIPhone,
+	test(dks.GitHubCRS, dks.ChangelistIDThatAttemptsToFixIOS, dks.PatchSetIDFixesIPadButNotIPhone,
 		[]corpusAndCount{
 			// DigestB01Pos has been incorrectly triaged on this CL as untriaged.
 			{Corpus: dks.CornersCorpus, Count: 1},
@@ -1550,7 +1550,7 @@ func TestPatchsetsAndTryjobsForCL2_InvalidCL_ReturnsErrorCode(t *testing.T) {
 			DB: db,
 			ReviewSystems: []clstore.ReviewSystem{
 				{
-					ID:          dks.GerritCRS,
+					ID:          dks.GitHubCRS,
 					URLTemplate: "www.example.com/gerrit/%s",
 				},
 			},
@@ -1562,7 +1562,7 @@ func TestPatchsetsAndTryjobsForCL2_InvalidCL_ReturnsErrorCode(t *testing.T) {
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodGet, "/json/v2/changelist/gerrit/not-a-real-cl", nil)
 	r = setChiURLParams(r, map[string]string{
-		"system": dks.GerritCRS,
+		"system": dks.GitHubCRS,
 		"id":     "not-a-real-cl",
 	})
 	wh.PatchsetsAndTryjobsForCL2(w, r)
@@ -1632,7 +1632,7 @@ func TestTriageLogHandler_ValidChangelist_Success(t *testing.T) {
 		HandlersConfig: HandlersConfig{
 			DB: db,
 			ReviewSystems: []clstore.ReviewSystem{
-				{ID: dks.GerritCRS},
+				{ID: dks.GitHubCRS},
 			},
 		},
 		anonymousCheapQuota: rate.NewLimiter(rate.Inf, 1),
@@ -1657,7 +1657,7 @@ func TestTriageLogHandler_InvalidChangelist_ReturnsEmptyEntries(t *testing.T) {
 		HandlersConfig: HandlersConfig{
 			DB: db,
 			ReviewSystems: []clstore.ReviewSystem{
-				{ID: dks.GerritCRS},
+				{ID: dks.GitHubCRS},
 			},
 		},
 		anonymousCheapQuota: rate.NewLimiter(rate.Inf, 1),
@@ -2047,7 +2047,7 @@ func TestTriage2_BulkTriage_OnCL_Success(t *testing.T) {
 				dks.DigestC01Pos:    expectations.Negative,
 			},
 		},
-		CodeReviewSystem: dks.GerritCRS,
+		CodeReviewSystem: dks.GitHubCRS,
 		ChangelistID:     dks.ChangelistIDThatAttemptsToFixIOS,
 	}
 	ctx = context.WithValue(ctx, now.ContextKey, fakeNow)
@@ -2364,7 +2364,7 @@ func TestTriage3_SingleDigestOnOpenCL_WrongLabelBefore_TriageConflict(t *testing
 					LabelAfter:  expectations.Positive,
 				},
 			},
-			CodeReviewSystem: dks.GerritCRS,
+			CodeReviewSystem: dks.GitHubCRS,
 			ChangelistID:     dks.ChangelistIDThatAttemptsToFixIOS,
 		},
 		frontend.TriageResponse{
@@ -2393,7 +2393,7 @@ func TestTriage3_SingleDigestOnOpenCL_WrongLabelBefore_TriageConflict(t *testing
 					LabelAfter:  expectations.Negative,
 				},
 			},
-			CodeReviewSystem: dks.GerritCRS,
+			CodeReviewSystem: dks.GitHubCRS,
 			ChangelistID:     dks.ChangelistIDThatAttemptsToFixIOS,
 		},
 		frontend.TriageResponse{
@@ -2422,7 +2422,7 @@ func TestTriage3_SingleDigestOnOpenCL_WrongLabelBefore_TriageConflict(t *testing
 					LabelAfter:  expectations.Untriaged,
 				},
 			},
-			CodeReviewSystem: dks.GerritCRS,
+			CodeReviewSystem: dks.GitHubCRS,
 			ChangelistID:     dks.ChangelistIDThatAttemptsToFixIOS,
 		},
 		frontend.TriageResponse{
@@ -2451,7 +2451,7 @@ func TestTriage3_SingleDigestOnOpenCL_WrongLabelBefore_TriageConflict(t *testing
 					LabelAfter:  expectations.Positive,
 				},
 			},
-			CodeReviewSystem: dks.GerritCRS,
+			CodeReviewSystem: dks.GitHubCRS,
 			ChangelistID:     dks.ChangelistIDThatAttemptsToFixIOS,
 		},
 		frontend.TriageResponse{
@@ -2782,7 +2782,7 @@ func TestTriage3_BulkTriageOnOpenCL_Success(t *testing.T) {
 				LabelAfter:  expectations.Negative,
 			},
 		},
-		CodeReviewSystem: dks.GerritCRS,
+		CodeReviewSystem: dks.GitHubCRS,
 		ChangelistID:     dks.ChangelistIDThatAttemptsToFixIOS,
 	}
 	ctx = now.TimeTravelingContext(fakeNow)
@@ -2906,7 +2906,7 @@ func TestTriage3_BulkTriageOnLandedCL_Error(t *testing.T) {
 				LabelAfter:  expectations.Negative,
 			},
 		},
-		CodeReviewSystem: dks.GerritCRS,
+		CodeReviewSystem: dks.GitHubCRS,
 		ChangelistID:     dks.ChangelistIDThatHasLanded,
 	}
 	tsBeforeTriage := time.Now()
@@ -3019,7 +3019,7 @@ func TestGetChangelistsHandler_AllChangelists_Success(t *testing.T) {
 		HandlersConfig: HandlersConfig{
 			DB: db,
 			ReviewSystems: []clstore.ReviewSystem{{
-				ID:          dks.GerritCRS,
+				ID:          dks.GitHubCRS,
 				URLTemplate: "example.com/%s/gerrit",
 			}, {
 				ID:          dks.GerritInternalCRS,
@@ -3051,7 +3051,7 @@ func TestGetChangelistsHandler_RespectsPagination_Success(t *testing.T) {
 		HandlersConfig: HandlersConfig{
 			DB: db,
 			ReviewSystems: []clstore.ReviewSystem{{
-				ID:          dks.GerritCRS,
+				ID:          dks.GitHubCRS,
 				URLTemplate: "example.com/%s/gerrit",
 			}, {
 				ID:          dks.GerritInternalCRS,
@@ -3079,7 +3079,7 @@ func TestGetChangelistsHandler_ActiveChangelists_Success(t *testing.T) {
 		HandlersConfig: HandlersConfig{
 			DB: db,
 			ReviewSystems: []clstore.ReviewSystem{{
-				ID:          dks.GerritCRS,
+				ID:          dks.GitHubCRS,
 				URLTemplate: "example.com/%s/gerrit",
 			}, {
 				ID:          dks.GerritInternalCRS,
@@ -3228,7 +3228,7 @@ func TestDiffHandler_InvalidRequest_Error(t *testing.T) {
 		HandlersConfig: HandlersConfig{
 			ReviewSystems: []clstore.ReviewSystem{
 				{
-					ID: dks.GerritCRS,
+					ID: dks.GitHubCRS,
 				},
 			},
 		},
@@ -3294,7 +3294,7 @@ func TestDiffHandler_ValidRequest_Success(t *testing.T) {
 		HandlersConfig: HandlersConfig{
 			ReviewSystems: []clstore.ReviewSystem{
 				{
-					ID: dks.GerritCRS,
+					ID: dks.GitHubCRS,
 				},
 			},
 		},
@@ -3346,7 +3346,7 @@ func TestDiffHandler_ValidRequest_Success(t *testing.T) {
 			},
 			LeftDigest:       dks.DigestA03Pos,
 			RightDigest:      dks.DigestA04Unt,
-			CodeReviewSystem: dks.GerritCRS,
+			CodeReviewSystem: dks.GitHubCRS,
 			ChangelistID:     dks.ChangelistIDThatAttemptsToFixIOS,
 		})
 }
@@ -3419,7 +3419,7 @@ func TestDetailsHandler_InvalidRequest_Error(t *testing.T) {
 		HandlersConfig: HandlersConfig{
 			ReviewSystems: []clstore.ReviewSystem{
 				{
-					ID: dks.GerritCRS,
+					ID: dks.GitHubCRS,
 				},
 			},
 		},
@@ -3475,7 +3475,7 @@ func TestDetailsHandler_ValidRequest_Success(t *testing.T) {
 		HandlersConfig: HandlersConfig{
 			ReviewSystems: []clstore.ReviewSystem{
 				{
-					ID: dks.GerritCRS,
+					ID: dks.GitHubCRS,
 				},
 			},
 		},
@@ -3528,7 +3528,7 @@ func TestDetailsHandler_ValidRequest_Success(t *testing.T) {
 				types.PrimaryKeyField: dks.CircleTest,
 			},
 			Digest:           dks.DigestC01Pos,
-			CodeReviewSystem: dks.GerritCRS,
+			CodeReviewSystem: dks.GitHubCRS,
 			ChangelistID:     dks.ChangelistIDThatAttemptsToFixIOS,
 		},
 		`{"digest":{"digest":"c01c01c01c01c01c01c01c01c01c01c0","test":"circle",`+
