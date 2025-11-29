@@ -407,13 +407,12 @@ func TestCommentOnCLs_CLWasAbandoned_DBNotUpdated(t *testing.T) {
 	db := sqltest.NewCockroachDBForTestsWithProductionSchema(ctx, t)
 	require.NoError(t, sqltest.BulkInsertDataTables(ctx, db, dks.Build()))
 
-	gerritInternalClient := &mock_codereview.Client{}
-
-	gerritInternalClient.On("GetChangelist", testutils.AnyContext, dks.ChangelistIDThatAddsNewTests).Return(
+	githubClient := mock_codereview.NewClient(t)
+	githubClient.On("GetChangelist", testutils.AnyContext, mock.AnythingOfType("string")).Return(
 		code_review.Changelist{Status: code_review.Abandoned}, nil)
 
 	c, err := New(db, []ReviewSystem{
-		{ID: dks.GitHubCRS, Client: gerritInternalClient},
+		{ID: dks.GitHubCRS, Client: githubClient},
 	}, basicTemplate, instanceURL, 100)
 	require.NoError(t, err)
 
@@ -422,8 +421,6 @@ func TestCommentOnCLs_CLWasAbandoned_DBNotUpdated(t *testing.T) {
 
 	err = c.CommentOnChangelistsWithUntriagedDigests(ctx)
 	require.NoError(t, err)
-
-	gerritInternalClient.AssertExpectations(t)
 
 	actualPatchsets := sqltest.GetAllRows(ctx, t, db, "Patchsets", &schema.PatchsetRow{}).([]schema.PatchsetRow)
 	assert.Equal(t, []schema.PatchsetRow{{
@@ -481,49 +478,52 @@ func TestCommentOnCLs_CLWasAbandoned_DBNotUpdated(t *testing.T) {
 	// a different background task, the same one that merges in expectations from a CL for landed
 	// CLs.
 	actualChangelists := sqltest.GetAllRows(ctx, t, db, "Changelists", &schema.ChangelistRow{}).([]schema.ChangelistRow)
-	assert.Equal(t, []schema.ChangelistRow{{
-		ChangelistID:     "github_CL_new_tests",
-		System:           dks.GitHubCRS,
-		Status:           schema.StatusOpen, // This shouldn't be modified
-		OwnerEmail:       dks.UserTwo,
-		Subject:          "Increase test coverage",
-		LastIngestedData: time.Date(2020, time.December, 12, 9, 20, 33, 0, time.UTC),
-	}, {
-		ChangelistID:     "github_CL_fix_ios",
-		System:           dks.GitHubCRS,
-		Status:           schema.StatusOpen, // This shouldn't be modified
-		OwnerEmail:       dks.UserOne,
-		Subject:          "Fix iOS",
-		LastIngestedData: time.Date(2020, time.December, 10, 4, 5, 6, 0, time.UTC),
-	}, {
-		ChangelistID:     "github_CLdisallowtriaging",
-		System:           dks.GitHubCRS,
-		Status:           schema.StatusOpen,
-		OwnerEmail:       dks.UserOne,
-		Subject:          "add test with disallow triaging",
-		LastIngestedData: time.Date(2020, time.December, 12, 16, 0, 0, 0, time.UTC),
-	}, {
-		ChangelistID:     "github_CLhaslanded",
-		System:           dks.GitHubCRS,
-		Status:           schema.StatusLanded,
-		OwnerEmail:       dks.UserTwo,
-		Subject:          "was landed",
-		LastIngestedData: time.Date(2020, time.May, 5, 5, 5, 0, 0, time.UTC),
-	}, {
-		ChangelistID:     "github_CLisabandoned",
-		System:           dks.GitHubCRS,
-		Status:           schema.StatusAbandoned,
-		OwnerEmail:       dks.UserOne,
-		Subject:          "was abandoned",
-		LastIngestedData: time.Date(2020, time.June, 6, 6, 6, 0, 0, time.UTC),
-	}, {
-		ChangelistID:     "github_CLmultipledatapoints",
-		System:           dks.GitHubCRS,
-		Status:           schema.StatusOpen,
-		OwnerEmail:       dks.UserOne,
-		Subject:          "multiple datapoints",
-		LastIngestedData: time.Date(2020, time.December, 12, 14, 0, 0, 0, time.UTC),
-	}}, actualChangelists)
+	assert.Equal(t, []schema.ChangelistRow{
+		{
+			ChangelistID:     "github_CL_fix_ios",
+			System:           dks.GitHubCRS,
+			Status:           schema.StatusOpen, // This shouldn't be modified
+			OwnerEmail:       dks.UserOne,
+			Subject:          "Fix iOS",
+			LastIngestedData: time.Date(2020, time.December, 10, 4, 5, 6, 0, time.UTC),
+		},
+		{
+			ChangelistID:     "github_CL_new_tests",
+			System:           dks.GitHubCRS,
+			Status:           schema.StatusOpen, // This shouldn't be modified
+			OwnerEmail:       dks.UserTwo,
+			Subject:          "Increase test coverage",
+			LastIngestedData: time.Date(2020, time.December, 12, 9, 20, 33, 0, time.UTC),
+		},
+		{
+			ChangelistID:     "github_CLdisallowtriaging",
+			System:           dks.GitHubCRS,
+			Status:           schema.StatusOpen,
+			OwnerEmail:       dks.UserOne,
+			Subject:          "add test with disallow triaging",
+			LastIngestedData: time.Date(2020, time.December, 12, 16, 0, 0, 0, time.UTC),
+		}, {
+			ChangelistID:     "github_CLhaslanded",
+			System:           dks.GitHubCRS,
+			Status:           schema.StatusLanded,
+			OwnerEmail:       dks.UserTwo,
+			Subject:          "was landed",
+			LastIngestedData: time.Date(2020, time.May, 5, 5, 5, 0, 0, time.UTC),
+		}, {
+			ChangelistID:     "github_CLisabandoned",
+			System:           dks.GitHubCRS,
+			Status:           schema.StatusAbandoned,
+			OwnerEmail:       dks.UserOne,
+			Subject:          "was abandoned",
+			LastIngestedData: time.Date(2020, time.June, 6, 6, 6, 0, 0, time.UTC),
+		}, {
+			ChangelistID:     "github_CLmultipledatapoints",
+			System:           dks.GitHubCRS,
+			Status:           schema.StatusOpen,
+			OwnerEmail:       dks.UserOne,
+			Subject:          "multiple datapoints",
+			LastIngestedData: time.Date(2020, time.December, 12, 14, 0, 0, 0, time.UTC),
+		}}, actualChangelists)
 }
 
 // This tests the case where leaving a comment fails. The whole function should not fail, the DB
@@ -534,14 +534,13 @@ func TestCommentOnCLs_CommentingResultsInError_ErrorLoggedNotReturned(t *testing
 	db := sqltest.NewCockroachDBForTestsWithProductionSchema(ctx, t)
 	require.NoError(t, sqltest.BulkInsertDataTables(ctx, db, dks.Build()))
 
-	gerritInternalClient := &mock_codereview.Client{}
-
-	gerritInternalClient.On("GetChangelist", testutils.AnyContext, dks.ChangelistIDThatAddsNewTests).Return(
+	githubClient := mock_codereview.NewClient(t)
+	githubClient.On("GetChangelist", testutils.AnyContext, mock.AnythingOfType("string")).Return(
 		code_review.Changelist{Status: code_review.Open}, nil)
-	gerritInternalClient.On("CommentOn", testutils.AnyContext, mock.Anything, mock.Anything).Return(errors.New("internet down"))
+	githubClient.On("CommentOn", testutils.AnyContext, mock.Anything, mock.Anything).Return(errors.New("internet down"))
 
 	c, err := New(db, []ReviewSystem{
-		{ID: dks.GitHubCRS, Client: gerritInternalClient},
+		{ID: dks.GitHubCRS, Client: githubClient},
 	}, basicTemplate, instanceURL, 100)
 	require.NoError(t, err)
 
@@ -550,8 +549,6 @@ func TestCommentOnCLs_CommentingResultsInError_ErrorLoggedNotReturned(t *testing
 
 	err = c.CommentOnChangelistsWithUntriagedDigests(ctx)
 	require.NoError(t, err)
-
-	gerritInternalClient.AssertExpectations(t)
 
 	actualPatchsets := sqltest.GetAllRows(ctx, t, db, "Patchsets", &schema.PatchsetRow{}).([]schema.PatchsetRow)
 	assert.Equal(t, []schema.PatchsetRow{{
