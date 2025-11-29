@@ -240,14 +240,14 @@ func TestUpdateCycle_CLsWithNoExpectationsLand_MarkedAsLanded(t *testing.T) {
 			Repo:        "https://example.com/my-repo.git",
 			LastGitHash: "2222222222222222222222222222222222222222",
 		}}, Changelists: []schema.ChangelistRow{{
-			ChangelistID:     "gerrit_000004",
+			ChangelistID:     "github_000004",
 			System:           "gerrit",
 			Status:           schema.StatusOpen,
 			OwnerEmail:       "whomever@example.com",
 			Subject:          "subject 4",
 			LastIngestedData: time.Date(2021, time.March, 1, 1, 1, 1, 0, time.UTC),
 		}, {
-			ChangelistID:     "gerrit_000003",
+			ChangelistID:     "github_000003",
 			System:           "gerrit",
 			Status:           schema.StatusOpen,
 			OwnerEmail:       "user1@example.com",
@@ -270,14 +270,14 @@ func TestUpdateCycle_CLsWithNoExpectationsLand_MarkedAsLanded(t *testing.T) {
 
 	cls := sqltest.GetAllRows(ctx, t, db, "Changelists", &schema.ChangelistRow{}).([]schema.ChangelistRow)
 	assert.Equal(t, []schema.ChangelistRow{{
-		ChangelistID:     "gerrit_000003",
+		ChangelistID:     "github_000003",
 		System:           "gerrit",
 		Status:           schema.StatusLanded,
 		OwnerEmail:       "user1@example.com",
 		Subject:          "Revert commit 2",
 		LastIngestedData: time.Date(2021, time.March, 1, 1, 1, 1, 0, time.UTC),
 	}, {
-		ChangelistID:     "gerrit_000004",
+		ChangelistID:     "github_000004",
 		System:           "gerrit",
 		Status:           schema.StatusLanded,
 		OwnerEmail:       "whomever@example.com",
@@ -315,49 +315,52 @@ func TestCheckForLandedCycle_CLExpectations_MergedIntoPrimaryBranch(t *testing.T
 	}}, actualRows)
 
 	cls := sqltest.GetAllRows(ctx, t, db, "Changelists", &schema.ChangelistRow{}).([]schema.ChangelistRow)
-	assert.Equal(t, []schema.ChangelistRow{{
-		ChangelistID:     "gerrit-internal_CL_new_tests",
-		System:           dks.GitHubCRS,
-		Status:           schema.StatusLanded, // updated
-		OwnerEmail:       dks.UserTwo,
-		Subject:          "Increase test coverage",
-		LastIngestedData: time.Date(2020, time.December, 12, 9, 20, 33, 0, time.UTC),
-	}, {
-		ChangelistID:     "gerrit_CL_fix_ios",
-		System:           dks.GitHubCRS,
-		Status:           schema.StatusOpen, // not touched
-		OwnerEmail:       dks.UserOne,
-		Subject:          "Fix iOS",
-		LastIngestedData: time.Date(2020, time.December, 10, 4, 5, 6, 0, time.UTC),
-	}, {
-		ChangelistID:     "gerrit_CLdisallowtriaging",
-		System:           dks.GitHubCRS,
-		Status:           schema.StatusOpen, // not touched
-		OwnerEmail:       dks.UserOne,
-		Subject:          "add test with disallow triaging",
-		LastIngestedData: time.Date(2020, time.December, 12, 16, 0, 0, 0, time.UTC),
-	}, {
-		ChangelistID:     "gerrit_CLhaslanded",
-		System:           dks.GitHubCRS,
-		Status:           schema.StatusLanded,
-		OwnerEmail:       dks.UserTwo,
-		Subject:          "was landed",
-		LastIngestedData: time.Date(2020, time.May, 5, 5, 5, 0, 0, time.UTC),
-	}, {
-		ChangelistID:     "gerrit_CLisabandoned",
-		System:           dks.GitHubCRS,
-		Status:           schema.StatusAbandoned,
-		OwnerEmail:       dks.UserOne,
-		Subject:          "was abandoned",
-		LastIngestedData: time.Date(2020, time.June, 6, 6, 6, 0, 0, time.UTC),
-	}, {
-		ChangelistID:     "gerrit_CLmultipledatapoints",
-		System:           dks.GitHubCRS,
-		Status:           schema.StatusOpen,
-		OwnerEmail:       dks.UserOne,
-		Subject:          "multiple datapoints",
-		LastIngestedData: time.Date(2020, time.December, 12, 14, 0, 0, 0, time.UTC),
-	}}, cls)
+	assert.Equal(t, []schema.ChangelistRow{
+		{
+			ChangelistID:     "github_CL_fix_ios",
+			System:           dks.GitHubCRS,
+			Status:           schema.StatusOpen, // not touched
+			OwnerEmail:       dks.UserOne,
+			Subject:          "Fix iOS",
+			LastIngestedData: time.Date(2020, time.December, 10, 4, 5, 6, 0, time.UTC),
+		},
+		{
+			ChangelistID:     "github_CL_new_tests",
+			System:           dks.GitHubCRS,
+			Status:           schema.StatusLanded, // updated
+			OwnerEmail:       dks.UserTwo,
+			Subject:          "Increase test coverage",
+			LastIngestedData: time.Date(2020, time.December, 12, 9, 20, 33, 0, time.UTC),
+		},
+		{
+			ChangelistID:     "github_CLdisallowtriaging",
+			System:           dks.GitHubCRS,
+			Status:           schema.StatusOpen, // not touched
+			OwnerEmail:       dks.UserOne,
+			Subject:          "add test with disallow triaging",
+			LastIngestedData: time.Date(2020, time.December, 12, 16, 0, 0, 0, time.UTC),
+		}, {
+			ChangelistID:     "github_CLhaslanded",
+			System:           dks.GitHubCRS,
+			Status:           schema.StatusLanded,
+			OwnerEmail:       dks.UserTwo,
+			Subject:          "was landed",
+			LastIngestedData: time.Date(2020, time.May, 5, 5, 5, 0, 0, time.UTC),
+		}, {
+			ChangelistID:     "github_CLisabandoned",
+			System:           dks.GitHubCRS,
+			Status:           schema.StatusAbandoned,
+			OwnerEmail:       dks.UserOne,
+			Subject:          "was abandoned",
+			LastIngestedData: time.Date(2020, time.June, 6, 6, 6, 0, 0, time.UTC),
+		}, {
+			ChangelistID:     "github_CLmultipledatapoints",
+			System:           dks.GitHubCRS,
+			Status:           schema.StatusOpen,
+			OwnerEmail:       dks.UserOne,
+			Subject:          "multiple datapoints",
+			LastIngestedData: time.Date(2020, time.December, 12, 14, 0, 0, 0, time.UTC),
+		}}, cls)
 
 	records := sqltest.GetAllRows(ctx, t, db, "ExpectationRecords", &schema.ExpectationRecordRow{}).([]schema.ExpectationRecordRow)
 	require.Len(t, records, len(existingData.ExpectationRecords)+2) // 2 users triaged on this CL
@@ -534,42 +537,42 @@ func TestCheckForLandedCycle_TriageExistingData_Success(t *testing.T) {
 
 	cls := sqltest.GetAllRows(ctx, t, db, "Changelists", &schema.ChangelistRow{}).([]schema.ChangelistRow)
 	assert.Equal(t, []schema.ChangelistRow{{
-		ChangelistID:     "gerrit-internal_CL_new_tests",
+		ChangelistID:     "github_CL_new_tests",
 		System:           dks.GitHubCRS,
 		Status:           schema.StatusLanded, // updated
 		OwnerEmail:       dks.UserTwo,
 		Subject:          "Increase test coverage",
 		LastIngestedData: time.Date(2020, time.December, 12, 9, 20, 33, 0, time.UTC),
 	}, {
-		ChangelistID:     "gerrit_CL_fix_ios",
+		ChangelistID:     "github_CL_fix_ios",
 		System:           dks.GitHubCRS,
 		Status:           schema.StatusOpen, // not touched
 		OwnerEmail:       dks.UserOne,
 		Subject:          "Fix iOS",
 		LastIngestedData: time.Date(2020, time.December, 10, 4, 5, 6, 0, time.UTC),
 	}, {
-		ChangelistID:     "gerrit_CLdisallowtriaging",
+		ChangelistID:     "github_CLdisallowtriaging",
 		System:           dks.GitHubCRS,
 		Status:           schema.StatusOpen, // not touched
 		OwnerEmail:       dks.UserOne,
 		Subject:          "add test with disallow triaging",
 		LastIngestedData: time.Date(2020, time.December, 12, 16, 0, 0, 0, time.UTC),
 	}, {
-		ChangelistID:     "gerrit_CLhaslanded",
+		ChangelistID:     "github_CLhaslanded",
 		System:           dks.GitHubCRS,
 		Status:           schema.StatusLanded,
 		OwnerEmail:       dks.UserTwo,
 		Subject:          "was landed",
 		LastIngestedData: time.Date(2020, time.May, 5, 5, 5, 0, 0, time.UTC),
 	}, {
-		ChangelistID:     "gerrit_CLisabandoned",
+		ChangelistID:     "github_CLisabandoned",
 		System:           dks.GitHubCRS,
 		Status:           schema.StatusAbandoned,
 		OwnerEmail:       dks.UserOne,
 		Subject:          "was abandoned",
 		LastIngestedData: time.Date(2020, time.June, 6, 6, 6, 0, 0, time.UTC),
 	}, {
-		ChangelistID:     "gerrit_CLmultipledatapoints",
+		ChangelistID:     "github_CLmultipledatapoints",
 		System:           dks.GitHubCRS,
 		Status:           schema.StatusOpen,
 		OwnerEmail:       dks.UserOne,
