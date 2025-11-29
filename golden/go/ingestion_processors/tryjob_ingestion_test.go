@@ -2,6 +2,7 @@ package ingestion_processors
 
 import (
 	"context"
+	"fmt"
 	"sync"
 	"testing"
 	"time"
@@ -14,6 +15,7 @@ import (
 	"go.goldmine.build/go/httputils"
 	"go.goldmine.build/go/paramtools"
 	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
 	"go.goldmine.build/go/testutils"
 	"go.goldmine.build/golden/go/clstore"
 	"go.goldmine.build/golden/go/code_review"
@@ -29,6 +31,38 @@ import (
 	"go.goldmine.build/golden/go/sql/sqltest"
 	"go.goldmine.build/golden/go/types"
 )
+
+// rubberstampCRS implements a simple Code Review System that pretends every CL it sees exists.
+type rubberstampCRS struct {
+}
+
+func (r rubberstampCRS) GetChangelist(_ context.Context, id string) (code_review.Changelist, error) {
+	sklog.Infof("Rubberstamp CL response for %s", id)
+	return code_review.Changelist{
+		SystemID: id,
+		Owner:    "<unknown>",
+		Status:   code_review.Open,
+		Subject:  "<unknown>",
+		Updated:  time.Now(),
+	}, nil
+}
+
+func (r rubberstampCRS) GetPatchset(_ context.Context, clID, psID string, psOrder int) (code_review.Patchset, error) {
+	if psOrder == 0 {
+		return code_review.Patchset{}, skerr.Fmt("The order of the Patchset must be provided in rubberstamp mode")
+	}
+	sklog.Infof("Rubberstamp PS response for %s %s %d", clID, psID, psOrder)
+	return code_review.Patchset{
+		SystemID:     fmt.Sprintf("%s|%s|%d", clID, psID, psOrder),
+		ChangelistID: clID,
+		Order:        psOrder,
+		GitHash:      "<unknown>",
+	}, nil
+}
+
+func (r rubberstampCRS) CommentOn(_ context.Context, _, _ string) error {
+	return skerr.Fmt("not implemented")
+}
 
 func TestTryjobSQL_SingleCRSAndCIS_Success(t *testing.T) {
 
