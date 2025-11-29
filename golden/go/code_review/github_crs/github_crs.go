@@ -124,6 +124,8 @@ type person struct {
 type commitsOnPullRequestResponse []commit
 
 // GetPatchset implements the code_review.Client interface.
+//
+// Note that psOrder can be 0, in which case we only use psID to find the patchset.
 func (c *CRSImpl) GetPatchset(ctx context.Context, clID, psID string, psOrder int) (code_review.Patchset, error) {
 	if _, err := strconv.ParseInt(clID, 10, 64); err != nil {
 		return code_review.Patchset{}, skerr.Fmt("invalid Changelist ID")

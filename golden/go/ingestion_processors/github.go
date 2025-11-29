@@ -1,5 +1,15 @@
 package ingestion_processors
 
+import "context"
+
+// This should be an implementation of the _ interface.
+
+type LookupSystem interface {
+	// Lookup returns the given CRS system, CL ID, PS Order or an error if it could not lookup
+	// the CL information.
+	Lookup(ctx context.Context, tjID string) (string, string, int, error)
+}
+
 /*
 
 To fetch GitHub PR data for tryjobs, first pull the PR info:
@@ -218,25 +228,47 @@ GITHUB_WORKFLOW.
 
 Note that GITHUB_SHA is the merge commit sha, so we actually want to record
 
-	PR_PATCHSET_SHA=$(git rev-parse HEAD^)
+	PR_PATCHES_PARENTS=git log --pretty=%P -n 1 $GITHUB_SHA
+
+Note that will return 2 SHAs separated by a space in the case of a merge commit, e.g.:
+
+	Run git log --pretty=%P -n 1 $GITHUB_SHA
+	5ae561f50219876d62d50f41b3d2f7c9c094106d 403e9b69508e292a06bc02be27cb5e4330a71c89
 
 In the goldctl upload we then supply the following keys in the metadata:
 
   // These keys are required for tryjobs and can be omitted for non-tryjobs.
   // GitHub support coming soon, Gerrit/googlesource support only at the moment.
-  issue: '1',  # Pull Request number
-  patchset: '4', # Commit index in the PR commits array (1-based)
+  change_list_id: '1',  # Pull Request number
+  patch_set_order: 4,  # Commit index in the PR commits array (1-based)
+  patch_set_id: $(git log --pretty=%P -n 1 $GITHUB_SHA | sed 's#.* ##'), # Commit index in the PR commits array (1-based)
 
-  github_merge_commit_sha: 'a23fca2fc99206cbcabc36e7a875c09cc101dae6',
-
-  buildbucket_build_id: '0',
-
+  github_merge_commit_parents: '5ae561f50219876d62d50f41b3d2f7c9c094106d 403e9b69508e292a06bc02be27cb5e4330a71c89',
+  github_workflow_name: $GITHUB_WORKFLOW,
 
   // These keys are optional, but can assist in debugging
-  builder: 'Test-Android-Clang-iPhone7-GPU-PowerVRGT7600-arm64-Debug-All-Metal',
-  swarming_bot_id: 'skia-rpi-102',
-  swarming_task_id: '3fcd8d4a539ba311',
 
+  builder: $GITHUB_WORKFLOW,
+
+  // This is how we distinguish tryjob uploads from non-tryjob uploads.
+  GITHUB_REF_NAME=main # or 1/merge for PR 1
+
+  PULL_NUMBER=$(echo $GITHUB_REF_NAME | cut -d'/' -f1)
+  PATCHSET_ID=$(git log --pretty=%P -n 1 $GITHUB_SHA | sed 's#.* ##')
+
+
+  				--crs=github
+				--cis=github
+				--changelist=$PULL_NUMBER
+				--patchset=0                # Using 0 here to indicate we are using patchset_id
+				--patchset_id=$PATCHSET_ID
+				--jobid=$PULL_NUMBER-$PATCHSET_ID # Add a lookupSystem that can map this to CL/PS.
+
+				$GITHUB_WORKFLOW
+
+
+
+How do we detect in a github workflow that we are running in a tryjob? or a commit on main branch?
 
 
 
