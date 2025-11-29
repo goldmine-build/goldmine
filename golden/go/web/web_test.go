@@ -485,11 +485,36 @@ func TestBaselineHandlerV2_ValidChangelist_Success(t *testing.T) {
 		baselineCache: ttlcache.New(time.Minute, 10*time.Minute),
 	}
 	w := httptest.NewRecorder()
-	r := httptest.NewRequest(http.MethodGet, frontend.ExpectationsRouteV2+"?issue=CL_fix_ios&crs=gerrit", nil)
+	r := httptest.NewRequest(http.MethodGet, frontend.ExpectationsRouteV2+"?issue=CL_fix_ios&crs=github", nil)
 
 	// Note that DigestC06Pos_CL is here, but DigestC07Unt_CL is not because the latter is
 	// untriaged (and thus omitted from the baseline).
-	expectedJSONResponse := `{"primary":{"circle":{"00000000000000000000000000000000":"negative","c01c01c01c01c01c01c01c01c01c01c0":"positive","c02c02c02c02c02c02c02c02c02c02c0":"positive","c06c06c06c06c06c06c06c06c06c06c0":"positive"},"square":{"a01a01a01a01a01a01a01a01a01a01a0":"positive","a02a02a02a02a02a02a02a02a02a02a0":"positive","a03a03a03a03a03a03a03a03a03a03a0":"positive","a07a07a07a07a07a07a07a07a07a07a0":"positive","a08a08a08a08a08a08a08a08a08a08a0":"positive","a09a09a09a09a09a09a09a09a09a09a0":"negative"},"triangle":{"b02b02b02b02b02b02b02b02b02b02b0":"positive","b03b03b03b03b03b03b03b03b03b03b0":"negative","b04b04b04b04b04b04b04b04b04b04b0":"negative"}},"cl_id":"CL_fix_ios","crs":"gerrit"}`
+	//expectedJSONResponse := `{"primary":{"circle":{"00000000000000000000000000000000":"negative","c01c01c01c01c01c01c01c01c01c01c0":"positive","c02c02c02c02c02c02c02c02c02c02c0":"positive","c06c06c06c06c06c06c06c06c06c06c0":"positive"},"square":{"a01a01a01a01a01a01a01a01a01a01a0":"positive","a02a02a02a02a02a02a02a02a02a02a0":"positive","a03a03a03a03a03a03a03a03a03a03a0":"positive","a07a07a07a07a07a07a07a07a07a07a0":"positive","a08a08a08a08a08a08a08a08a08a08a0":"positive","a09a09a09a09a09a09a09a09a09a09a0":"negative"},"triangle":{"b02b02b02b02b02b02b02b02b02b02b0":"positive","b03b03b03b03b03b03b03b03b03b03b0":"negative","b04b04b04b04b04b04b04b04b04b04b0":"negative"}},"cl_id":"CL_fix_ios","crs":"github"}`
+	expectedJSONResponse := `{
+  "primary": {
+    "circle": {
+      "00000000000000000000000000000000": "negative",
+      "c01c01c01c01c01c01c01c01c01c01c0": "positive",
+      "c02c02c02c02c02c02c02c02c02c02c0": "positive"
+    },
+    "square": {
+      "a01a01a01a01a01a01a01a01a01a01a0": "positive",
+      "a02a02a02a02a02a02a02a02a02a02a0": "positive",
+      "a03a03a03a03a03a03a03a03a03a03a0": "positive",
+      "a07a07a07a07a07a07a07a07a07a07a0": "positive",
+      "a08a08a08a08a08a08a08a08a08a08a0": "positive",
+      "a09a09a09a09a09a09a09a09a09a09a0": "negative"
+    },
+    "triangle": {
+      "b01b01b01b01b01b01b01b01b01b01b0": "positive",
+      "b02b02b02b02b02b02b02b02b02b02b0": "positive",
+      "b03b03b03b03b03b03b03b03b03b03b0": "negative",
+      "b04b04b04b04b04b04b04b04b04b04b0": "negative"
+    }
+  },
+  "cl_id": "CL_fix_ios",
+  "crs": "github"
+}`
 
 	wh.BaselineHandlerV2(w, r)
 	assertJSONResponseWas(t, http.StatusOK, expectedJSONResponse, w)
@@ -512,10 +537,41 @@ func TestBaselineHandlerV2_ValidChangelistWithNewTests_Success(t *testing.T) {
 		baselineCache: ttlcache.New(time.Minute, 10*time.Minute),
 	}
 	w := httptest.NewRecorder()
-	r := httptest.NewRequest(http.MethodGet, frontend.ExpectationsRouteV2+"?issue=CL_new_tests&crs=gerrit-internal", nil)
+	r := httptest.NewRequest(http.MethodGet, frontend.ExpectationsRouteV2+"?issue=CL_new_tests&crs=github", nil)
 
 	// We expect to see data from the Seven Test and RoundRect Test.
-	expectedJSONResponse := `{"primary":{"circle":{"00000000000000000000000000000000":"negative","c01c01c01c01c01c01c01c01c01c01c0":"positive","c02c02c02c02c02c02c02c02c02c02c0":"positive"},"round rect":{"e01e01e01e01e01e01e01e01e01e01e0":"positive","e02e02e02e02e02e02e02e02e02e02e0":"positive"},"seven":{"d01d01d01d01d01d01d01d01d01d01d0":"positive"},"square":{"a01a01a01a01a01a01a01a01a01a01a0":"positive","a02a02a02a02a02a02a02a02a02a02a0":"positive","a03a03a03a03a03a03a03a03a03a03a0":"positive","a07a07a07a07a07a07a07a07a07a07a0":"positive","a08a08a08a08a08a08a08a08a08a08a0":"positive","a09a09a09a09a09a09a09a09a09a09a0":"negative"},"triangle":{"b01b01b01b01b01b01b01b01b01b01b0":"positive","b02b02b02b02b02b02b02b02b02b02b0":"positive","b03b03b03b03b03b03b03b03b03b03b0":"negative","b04b04b04b04b04b04b04b04b04b04b0":"negative"}},"cl_id":"CL_new_tests","crs":"gerrit-internal"}`
+	expectedJSONResponse := `{
+  "primary": {
+    "circle": {
+      "00000000000000000000000000000000": "negative",
+      "c01c01c01c01c01c01c01c01c01c01c0": "positive",
+      "c02c02c02c02c02c02c02c02c02c02c0": "positive"
+    },
+    "round rect": {
+      "e01e01e01e01e01e01e01e01e01e01e0": "positive",
+      "e02e02e02e02e02e02e02e02e02e02e0": "positive"
+    },
+    "seven": {
+      "d01d01d01d01d01d01d01d01d01d01d0": "positive"
+    },
+    "square": {
+      "a01a01a01a01a01a01a01a01a01a01a0": "positive",
+      "a02a02a02a02a02a02a02a02a02a02a0": "positive",
+      "a03a03a03a03a03a03a03a03a03a03a0": "positive",
+      "a07a07a07a07a07a07a07a07a07a07a0": "positive",
+      "a08a08a08a08a08a08a08a08a08a08a0": "positive",
+      "a09a09a09a09a09a09a09a09a09a09a0": "negative"
+    },
+    "triangle": {
+      "b01b01b01b01b01b01b01b01b01b01b0": "positive",
+      "b02b02b02b02b02b02b02b02b02b02b0": "positive",
+      "b03b03b03b03b03b03b03b03b03b03b0": "negative",
+      "b04b04b04b04b04b04b04b04b04b04b0": "negative"
+    }
+  },
+  "cl_id": "CL_new_tests",
+  "crs": "github"
+}`
 
 	wh.BaselineHandlerV2(w, r)
 	assertJSONResponseWas(t, http.StatusOK, expectedJSONResponse, w)
@@ -562,9 +618,33 @@ func TestBaselineHandlerV2_NewCL_ReturnsPrimaryBaseline(t *testing.T) {
 		baselineCache: ttlcache.New(time.Minute, 10*time.Minute),
 	}
 	w := httptest.NewRecorder()
-	r := httptest.NewRequest(http.MethodGet, frontend.ExpectationsRouteV2+"?issue=NewCLID&crs=gerrit", nil)
+	r := httptest.NewRequest(http.MethodGet, frontend.ExpectationsRouteV2+"?issue=NewCLID&crs=github", nil)
 
-	expectedJSONResponse := `{"primary":{"circle":{"00000000000000000000000000000000":"negative","c01c01c01c01c01c01c01c01c01c01c0":"positive","c02c02c02c02c02c02c02c02c02c02c0":"positive"},"square":{"a01a01a01a01a01a01a01a01a01a01a0":"positive","a02a02a02a02a02a02a02a02a02a02a0":"positive","a03a03a03a03a03a03a03a03a03a03a0":"positive","a07a07a07a07a07a07a07a07a07a07a0":"positive","a08a08a08a08a08a08a08a08a08a08a0":"positive","a09a09a09a09a09a09a09a09a09a09a0":"negative"},"triangle":{"b01b01b01b01b01b01b01b01b01b01b0":"positive","b02b02b02b02b02b02b02b02b02b02b0":"positive","b03b03b03b03b03b03b03b03b03b03b0":"negative","b04b04b04b04b04b04b04b04b04b04b0":"negative"}},"cl_id":"NewCLID","crs":"gerrit"}`
+	expectedJSONResponse := `{
+  "primary": {
+    "circle": {
+      "00000000000000000000000000000000": "negative",
+      "c01c01c01c01c01c01c01c01c01c01c0": "positive",
+      "c02c02c02c02c02c02c02c02c02c02c0": "positive"
+    },
+    "square": {
+      "a01a01a01a01a01a01a01a01a01a01a0": "positive",
+      "a02a02a02a02a02a02a02a02a02a02a0": "positive",
+      "a03a03a03a03a03a03a03a03a03a03a0": "positive",
+      "a07a07a07a07a07a07a07a07a07a07a0": "positive",
+      "a08a08a08a08a08a08a08a08a08a08a0": "positive",
+      "a09a09a09a09a09a09a09a09a09a09a0": "negative"
+    },
+    "triangle": {
+      "b01b01b01b01b01b01b01b01b01b01b0": "positive",
+      "b02b02b02b02b02b02b02b02b02b02b0": "positive",
+      "b03b03b03b03b03b03b03b03b03b03b0": "negative",
+      "b04b04b04b04b04b04b04b04b04b04b0": "negative"
+    }
+  },
+  "cl_id": "NewCLID",
+  "crs": "github"
+}`
 
 	wh.BaselineHandlerV2(w, r)
 	assertJSONResponseWas(t, http.StatusOK, expectedJSONResponse, w)
@@ -587,7 +667,13 @@ func TestBaselineHandlerV2_CachedPrimaryBranch_ReturnsCachedBaseline(t *testing.
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodGet, frontend.ExpectationsRouteV2, nil)
 
-	expectedJSONResponse := `{"primary":{"circle":{"a01a01a01a01a01a01a01a01a01a01a0":"positive"}}}`
+	expectedJSONResponse := `{
+  "primary": {
+    "circle": {
+      "a01a01a01a01a01a01a01a01a01a01a0": "positive"
+    }
+  }
+}`
 
 	wh.BaselineHandlerV2(w, r)
 	assertJSONResponseWas(t, http.StatusOK, expectedJSONResponse, w)
@@ -606,7 +692,7 @@ func TestBaselineHandlerV2_CachedChangelist_ReturnsCachedBaseline(t *testing.T) 
 		},
 		baselineCache: ttlcache.New(time.Minute, 10*time.Minute),
 	}
-	wh.baselineCache.Set("gerrit_CLID", frontend.BaselineV2Response{
+	wh.baselineCache.Set("github_CLID", frontend.BaselineV2Response{
 		CodeReviewSystem: dks.GitHubCRS,
 		ChangelistID:     "CLID",
 		Expectations: expectations.Baseline{
@@ -617,9 +703,17 @@ func TestBaselineHandlerV2_CachedChangelist_ReturnsCachedBaseline(t *testing.T) 
 	}, ttlcache.DefaultExpiration)
 
 	w := httptest.NewRecorder()
-	r := httptest.NewRequest(http.MethodGet, frontend.ExpectationsRouteV2+"?issue=CLID&crs=gerrit", nil)
+	r := httptest.NewRequest(http.MethodGet, frontend.ExpectationsRouteV2+"?issue=CLID&crs=github", nil)
 
-	expectedJSONResponse := `{"primary":{"circle":{"a01a01a01a01a01a01a01a01a01a01a0":"positive"}},"cl_id":"CLID","crs":"gerrit"}`
+	expectedJSONResponse := `{
+  "primary": {
+    "circle": {
+      "a01a01a01a01a01a01a01a01a01a01a0": "positive"
+    }
+  },
+  "cl_id": "CLID",
+  "crs": "github"
+}`
 
 	wh.BaselineHandlerV2(w, r)
 	assertJSONResponseWas(t, http.StatusOK, expectedJSONResponse, w)
@@ -633,7 +727,10 @@ func TestWhoami_NotLoggedIn_Success(t *testing.T) {
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodGet, requestURL, nil)
 	wh.Whoami(w, r)
-	assertJSONResponseWas(t, http.StatusOK, `{"roles":null,"whoami":""}`, w)
+	assertJSONResponseWas(t, http.StatusOK, `{
+  "roles": null,
+  "whoami": ""
+}`, w)
 }
 
 // TestWhoami_LoggedIn_Success tests that /json/whoami returns the email of the user that is
@@ -644,7 +741,12 @@ func TestWhoami_LoggedIn_Success(t *testing.T) {
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodGet, requestURL, nil)
 	wh.Whoami(w, r)
-	assertJSONResponseWas(t, http.StatusOK, `{"roles":["editor"],"whoami":"user@example.com"}`, w)
+	assertJSONResponseWas(t, http.StatusOK, `{
+  "roles": [
+    "editor"
+  ],
+  "whoami": "user@example.com"
+}`, w)
 }
 
 func TestChangelistSearchRedirect_CLHasUntriagedDigests_Success(t *testing.T) {

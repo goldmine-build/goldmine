@@ -35,7 +35,9 @@ func setJSONHeaders(w http.ResponseWriter) {
 // a text based error code is send to the client.
 func sendJSONResponse(w http.ResponseWriter, resp interface{}) {
 	setJSONHeaders(w)
-	if err := json.NewEncoder(w).Encode(resp); err != nil {
+	encoder := json.NewEncoder(w)
+	encoder.SetIndent("", "  ")
+	if err := encoder.Encode(resp); err != nil {
 		httputils.ReportError(w, err, "Failed to encode JSON response.", http.StatusInternalServerError)
 	}
 }
