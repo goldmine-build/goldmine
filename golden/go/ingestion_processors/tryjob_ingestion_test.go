@@ -1065,9 +1065,9 @@ func TestTryjobSQL_Process_SameFileMultipleTimesInParallel_Success_cdb(t *testin
 	const psID = dks.PatchSetIDFixesIPadButNotIPhone
 	const tjID = dks.Tryjob01IPhoneRGB
 
-	const qualifiedCL = "gerrit_CL_fix_ios"
-	const qualifiedPS = "gerrit_PS_fixes_ipad_but_not_iphone"
-	const qualifiedTJ = "buildbucket_tryjob_01_iphonergb"
+	const qualifiedCL = "github_CL_fix_ios"
+	const qualifiedPS = "github_PS_fixes_ipad_but_not_iphone"
+	const qualifiedTJ = "github_tryjob_01_iphonergb"
 
 	ctx = overwriteNow(ctx, fakeIngestionTime)
 	wg := sync.WaitGroup{}
@@ -1104,7 +1104,7 @@ func TestTryjobSQL_Process_SameFileMultipleTimesInParallel_Success_cdb(t *testin
 					dks.GitHubCIS: mcis,
 				},
 				reviewSystems: map[string]clstore.ReviewSystem{
-					"github": clstore.ReviewSystem{
+					"github": {
 						ID:     githubCRS,
 						Client: mcrs,
 					},
