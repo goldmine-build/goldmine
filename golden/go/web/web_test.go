@@ -3063,6 +3063,12 @@ func TestTriage3_SingleDigestOnPrimaryBranch_ImageMatchingAlgorithm_UsesAlgorith
 	db := sqltest.NewCockroachDBForTestsWithProductionSchema(ctx, t)
 	require.NoError(t, sqltest.BulkInsertDataTables(ctx, db, dks.Build()))
 
+	// Record the changes to each of the tables below.
+	expectationrecords := sqltest.NewRowChanges[schema.ExpectationRecordRow](ctx, t, db, "expectationrecords")
+	exp := sqltest.NewRowChanges[schema.ExpectationRow](ctx, t, db, "expectations")
+	secondaryBranchExpectations := sqltest.NewRowChanges[schema.SecondaryBranchExpectationRow](ctx, t, db, "SecondaryBranchExpectations")
+	expectationDeltas := sqltest.NewRowChanges[schema.ExpectationDeltaRow](ctx, t, db, "ExpectationDeltas")
+
 	const user = "not_me@example.com"
 	const algorithmName = "fuzzy"
 	fakeNow := time.Date(2021, time.July, 4, 4, 4, 4, 0, time.UTC)
@@ -3088,12 +3094,11 @@ func TestTriage3_SingleDigestOnPrimaryBranch_ImageMatchingAlgorithm_UsesAlgorith
 		ImageMatchingAlgorithm: algorithmName,
 	}
 	ctx = now.TimeTravelingContext(fakeNow)
-	tsBeforeTriage := time.Now()
 	res, err := wh.triage3(ctx, user, tr)
 	require.NoError(t, err)
 	assert.Equal(t, frontend.TriageResponse{Status: frontend.TriageResponseStatusOK}, res)
 
-	missingRecords, newRecords := sqltest.GetRowChanges[schema.ExpectationRecordRow](ctx, t, db, "ExpectationRecords", tsBeforeTriage)
+	missingRecords, newRecords := sqltest.GetChangedRows(expectationrecords)
 	assert.Empty(t, missingRecords)
 	assert.Equal(t, []schema.ExpectationRecordRow{{
 		ExpectationRecordID: newRecords[0].ExpectationRecordID, // Randomly generated.
@@ -3102,7 +3107,7 @@ func TestTriage3_SingleDigestOnPrimaryBranch_ImageMatchingAlgorithm_UsesAlgorith
 		NumChanges:          1,
 	}}, newRecords)
 
-	missingExpectations, newExpectations := sqltest.GetRowChanges[schema.ExpectationRow](ctx, t, db, "Expectations", tsBeforeTriage)
+	missingExpectations, newExpectations := sqltest.GetChangedRows(exp)
 	assert.Equal(t, []schema.ExpectationRow{{
 		GroupingID:          dks.CircleGroupingID,
 		Digest:              d(dks.DigestC03Unt),
@@ -3116,9 +3121,9 @@ func TestTriage3_SingleDigestOnPrimaryBranch_ImageMatchingAlgorithm_UsesAlgorith
 		ExpectationRecordID: &newRecords[0].ExpectationRecordID, // Randomly generated.
 	}}, newExpectations)
 
-	assertNoChanges[schema.SecondaryBranchExpectationRow](ctx, t, db, "SecondaryBranchExpectations", tsBeforeTriage)
+	sqltest.AssertNoChanges(secondaryBranchExpectations)
 
-	missingDeltas, newDeltas := sqltest.GetRowChanges[schema.ExpectationDeltaRow](ctx, t, db, "ExpectationDeltas", tsBeforeTriage)
+	missingDeltas, newDeltas := sqltest.GetChangedRows(expectationDeltas)
 	assert.Empty(t, missingDeltas)
 	assert.Equal(t, []schema.ExpectationDeltaRow{{
 		ExpectationRecordID: newRecords[0].ExpectationRecordID, // Randomly generated.
