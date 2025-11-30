@@ -3526,7 +3526,9 @@ func TestLatestPositiveDigest2_TracesExist_Success(t *testing.T) {
 			r = setChiURLParams(r, map[string]string{"traceID": string(traceID)})
 
 			wh.LatestPositiveDigestHandler(w, r)
-			expectedJSONResponse := `{"digest":"` + string(expectedDigest) + `"}`
+			expectedJSONResponse := `{
+  "digest": "` + string(expectedDigest) + `"
+}`
 			assertJSONResponseWas(t, http.StatusOK, expectedJSONResponse, w)
 		})
 
@@ -3580,7 +3582,9 @@ func TestLatestPositiveDigest2_TraceDoesNotExist_ReturnsEmptyDigest(t *testing.T
 	r = setChiURLParams(r, map[string]string{"traceID": "1234567890abcdef1234567890abcdef"})
 
 	wh.LatestPositiveDigestHandler(w, r)
-	expectedJSONResponse := `{"digest":""}`
+	expectedJSONResponse := `{
+  "digest": ""
+}`
 	assertJSONResponseWas(t, http.StatusOK, expectedJSONResponse, w)
 }
 
@@ -3595,10 +3599,7 @@ func TestGetChangelistsHandler_AllChangelists_Success(t *testing.T) {
 			DB: db,
 			ReviewSystems: []clstore.ReviewSystem{{
 				ID:          dks.GitHubCRS,
-				URLTemplate: "example.com/%s/gerrit",
-			}, {
-				ID:          dks.GitHubCRS,
-				URLTemplate: "example.com/%s/gerrit-internal",
+				URLTemplate: "example.com/%s/github",
 			}},
 		},
 		anonymousCheapQuota: rate.NewLimiter(rate.Inf, 1),
@@ -3607,12 +3608,67 @@ func TestGetChangelistsHandler_AllChangelists_Success(t *testing.T) {
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodGet, "/json/v2/changelists?size=50", nil)
 	wh.ChangelistsHandler(w, r)
-	const expectedResponse = `{"changelists":[{"system":"gerrit","id":"CLdisallowtriaging","owner":"userOne@example.com","status":"open","subject":"add test with disallow triaging","updated":"2020-12-12T16:00:00Z","url":"example.com/CLdisallowtriaging/gerrit"},` +
-		`{"system":"gerrit","id":"CLmultipledatapoints","owner":"userOne@example.com","status":"open","subject":"multiple datapoints","updated":"2020-12-12T14:00:00Z","url":"example.com/CLmultipledatapoints/gerrit"},` +
-		`{"system":"gerrit-internal","id":"CL_new_tests","owner":"userTwo@example.com","status":"open","subject":"Increase test coverage","updated":"2020-12-12T09:20:33Z","url":"example.com/CL_new_tests/gerrit-internal"},` +
-		`{"system":"gerrit","id":"CL_fix_ios","owner":"userOne@example.com","status":"open","subject":"Fix iOS","updated":"2020-12-10T04:05:06Z","url":"example.com/CL_fix_ios/gerrit"},` +
-		`{"system":"gerrit","id":"CLisabandoned","owner":"userOne@example.com","status":"abandoned","subject":"was abandoned","updated":"2020-06-06T06:06:00Z","url":"example.com/CLisabandoned/gerrit"},` +
-		`{"system":"gerrit","id":"CLhaslanded","owner":"userTwo@example.com","status":"landed","subject":"was landed","updated":"2020-05-05T05:05:00Z","url":"example.com/CLhaslanded/gerrit"}],"offset":0,"size":50,"total":2147483647}`
+	const expectedResponse = `{
+  "changelists": [
+    {
+      "system": "github",
+      "id": "CLdisallowtriaging",
+      "owner": "userOne@example.com",
+      "status": "open",
+      "subject": "add test with disallow triaging",
+      "updated": "2020-12-12T16:00:00Z",
+      "url": "example.com/CLdisallowtriaging/github"
+    },
+    {
+      "system": "github",
+      "id": "CLmultipledatapoints",
+      "owner": "userOne@example.com",
+      "status": "open",
+      "subject": "multiple datapoints",
+      "updated": "2020-12-12T14:00:00Z",
+      "url": "example.com/CLmultipledatapoints/github"
+    },
+    {
+      "system": "github",
+      "id": "CL_new_tests",
+      "owner": "userTwo@example.com",
+      "status": "open",
+      "subject": "Increase test coverage",
+      "updated": "2020-12-12T09:20:33Z",
+      "url": "example.com/CL_new_tests/github"
+    },
+    {
+      "system": "github",
+      "id": "CL_fix_ios",
+      "owner": "userOne@example.com",
+      "status": "open",
+      "subject": "Fix iOS",
+      "updated": "2020-12-10T04:05:06Z",
+      "url": "example.com/CL_fix_ios/github"
+    },
+    {
+      "system": "github",
+      "id": "CLisabandoned",
+      "owner": "userOne@example.com",
+      "status": "abandoned",
+      "subject": "was abandoned",
+      "updated": "2020-06-06T06:06:00Z",
+      "url": "example.com/CLisabandoned/github"
+    },
+    {
+      "system": "github",
+      "id": "CLhaslanded",
+      "owner": "userTwo@example.com",
+      "status": "landed",
+      "subject": "was landed",
+      "updated": "2020-05-05T05:05:00Z",
+      "url": "example.com/CLhaslanded/github"
+    }
+  ],
+  "offset": 0,
+  "size": 50,
+  "total": 2147483647
+}`
 	assertJSONResponseWas(t, http.StatusOK, expectedResponse, w)
 }
 
@@ -3627,10 +3683,7 @@ func TestGetChangelistsHandler_RespectsPagination_Success(t *testing.T) {
 			DB: db,
 			ReviewSystems: []clstore.ReviewSystem{{
 				ID:          dks.GitHubCRS,
-				URLTemplate: "example.com/%s/gerrit",
-			}, {
-				ID:          dks.GitHubCRS,
-				URLTemplate: "example.com/%s/gerrit-internal",
+				URLTemplate: "example.com/%s/github",
 			}},
 		},
 		anonymousCheapQuota: rate.NewLimiter(rate.Inf, 1),
@@ -3639,8 +3692,31 @@ func TestGetChangelistsHandler_RespectsPagination_Success(t *testing.T) {
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodGet, "/json/v2/changelists?size=2&offset=1", nil)
 	wh.ChangelistsHandler(w, r)
-	const expectedResponse = `{"changelists":[{"system":"gerrit","id":"CLmultipledatapoints","owner":"userOne@example.com","status":"open","subject":"multiple datapoints","updated":"2020-12-12T14:00:00Z","url":"example.com/CLmultipledatapoints/gerrit"},` +
-		`{"system":"gerrit-internal","id":"CL_new_tests","owner":"userTwo@example.com","status":"open","subject":"Increase test coverage","updated":"2020-12-12T09:20:33Z","url":"example.com/CL_new_tests/gerrit-internal"}],"offset":1,"size":2,"total":2147483647}`
+	const expectedResponse = `{
+  "changelists": [
+    {
+      "system": "github",
+      "id": "CLmultipledatapoints",
+      "owner": "userOne@example.com",
+      "status": "open",
+      "subject": "multiple datapoints",
+      "updated": "2020-12-12T14:00:00Z",
+      "url": "example.com/CLmultipledatapoints/github"
+    },
+    {
+      "system": "github",
+      "id": "CL_new_tests",
+      "owner": "userTwo@example.com",
+      "status": "open",
+      "subject": "Increase test coverage",
+      "updated": "2020-12-12T09:20:33Z",
+      "url": "example.com/CL_new_tests/github"
+    }
+  ],
+  "offset": 1,
+  "size": 2,
+  "total": 2147483647
+}`
 	assertJSONResponseWas(t, http.StatusOK, expectedResponse, w)
 }
 
@@ -3655,10 +3731,7 @@ func TestGetChangelistsHandler_ActiveChangelists_Success(t *testing.T) {
 			DB: db,
 			ReviewSystems: []clstore.ReviewSystem{{
 				ID:          dks.GitHubCRS,
-				URLTemplate: "example.com/%s/gerrit",
-			}, {
-				ID:          dks.GitHubCRS,
-				URLTemplate: "example.com/%s/gerrit-internal",
+				URLTemplate: "example.com/%s/github",
 			}},
 		},
 		anonymousCheapQuota: rate.NewLimiter(rate.Inf, 1),
@@ -3667,10 +3740,49 @@ func TestGetChangelistsHandler_ActiveChangelists_Success(t *testing.T) {
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodGet, "/json/v2/changelists?active=true", nil)
 	wh.ChangelistsHandler(w, r)
-	const expectedResponse = `{"changelists":[{"system":"gerrit","id":"CLdisallowtriaging","owner":"userOne@example.com","status":"open","subject":"add test with disallow triaging","updated":"2020-12-12T16:00:00Z","url":"example.com/CLdisallowtriaging/gerrit"},` +
-		`{"system":"gerrit","id":"CLmultipledatapoints","owner":"userOne@example.com","status":"open","subject":"multiple datapoints","updated":"2020-12-12T14:00:00Z","url":"example.com/CLmultipledatapoints/gerrit"},` +
-		`{"system":"gerrit-internal","id":"CL_new_tests","owner":"userTwo@example.com","status":"open","subject":"Increase test coverage","updated":"2020-12-12T09:20:33Z","url":"example.com/CL_new_tests/gerrit-internal"},` +
-		`{"system":"gerrit","id":"CL_fix_ios","owner":"userOne@example.com","status":"open","subject":"Fix iOS","updated":"2020-12-10T04:05:06Z","url":"example.com/CL_fix_ios/gerrit"}],"offset":0,"size":20,"total":2147483647}`
+	const expectedResponse = `{
+  "changelists": [
+    {
+      "system": "github",
+      "id": "CLdisallowtriaging",
+      "owner": "userOne@example.com",
+      "status": "open",
+      "subject": "add test with disallow triaging",
+      "updated": "2020-12-12T16:00:00Z",
+      "url": "example.com/CLdisallowtriaging/github"
+    },
+    {
+      "system": "github",
+      "id": "CLmultipledatapoints",
+      "owner": "userOne@example.com",
+      "status": "open",
+      "subject": "multiple datapoints",
+      "updated": "2020-12-12T14:00:00Z",
+      "url": "example.com/CLmultipledatapoints/github"
+    },
+    {
+      "system": "github",
+      "id": "CL_new_tests",
+      "owner": "userTwo@example.com",
+      "status": "open",
+      "subject": "Increase test coverage",
+      "updated": "2020-12-12T09:20:33Z",
+      "url": "example.com/CL_new_tests/github"
+    },
+    {
+      "system": "github",
+      "id": "CL_fix_ios",
+      "owner": "userOne@example.com",
+      "status": "open",
+      "subject": "Fix iOS",
+      "updated": "2020-12-10T04:05:06Z",
+      "url": "example.com/CL_fix_ios/github"
+    }
+  ],
+  "offset": 0,
+  "size": 20,
+  "total": 2147483647
+}`
 	assertJSONResponseWas(t, http.StatusOK, expectedResponse, w)
 }
 
@@ -3693,8 +3805,34 @@ func TestListIgnoreRules2_WithCounts_Success(t *testing.T) {
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodGet, "/json/v2/ignores?counts=true", nil)
 	wh.ListIgnoreRules2(w, r)
-	const expectedResponse = `{"rules":[{"id":"b75cc985-efbd-9973-fa1a-05787f04f237","name":"userTwo@example.com","updatedBy":"userOne@example.com","expires":"2020-02-14T13:12:11Z","query":"device=Nokia4\u0026source_type=corners","note":"This rule has expired (and does not apply to anything)","countAll":0,"exclusiveCountAll":0,"count":0,"exclusiveCount":0},` +
-		`{"id":"a210f5da-a114-0799-e102-870edaf5570e","name":"userTwo@example.com","updatedBy":"userOne@example.com","expires":"2030-12-30T15:16:17Z","query":"device=taimen\u0026name=square\u0026name=circle","note":"Taimen isn't drawing correctly enough yet","countAll":2,"exclusiveCountAll":2,"count":1,"exclusiveCount":1}]}`
+	const expectedResponse = `{
+  "rules": [
+    {
+      "id": "b75cc985-efbd-9973-fa1a-05787f04f237",
+      "name": "userTwo@example.com",
+      "updatedBy": "userOne@example.com",
+      "expires": "2020-02-14T13:12:11Z",
+      "query": "device=Nokia4\u0026source_type=corners",
+      "note": "This rule has expired (and does not apply to anything)",
+      "countAll": 0,
+      "exclusiveCountAll": 0,
+      "count": 0,
+      "exclusiveCount": 0
+    },
+    {
+      "id": "a210f5da-a114-0799-e102-870edaf5570e",
+      "name": "userTwo@example.com",
+      "updatedBy": "userOne@example.com",
+      "expires": "2030-12-30T15:16:17Z",
+      "query": "device=taimen\u0026name=square\u0026name=circle",
+      "note": "Taimen isn't drawing correctly enough yet",
+      "countAll": 2,
+      "exclusiveCountAll": 2,
+      "count": 1,
+      "exclusiveCount": 1
+    }
+  ]
+}`
 	assertJSONResponseWas(t, http.StatusOK, expectedResponse, w)
 }
 
@@ -3762,18 +3900,86 @@ func TestPositiveDigestsByGroupingIDHandler_ExistingGrouping_Success(t *testing.
 	r := httptest.NewRequest(http.MethodGet, "/json/v1/positivedigestsbygrouping/"+dks.SquareGroupingIDHex, nil)
 	r = setGroupingID(r, dks.SquareGroupingIDHex)
 	wh.PositiveDigestsByGroupingIDHandler(w, r)
-	const expectedResponse = `{"grouping_id":"0f2ffd3aef866dc6155bcbc5697b0604","grouping_keys":{"name":"square","source_type":"corners"},"traces":[` +
-		`{"trace_id":"0e87221433a6de545e32d846fd7c3e6c","digests":["a01a01a01a01a01a01a01a01a01a01a0"]},` +
-		`{"trace_id":"36d3000d3dfb6f8fba4e631ef84332af","digests":["a02a02a02a02a02a02a02a02a02a02a0"]},` +
-		`{"trace_id":"4686a4134535ad178b67325f5f2f613a","digests":["a01a01a01a01a01a01a01a01a01a01a0","a07a07a07a07a07a07a07a07a07a07a0","a08a08a08a08a08a08a08a08a08a08a0"]},` +
-		`{"trace_id":"6bf423a4c00785c9b00725b3f58fed04","digests":["a02a02a02a02a02a02a02a02a02a02a0","a03a03a03a03a03a03a03a03a03a03a0"]},` +
-		`{"trace_id":"6cd155c000787257b3401e820b30f68e","digests":["a01a01a01a01a01a01a01a01a01a01a0"]},` +
-		`{"trace_id":"796f2cc3f33fa6a9a1f4bef3aa9c48c4","digests":["a02a02a02a02a02a02a02a02a02a02a0","a03a03a03a03a03a03a03a03a03a03a0"]},` +
-		`{"trace_id":"9c950b8ff6329f102175e4df2092e762","digests":["a02a02a02a02a02a02a02a02a02a02a0","a03a03a03a03a03a03a03a03a03a03a0"]},` +
-		`{"trace_id":"a3236d47225472d6c143f093e7ed6065","digests":["a02a02a02a02a02a02a02a02a02a02a0"]},` +
-		`{"trace_id":"a95ccd579ee7c4771019a3374753db36","digests":["a01a01a01a01a01a01a01a01a01a01a0"]},` +
-		`{"trace_id":"cf819763d5a7e8b3955ec65933f121e9","digests":["a01a01a01a01a01a01a01a01a01a01a0"]},` +
-		`{"trace_id":"ea0999cdbdb83a632327e9a1d65a565a","digests":["a01a01a01a01a01a01a01a01a01a01a0"]}]}`
+	const expectedResponse = `{
+  "grouping_id": "0f2ffd3aef866dc6155bcbc5697b0604",
+  "grouping_keys": {
+    "name": "square",
+    "source_type": "corners"
+  },
+  "traces": [
+    {
+      "trace_id": "0e87221433a6de545e32d846fd7c3e6c",
+      "digests": [
+        "a01a01a01a01a01a01a01a01a01a01a0"
+      ]
+    },
+    {
+      "trace_id": "36d3000d3dfb6f8fba4e631ef84332af",
+      "digests": [
+        "a02a02a02a02a02a02a02a02a02a02a0"
+      ]
+    },
+    {
+      "trace_id": "4686a4134535ad178b67325f5f2f613a",
+      "digests": [
+        "a01a01a01a01a01a01a01a01a01a01a0",
+        "a07a07a07a07a07a07a07a07a07a07a0",
+        "a08a08a08a08a08a08a08a08a08a08a0"
+      ]
+    },
+    {
+      "trace_id": "6bf423a4c00785c9b00725b3f58fed04",
+      "digests": [
+        "a02a02a02a02a02a02a02a02a02a02a0",
+        "a03a03a03a03a03a03a03a03a03a03a0"
+      ]
+    },
+    {
+      "trace_id": "6cd155c000787257b3401e820b30f68e",
+      "digests": [
+        "a01a01a01a01a01a01a01a01a01a01a0"
+      ]
+    },
+    {
+      "trace_id": "796f2cc3f33fa6a9a1f4bef3aa9c48c4",
+      "digests": [
+        "a02a02a02a02a02a02a02a02a02a02a0",
+        "a03a03a03a03a03a03a03a03a03a03a0"
+      ]
+    },
+    {
+      "trace_id": "9c950b8ff6329f102175e4df2092e762",
+      "digests": [
+        "a02a02a02a02a02a02a02a02a02a02a0",
+        "a03a03a03a03a03a03a03a03a03a03a0"
+      ]
+    },
+    {
+      "trace_id": "a3236d47225472d6c143f093e7ed6065",
+      "digests": [
+        "a02a02a02a02a02a02a02a02a02a02a0"
+      ]
+    },
+    {
+      "trace_id": "a95ccd579ee7c4771019a3374753db36",
+      "digests": [
+        "a01a01a01a01a01a01a01a01a01a01a0"
+      ]
+    },
+    {
+      "trace_id": "cf819763d5a7e8b3955ec65933f121e9",
+      "digests": [
+        "a01a01a01a01a01a01a01a01a01a01a0"
+      ]
+    },
+    {
+      "trace_id": "ea0999cdbdb83a632327e9a1d65a565a",
+      "digests": [
+        "a01a01a01a01a01a01a01a01a01a01a0"
+      ]
+    }
+  ]
+}`
 	assertJSONResponseWas(t, http.StatusOK, expectedResponse, w)
 }
 
