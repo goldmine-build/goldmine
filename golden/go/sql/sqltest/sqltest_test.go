@@ -142,7 +142,7 @@ func TestGetAllRows_RowsOrderNotDefined_ReturnsInAnyOrder(t *testing.T) {
 	}, actualRows)
 }
 
-func TestGetRowChanges_RowsOrderDefined_ReturnsInOrder(t *testing.T) {
+func TestGetChangedRows_RowsOrderDefined_ReturnsInOrder(t *testing.T) {
 	ctx := context.Background()
 	db := sqltest.NewCockroachDBForTests(ctx, t)
 	_, err := db.Exec(ctx, testSchema)
@@ -178,7 +178,7 @@ func TestGetRowChanges_RowsOrderDefined_ReturnsInOrder(t *testing.T) {
 	}, newRows)
 }
 
-func TestGetRowChanges_RowsOrderNotDefined_ReturnsInAnyOrder(t *testing.T) {
+func TestGetChangedRows_RowsOrderNotDefined_ReturnsInAnyOrder(t *testing.T) {
 
 	ctx := context.Background()
 	db := sqltest.NewCockroachDBForTests(ctx, t)
@@ -194,7 +194,8 @@ func TestGetRowChanges_RowsOrderNotDefined_ReturnsInAnyOrder(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	t0 := time.Now()
+	rc := sqltest.NewRowChanges[tableOneRow](ctx, t, db, "TableOne")
+
 	_, err = db.Exec(ctx, "INSERT INTO TableOne VALUES ('grape', 'hackberry')")
 	require.NoError(t, err)
 	_, err = db.Exec(ctx, "UPDATE TableOne SET column_one = 'apricot' WHERE column_one = 'apple'")
@@ -202,7 +203,7 @@ func TestGetRowChanges_RowsOrderNotDefined_ReturnsInAnyOrder(t *testing.T) {
 	_, err = db.Exec(ctx, "DELETE FROM TableOne WHERE column_one = 'cherry'")
 	require.NoError(t, err)
 
-	missingRows, newRows := sqltest.GetRowChanges[tableOneRow](ctx, t, db, "TableOne", t0)
+	missingRows, newRows := sqltest.GetChangedRows(rc)
 	assert.ElementsMatch(t, []tableOneRow{
 		{ColumnOne: "apple", ColumnTwo: "banana"},
 		{ColumnOne: "cherry", ColumnTwo: "durian"},
