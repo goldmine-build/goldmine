@@ -57,7 +57,6 @@ go_test(
         "//go/now",
         "//go/paramtools",
         "//go/roles",
-        "//go/sklog",
         "//go/testutils",
         "//golden/go/clstore",
         "//golden/go/code_review/mocks",

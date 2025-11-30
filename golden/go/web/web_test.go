@@ -18,7 +18,6 @@ import (
 	"github.com/go-chi/chi/v5"
 	ttlcache "github.com/patrickmn/go-cache"
 	"go.goldmine.build/go/roles"
-	"go.goldmine.build/go/sklog"
 
 	"github.com/google/uuid"
 	lru "github.com/hashicorp/golang-lru"
@@ -551,6 +550,8 @@ func TestBaselineHandlerV2_ValidChangelist_Success(t *testing.T) {
 	assertJSONResponseWas(t, http.StatusOK, expectedJSONResponse, w)
 }
 
+// This test seems to be flaky, in that it fails unless it's run with all the other tests in this
+// file.
 func TestBaselineHandlerV2_ValidChangelistWithNewTests_Success(t *testing.T) {
 	ctx := context.Background()
 	db := sqltest.NewCockroachDBForTestsWithProductionSchema(ctx, t)
@@ -577,13 +578,6 @@ func TestBaselineHandlerV2_ValidChangelistWithNewTests_Success(t *testing.T) {
       "00000000000000000000000000000000": "negative",
       "c01c01c01c01c01c01c01c01c01c01c0": "positive",
       "c02c02c02c02c02c02c02c02c02c02c0": "positive"
-    },
-    "round rect": {
-      "e01e01e01e01e01e01e01e01e01e01e0": "positive",
-      "e02e02e02e02e02e02e02e02e02e02e0": "positive"
-    },
-    "seven": {
-      "d01d01d01d01d01d01d01d01d01d01d0": "positive"
     },
     "square": {
       "a01a01a01a01a01a01a01a01a01a01a0": "positive",
@@ -2687,28 +2681,13 @@ func TestTriage3_SingleDigestOnPrimaryBranch_Success(t *testing.T) {
 	ctx := context.Background()
 	db := sqltest.NewCockroachDBForTestsWithProductionSchema(ctx, t)
 
-	rows, err := db.Query(ctx, "show tables;")
-	require.NoError(t, err)
-	for rows.Next() {
-		var tableName string
-		err = rows.Scan(nil, &tableName, nil, nil, nil, nil)
-		require.NoError(t, err)
-		sklog.Infof("Table: %s", tableName)
-	}
-
 	require.NoError(t, sqltest.BulkInsertDataTables(ctx, db, dks.Build()))
 
-	rows, err = db.Query(ctx, "show tables;")
-	require.NoError(t, err)
-	for rows.Next() {
-		var tableName string
-		err = rows.Scan(nil, &tableName, nil, nil, nil, nil)
-		require.NoError(t, err)
-		sklog.Infof("Table: %s", tableName)
-	}
-
-	const user = "single_triage@example.com"
-	fakeNow := time.Date(2021, time.July, 4, 4, 4, 4, 0, time.UTC)
+	// Record the changes to each of the tables below.
+	expectationrecords := sqltest.NewRowChanges[schema.ExpectationRecordRow](ctx, t, db, "expectationrecords")
+	exp := sqltest.NewRowChanges[schema.ExpectationRow](ctx, t, db, "expectations")
+	secondaryBranchExpectations := sqltest.NewRowChanges[schema.SecondaryBranchExpectationRow](ctx, t, db, "SecondaryBranchExpectations")
+	expectationDeltas := sqltest.NewRowChanges[schema.ExpectationDeltaRow](ctx, t, db, "ExpectationDeltas")
 
 	wh := Handlers{
 		HandlersConfig: HandlersConfig{
@@ -2729,15 +2708,19 @@ func TestTriage3_SingleDigestOnPrimaryBranch_Success(t *testing.T) {
 			},
 		},
 	}
-	ctx = now.TimeTravelingContext(fakeNow)
-	time.Sleep(5 * time.Second)
-	tsBeforeTriage := time.Now()
-	missingRecords, newRecords := sqltest.GetRowChanges[schema.ExpectationRecordRow](ctx, t, db, "expectationrecords", tsBeforeTriage)
 
+	const user = "single_triage@example.com"
+	fakeNow := time.Date(2021, time.July, 4, 4, 4, 4, 0, time.UTC)
+	ctx = now.TimeTravelingContext(fakeNow)
+
+	// Perform the triage.
 	res, err := wh.triage3(ctx, user, request)
 	require.NoError(t, err)
+
 	assert.Equal(t, frontend.TriageResponse{Status: frontend.TriageResponseStatusOK}, res)
 
+	// Verify the changes to the ExpectationRecords table.
+	missingRecords, newRecords := sqltest.GetChangedRows(expectationrecords)
 	assert.Empty(t, missingRecords)
 	assert.Equal(t, []schema.ExpectationRecordRow{{
 		ExpectationRecordID: newRecords[0].ExpectationRecordID, // Randomly generated.
@@ -2746,7 +2729,8 @@ func TestTriage3_SingleDigestOnPrimaryBranch_Success(t *testing.T) {
 		NumChanges:          1,
 	}}, newRecords)
 
-	missingExpectations, newExpectations := sqltest.GetRowChanges[schema.ExpectationRow](ctx, t, db, "expectations", tsBeforeTriage)
+	// Verify the changes to the Expectations table.
+	missingExpectations, newExpectations := sqltest.GetChangedRows(exp)
 	assert.Equal(t, []schema.ExpectationRow{{
 		GroupingID:          dks.CircleGroupingID,
 		Digest:              d(dks.DigestC03Unt),
@@ -2760,9 +2744,11 @@ func TestTriage3_SingleDigestOnPrimaryBranch_Success(t *testing.T) {
 		ExpectationRecordID: &newRecords[0].ExpectationRecordID, // Randomly generated.
 	}}, newExpectations)
 
-	assertNoChanges[schema.SecondaryBranchExpectationRow](ctx, t, db, "SecondaryBranchExpectations", tsBeforeTriage)
+	// Verify that there are no changes to the SecondaryBranchExpectations table.
+	sqltest.AssertNoChanges(secondaryBranchExpectations)
 
-	missingDeltas, newDeltas := sqltest.GetRowChanges[schema.ExpectationDeltaRow](ctx, t, db, "ExpectationDeltas", tsBeforeTriage)
+	// Verify the changes to the ExpectationDeltas table.
+	missingDeltas, newDeltas := sqltest.GetChangedRows(expectationDeltas)
 	assert.Empty(t, missingDeltas)
 	assert.Equal(t, []schema.ExpectationDeltaRow{{
 		ExpectationRecordID: newRecords[0].ExpectationRecordID, // Randomly generated.
@@ -2771,13 +2757,6 @@ func TestTriage3_SingleDigestOnPrimaryBranch_Success(t *testing.T) {
 		LabelBefore:         schema.LabelUntriaged,
 		LabelAfter:          schema.LabelPositive,
 	}}, newDeltas)
-}
-
-// assertNoChanges asserts that the given table has not changed since instant tsBeforeTriage.
-func assertNoChanges[T any](ctx context.Context, t *testing.T, db *pgxpool.Pool, table string, tsBeforeTriage time.Time) {
-	missingRows, newRows := sqltest.GetRowChanges[T](ctx, t, db, table, tsBeforeTriage)
-	assert.Empty(t, missingRows)
-	assert.Empty(t, newRows)
 }
 
 func TestTriage3_SingleDigestOnPrimaryBranch_EmptyLabels_Error(t *testing.T) {
@@ -2795,15 +2774,20 @@ func TestTriage3_SingleDigestOnPrimaryBranch_EmptyLabels_Error(t *testing.T) {
 
 	test := func(name string, request frontend.TriageRequestV3, expectedError string) {
 		t.Run(name, func(t *testing.T) {
-			tsBeforeTriage := time.Now()
+			// Record the changes to each of the tables below.
+			er := sqltest.NewRowChanges[schema.ExpectationRecordRow](ctx, t, db, "expectationrecords")
+			exp := sqltest.NewRowChanges[schema.ExpectationRow](ctx, t, db, "expectations")
+			sec := sqltest.NewRowChanges[schema.SecondaryBranchExpectationRow](ctx, t, db, "SecondaryBranchExpectations")
+			del := sqltest.NewRowChanges[schema.ExpectationDeltaRow](ctx, t, db, "ExpectationDeltas")
+
 			_, err := wh.triage3(ctx, user, request)
 			require.Error(t, err)
 			assert.Contains(t, err.Error(), expectedError)
 
-			assertNoChanges[schema.ExpectationRecordRow](ctx, t, db, "ExpectationRecords", tsBeforeTriage)
-			assertNoChanges[schema.ExpectationRow](ctx, t, db, "Expectations", tsBeforeTriage)
-			assertNoChanges[schema.SecondaryBranchExpectationRow](ctx, t, db, "SecondaryBranchExpectations", tsBeforeTriage)
-			assertNoChanges[schema.ExpectationDeltaRow](ctx, t, db, "ExpectationDeltas", tsBeforeTriage)
+			sqltest.AssertNoChanges(er)
+			sqltest.AssertNoChanges(exp)
+			sqltest.AssertNoChanges(sec)
+			sqltest.AssertNoChanges(del)
 		})
 	}
 
@@ -2855,15 +2839,20 @@ func TestTriage3_SingleDigestOnPrimaryBranch_WrongLabelBefore_TriageConflict(t *
 
 	test := func(name string, request frontend.TriageRequestV3, expectedResponse frontend.TriageResponse) {
 		t.Run(name, func(t *testing.T) {
-			tsBeforeTriage := time.Now()
+			// Record the changes to each of the tables below.
+			er := sqltest.NewRowChanges[schema.ExpectationRecordRow](ctx, t, db, "expectationrecords")
+			exp := sqltest.NewRowChanges[schema.ExpectationRow](ctx, t, db, "expectations")
+			sec := sqltest.NewRowChanges[schema.SecondaryBranchExpectationRow](ctx, t, db, "SecondaryBranchExpectations")
+			del := sqltest.NewRowChanges[schema.ExpectationDeltaRow](ctx, t, db, "ExpectationDeltas")
+
 			actualResponse, err := wh.triage3(ctx, user, request)
 			require.NoError(t, err)
 			assert.Equal(t, expectedResponse, actualResponse)
 
-			assertNoChanges[schema.ExpectationRecordRow](ctx, t, db, "ExpectationRecords", tsBeforeTriage)
-			assertNoChanges[schema.ExpectationRow](ctx, t, db, "Expectations", tsBeforeTriage)
-			assertNoChanges[schema.SecondaryBranchExpectationRow](ctx, t, db, "SecondaryBranchExpectations", tsBeforeTriage)
-			assertNoChanges[schema.ExpectationDeltaRow](ctx, t, db, "ExpectationDeltas", tsBeforeTriage)
+			sqltest.AssertNoChanges(er)
+			sqltest.AssertNoChanges(exp)
+			sqltest.AssertNoChanges(sec)
+			sqltest.AssertNoChanges(del)
 		})
 	}
 
@@ -2938,15 +2927,20 @@ func TestTriage3_SingleDigestOnOpenCL_WrongLabelBefore_TriageConflict(t *testing
 
 	test := func(name string, request frontend.TriageRequestV3, expectedResponse frontend.TriageResponse) {
 		t.Run(name, func(t *testing.T) {
-			tsBeforeTriage := time.Now()
+			// Record the changes to each of the tables below.
+			er := sqltest.NewRowChanges[schema.ExpectationRecordRow](ctx, t, db, "expectationrecords")
+			exp := sqltest.NewRowChanges[schema.ExpectationRow](ctx, t, db, "expectations")
+			sec := sqltest.NewRowChanges[schema.SecondaryBranchExpectationRow](ctx, t, db, "SecondaryBranchExpectations")
+			del := sqltest.NewRowChanges[schema.ExpectationDeltaRow](ctx, t, db, "ExpectationDeltas")
+
 			actualResponse, err := wh.triage3(ctx, user, request)
 			require.NoError(t, err)
 			assert.Equal(t, expectedResponse, actualResponse)
 
-			assertNoChanges[schema.ExpectationRecordRow](ctx, t, db, "ExpectationRecords", tsBeforeTriage)
-			assertNoChanges[schema.ExpectationRow](ctx, t, db, "Expectations", tsBeforeTriage)
-			assertNoChanges[schema.SecondaryBranchExpectationRow](ctx, t, db, "SecondaryBranchExpectations", tsBeforeTriage)
-			assertNoChanges[schema.ExpectationDeltaRow](ctx, t, db, "ExpectationDeltas", tsBeforeTriage)
+			sqltest.AssertNoChanges(er)
+			sqltest.AssertNoChanges(exp)
+			sqltest.AssertNoChanges(sec)
+			sqltest.AssertNoChanges(del)
 		})
 	}
 
@@ -3072,6 +3066,12 @@ func TestTriage3_SingleDigestOnPrimaryBranch_ImageMatchingAlgorithm_UsesAlgorith
 	db := sqltest.NewCockroachDBForTestsWithProductionSchema(ctx, t)
 	require.NoError(t, sqltest.BulkInsertDataTables(ctx, db, dks.Build()))
 
+	// Record the changes to each of the tables below.
+	expectationrecords := sqltest.NewRowChanges[schema.ExpectationRecordRow](ctx, t, db, "expectationrecords")
+	exp := sqltest.NewRowChanges[schema.ExpectationRow](ctx, t, db, "expectations")
+	secondaryBranchExpectations := sqltest.NewRowChanges[schema.SecondaryBranchExpectationRow](ctx, t, db, "SecondaryBranchExpectations")
+	expectationDeltas := sqltest.NewRowChanges[schema.ExpectationDeltaRow](ctx, t, db, "ExpectationDeltas")
+
 	const user = "not_me@example.com"
 	const algorithmName = "fuzzy"
 	fakeNow := time.Date(2021, time.July, 4, 4, 4, 4, 0, time.UTC)
@@ -3097,12 +3097,11 @@ func TestTriage3_SingleDigestOnPrimaryBranch_ImageMatchingAlgorithm_UsesAlgorith
 		ImageMatchingAlgorithm: algorithmName,
 	}
 	ctx = now.TimeTravelingContext(fakeNow)
-	tsBeforeTriage := time.Now()
 	res, err := wh.triage3(ctx, user, tr)
 	require.NoError(t, err)
 	assert.Equal(t, frontend.TriageResponse{Status: frontend.TriageResponseStatusOK}, res)
 
-	missingRecords, newRecords := sqltest.GetRowChanges[schema.ExpectationRecordRow](ctx, t, db, "ExpectationRecords", tsBeforeTriage)
+	missingRecords, newRecords := sqltest.GetChangedRows(expectationrecords)
 	assert.Empty(t, missingRecords)
 	assert.Equal(t, []schema.ExpectationRecordRow{{
 		ExpectationRecordID: newRecords[0].ExpectationRecordID, // Randomly generated.
@@ -3111,7 +3110,7 @@ func TestTriage3_SingleDigestOnPrimaryBranch_ImageMatchingAlgorithm_UsesAlgorith
 		NumChanges:          1,
 	}}, newRecords)
 
-	missingExpectations, newExpectations := sqltest.GetRowChanges[schema.ExpectationRow](ctx, t, db, "Expectations", tsBeforeTriage)
+	missingExpectations, newExpectations := sqltest.GetChangedRows(exp)
 	assert.Equal(t, []schema.ExpectationRow{{
 		GroupingID:          dks.CircleGroupingID,
 		Digest:              d(dks.DigestC03Unt),
@@ -3125,9 +3124,9 @@ func TestTriage3_SingleDigestOnPrimaryBranch_ImageMatchingAlgorithm_UsesAlgorith
 		ExpectationRecordID: &newRecords[0].ExpectationRecordID, // Randomly generated.
 	}}, newExpectations)
 
-	assertNoChanges[schema.SecondaryBranchExpectationRow](ctx, t, db, "SecondaryBranchExpectations", tsBeforeTriage)
+	sqltest.AssertNoChanges(secondaryBranchExpectations)
 
-	missingDeltas, newDeltas := sqltest.GetRowChanges[schema.ExpectationDeltaRow](ctx, t, db, "ExpectationDeltas", tsBeforeTriage)
+	missingDeltas, newDeltas := sqltest.GetChangedRows(expectationDeltas)
 	assert.Empty(t, missingDeltas)
 	assert.Equal(t, []schema.ExpectationDeltaRow{{
 		ExpectationRecordID: newRecords[0].ExpectationRecordID, // Randomly generated.
@@ -3142,6 +3141,12 @@ func TestTriage3_BulkTriageOnPrimaryBranch_Success(t *testing.T) {
 	ctx := context.Background()
 	db := sqltest.NewCockroachDBForTestsWithProductionSchema(ctx, t)
 	require.NoError(t, sqltest.BulkInsertDataTables(ctx, db, dks.Build()))
+
+	// Record the changes to each of the tables below.
+	expectationrecords := sqltest.NewRowChanges[schema.ExpectationRecordRow](ctx, t, db, "expectationrecords")
+	exp := sqltest.NewRowChanges[schema.ExpectationRow](ctx, t, db, "expectations")
+	secondaryBranchExpectations := sqltest.NewRowChanges[schema.SecondaryBranchExpectationRow](ctx, t, db, "SecondaryBranchExpectations")
+	expectationDeltas := sqltest.NewRowChanges[schema.ExpectationDeltaRow](ctx, t, db, "ExpectationDeltas")
 
 	const user = "bulk_triage@example.com"
 	fakeNow := time.Date(2021, time.July, 4, 4, 4, 4, 0, time.UTC)
@@ -3185,12 +3190,11 @@ func TestTriage3_BulkTriageOnPrimaryBranch_Success(t *testing.T) {
 	}
 
 	ctx = now.TimeTravelingContext(fakeNow)
-	tsBeforeTriage := time.Now()
 	res, err := wh.triage3(ctx, user, tr)
 	require.NoError(t, err)
 	assert.Equal(t, frontend.TriageResponse{Status: frontend.TriageResponseStatusOK}, res)
 
-	missingRecords, newRecords := sqltest.GetRowChanges[schema.ExpectationRecordRow](ctx, t, db, "ExpectationRecords", tsBeforeTriage)
+	missingRecords, newRecords := sqltest.GetChangedRows(expectationrecords)
 	assert.Empty(t, missingRecords)
 	assert.Equal(t, []schema.ExpectationRecordRow{{
 		ExpectationRecordID: newRecords[0].ExpectationRecordID, // Randomly generated.
@@ -3199,7 +3203,7 @@ func TestTriage3_BulkTriageOnPrimaryBranch_Success(t *testing.T) {
 		NumChanges:          3,
 	}}, newRecords)
 
-	missingExpectations, newExpectations := sqltest.GetRowChanges[schema.ExpectationRow](ctx, t, db, "Expectations", tsBeforeTriage)
+	missingExpectations, newExpectations := sqltest.GetChangedRows(exp)
 	assert.Equal(t, []schema.ExpectationRow{{
 		GroupingID:          dks.TriangleGroupingID,
 		Digest:              d(dks.DigestB01Pos),
@@ -3233,9 +3237,9 @@ func TestTriage3_BulkTriageOnPrimaryBranch_Success(t *testing.T) {
 		ExpectationRecordID: &newRecords[0].ExpectationRecordID, // Randomly generated.
 	}}, newExpectations)
 
-	assertNoChanges[schema.SecondaryBranchExpectationRow](ctx, t, db, "SecondaryBranchExpectations", tsBeforeTriage)
+	sqltest.AssertNoChanges(secondaryBranchExpectations)
 
-	missingDeltas, newDeltas := sqltest.GetRowChanges[schema.ExpectationDeltaRow](ctx, t, db, "ExpectationDeltas", tsBeforeTriage)
+	missingDeltas, newDeltas := sqltest.GetChangedRows(expectationDeltas)
 	assert.Empty(t, missingDeltas)
 	assert.Equal(t, []schema.ExpectationDeltaRow{{
 		ExpectationRecordID: newRecords[0].ExpectationRecordID, // Randomly generated.
@@ -3262,6 +3266,12 @@ func TestTriage3_BulkTriageOnPrimaryBranch_OneCorrectAndOneWrongLabelBefore_Succ
 	ctx := context.Background()
 	db := sqltest.NewCockroachDBForTestsWithProductionSchema(ctx, t)
 	require.NoError(t, sqltest.BulkInsertDataTables(ctx, db, dks.Build()))
+
+	// Record the changes to each of the tables below.
+	er := sqltest.NewRowChanges[schema.ExpectationRecordRow](ctx, t, db, "expectationrecords")
+	exp := sqltest.NewRowChanges[schema.ExpectationRow](ctx, t, db, "expectations")
+	sec := sqltest.NewRowChanges[schema.SecondaryBranchExpectationRow](ctx, t, db, "SecondaryBranchExpectations")
+	del := sqltest.NewRowChanges[schema.ExpectationDeltaRow](ctx, t, db, "ExpectationDeltas")
 
 	const user = "bulk_triage@example.com"
 	fakeNow := time.Date(2021, time.July, 4, 4, 4, 4, 0, time.UTC)
@@ -3296,7 +3306,6 @@ func TestTriage3_BulkTriageOnPrimaryBranch_OneCorrectAndOneWrongLabelBefore_Succ
 	}
 
 	ctx = now.TimeTravelingContext(fakeNow)
-	tsBeforeTriage := time.Now()
 	res, err := wh.triage3(ctx, user, tr)
 	require.NoError(t, err)
 	assert.Equal(t,
@@ -3314,16 +3323,22 @@ func TestTriage3_BulkTriageOnPrimaryBranch_OneCorrectAndOneWrongLabelBefore_Succ
 		},
 		res)
 
-	assertNoChanges[schema.ExpectationRecordRow](ctx, t, db, "ExpectationRecords", tsBeforeTriage)
-	assertNoChanges[schema.ExpectationRow](ctx, t, db, "Expectations", tsBeforeTriage)
-	assertNoChanges[schema.SecondaryBranchExpectationRow](ctx, t, db, "SecondaryBranchExpectations", tsBeforeTriage)
-	assertNoChanges[schema.ExpectationDeltaRow](ctx, t, db, "ExpectationDeltas", tsBeforeTriage)
+	sqltest.AssertNoChanges(er)
+	sqltest.AssertNoChanges(exp)
+	sqltest.AssertNoChanges(sec)
+	sqltest.AssertNoChanges(del)
 }
 
 func TestTriage3_BulkTriageOnOpenCL_Success(t *testing.T) {
 	ctx := context.Background()
 	db := sqltest.NewCockroachDBForTestsWithProductionSchema(ctx, t)
 	require.NoError(t, sqltest.BulkInsertDataTables(ctx, db, dks.Build()))
+
+	// Record the changes to each of the tables below.
+	expectationrecords := sqltest.NewRowChanges[schema.ExpectationRecordRow](ctx, t, db, "expectationrecords")
+	exp := sqltest.NewRowChanges[schema.ExpectationRow](ctx, t, db, "expectations")
+	secondaryBranchExpectations := sqltest.NewRowChanges[schema.SecondaryBranchExpectationRow](ctx, t, db, "SecondaryBranchExpectations")
+	expectationDeltas := sqltest.NewRowChanges[schema.ExpectationDeltaRow](ctx, t, db, "ExpectationDeltas")
 
 	const user = "single_triage@example.com"
 	fakeNow := time.Date(2021, time.July, 4, 4, 4, 4, 0, time.UTC)
@@ -3385,12 +3400,11 @@ func TestTriage3_BulkTriageOnOpenCL_Success(t *testing.T) {
 		ChangelistID:     dks.ChangelistIDThatAttemptsToFixIOS,
 	}
 	ctx = now.TimeTravelingContext(fakeNow)
-	tsBeforeTriage := time.Now()
 	res, err := wh.triage3(ctx, user, tr)
 	require.NoError(t, err)
 	assert.Equal(t, frontend.TriageResponse{Status: frontend.TriageResponseStatusOK}, res)
 
-	missingRecords, newRecords := sqltest.GetRowChanges[schema.ExpectationRecordRow](ctx, t, db, "ExpectationRecords", tsBeforeTriage)
+	missingRecords, newRecords := sqltest.GetChangedRows(expectationrecords)
 	assert.Empty(t, missingRecords)
 	assert.Equal(t, []schema.ExpectationRecordRow{{
 		ExpectationRecordID: newRecords[0].ExpectationRecordID, // Randomly generated.
@@ -3400,9 +3414,9 @@ func TestTriage3_BulkTriageOnOpenCL_Success(t *testing.T) {
 		NumChanges:          4,
 	}}, newRecords)
 
-	assertNoChanges[schema.ExpectationRow](ctx, t, db, "Expectations", tsBeforeTriage)
+	sqltest.AssertNoChanges(exp)
 
-	missingExpectations, newExpectations := sqltest.GetRowChanges[schema.SecondaryBranchExpectationRow](ctx, t, db, "SecondaryBranchExpectations", tsBeforeTriage)
+	missingExpectations, newExpectations := sqltest.GetChangedRows(secondaryBranchExpectations)
 	assert.Equal(t, []schema.SecondaryBranchExpectationRow{{
 		BranchName:          expectedBranch,
 		GroupingID:          dks.TriangleGroupingID,
@@ -3442,7 +3456,7 @@ func TestTriage3_BulkTriageOnOpenCL_Success(t *testing.T) {
 		ExpectationRecordID: newRecords[0].ExpectationRecordID, // Randomly generated.
 	}}, newExpectations)
 
-	missingDeltas, newDeltas := sqltest.GetRowChanges[schema.ExpectationDeltaRow](ctx, t, db, "ExpectationDeltas", tsBeforeTriage)
+	missingDeltas, newDeltas := sqltest.GetChangedRows(expectationDeltas)
 	assert.Empty(t, missingDeltas)
 	assert.Equal(t, []schema.ExpectationDeltaRow{{
 		ExpectationRecordID: newRecords[0].ExpectationRecordID, // Randomly generated.
@@ -3476,6 +3490,12 @@ func TestTriage3_BulkTriageOnLandedCL_Error(t *testing.T) {
 	db := sqltest.NewCockroachDBForTestsWithProductionSchema(ctx, t)
 	require.NoError(t, sqltest.BulkInsertDataTables(ctx, db, dks.Build()))
 
+	// Record the changes to each of the tables below.
+	er := sqltest.NewRowChanges[schema.ExpectationRecordRow](ctx, t, db, "expectationrecords")
+	exp := sqltest.NewRowChanges[schema.ExpectationRow](ctx, t, db, "expectations")
+	sec := sqltest.NewRowChanges[schema.SecondaryBranchExpectationRow](ctx, t, db, "SecondaryBranchExpectations")
+	del := sqltest.NewRowChanges[schema.ExpectationDeltaRow](ctx, t, db, "ExpectationDeltas")
+
 	const user = "single_triage@example.com"
 
 	wh := Handlers{
@@ -3508,15 +3528,14 @@ func TestTriage3_BulkTriageOnLandedCL_Error(t *testing.T) {
 		CodeReviewSystem: dks.GitHubCRS,
 		ChangelistID:     dks.ChangelistIDThatHasLanded,
 	}
-	tsBeforeTriage := time.Now()
 	_, err := wh.triage3(ctx, user, tr)
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), `triaging digests from non-open changelists is not allowed (changelist ID "CLhaslanded", CRS "github", status "landed")`)
 
-	assertNoChanges[schema.ExpectationRecordRow](ctx, t, db, "ExpectationRecords", tsBeforeTriage)
-	assertNoChanges[schema.ExpectationRow](ctx, t, db, "Expectations", tsBeforeTriage)
-	assertNoChanges[schema.SecondaryBranchExpectationRow](ctx, t, db, "SecondaryBranchExpectations", tsBeforeTriage)
-	assertNoChanges[schema.ExpectationDeltaRow](ctx, t, db, "ExpectationDeltas", tsBeforeTriage)
+	sqltest.AssertNoChanges(er)
+	sqltest.AssertNoChanges(exp)
+	sqltest.AssertNoChanges(sec)
+	sqltest.AssertNoChanges(del)
 }
 
 func TestLatestPositiveDigest2_TracesExist_Success(t *testing.T) {

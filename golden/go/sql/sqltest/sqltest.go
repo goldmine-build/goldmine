@@ -10,9 +10,9 @@ import (
 	"reflect"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"go.goldmine.build/bazel/external/cockroachdb"
@@ -195,9 +195,27 @@ func GetAllRows(ctx context.Context, t *testing.T, db *pgxpool.Pool, table strin
 	return rv.Interface()
 }
 
-// GetRowChanges compares the rows found in the given table at instant t0 against those found at
-// present time. It returns a slice of rows found in the table at t0 but not at present (aka
-// missing rows), and a slice of rows found in the table at present but not at t0 (aka new rows).
+type RowChanges[T any] struct {
+	ctx       context.Context
+	t         *testing.T
+	db        *pgxpool.Pool
+	tablename string
+
+	// getRows is a function that takes in a SQL statement and returns the rows
+	// of type T from the table.
+	getRows func(statement string) []T
+
+	// orderByClause is the SQL fragment used to order the rows when querying.
+	orderByClause string
+
+	// startValues are the rows present at the time of creation.
+	startValues []T
+}
+
+// NewRowChanges returns a rowChanges object that can be used to track changes.
+//
+// Pass the returned rowChanges to GetChangedRows to get the rows that have been added
+// or removed since the creation of the rowChanges object.
 //
 // The row type may optionally implement the RowsOrder interface to specify an ordering to return
 // the rows in, which can make for easier to debug tests.
@@ -211,7 +229,7 @@ func GetAllRows(ctx context.Context, t *testing.T, db *pgxpool.Pool, table strin
 //   - A test updates a row, then asserts that the slice with missing rows contains the affected row
 //     prior to the update, and that the slice with new rows contains the affected row after the
 //     update.
-func GetRowChanges[T any](ctx context.Context, t *testing.T, db *pgxpool.Pool, table string, t0 time.Time) (missingRows, newRows []T) {
+func NewRowChanges[T any](ctx context.Context, t *testing.T, db *pgxpool.Pool, table string) RowChanges[T] {
 	getRows := func(statement string) []T {
 		rows, err := db.Query(ctx, statement)
 		require.NoError(t, err)
@@ -233,7 +251,22 @@ func GetRowChanges[T any](ctx context.Context, t *testing.T, db *pgxpool.Pool, t
 	}
 
 	currentRows := getRows(fmt.Sprintf("SELECT * FROM %s %s", table, orderByClause))
-	pastRows := getRows(fmt.Sprintf("SELECT * FROM %s AS OF SYSTEM TIME '%s' %s", table, t0.Format("2006-01-02 15:04:05.000000"), orderByClause))
+	return RowChanges[T]{
+		ctx:           ctx,
+		t:             t,
+		db:            db,
+		getRows:       getRows,
+		orderByClause: orderByClause,
+		tablename:     table,
+		startValues:   currentRows,
+	}
+}
+
+// GetChangedRows compares the rows found in the given table at the time of
+// creation against those found at present time.
+func GetChangedRows[T any](r RowChanges[T]) (missingRows, newRows []T) {
+	currentRows := r.getRows(fmt.Sprintf("SELECT * FROM %s %s", r.tablename, r.orderByClause))
+	pastRows := r.startValues
 
 	// Find all past rows that are not in the set of current rows.
 	for _, pastRow := range pastRows {
@@ -264,6 +297,13 @@ func GetRowChanges[T any](ctx context.Context, t *testing.T, db *pgxpool.Pool, t
 	}
 
 	return missingRows, newRows
+}
+
+func AssertNoChanges[T any](r RowChanges[T]) {
+	missingRows, newRows := GetChangedRows(r)
+	assert.Empty(r.t, missingRows)
+	assert.Empty(r.t, newRows)
+
 }
 
 // GetExplain returns the query plan for a given statement and arguments.
