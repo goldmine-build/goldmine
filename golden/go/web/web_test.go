@@ -18,6 +18,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	ttlcache "github.com/patrickmn/go-cache"
 	"go.goldmine.build/go/roles"
+	"go.goldmine.build/go/sklog"
 
 	"github.com/google/uuid"
 	lru "github.com/hashicorp/golang-lru"
@@ -433,6 +434,8 @@ func TestDeleteIgnoreRule_NoID_InternalServerError(t *testing.T) {
 // TestDeleteIgnoreRule_StoreFailure_InternalServerError tests an exceptional case of attempting
 // to delete an ignore rule in which there is an error returned by the IgnoreStore (note: There
 // is no error returned from ignore.Store when deleting a rule which does not exist).
+//
+// This test is flaky.
 func TestDeleteIgnoreRule_StoreFailure_InternalServerError(t *testing.T) {
 	const id = "12345"
 
@@ -1395,10 +1398,10 @@ func TestStartCLCacheProcess_Success(t *testing.T) {
 	require.Eventually(t, func() bool {
 		return wh.clSummaryCache.Len() == 4
 	}, 5*time.Second, 100*time.Millisecond)
-	assert.True(t, wh.clSummaryCache.Contains("gerrit_CL_fix_ios"))
-	assert.True(t, wh.clSummaryCache.Contains("gerrit-internal_CL_new_tests"))
-	assert.True(t, wh.clSummaryCache.Contains("gerrit_CLdisallowtriaging"))
-	assert.True(t, wh.clSummaryCache.Contains("gerrit_CLmultipledatapoints"))
+	assert.True(t, wh.clSummaryCache.Contains("github_CL_fix_ios"))
+	assert.True(t, wh.clSummaryCache.Contains("github_CL_new_tests"))
+	assert.True(t, wh.clSummaryCache.Contains("github_CLdisallowtriaging"))
+	assert.True(t, wh.clSummaryCache.Contains("github_CLmultipledatapoints"))
 }
 
 func TestStatusHandler_Success(t *testing.T) {
@@ -2683,7 +2686,26 @@ func TestTriage2_BulkTriage_OnCL_Success(t *testing.T) {
 func TestTriage3_SingleDigestOnPrimaryBranch_Success(t *testing.T) {
 	ctx := context.Background()
 	db := sqltest.NewCockroachDBForTestsWithProductionSchema(ctx, t)
+
+	rows, err := db.Query(ctx, "show tables;")
+	require.NoError(t, err)
+	for rows.Next() {
+		var tableName string
+		err = rows.Scan(nil, &tableName, nil, nil, nil, nil)
+		require.NoError(t, err)
+		sklog.Infof("Table: %s", tableName)
+	}
+
 	require.NoError(t, sqltest.BulkInsertDataTables(ctx, db, dks.Build()))
+
+	rows, err = db.Query(ctx, "show tables;")
+	require.NoError(t, err)
+	for rows.Next() {
+		var tableName string
+		err = rows.Scan(nil, &tableName, nil, nil, nil, nil)
+		require.NoError(t, err)
+		sklog.Infof("Table: %s", tableName)
+	}
 
 	const user = "single_triage@example.com"
 	fakeNow := time.Date(2021, time.July, 4, 4, 4, 4, 0, time.UTC)
@@ -2708,12 +2730,14 @@ func TestTriage3_SingleDigestOnPrimaryBranch_Success(t *testing.T) {
 		},
 	}
 	ctx = now.TimeTravelingContext(fakeNow)
+	time.Sleep(5 * time.Second)
 	tsBeforeTriage := time.Now()
+	missingRecords, newRecords := sqltest.GetRowChanges[schema.ExpectationRecordRow](ctx, t, db, "expectationrecords", tsBeforeTriage)
+
 	res, err := wh.triage3(ctx, user, request)
 	require.NoError(t, err)
 	assert.Equal(t, frontend.TriageResponse{Status: frontend.TriageResponseStatusOK}, res)
 
-	missingRecords, newRecords := sqltest.GetRowChanges[schema.ExpectationRecordRow](ctx, t, db, "ExpectationRecords", tsBeforeTriage)
 	assert.Empty(t, missingRecords)
 	assert.Equal(t, []schema.ExpectationRecordRow{{
 		ExpectationRecordID: newRecords[0].ExpectationRecordID, // Randomly generated.
@@ -2722,7 +2746,7 @@ func TestTriage3_SingleDigestOnPrimaryBranch_Success(t *testing.T) {
 		NumChanges:          1,
 	}}, newRecords)
 
-	missingExpectations, newExpectations := sqltest.GetRowChanges[schema.ExpectationRow](ctx, t, db, "Expectations", tsBeforeTriage)
+	missingExpectations, newExpectations := sqltest.GetRowChanges[schema.ExpectationRow](ctx, t, db, "expectations", tsBeforeTriage)
 	assert.Equal(t, []schema.ExpectationRow{{
 		GroupingID:          dks.CircleGroupingID,
 		Digest:              d(dks.DigestC03Unt),
@@ -3487,7 +3511,7 @@ func TestTriage3_BulkTriageOnLandedCL_Error(t *testing.T) {
 	tsBeforeTriage := time.Now()
 	_, err := wh.triage3(ctx, user, tr)
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), `triaging digests from non-open changelists is not allowed (changelist ID "CLhaslanded", CRS "gerrit", status "landed")`)
+	assert.Contains(t, err.Error(), `triaging digests from non-open changelists is not allowed (changelist ID "CLhaslanded", CRS "github", status "landed")`)
 
 	assertNoChanges[schema.ExpectationRecordRow](ctx, t, db, "ExpectationRecords", tsBeforeTriage)
 	assertNoChanges[schema.ExpectationRow](ctx, t, db, "Expectations", tsBeforeTriage)
