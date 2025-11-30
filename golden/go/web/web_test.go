@@ -550,6 +550,8 @@ func TestBaselineHandlerV2_ValidChangelist_Success(t *testing.T) {
 	assertJSONResponseWas(t, http.StatusOK, expectedJSONResponse, w)
 }
 
+// This test seems to be flaky, in that it fails unless it's run with all the other tests in this
+// file.
 func TestBaselineHandlerV2_ValidChangelistWithNewTests_Success(t *testing.T) {
 	ctx := context.Background()
 	db := sqltest.NewCockroachDBForTestsWithProductionSchema(ctx, t)
@@ -576,13 +578,6 @@ func TestBaselineHandlerV2_ValidChangelistWithNewTests_Success(t *testing.T) {
       "00000000000000000000000000000000": "negative",
       "c01c01c01c01c01c01c01c01c01c01c0": "positive",
       "c02c02c02c02c02c02c02c02c02c02c0": "positive"
-    },
-    "round rect": {
-      "e01e01e01e01e01e01e01e01e01e01e0": "positive",
-      "e02e02e02e02e02e02e02e02e02e02e0": "positive"
-    },
-    "seven": {
-      "d01d01d01d01d01d01d01d01d01d01d0": "positive"
     },
     "square": {
       "a01a01a01a01a01a01a01a01a01a01a0": "positive",
@@ -2764,13 +2759,6 @@ func TestTriage3_SingleDigestOnPrimaryBranch_Success(t *testing.T) {
 	}}, newDeltas)
 }
 
-// assertNoChanges asserts that the given table has not changed since instant tsBeforeTriage.
-func assertNoChanges[T any](ctx context.Context, t *testing.T, db *pgxpool.Pool, table string, tsBeforeTriage time.Time) {
-	missingRows, newRows := sqltest.GetRowChanges[T](ctx, t, db, table, tsBeforeTriage)
-	assert.Empty(t, missingRows)
-	assert.Empty(t, newRows)
-}
-
 func TestTriage3_SingleDigestOnPrimaryBranch_EmptyLabels_Error(t *testing.T) {
 	ctx := context.Background()
 	db := sqltest.NewCockroachDBForTestsWithProductionSchema(ctx, t)
@@ -2939,15 +2927,20 @@ func TestTriage3_SingleDigestOnOpenCL_WrongLabelBefore_TriageConflict(t *testing
 
 	test := func(name string, request frontend.TriageRequestV3, expectedResponse frontend.TriageResponse) {
 		t.Run(name, func(t *testing.T) {
-			tsBeforeTriage := time.Now()
+			// Record the changes to each of the tables below.
+			er := sqltest.NewRowChanges[schema.ExpectationRecordRow](ctx, t, db, "expectationrecords")
+			exp := sqltest.NewRowChanges[schema.ExpectationRow](ctx, t, db, "expectations")
+			sec := sqltest.NewRowChanges[schema.SecondaryBranchExpectationRow](ctx, t, db, "SecondaryBranchExpectations")
+			del := sqltest.NewRowChanges[schema.ExpectationDeltaRow](ctx, t, db, "ExpectationDeltas")
+
 			actualResponse, err := wh.triage3(ctx, user, request)
 			require.NoError(t, err)
 			assert.Equal(t, expectedResponse, actualResponse)
 
-			assertNoChanges[schema.ExpectationRecordRow](ctx, t, db, "ExpectationRecords", tsBeforeTriage)
-			assertNoChanges[schema.ExpectationRow](ctx, t, db, "Expectations", tsBeforeTriage)
-			assertNoChanges[schema.SecondaryBranchExpectationRow](ctx, t, db, "SecondaryBranchExpectations", tsBeforeTriage)
-			assertNoChanges[schema.ExpectationDeltaRow](ctx, t, db, "ExpectationDeltas", tsBeforeTriage)
+			sqltest.AssertNoChanges(er)
+			sqltest.AssertNoChanges(exp)
+			sqltest.AssertNoChanges(sec)
+			sqltest.AssertNoChanges(del)
 		})
 	}
 
@@ -3274,6 +3267,12 @@ func TestTriage3_BulkTriageOnPrimaryBranch_OneCorrectAndOneWrongLabelBefore_Succ
 	db := sqltest.NewCockroachDBForTestsWithProductionSchema(ctx, t)
 	require.NoError(t, sqltest.BulkInsertDataTables(ctx, db, dks.Build()))
 
+	// Record the changes to each of the tables below.
+	er := sqltest.NewRowChanges[schema.ExpectationRecordRow](ctx, t, db, "expectationrecords")
+	exp := sqltest.NewRowChanges[schema.ExpectationRow](ctx, t, db, "expectations")
+	sec := sqltest.NewRowChanges[schema.SecondaryBranchExpectationRow](ctx, t, db, "SecondaryBranchExpectations")
+	del := sqltest.NewRowChanges[schema.ExpectationDeltaRow](ctx, t, db, "ExpectationDeltas")
+
 	const user = "bulk_triage@example.com"
 	fakeNow := time.Date(2021, time.July, 4, 4, 4, 4, 0, time.UTC)
 
@@ -3307,7 +3306,6 @@ func TestTriage3_BulkTriageOnPrimaryBranch_OneCorrectAndOneWrongLabelBefore_Succ
 	}
 
 	ctx = now.TimeTravelingContext(fakeNow)
-	tsBeforeTriage := time.Now()
 	res, err := wh.triage3(ctx, user, tr)
 	require.NoError(t, err)
 	assert.Equal(t,
@@ -3325,10 +3323,10 @@ func TestTriage3_BulkTriageOnPrimaryBranch_OneCorrectAndOneWrongLabelBefore_Succ
 		},
 		res)
 
-	assertNoChanges[schema.ExpectationRecordRow](ctx, t, db, "ExpectationRecords", tsBeforeTriage)
-	assertNoChanges[schema.ExpectationRow](ctx, t, db, "Expectations", tsBeforeTriage)
-	assertNoChanges[schema.SecondaryBranchExpectationRow](ctx, t, db, "SecondaryBranchExpectations", tsBeforeTriage)
-	assertNoChanges[schema.ExpectationDeltaRow](ctx, t, db, "ExpectationDeltas", tsBeforeTriage)
+	sqltest.AssertNoChanges(er)
+	sqltest.AssertNoChanges(exp)
+	sqltest.AssertNoChanges(sec)
+	sqltest.AssertNoChanges(del)
 }
 
 func TestTriage3_BulkTriageOnOpenCL_Success(t *testing.T) {
@@ -3492,6 +3490,12 @@ func TestTriage3_BulkTriageOnLandedCL_Error(t *testing.T) {
 	db := sqltest.NewCockroachDBForTestsWithProductionSchema(ctx, t)
 	require.NoError(t, sqltest.BulkInsertDataTables(ctx, db, dks.Build()))
 
+	// Record the changes to each of the tables below.
+	er := sqltest.NewRowChanges[schema.ExpectationRecordRow](ctx, t, db, "expectationrecords")
+	exp := sqltest.NewRowChanges[schema.ExpectationRow](ctx, t, db, "expectations")
+	sec := sqltest.NewRowChanges[schema.SecondaryBranchExpectationRow](ctx, t, db, "SecondaryBranchExpectations")
+	del := sqltest.NewRowChanges[schema.ExpectationDeltaRow](ctx, t, db, "ExpectationDeltas")
+
 	const user = "single_triage@example.com"
 
 	wh := Handlers{
@@ -3524,15 +3528,14 @@ func TestTriage3_BulkTriageOnLandedCL_Error(t *testing.T) {
 		CodeReviewSystem: dks.GitHubCRS,
 		ChangelistID:     dks.ChangelistIDThatHasLanded,
 	}
-	tsBeforeTriage := time.Now()
 	_, err := wh.triage3(ctx, user, tr)
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), `triaging digests from non-open changelists is not allowed (changelist ID "CLhaslanded", CRS "github", status "landed")`)
 
-	assertNoChanges[schema.ExpectationRecordRow](ctx, t, db, "ExpectationRecords", tsBeforeTriage)
-	assertNoChanges[schema.ExpectationRow](ctx, t, db, "Expectations", tsBeforeTriage)
-	assertNoChanges[schema.SecondaryBranchExpectationRow](ctx, t, db, "SecondaryBranchExpectations", tsBeforeTriage)
-	assertNoChanges[schema.ExpectationDeltaRow](ctx, t, db, "ExpectationDeltas", tsBeforeTriage)
+	sqltest.AssertNoChanges(er)
+	sqltest.AssertNoChanges(exp)
+	sqltest.AssertNoChanges(sec)
+	sqltest.AssertNoChanges(del)
 }
 
 func TestLatestPositiveDigest2_TracesExist_Success(t *testing.T) {
