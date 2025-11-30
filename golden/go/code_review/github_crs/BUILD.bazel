@@ -22,7 +22,6 @@ go_test(
     embed = [":github_crs"],
     deps = [
         "//go/mockhttpclient",
-        "//go/vcsinfo",
         "//golden/go/code_review",
         "@com_github_stretchr_testify//assert",
         "@com_github_stretchr_testify//require",

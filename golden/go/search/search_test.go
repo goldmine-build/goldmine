@@ -4200,7 +4200,7 @@ func TestSearch_ResultHasNoReferenceDiffsNorExistingTraces_Success(t *testing.T)
 		Hash:          dks.ChangelistIDThatAddsNewTests,
 		Author:        dks.UserTwo,
 		Subject:       "Increase test coverage",
-		ChangelistURL: "http://example.com/internal/CL_new_tests",
+		ChangelistURL: "http://example.com/public/CL_new_tests",
 	})
 	assert.Equal(t, &frontend.SearchResponse{
 		Results: []*frontend.SearchResult{{
