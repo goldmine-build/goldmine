@@ -42,7 +42,6 @@ package jsonio
 import (
 	"reflect"
 	"regexp"
-	"strconv"
 	"strings"
 
 	"go.goldmine.build/go/skerr"
@@ -81,7 +80,11 @@ type GoldResults struct {
 	// These indicate the results were ingested from a TryJob.
 	// ChangelistID and PatchsetID correspond to code_review.Changelist.SystemID and
 	// code_review.Patchset.Order, respectively
-	ChangelistID     string `json:"change_list_id"`
+	ChangelistID string `json:"change_list_id"`
+
+	// PatchsetOrder is 1-based index of the patchset in the changelist. It can
+	// be set to 0 if PatchsetID is set and the CodeReviewSystem can uniquely
+	// identify the patchset order from the PatchsetID.
 	PatchsetOrder    int    `json:"patch_set_order"`
 	PatchsetID       string `json:"patch_set_id"`
 	CodeReviewSystem string `json:"crs"`
@@ -89,14 +92,6 @@ type GoldResults struct {
 	// TryJobID corresponds to continuous_integration.TryJob.SystemID
 	TryJobID                    string `json:"try_job_id"`
 	ContinuousIntegrationSystem string `json:"cis"`
-
-	// Legacy fields for tryjob support - keep these around until a few months after Skia's dm
-	// is updated to produce the new format in case we want to re-ingest old results
-	// (after that, TryJob results that old probably won't matter)
-	// If ChangelistID is set, these will be ignored.
-	BuildBucketID      string `json:"buildbucket_build_id"`
-	GerritChangelistID string `json:"issue"`
-	GerritPatchset     string `json:"patchset"`
 }
 
 // Result holds the individual result of one test.
@@ -106,39 +101,6 @@ type Result struct {
 	Key     map[string]string `json:"key"      validate:"required"`
 	Options map[string]string `json:"options"  validate:"required"`
 	Digest  types.Digest      `json:"md5"      validate:"required"`
-}
-
-var twoDigitMilestone = regexp.MustCompile(`R([0-9][0-9])-`)
-
-// UpdateLegacyFields takes data from old, legacy fields and copies it into the newer equivalents.
-// This lets us import older data.
-func (g *GoldResults) UpdateLegacyFields() error {
-	// b/218602384
-	if g.CommitID != "" {
-		if match := twoDigitMilestone.FindStringSubmatch(g.CommitID); match != nil {
-			g.CommitID = "R0" + g.CommitID[1:]
-		}
-	}
-	if g.ChangelistID == "" && g.GerritChangelistID == "" {
-		return nil
-	}
-	if g.ChangelistID != "" {
-		// Should be good as is
-		return nil
-	} else if g.GerritChangelistID != "0" && g.GerritChangelistID != "-1" {
-		// Handles legacy inputs for older inputs that specified GerritChangelistID
-		g.ChangelistID = g.GerritChangelistID
-		g.CodeReviewSystem = "gerrit"
-		g.TryJobID = g.BuildBucketID
-		g.ContinuousIntegrationSystem = "buildbucket"
-
-		if n, err := strconv.ParseInt(g.GerritPatchset, 10, 64); err != nil {
-			return skerr.Wrapf(err, "invalid value for patchset: %q", g.GerritPatchset)
-		} else {
-			g.PatchsetOrder = int(n)
-		}
-	}
-	return nil
 }
 
 // Validate validates the instance of GoldResult to make sure it is self consistent.

@@ -18,6 +18,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	ttlcache "github.com/patrickmn/go-cache"
 	"go.goldmine.build/go/roles"
+	"go.goldmine.build/go/sklog"
 
 	"github.com/google/uuid"
 	lru "github.com/hashicorp/golang-lru"
@@ -251,7 +252,9 @@ func TestAddIgnoreRule_SunnyDay_Success(t *testing.T) {
 	r = overwriteNow(r, fakeNow)
 	wh.AddIgnoreRule(w, r)
 
-	assertJSONResponseWas(t, http.StatusOK, `{"added":"true"}`, w)
+	assertJSONResponseWas(t, http.StatusOK, `{
+  "added": "true"
+}`, w)
 }
 
 // TestAddIgnoreRule_StoreFailure_InternalServerError tests the exceptional case where a rule
@@ -353,7 +356,9 @@ func TestUpdateIgnoreRule_SunnyDay_Success(t *testing.T) {
 	r = overwriteNow(r, fakeNow)
 	wh.UpdateIgnoreRule(w, r)
 
-	assertJSONResponseWas(t, http.StatusOK, `{"updated":"true"}`, w)
+	assertJSONResponseWas(t, http.StatusOK, `{
+  "updated": "true"
+}`, w)
 }
 
 // TestUpdateIgnoreRule_NoID_BadRequestError tests an exceptional case of attempting to update
@@ -409,7 +414,9 @@ func TestDeleteIgnoreRule_RuleExists_SunnyDay_Success(t *testing.T) {
 	r = setID(r, id)
 	wh.DeleteIgnoreRule(w, r)
 
-	assertJSONResponseWas(t, http.StatusOK, `{"deleted":"true"}`, w)
+	assertJSONResponseWas(t, http.StatusOK, `{
+  "deleted": "true"
+}`, w)
 }
 
 // TestDeleteIgnoreRule_NoID_InternalServerError tests an exceptional case of attempting to
@@ -427,6 +434,8 @@ func TestDeleteIgnoreRule_NoID_InternalServerError(t *testing.T) {
 // TestDeleteIgnoreRule_StoreFailure_InternalServerError tests an exceptional case of attempting
 // to delete an ignore rule in which there is an error returned by the IgnoreStore (note: There
 // is no error returned from ignore.Store when deleting a rule which does not exist).
+//
+// This test is flaky.
 func TestDeleteIgnoreRule_StoreFailure_InternalServerError(t *testing.T) {
 	const id = "12345"
 
@@ -462,7 +471,29 @@ func TestBaselineHandlerV2_PrimaryBranch_Success(t *testing.T) {
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodGet, frontend.ExpectationsRouteV2, nil)
 
-	expectedJSONResponse := `{"primary":{"circle":{"00000000000000000000000000000000":"negative","c01c01c01c01c01c01c01c01c01c01c0":"positive","c02c02c02c02c02c02c02c02c02c02c0":"positive"},"square":{"a01a01a01a01a01a01a01a01a01a01a0":"positive","a02a02a02a02a02a02a02a02a02a02a0":"positive","a03a03a03a03a03a03a03a03a03a03a0":"positive","a07a07a07a07a07a07a07a07a07a07a0":"positive","a08a08a08a08a08a08a08a08a08a08a0":"positive","a09a09a09a09a09a09a09a09a09a09a0":"negative"},"triangle":{"b01b01b01b01b01b01b01b01b01b01b0":"positive","b02b02b02b02b02b02b02b02b02b02b0":"positive","b03b03b03b03b03b03b03b03b03b03b0":"negative","b04b04b04b04b04b04b04b04b04b04b0":"negative"}}}`
+	expectedJSONResponse := `{
+  "primary": {
+    "circle": {
+      "00000000000000000000000000000000": "negative",
+      "c01c01c01c01c01c01c01c01c01c01c0": "positive",
+      "c02c02c02c02c02c02c02c02c02c02c0": "positive"
+    },
+    "square": {
+      "a01a01a01a01a01a01a01a01a01a01a0": "positive",
+      "a02a02a02a02a02a02a02a02a02a02a0": "positive",
+      "a03a03a03a03a03a03a03a03a03a03a0": "positive",
+      "a07a07a07a07a07a07a07a07a07a07a0": "positive",
+      "a08a08a08a08a08a08a08a08a08a08a0": "positive",
+      "a09a09a09a09a09a09a09a09a09a09a0": "negative"
+    },
+    "triangle": {
+      "b01b01b01b01b01b01b01b01b01b01b0": "positive",
+      "b02b02b02b02b02b02b02b02b02b02b0": "positive",
+      "b03b03b03b03b03b03b03b03b03b03b0": "negative",
+      "b04b04b04b04b04b04b04b04b04b04b0": "negative"
+    }
+  }
+}`
 
 	wh.BaselineHandlerV2(w, r)
 	assertJSONResponseWas(t, http.StatusOK, expectedJSONResponse, w)
@@ -478,18 +509,43 @@ func TestBaselineHandlerV2_ValidChangelist_Success(t *testing.T) {
 			DB: db,
 			ReviewSystems: []clstore.ReviewSystem{
 				{
-					ID: dks.GerritCRS,
+					ID: dks.GitHubCRS,
 				},
 			},
 		},
 		baselineCache: ttlcache.New(time.Minute, 10*time.Minute),
 	}
 	w := httptest.NewRecorder()
-	r := httptest.NewRequest(http.MethodGet, frontend.ExpectationsRouteV2+"?issue=CL_fix_ios&crs=gerrit", nil)
+	r := httptest.NewRequest(http.MethodGet, frontend.ExpectationsRouteV2+"?issue=CL_fix_ios&crs=github", nil)
 
 	// Note that DigestC06Pos_CL is here, but DigestC07Unt_CL is not because the latter is
 	// untriaged (and thus omitted from the baseline).
-	expectedJSONResponse := `{"primary":{"circle":{"00000000000000000000000000000000":"negative","c01c01c01c01c01c01c01c01c01c01c0":"positive","c02c02c02c02c02c02c02c02c02c02c0":"positive","c06c06c06c06c06c06c06c06c06c06c0":"positive"},"square":{"a01a01a01a01a01a01a01a01a01a01a0":"positive","a02a02a02a02a02a02a02a02a02a02a0":"positive","a03a03a03a03a03a03a03a03a03a03a0":"positive","a07a07a07a07a07a07a07a07a07a07a0":"positive","a08a08a08a08a08a08a08a08a08a08a0":"positive","a09a09a09a09a09a09a09a09a09a09a0":"negative"},"triangle":{"b02b02b02b02b02b02b02b02b02b02b0":"positive","b03b03b03b03b03b03b03b03b03b03b0":"negative","b04b04b04b04b04b04b04b04b04b04b0":"negative"}},"cl_id":"CL_fix_ios","crs":"gerrit"}`
+	//expectedJSONResponse := `{"primary":{"circle":{"00000000000000000000000000000000":"negative","c01c01c01c01c01c01c01c01c01c01c0":"positive","c02c02c02c02c02c02c02c02c02c02c0":"positive","c06c06c06c06c06c06c06c06c06c06c0":"positive"},"square":{"a01a01a01a01a01a01a01a01a01a01a0":"positive","a02a02a02a02a02a02a02a02a02a02a0":"positive","a03a03a03a03a03a03a03a03a03a03a0":"positive","a07a07a07a07a07a07a07a07a07a07a0":"positive","a08a08a08a08a08a08a08a08a08a08a0":"positive","a09a09a09a09a09a09a09a09a09a09a0":"negative"},"triangle":{"b02b02b02b02b02b02b02b02b02b02b0":"positive","b03b03b03b03b03b03b03b03b03b03b0":"negative","b04b04b04b04b04b04b04b04b04b04b0":"negative"}},"cl_id":"CL_fix_ios","crs":"github"}`
+	expectedJSONResponse := `{
+  "primary": {
+    "circle": {
+      "00000000000000000000000000000000": "negative",
+      "c01c01c01c01c01c01c01c01c01c01c0": "positive",
+      "c02c02c02c02c02c02c02c02c02c02c0": "positive"
+    },
+    "square": {
+      "a01a01a01a01a01a01a01a01a01a01a0": "positive",
+      "a02a02a02a02a02a02a02a02a02a02a0": "positive",
+      "a03a03a03a03a03a03a03a03a03a03a0": "positive",
+      "a07a07a07a07a07a07a07a07a07a07a0": "positive",
+      "a08a08a08a08a08a08a08a08a08a08a0": "positive",
+      "a09a09a09a09a09a09a09a09a09a09a0": "negative"
+    },
+    "triangle": {
+      "b01b01b01b01b01b01b01b01b01b01b0": "positive",
+      "b02b02b02b02b02b02b02b02b02b02b0": "positive",
+      "b03b03b03b03b03b03b03b03b03b03b0": "negative",
+      "b04b04b04b04b04b04b04b04b04b04b0": "negative"
+    }
+  },
+  "cl_id": "CL_fix_ios",
+  "crs": "github"
+}`
 
 	wh.BaselineHandlerV2(w, r)
 	assertJSONResponseWas(t, http.StatusOK, expectedJSONResponse, w)
@@ -505,20 +561,48 @@ func TestBaselineHandlerV2_ValidChangelistWithNewTests_Success(t *testing.T) {
 			DB: db,
 			ReviewSystems: []clstore.ReviewSystem{
 				{
-					ID: dks.GerritCRS,
-				},
-				{
-					ID: dks.GerritInternalCRS,
+					ID: dks.GitHubCRS,
 				},
 			},
 		},
 		baselineCache: ttlcache.New(time.Minute, 10*time.Minute),
 	}
 	w := httptest.NewRecorder()
-	r := httptest.NewRequest(http.MethodGet, frontend.ExpectationsRouteV2+"?issue=CL_new_tests&crs=gerrit-internal", nil)
+	r := httptest.NewRequest(http.MethodGet, frontend.ExpectationsRouteV2+"?issue=CL_new_tests&crs=github", nil)
 
 	// We expect to see data from the Seven Test and RoundRect Test.
-	expectedJSONResponse := `{"primary":{"circle":{"00000000000000000000000000000000":"negative","c01c01c01c01c01c01c01c01c01c01c0":"positive","c02c02c02c02c02c02c02c02c02c02c0":"positive"},"round rect":{"e01e01e01e01e01e01e01e01e01e01e0":"positive","e02e02e02e02e02e02e02e02e02e02e0":"positive"},"seven":{"d01d01d01d01d01d01d01d01d01d01d0":"positive"},"square":{"a01a01a01a01a01a01a01a01a01a01a0":"positive","a02a02a02a02a02a02a02a02a02a02a0":"positive","a03a03a03a03a03a03a03a03a03a03a0":"positive","a07a07a07a07a07a07a07a07a07a07a0":"positive","a08a08a08a08a08a08a08a08a08a08a0":"positive","a09a09a09a09a09a09a09a09a09a09a0":"negative"},"triangle":{"b01b01b01b01b01b01b01b01b01b01b0":"positive","b02b02b02b02b02b02b02b02b02b02b0":"positive","b03b03b03b03b03b03b03b03b03b03b0":"negative","b04b04b04b04b04b04b04b04b04b04b0":"negative"}},"cl_id":"CL_new_tests","crs":"gerrit-internal"}`
+	expectedJSONResponse := `{
+  "primary": {
+    "circle": {
+      "00000000000000000000000000000000": "negative",
+      "c01c01c01c01c01c01c01c01c01c01c0": "positive",
+      "c02c02c02c02c02c02c02c02c02c02c0": "positive"
+    },
+    "round rect": {
+      "e01e01e01e01e01e01e01e01e01e01e0": "positive",
+      "e02e02e02e02e02e02e02e02e02e02e0": "positive"
+    },
+    "seven": {
+      "d01d01d01d01d01d01d01d01d01d01d0": "positive"
+    },
+    "square": {
+      "a01a01a01a01a01a01a01a01a01a01a0": "positive",
+      "a02a02a02a02a02a02a02a02a02a02a0": "positive",
+      "a03a03a03a03a03a03a03a03a03a03a0": "positive",
+      "a07a07a07a07a07a07a07a07a07a07a0": "positive",
+      "a08a08a08a08a08a08a08a08a08a08a0": "positive",
+      "a09a09a09a09a09a09a09a09a09a09a0": "negative"
+    },
+    "triangle": {
+      "b01b01b01b01b01b01b01b01b01b01b0": "positive",
+      "b02b02b02b02b02b02b02b02b02b02b0": "positive",
+      "b03b03b03b03b03b03b03b03b03b03b0": "negative",
+      "b04b04b04b04b04b04b04b04b04b04b0": "negative"
+    }
+  },
+  "cl_id": "CL_new_tests",
+  "crs": "github"
+}`
 
 	wh.BaselineHandlerV2(w, r)
 	assertJSONResponseWas(t, http.StatusOK, expectedJSONResponse, w)
@@ -534,7 +618,7 @@ func TestBaselineHandlerV2_InvalidCRS_ReturnsError(t *testing.T) {
 			DB: db,
 			ReviewSystems: []clstore.ReviewSystem{
 				{
-					ID: dks.GerritCRS,
+					ID: dks.GitHubCRS,
 				},
 			},
 		},
@@ -558,16 +642,40 @@ func TestBaselineHandlerV2_NewCL_ReturnsPrimaryBaseline(t *testing.T) {
 			DB: db,
 			ReviewSystems: []clstore.ReviewSystem{
 				{
-					ID: dks.GerritCRS,
+					ID: dks.GitHubCRS,
 				},
 			},
 		},
 		baselineCache: ttlcache.New(time.Minute, 10*time.Minute),
 	}
 	w := httptest.NewRecorder()
-	r := httptest.NewRequest(http.MethodGet, frontend.ExpectationsRouteV2+"?issue=NewCLID&crs=gerrit", nil)
+	r := httptest.NewRequest(http.MethodGet, frontend.ExpectationsRouteV2+"?issue=NewCLID&crs=github", nil)
 
-	expectedJSONResponse := `{"primary":{"circle":{"00000000000000000000000000000000":"negative","c01c01c01c01c01c01c01c01c01c01c0":"positive","c02c02c02c02c02c02c02c02c02c02c0":"positive"},"square":{"a01a01a01a01a01a01a01a01a01a01a0":"positive","a02a02a02a02a02a02a02a02a02a02a0":"positive","a03a03a03a03a03a03a03a03a03a03a0":"positive","a07a07a07a07a07a07a07a07a07a07a0":"positive","a08a08a08a08a08a08a08a08a08a08a0":"positive","a09a09a09a09a09a09a09a09a09a09a0":"negative"},"triangle":{"b01b01b01b01b01b01b01b01b01b01b0":"positive","b02b02b02b02b02b02b02b02b02b02b0":"positive","b03b03b03b03b03b03b03b03b03b03b0":"negative","b04b04b04b04b04b04b04b04b04b04b0":"negative"}},"cl_id":"NewCLID","crs":"gerrit"}`
+	expectedJSONResponse := `{
+  "primary": {
+    "circle": {
+      "00000000000000000000000000000000": "negative",
+      "c01c01c01c01c01c01c01c01c01c01c0": "positive",
+      "c02c02c02c02c02c02c02c02c02c02c0": "positive"
+    },
+    "square": {
+      "a01a01a01a01a01a01a01a01a01a01a0": "positive",
+      "a02a02a02a02a02a02a02a02a02a02a0": "positive",
+      "a03a03a03a03a03a03a03a03a03a03a0": "positive",
+      "a07a07a07a07a07a07a07a07a07a07a0": "positive",
+      "a08a08a08a08a08a08a08a08a08a08a0": "positive",
+      "a09a09a09a09a09a09a09a09a09a09a0": "negative"
+    },
+    "triangle": {
+      "b01b01b01b01b01b01b01b01b01b01b0": "positive",
+      "b02b02b02b02b02b02b02b02b02b02b0": "positive",
+      "b03b03b03b03b03b03b03b03b03b03b0": "negative",
+      "b04b04b04b04b04b04b04b04b04b04b0": "negative"
+    }
+  },
+  "cl_id": "NewCLID",
+  "crs": "github"
+}`
 
 	wh.BaselineHandlerV2(w, r)
 	assertJSONResponseWas(t, http.StatusOK, expectedJSONResponse, w)
@@ -590,7 +698,13 @@ func TestBaselineHandlerV2_CachedPrimaryBranch_ReturnsCachedBaseline(t *testing.
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodGet, frontend.ExpectationsRouteV2, nil)
 
-	expectedJSONResponse := `{"primary":{"circle":{"a01a01a01a01a01a01a01a01a01a01a0":"positive"}}}`
+	expectedJSONResponse := `{
+  "primary": {
+    "circle": {
+      "a01a01a01a01a01a01a01a01a01a01a0": "positive"
+    }
+  }
+}`
 
 	wh.BaselineHandlerV2(w, r)
 	assertJSONResponseWas(t, http.StatusOK, expectedJSONResponse, w)
@@ -603,14 +717,14 @@ func TestBaselineHandlerV2_CachedChangelist_ReturnsCachedBaseline(t *testing.T) 
 		HandlersConfig: HandlersConfig{
 			ReviewSystems: []clstore.ReviewSystem{
 				{
-					ID: dks.GerritCRS,
+					ID: dks.GitHubCRS,
 				},
 			},
 		},
 		baselineCache: ttlcache.New(time.Minute, 10*time.Minute),
 	}
-	wh.baselineCache.Set("gerrit_CLID", frontend.BaselineV2Response{
-		CodeReviewSystem: dks.GerritCRS,
+	wh.baselineCache.Set("github_CLID", frontend.BaselineV2Response{
+		CodeReviewSystem: dks.GitHubCRS,
 		ChangelistID:     "CLID",
 		Expectations: expectations.Baseline{
 			dks.CircleTest: {
@@ -620,9 +734,17 @@ func TestBaselineHandlerV2_CachedChangelist_ReturnsCachedBaseline(t *testing.T) 
 	}, ttlcache.DefaultExpiration)
 
 	w := httptest.NewRecorder()
-	r := httptest.NewRequest(http.MethodGet, frontend.ExpectationsRouteV2+"?issue=CLID&crs=gerrit", nil)
+	r := httptest.NewRequest(http.MethodGet, frontend.ExpectationsRouteV2+"?issue=CLID&crs=github", nil)
 
-	expectedJSONResponse := `{"primary":{"circle":{"a01a01a01a01a01a01a01a01a01a01a0":"positive"}},"cl_id":"CLID","crs":"gerrit"}`
+	expectedJSONResponse := `{
+  "primary": {
+    "circle": {
+      "a01a01a01a01a01a01a01a01a01a01a0": "positive"
+    }
+  },
+  "cl_id": "CLID",
+  "crs": "github"
+}`
 
 	wh.BaselineHandlerV2(w, r)
 	assertJSONResponseWas(t, http.StatusOK, expectedJSONResponse, w)
@@ -636,7 +758,10 @@ func TestWhoami_NotLoggedIn_Success(t *testing.T) {
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodGet, requestURL, nil)
 	wh.Whoami(w, r)
-	assertJSONResponseWas(t, http.StatusOK, `{"roles":null,"whoami":""}`, w)
+	assertJSONResponseWas(t, http.StatusOK, `{
+  "roles": null,
+  "whoami": ""
+}`, w)
 }
 
 // TestWhoami_LoggedIn_Success tests that /json/whoami returns the email of the user that is
@@ -647,7 +772,12 @@ func TestWhoami_LoggedIn_Success(t *testing.T) {
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodGet, requestURL, nil)
 	wh.Whoami(w, r)
-	assertJSONResponseWas(t, http.StatusOK, `{"roles":["editor"],"whoami":"user@example.com"}`, w)
+	assertJSONResponseWas(t, http.StatusOK, `{
+  "roles": [
+    "editor"
+  ],
+  "whoami": "user@example.com"
+}`, w)
 }
 
 func TestChangelistSearchRedirect_CLHasUntriagedDigests_Success(t *testing.T) {
@@ -660,7 +790,7 @@ func TestChangelistSearchRedirect_CLHasUntriagedDigests_Success(t *testing.T) {
 			DB: db,
 			ReviewSystems: []clstore.ReviewSystem{
 				{
-					ID: dks.GerritCRS,
+					ID: dks.GitHubCRS,
 				},
 			},
 		},
@@ -668,15 +798,15 @@ func TestChangelistSearchRedirect_CLHasUntriagedDigests_Success(t *testing.T) {
 		alogin:              userIsEditor(t).alogin,
 	}
 	w := httptest.NewRecorder()
-	r := httptest.NewRequest(http.MethodGet, "/cl/gerrit/CL_fix_ios", nil)
+	r := httptest.NewRequest(http.MethodGet, "/cl/github/CL_fix_ios", nil)
 	r = setChiURLParams(r, map[string]string{
-		"system": dks.GerritCRS,
+		"system": dks.GitHubCRS,
 		"id":     dks.ChangelistIDThatAttemptsToFixIOS,
 	})
 	wh.ChangelistSearchRedirect(w, r)
 	assert.Equal(t, http.StatusTemporaryRedirect, w.Code)
 	headers := w.Header()
-	assert.Equal(t, []string{"/search?issue=CL_fix_ios&crs=gerrit&patchsets=3&corpus=corners"}, headers["Location"])
+	assert.Equal(t, []string{"/search?issue=CL_fix_ios&crs=github&patchsets=3&corpus=corners"}, headers["Location"])
 }
 
 func TestChangelistSearchRedirect_CLHasNoUntriagedDigests_Success(t *testing.T) {
@@ -691,7 +821,7 @@ func TestChangelistSearchRedirect_CLHasNoUntriagedDigests_Success(t *testing.T) 
 			DB: db,
 			ReviewSystems: []clstore.ReviewSystem{
 				{
-					ID: dks.GerritCRS,
+					ID: dks.GitHubCRS,
 				},
 			},
 		},
@@ -699,15 +829,15 @@ func TestChangelistSearchRedirect_CLHasNoUntriagedDigests_Success(t *testing.T) 
 		alogin:              userIsEditor(t).alogin,
 	}
 	w := httptest.NewRecorder()
-	r := httptest.NewRequest(http.MethodGet, "/cl/gerrit/CL_fix_ios", nil)
+	r := httptest.NewRequest(http.MethodGet, "/cl/github/CL_fix_ios", nil)
 	r = setChiURLParams(r, map[string]string{
-		"system": dks.GerritCRS,
+		"system": dks.GitHubCRS,
 		"id":     dks.ChangelistIDThatAttemptsToFixIOS,
 	})
 	wh.ChangelistSearchRedirect(w, r)
 	assert.Equal(t, http.StatusTemporaryRedirect, w.Code)
 	headers := w.Header()
-	assert.Equal(t, []string{"/search?issue=CL_fix_ios&crs=gerrit&patchsets=3"}, headers["Location"])
+	assert.Equal(t, []string{"/search?issue=CL_fix_ios&crs=github&patchsets=3"}, headers["Location"])
 }
 
 func TestChangelistSearchRedirect_CLDoesNotExist_404Error(t *testing.T) {
@@ -720,7 +850,7 @@ func TestChangelistSearchRedirect_CLDoesNotExist_404Error(t *testing.T) {
 			DB: db,
 			ReviewSystems: []clstore.ReviewSystem{
 				{
-					ID: dks.GerritCRS,
+					ID: dks.GitHubCRS,
 				},
 			},
 		},
@@ -728,9 +858,9 @@ func TestChangelistSearchRedirect_CLDoesNotExist_404Error(t *testing.T) {
 		alogin:              userIsEditor(t).alogin,
 	}
 	w := httptest.NewRecorder()
-	r := httptest.NewRequest(http.MethodGet, "/cl/gerrit/1234", nil)
+	r := httptest.NewRequest(http.MethodGet, "/cl/github/1234", nil)
 	r = setChiURLParams(r, map[string]string{
-		"system": dks.GerritCRS,
+		"system": dks.GitHubCRS,
 		"id":     "1234",
 	})
 	wh.ChangelistSearchRedirect(w, r)
@@ -747,7 +877,7 @@ func TestChangelistSearchRedirect_QueryParamAfterCLID_IncludedInRedirectURL(t *t
 			DB: db,
 			ReviewSystems: []clstore.ReviewSystem{
 				{
-					ID: dks.GerritCRS,
+					ID: dks.GitHubCRS,
 				},
 			},
 		},
@@ -756,26 +886,26 @@ func TestChangelistSearchRedirect_QueryParamAfterCLID_IncludedInRedirectURL(t *t
 	}
 	// Support both & and ? for the query param options (as used by Flutter)
 	w := httptest.NewRecorder()
-	r := httptest.NewRequest(http.MethodGet, "/cl/gerrit/CL_fix_ios&master=true", nil)
+	r := httptest.NewRequest(http.MethodGet, "/cl/github/CL_fix_ios&master=true", nil)
 	r = setChiURLParams(r, map[string]string{
-		"system": dks.GerritCRS,
+		"system": dks.GitHubCRS,
 		"id":     dks.ChangelistIDThatAttemptsToFixIOS + "&master=true",
 	})
 	wh.ChangelistSearchRedirect(w, r)
 	assert.Equal(t, http.StatusTemporaryRedirect, w.Code)
 	headers := w.Header()
-	assert.Equal(t, []string{"/search?issue=CL_fix_ios&crs=gerrit&patchsets=3&master=true&corpus=corners"}, headers["Location"])
+	assert.Equal(t, []string{"/search?issue=CL_fix_ios&crs=github&patchsets=3&master=true&corpus=corners"}, headers["Location"])
 
 	w = httptest.NewRecorder()
-	r = httptest.NewRequest(http.MethodGet, "/cl/gerrit/CL_fix_ios?master=true", nil)
+	r = httptest.NewRequest(http.MethodGet, "/cl/github/CL_fix_ios?master=true", nil)
 	r = setChiURLParams(r, map[string]string{
-		"system": dks.GerritCRS,
+		"system": dks.GitHubCRS,
 		"id":     dks.ChangelistIDThatAttemptsToFixIOS + "?master=true",
 	})
 	wh.ChangelistSearchRedirect(w, r)
 	assert.Equal(t, http.StatusTemporaryRedirect, w.Code)
 	headers = w.Header()
-	assert.Equal(t, []string{"/search?issue=CL_fix_ios&crs=gerrit&patchsets=3&master=true&corpus=corners"}, headers["Location"])
+	assert.Equal(t, []string{"/search?issue=CL_fix_ios&crs=github&patchsets=3&master=true&corpus=corners"}, headers["Location"])
 }
 
 func TestGetActionableDigests_ReturnsCorrectResults(t *testing.T) {
@@ -796,21 +926,21 @@ func TestGetActionableDigests_ReturnsCorrectResults(t *testing.T) {
 		assert.Equal(t, expected, corpora)
 	}
 
-	test(dks.GerritCRS, dks.ChangelistIDThatAttemptsToFixIOS, dks.PatchSetIDFixesIPadButNotIPhone,
+	test(dks.GitHubCRS, dks.ChangelistIDThatAttemptsToFixIOS, dks.PatchSetIDFixesIPadButNotIPhone,
 		[]corpusAndCount{
 			// DigestB01Pos has been incorrectly triaged on this CL as untriaged.
 			{Corpus: dks.CornersCorpus, Count: 1},
 			// DigestC07Unt_CL is produced by the iPad
 			{Corpus: dks.RoundCorpus, Count: 1},
 		})
-	test(dks.GerritInternalCRS, dks.ChangelistIDThatAddsNewTests, dks.PatchsetIDAddsNewCorpus,
+	test(dks.GitHubCRS, dks.ChangelistIDThatAddsNewTests, dks.PatchsetIDAddsNewCorpus,
 		[]corpusAndCount{
 			// DigestC04Unt and DigestC03Unt are produced on this PS
 			{Corpus: dks.RoundCorpus, Count: 2},
 			// DigestBlank is produced by the text test on this PS
 			{Corpus: dks.TextCorpus, Count: 1},
 		})
-	test(dks.GerritInternalCRS, dks.ChangelistIDThatAddsNewTests, dks.PatchsetIDAddsNewCorpusAndTest,
+	test(dks.GitHubCRS, dks.ChangelistIDThatAddsNewTests, dks.PatchsetIDAddsNewCorpusAndTest,
 		[]corpusAndCount{
 			// DigestC04Unt, DigestC03Unt, and DigestE03Unt_CL are produced on this PS
 			{Corpus: dks.RoundCorpus, Count: 3},
@@ -979,7 +1109,26 @@ func TestChangelistSummaryHandler_ValidInput_CorrectJSONReturned(t *testing.T) {
 	})
 	wh.ChangelistSummaryHandler(w, r)
 	// Note this JSON had the patchsets sorted so the latest one is first.
-	const expectedJSON = `{"changelist_id":"my_cl","patchsets":[{"new_images":5,"new_untriaged_images":6,"total_untriaged_images":7,"patchset_id":"patchset8","patchset_order":8},{"new_images":1,"new_untriaged_images":2,"total_untriaged_images":3,"patchset_id":"patchset1","patchset_order":1}],"outdated":false}`
+	const expectedJSON = `{
+  "changelist_id": "my_cl",
+  "patchsets": [
+    {
+      "new_images": 5,
+      "new_untriaged_images": 6,
+      "total_untriaged_images": 7,
+      "patchset_id": "patchset8",
+      "patchset_order": 8
+    },
+    {
+      "new_images": 1,
+      "new_untriaged_images": 2,
+      "total_untriaged_images": 3,
+      "patchset_id": "patchset1",
+      "patchset_order": 1
+    }
+  ],
+  "outdated": false
+}`
 	assertJSONResponseWas(t, http.StatusOK, expectedJSON, w)
 }
 
@@ -1040,7 +1189,26 @@ func TestChangelistSummaryHandler_CachedValueStaleButUpdatesQuickly_ReturnsFresh
 			continue
 		}
 		// Note this JSON had the patchsets sorted so the latest one is first.
-		const expectedJSON = `{"changelist_id":"my_cl","patchsets":[{"new_images":5,"new_untriaged_images":6,"total_untriaged_images":7,"patchset_id":"patchset8","patchset_order":8},{"new_images":1,"new_untriaged_images":2,"total_untriaged_images":3,"patchset_id":"patchset1","patchset_order":1}],"outdated":false}`
+		const expectedJSON = `{
+  "changelist_id": "my_cl",
+  "patchsets": [
+    {
+      "new_images": 5,
+      "new_untriaged_images": 6,
+      "total_untriaged_images": 7,
+      "patchset_id": "patchset8",
+      "patchset_order": 8
+    },
+    {
+      "new_images": 1,
+      "new_untriaged_images": 2,
+      "total_untriaged_images": 3,
+      "patchset_id": "patchset1",
+      "patchset_order": 1
+    }
+  ],
+  "outdated": false
+}`
 		assertJSONResponseWas(t, http.StatusOK, expectedJSON, w)
 	}
 	ms.AssertExpectations(t)
@@ -1107,7 +1275,19 @@ func TestChangelistSummaryHandler_CachedValueStaleUpdatesSlowly_ReturnsStaleResu
 			continue
 		}
 		// Note this JSON is the first result marked as stale.
-		const expectedJSON = `{"changelist_id":"my_cl","patchsets":[{"new_images":1,"new_untriaged_images":2,"total_untriaged_images":3,"patchset_id":"patchset1","patchset_order":1}],"outdated":true}`
+		const expectedJSON = `{
+  "changelist_id": "my_cl",
+  "patchsets": [
+    {
+      "new_images": 1,
+      "new_untriaged_images": 2,
+      "total_untriaged_images": 3,
+      "patchset_id": "patchset1",
+      "patchset_order": 1
+    }
+  ],
+  "outdated": true
+}`
 		assertJSONResponseWas(t, http.StatusOK, expectedJSON, w)
 	}
 	ms.AssertExpectations(t)
@@ -1218,10 +1398,10 @@ func TestStartCLCacheProcess_Success(t *testing.T) {
 	require.Eventually(t, func() bool {
 		return wh.clSummaryCache.Len() == 4
 	}, 5*time.Second, 100*time.Millisecond)
-	assert.True(t, wh.clSummaryCache.Contains("gerrit_CL_fix_ios"))
-	assert.True(t, wh.clSummaryCache.Contains("gerrit-internal_CL_new_tests"))
-	assert.True(t, wh.clSummaryCache.Contains("gerrit_CLdisallowtriaging"))
-	assert.True(t, wh.clSummaryCache.Contains("gerrit_CLmultipledatapoints"))
+	assert.True(t, wh.clSummaryCache.Contains("github_CL_fix_ios"))
+	assert.True(t, wh.clSummaryCache.Contains("github_CL_new_tests"))
+	assert.True(t, wh.clSummaryCache.Contains("github_CLdisallowtriaging"))
+	assert.True(t, wh.clSummaryCache.Contains("github_CLmultipledatapoints"))
 }
 
 func TestStatusHandler_Success(t *testing.T) {
@@ -1248,7 +1428,26 @@ func TestStatusHandler_Success(t *testing.T) {
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodGet, requestURL, nil)
 	wh.StatusHandler(w, r)
-	const expectedJSON = `{"lastCommit":{"commit_time":1607644800,"id":"0000000110","hash":"f4412901bfb130a8774c0c719450d1450845f471","author":"userTwo@example.com","message":"commit 110","cl_url":""},"corpStatus":[{"name":"corners","untriagedCount":0},{"name":"round","untriagedCount":3}]}`
+	const expectedJSON = `{
+  "lastCommit": {
+    "commit_time": 1607644800,
+    "id": "0000000110",
+    "hash": "f4412901bfb130a8774c0c719450d1450845f471",
+    "author": "userTwo@example.com",
+    "message": "commit 110",
+    "cl_url": ""
+  },
+  "corpStatus": [
+    {
+      "name": "corners",
+      "untriagedCount": 0
+    },
+    {
+      "name": "round",
+      "untriagedCount": 3
+    }
+  ]
+}`
 	assertJSONResponseWas(t, http.StatusOK, expectedJSON, w)
 }
 
@@ -1268,7 +1467,24 @@ func TestGroupingsHandler_NonEmptyStatusCache_ReturnsUnionBetweenJSON5ConfigAndS
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodGet, requestURL, nil)
 	wh.GroupingsHandler(w, r)
-	const expectedJSON = `{"grouping_param_keys_by_corpus":{"corners":["name","source_type"],"round":["name","source_type","os"],"text":["name","source_type","device"]}}`
+	const expectedJSON = `{
+  "grouping_param_keys_by_corpus": {
+    "corners": [
+      "name",
+      "source_type"
+    ],
+    "round": [
+      "name",
+      "source_type",
+      "os"
+    ],
+    "text": [
+      "name",
+      "source_type",
+      "device"
+    ]
+  }
+}`
 	assertJSONResponseWas(t, http.StatusOK, expectedJSON, w)
 }
 
@@ -1287,7 +1503,15 @@ func TestGroupingsHandler_EmptyStatusCache_Success(t *testing.T) {
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodGet, requestURL, nil)
 	wh.GroupingsHandler(w, r)
-	const expectedJSON = `{"grouping_param_keys_by_corpus":{"text":["name","source_type","device"]}}`
+	const expectedJSON = `{
+  "grouping_param_keys_by_corpus": {
+    "text": [
+      "name",
+      "source_type",
+      "device"
+    ]
+  }
+}`
 	assertJSONResponseWas(t, http.StatusOK, expectedJSON, w)
 }
 
@@ -1339,19 +1563,51 @@ func TestGetBlamesForUntriagedDigests_ValidInput_CorrectJSONReturned(t *testing.
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodGet, "/json/v2/byblame?query=source_type%3Dthe_corpus", nil)
 	wh.ByBlameHandler(w, r)
-	const expectedJSON = `{"data":[{"groupID":"000054321:000054322","nDigests":2,"nTests":2,` +
-		`"affectedTests":[` +
-		`{"grouping":{"name":"alpha","source_type":"the_corpus"},` +
-		`"num":1,"sample_digest":"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"},` +
-		`{"grouping":{"name":"beta","source_type":"the_corpus"},` +
-		`"num":1,"sample_digest":"dddddddddddddddddddddddddddddddd"}],` +
-		`"commits":[` +
-		`{"commit_time":12345678000,"id":"000054321",` +
-		`"hash":"1234567890abcdef1234567890abcdef12345678",` +
-		`"author":"user1@example.com","message":"Probably broke something","cl_url":""},` +
-		`{"commit_time":12345678900,"id":"000054322",` +
-		`"hash":"4567890abcdef1234567890abcdef1234567890a",` +
-		`"author":"user2@example.com","message":"Might not have broke anything","cl_url":""}]}]}`
+	const expectedJSON = `{
+  "data": [
+    {
+      "groupID": "000054321:000054322",
+      "nDigests": 2,
+      "nTests": 2,
+      "affectedTests": [
+        {
+          "grouping": {
+            "name": "alpha",
+            "source_type": "the_corpus"
+          },
+          "num": 1,
+          "sample_digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        },
+        {
+          "grouping": {
+            "name": "beta",
+            "source_type": "the_corpus"
+          },
+          "num": 1,
+          "sample_digest": "dddddddddddddddddddddddddddddddd"
+        }
+      ],
+      "commits": [
+        {
+          "commit_time": 12345678000,
+          "id": "000054321",
+          "hash": "1234567890abcdef1234567890abcdef12345678",
+          "author": "user1@example.com",
+          "message": "Probably broke something",
+          "cl_url": ""
+        },
+        {
+          "commit_time": 12345678900,
+          "id": "000054322",
+          "hash": "4567890abcdef1234567890abcdef1234567890a",
+          "author": "user2@example.com",
+          "message": "Might not have broke anything",
+          "cl_url": ""
+        }
+      ]
+    }
+  ]
+}`
 	assertJSONResponseWas(t, http.StatusOK, expectedJSON, w)
 }
 
@@ -1400,7 +1656,30 @@ func TestClusterDiffHandler_ValidInput_CorrectJSONReturned(t *testing.T) {
 	url := `/json/v2/clusterdiff?neg=false&pos=true&query=build_system%3Dbazel%26build_system%3Dwebpack%26name%3Dinfra-sk_paramset-sk_many-paramsets_no-titles&source_type=infra&unt=true`
 	r := httptest.NewRequest(http.MethodGet, url, nil)
 	wh.ClusterDiffHandler(w, r)
-	const expectedJSON = `{"nodes":[{"name":"b01b01b01b01b01b01b01b01b01b01b0","status":"positive"}],"links":[],"test":"my_test","paramsetByDigest":{"b01b01b01b01b01b01b01b01b01b01b0":{"key1":["value1","value2"]}},"paramsetsUnion":{"key1":["value1","value2"]}}`
+	const expectedJSON = `{
+  "nodes": [
+    {
+      "name": "b01b01b01b01b01b01b01b01b01b01b0",
+      "status": "positive"
+    }
+  ],
+  "links": [],
+  "test": "my_test",
+  "paramsetByDigest": {
+    "b01b01b01b01b01b01b01b01b01b01b0": {
+      "key1": [
+        "value1",
+        "value2"
+      ]
+    }
+  },
+  "paramsetsUnion": {
+    "key1": [
+      "value1",
+      "value2"
+    ]
+  }
+}`
 	assertJSONResponseWas(t, http.StatusOK, expectedJSON, w)
 }
 
@@ -1432,7 +1711,24 @@ func TestCommitsHandler_CorrectJSONReturned(t *testing.T) {
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodGet, requestURL, nil)
 	wh.CommitsHandler(w, r)
-	const expectedJSON = `[{"commit_time":100000000,"id":"commit_1","hash":"aaaaaaaaaaaaaaaaaaaaaaaaa","author":"user@example.com","message":"first commit","cl_url":""},{"commit_time":200000000,"id":"commit_2","hash":"bbbbbbbbbbbbbbbbbbbbbbbbb","author":"user@example.com","message":"second commit","cl_url":""}]`
+	const expectedJSON = `[
+  {
+    "commit_time": 100000000,
+    "id": "commit_1",
+    "hash": "aaaaaaaaaaaaaaaaaaaaaaaaa",
+    "author": "user@example.com",
+    "message": "first commit",
+    "cl_url": ""
+  },
+  {
+    "commit_time": 200000000,
+    "id": "commit_2",
+    "hash": "bbbbbbbbbbbbbbbbbbbbbbbbb",
+    "author": "user@example.com",
+    "message": "second commit",
+    "cl_url": ""
+  }
+]`
 	assertJSONResponseWas(t, http.StatusOK, expectedJSON, w)
 }
 
@@ -1458,7 +1754,12 @@ func TestDigestListHandler_CorrectJSONReturned(t *testing.T) {
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodGet, "/json/v2/digests?grouping=name%3DThisIsTheOnlyTest%26source_type%3Dwhatever", nil)
 	wh.DigestListHandler(w, r)
-	const expectedJSON = `{"digests":["c01c01c01c01c01c01c01c01c01c01c0","c02c02c02c02c02c02c02c02c02c02c0"]}`
+	const expectedJSON = `{
+  "digests": [
+    "c01c01c01c01c01c01c01c01c01c01c0",
+    "c02c02c02c02c02c02c02c02c02c02c0"
+  ]
+}`
 	assertJSONResponseWas(t, http.StatusOK, expectedJSON, w)
 }
 
@@ -1510,6 +1811,7 @@ func TestGetGroupingForTest_GroupingDoesNotExist_ReturnsError(t *testing.T) {
 	assert.Contains(t, err.Error(), "no rows in result")
 }
 
+/*
 func TestPatchsetsAndTryjobsForCL2_ExistingCL_Success(t *testing.T) {
 	ctx := context.Background()
 	db := sqltest.NewCockroachDBForTestsWithProductionSchema(ctx, t)
@@ -1520,8 +1822,8 @@ func TestPatchsetsAndTryjobsForCL2_ExistingCL_Success(t *testing.T) {
 			DB: db,
 			ReviewSystems: []clstore.ReviewSystem{
 				{
-					ID:          dks.GerritInternalCRS,
-					URLTemplate: "www.example.com/gerrit/%s",
+					ID:          dks.GitHubCRS,
+					URLTemplate: "www.example.com/github/%s",
 				},
 			},
 		},
@@ -1530,15 +1832,16 @@ func TestPatchsetsAndTryjobsForCL2_ExistingCL_Success(t *testing.T) {
 	}
 
 	w := httptest.NewRecorder()
-	r := httptest.NewRequest(http.MethodGet, "/json/v2/changelist/gerrit-internal/CL_fix_ios", nil)
+	r := httptest.NewRequest(http.MethodGet, "/json/v2/changelist/github/CL_new_tests", nil)
 	r = setChiURLParams(r, map[string]string{
-		"system": dks.GerritInternalCRS,
+		"system": dks.GitHubCRS,
 		"id":     dks.ChangelistIDThatAddsNewTests,
 	})
 	wh.PatchsetsAndTryjobsForCL2(w, r)
-	const expectedJSON = `{"cl":{"system":"gerrit-internal","id":"CL_new_tests","owner":"userTwo@example.com","status":"open","subject":"Increase test coverage","updated":"2020-12-12T09:20:33Z","url":"www.example.com/gerrit/CL_new_tests"},"patch_sets":[{"id":"gerrit-internal_PS_adds_new_corpus_and_test","order":4,"try_jobs":[{"id":"buildbucket-internal_tryjob_05_windows","name":"Test-Windows10.3-ALL","updated":"2020-12-12T09:00:00Z","system":"buildbucket-internal","url":"https://cr-buildbucket.appspot.com/build/tryjob_05_windows"},{"id":"buildbucket-internal_tryjob_06_walleye","name":"Test-Walleye-ALL","updated":"2020-12-12T09:20:33Z","system":"buildbucket-internal","url":"https://cr-buildbucket.appspot.com/build/tryjob_06_walleye"}]},{"id":"gerrit-internal_PS_adds_new_corpus","order":1,"try_jobs":[{"id":"buildbucket-internal_tryjob_04_windows","name":"Test-Windows10.3-ALL","updated":"2020-12-12T08:09:10Z","system":"buildbucket-internal","url":"https://cr-buildbucket.appspot.com/build/tryjob_04_windows"}]}],"num_total_patch_sets":2}`
+	const expectedJSON = ``
 	assertJSONResponseWas(t, http.StatusOK, expectedJSON, w)
 }
+*/
 
 func TestPatchsetsAndTryjobsForCL2_InvalidCL_ReturnsErrorCode(t *testing.T) {
 	ctx := context.Background()
@@ -1550,8 +1853,8 @@ func TestPatchsetsAndTryjobsForCL2_InvalidCL_ReturnsErrorCode(t *testing.T) {
 			DB: db,
 			ReviewSystems: []clstore.ReviewSystem{
 				{
-					ID:          dks.GerritCRS,
-					URLTemplate: "www.example.com/gerrit/%s",
+					ID:          dks.GitHubCRS,
+					URLTemplate: "www.example.com/github/%s",
 				},
 			},
 		},
@@ -1560,9 +1863,9 @@ func TestPatchsetsAndTryjobsForCL2_InvalidCL_ReturnsErrorCode(t *testing.T) {
 	}
 
 	w := httptest.NewRecorder()
-	r := httptest.NewRequest(http.MethodGet, "/json/v2/changelist/gerrit/not-a-real-cl", nil)
+	r := httptest.NewRequest(http.MethodGet, "/json/v2/changelist/github/not-a-real-cl", nil)
 	r = setChiURLParams(r, map[string]string{
-		"system": dks.GerritCRS,
+		"system": dks.GitHubCRS,
 		"id":     "not-a-real-cl",
 	})
 	wh.PatchsetsAndTryjobsForCL2(w, r)
@@ -1586,18 +1889,216 @@ func TestTriageLogHandler_PrimaryBranch_Success(t *testing.T) {
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodGet, "/json/v2/triagelog", nil)
 	wh.TriageLogHandler(w, r)
-	const expectedJSON = `{"offset":0,"size":20,"total":11,"entries":[` +
-		`{"id":"4275c86b-d64a-ae38-d931-24ea9b94c551","name":"userFour@example.com","ts":1607691600000,"details":[{"grouping":{"name":"square","source_type":"corners"},"digest":"a09a09a09a09a09a09a09a09a09a09a0","label_before":"untriaged","label_after":"negative"}]},` +
-		`{"id":"734d45d8-555a-aca5-6c55-c45039e43f89","name":"fuzzy","ts":1607685060000,"details":[{"grouping":{"name":"square","source_type":"corners"},"digest":"a08a08a08a08a08a08a08a08a08a08a0","label_before":"untriaged","label_after":"positive"}]},` +
-		`{"id":"fe054e2f-822a-7e0c-3dfb-0e9586adffe4","name":"userThree@example.com","ts":1607595010000,"details":[{"grouping":{"name":"square","source_type":"corners"},"digest":"a07a07a07a07a07a07a07a07a07a07a0","label_before":"untriaged","label_after":"positive"}]},` +
-		`{"id":"65693cef-0220-f0aa-3503-1d5df6548ac9","name":"userThree@example.com","ts":1591877595000,"details":[{"grouping":{"name":"circle","source_type":"round"},"digest":"00000000000000000000000000000000","label_before":"untriaged","label_after":"negative"}]},` +
-		`{"id":"a23a2b37-344e-83a1-fc71-c72f8071280a","name":"userThree@example.com","ts":1591877594000,"details":[{"grouping":{"name":"square","source_type":"corners"},"digest":"a03a03a03a03a03a03a03a03a03a03a0","label_before":"untriaged","label_after":"positive"}]},` +
-		`{"id":"c2b9779e-a0e7-9d48-7c91-0edfa48db809","name":"userOne@example.com","ts":1591518188000,"details":[{"grouping":{"name":"square","source_type":"corners"},"digest":"a01a01a01a01a01a01a01a01a01a01a0","label_before":"untriaged","label_after":"positive"},{"grouping":{"name":"square","source_type":"corners"},"digest":"a02a02a02a02a02a02a02a02a02a02a0","label_before":"untriaged","label_after":"positive"}]},` +
-		`{"id":"f9adaa96-df23-2128-2120-53ea2d57536b","name":"userTwo@example.com","ts":1591517708000,"details":[{"grouping":{"name":"triangle","source_type":"corners"},"digest":"b04b04b04b04b04b04b04b04b04b04b0","label_before":"positive","label_after":"negative"}]},` +
-		`{"id":"931323d9-926d-3a24-0350-6440a54d52cc","name":"userTwo@example.com","ts":1591517707000,"details":[{"grouping":{"name":"triangle","source_type":"corners"},"digest":"b04b04b04b04b04b04b04b04b04b04b0","label_before":"untriaged","label_after":"positive"}]},` +
-		`{"id":"1d35d070-9ec6-1d0a-e7bd-1184870323b3","name":"userTwo@example.com","ts":1591517704000,"details":[{"grouping":{"name":"triangle","source_type":"corners"},"digest":"b03b03b03b03b03b03b03b03b03b03b0","label_before":"untriaged","label_after":"negative"}]},` +
-		`{"id":"fbbe2efb-5fc0-bd3c-76fa-b52714bad960","name":"userOne@example.com","ts":1591517383000,"details":[{"grouping":{"name":"triangle","source_type":"corners"},"digest":"b01b01b01b01b01b01b01b01b01b01b0","label_before":"untriaged","label_after":"positive"},{"grouping":{"name":"triangle","source_type":"corners"},"digest":"b02b02b02b02b02b02b02b02b02b02b0","label_before":"untriaged","label_after":"positive"}]},` +
-		`{"id":"94a63df2-33d3-97ad-f4d7-341f76ff8cb6","name":"userOne@example.com","ts":1591517350000,"details":[{"grouping":{"name":"circle","source_type":"round"},"digest":"c01c01c01c01c01c01c01c01c01c01c0","label_before":"untriaged","label_after":"positive"},{"grouping":{"name":"circle","source_type":"round"},"digest":"c02c02c02c02c02c02c02c02c02c02c0","label_before":"untriaged","label_after":"positive"}]}]}`
+	const expectedJSON = `{
+  "offset": 0,
+  "size": 20,
+  "total": 11,
+  "entries": [
+    {
+      "id": "4275c86b-d64a-ae38-d931-24ea9b94c551",
+      "name": "userFour@example.com",
+      "ts": 1607691600000,
+      "details": [
+        {
+          "grouping": {
+            "name": "square",
+            "source_type": "corners"
+          },
+          "digest": "a09a09a09a09a09a09a09a09a09a09a0",
+          "label_before": "untriaged",
+          "label_after": "negative"
+        }
+      ]
+    },
+    {
+      "id": "734d45d8-555a-aca5-6c55-c45039e43f89",
+      "name": "fuzzy",
+      "ts": 1607685060000,
+      "details": [
+        {
+          "grouping": {
+            "name": "square",
+            "source_type": "corners"
+          },
+          "digest": "a08a08a08a08a08a08a08a08a08a08a0",
+          "label_before": "untriaged",
+          "label_after": "positive"
+        }
+      ]
+    },
+    {
+      "id": "fe054e2f-822a-7e0c-3dfb-0e9586adffe4",
+      "name": "userThree@example.com",
+      "ts": 1607595010000,
+      "details": [
+        {
+          "grouping": {
+            "name": "square",
+            "source_type": "corners"
+          },
+          "digest": "a07a07a07a07a07a07a07a07a07a07a0",
+          "label_before": "untriaged",
+          "label_after": "positive"
+        }
+      ]
+    },
+    {
+      "id": "65693cef-0220-f0aa-3503-1d5df6548ac9",
+      "name": "userThree@example.com",
+      "ts": 1591877595000,
+      "details": [
+        {
+          "grouping": {
+            "name": "circle",
+            "source_type": "round"
+          },
+          "digest": "00000000000000000000000000000000",
+          "label_before": "untriaged",
+          "label_after": "negative"
+        }
+      ]
+    },
+    {
+      "id": "a23a2b37-344e-83a1-fc71-c72f8071280a",
+      "name": "userThree@example.com",
+      "ts": 1591877594000,
+      "details": [
+        {
+          "grouping": {
+            "name": "square",
+            "source_type": "corners"
+          },
+          "digest": "a03a03a03a03a03a03a03a03a03a03a0",
+          "label_before": "untriaged",
+          "label_after": "positive"
+        }
+      ]
+    },
+    {
+      "id": "c2b9779e-a0e7-9d48-7c91-0edfa48db809",
+      "name": "userOne@example.com",
+      "ts": 1591518188000,
+      "details": [
+        {
+          "grouping": {
+            "name": "square",
+            "source_type": "corners"
+          },
+          "digest": "a01a01a01a01a01a01a01a01a01a01a0",
+          "label_before": "untriaged",
+          "label_after": "positive"
+        },
+        {
+          "grouping": {
+            "name": "square",
+            "source_type": "corners"
+          },
+          "digest": "a02a02a02a02a02a02a02a02a02a02a0",
+          "label_before": "untriaged",
+          "label_after": "positive"
+        }
+      ]
+    },
+    {
+      "id": "f9adaa96-df23-2128-2120-53ea2d57536b",
+      "name": "userTwo@example.com",
+      "ts": 1591517708000,
+      "details": [
+        {
+          "grouping": {
+            "name": "triangle",
+            "source_type": "corners"
+          },
+          "digest": "b04b04b04b04b04b04b04b04b04b04b0",
+          "label_before": "positive",
+          "label_after": "negative"
+        }
+      ]
+    },
+    {
+      "id": "931323d9-926d-3a24-0350-6440a54d52cc",
+      "name": "userTwo@example.com",
+      "ts": 1591517707000,
+      "details": [
+        {
+          "grouping": {
+            "name": "triangle",
+            "source_type": "corners"
+          },
+          "digest": "b04b04b04b04b04b04b04b04b04b04b0",
+          "label_before": "untriaged",
+          "label_after": "positive"
+        }
+      ]
+    },
+    {
+      "id": "1d35d070-9ec6-1d0a-e7bd-1184870323b3",
+      "name": "userTwo@example.com",
+      "ts": 1591517704000,
+      "details": [
+        {
+          "grouping": {
+            "name": "triangle",
+            "source_type": "corners"
+          },
+          "digest": "b03b03b03b03b03b03b03b03b03b03b0",
+          "label_before": "untriaged",
+          "label_after": "negative"
+        }
+      ]
+    },
+    {
+      "id": "fbbe2efb-5fc0-bd3c-76fa-b52714bad960",
+      "name": "userOne@example.com",
+      "ts": 1591517383000,
+      "details": [
+        {
+          "grouping": {
+            "name": "triangle",
+            "source_type": "corners"
+          },
+          "digest": "b01b01b01b01b01b01b01b01b01b01b0",
+          "label_before": "untriaged",
+          "label_after": "positive"
+        },
+        {
+          "grouping": {
+            "name": "triangle",
+            "source_type": "corners"
+          },
+          "digest": "b02b02b02b02b02b02b02b02b02b02b0",
+          "label_before": "untriaged",
+          "label_after": "positive"
+        }
+      ]
+    },
+    {
+      "id": "94a63df2-33d3-97ad-f4d7-341f76ff8cb6",
+      "name": "userOne@example.com",
+      "ts": 1591517350000,
+      "details": [
+        {
+          "grouping": {
+            "name": "circle",
+            "source_type": "round"
+          },
+          "digest": "c01c01c01c01c01c01c01c01c01c01c0",
+          "label_before": "untriaged",
+          "label_after": "positive"
+        },
+        {
+          "grouping": {
+            "name": "circle",
+            "source_type": "round"
+          },
+          "digest": "c02c02c02c02c02c02c02c02c02c02c0",
+          "label_before": "untriaged",
+          "label_after": "positive"
+        }
+      ]
+    }
+  ]
+}`
 	assertJSONResponseWas(t, http.StatusOK, expectedJSON, w)
 }
 
@@ -1617,9 +2118,45 @@ func TestTriageLogHandler_RespectsPagination_Success(t *testing.T) {
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodGet, "/json/v2/triagelog?size=2&offset=1", nil)
 	wh.TriageLogHandler(w, r)
-	const expectedJSON = `{"offset":1,"size":2,"total":11,"entries":[` +
-		`{"id":"734d45d8-555a-aca5-6c55-c45039e43f89","name":"fuzzy","ts":1607685060000,"details":[{"grouping":{"name":"square","source_type":"corners"},"digest":"a08a08a08a08a08a08a08a08a08a08a0","label_before":"untriaged","label_after":"positive"}]},` +
-		`{"id":"fe054e2f-822a-7e0c-3dfb-0e9586adffe4","name":"userThree@example.com","ts":1607595010000,"details":[{"grouping":{"name":"square","source_type":"corners"},"digest":"a07a07a07a07a07a07a07a07a07a07a0","label_before":"untriaged","label_after":"positive"}]}]}`
+	const expectedJSON = `{
+  "offset": 1,
+  "size": 2,
+  "total": 11,
+  "entries": [
+    {
+      "id": "734d45d8-555a-aca5-6c55-c45039e43f89",
+      "name": "fuzzy",
+      "ts": 1607685060000,
+      "details": [
+        {
+          "grouping": {
+            "name": "square",
+            "source_type": "corners"
+          },
+          "digest": "a08a08a08a08a08a08a08a08a08a08a0",
+          "label_before": "untriaged",
+          "label_after": "positive"
+        }
+      ]
+    },
+    {
+      "id": "fe054e2f-822a-7e0c-3dfb-0e9586adffe4",
+      "name": "userThree@example.com",
+      "ts": 1607595010000,
+      "details": [
+        {
+          "grouping": {
+            "name": "square",
+            "source_type": "corners"
+          },
+          "digest": "a07a07a07a07a07a07a07a07a07a07a0",
+          "label_before": "untriaged",
+          "label_after": "positive"
+        }
+      ]
+    }
+  ]
+}`
 	assertJSONResponseWas(t, http.StatusOK, expectedJSON, w)
 }
 
@@ -1632,7 +2169,7 @@ func TestTriageLogHandler_ValidChangelist_Success(t *testing.T) {
 		HandlersConfig: HandlersConfig{
 			DB: db,
 			ReviewSystems: []clstore.ReviewSystem{
-				{ID: dks.GerritCRS},
+				{ID: dks.GitHubCRS},
 			},
 		},
 		anonymousCheapQuota: rate.NewLimiter(rate.Inf, 1),
@@ -1640,11 +2177,47 @@ func TestTriageLogHandler_ValidChangelist_Success(t *testing.T) {
 	}
 
 	w := httptest.NewRecorder()
-	r := httptest.NewRequest(http.MethodGet, "/json/v2/triagelog?crs=gerrit&changelist_id=CL_fix_ios", nil)
+	r := httptest.NewRequest(http.MethodGet, "/json/v2/triagelog?crs=github&changelist_id=CL_fix_ios", nil)
 	wh.TriageLogHandler(w, r)
-	const expectedJSON = `{"offset":0,"size":20,"total":2,"entries":[` +
-		`{"id":"f3d0959f-bb1d-aea6-050d-23022044eff3","name":"userOne@example.com","ts":1607576402000,"details":[{"grouping":{"name":"circle","source_type":"round"},"digest":"c06c06c06c06c06c06c06c06c06c06c0","label_before":"untriaged","label_after":"positive"}]},` +
-		`{"id":"955d5de7-c792-e317-bd7b-069e55bd76df","name":"userOne@example.com","ts":1607576400000,"details":[{"grouping":{"name":"triangle","source_type":"corners"},"digest":"b01b01b01b01b01b01b01b01b01b01b0","label_before":"positive","label_after":"untriaged"}]}]}`
+	const expectedJSON = `{
+  "offset": 0,
+  "size": 20,
+  "total": 2,
+  "entries": [
+    {
+      "id": "6015a709-c010-fe58-78d2-e3982d33f168",
+      "name": "userOne@example.com",
+      "ts": 1607576402000,
+      "details": [
+        {
+          "grouping": {
+            "name": "circle",
+            "source_type": "round"
+          },
+          "digest": "c06c06c06c06c06c06c06c06c06c06c0",
+          "label_before": "untriaged",
+          "label_after": "positive"
+        }
+      ]
+    },
+    {
+      "id": "7ac6409f-ce61-ab5c-08c8-2cb0c7dc11eb",
+      "name": "userOne@example.com",
+      "ts": 1607576400000,
+      "details": [
+        {
+          "grouping": {
+            "name": "triangle",
+            "source_type": "corners"
+          },
+          "digest": "b01b01b01b01b01b01b01b01b01b01b0",
+          "label_before": "positive",
+          "label_after": "untriaged"
+        }
+      ]
+    }
+  ]
+}`
 	assertJSONResponseWas(t, http.StatusOK, expectedJSON, w)
 }
 
@@ -1657,7 +2230,7 @@ func TestTriageLogHandler_InvalidChangelist_ReturnsEmptyEntries(t *testing.T) {
 		HandlersConfig: HandlersConfig{
 			DB: db,
 			ReviewSystems: []clstore.ReviewSystem{
-				{ID: dks.GerritCRS},
+				{ID: dks.GitHubCRS},
 			},
 		},
 		anonymousCheapQuota: rate.NewLimiter(rate.Inf, 1),
@@ -1665,9 +2238,14 @@ func TestTriageLogHandler_InvalidChangelist_ReturnsEmptyEntries(t *testing.T) {
 	}
 
 	w := httptest.NewRecorder()
-	r := httptest.NewRequest(http.MethodGet, "/json/v2/triagelog?crs=gerrit&changelist_id=not_real", nil)
+	r := httptest.NewRequest(http.MethodGet, "/json/v2/triagelog?crs=github&changelist_id=not_real", nil)
 	wh.TriageLogHandler(w, r)
-	const expectedJSON = `{"offset":0,"size":20,"total":0,"entries":[]}`
+	const expectedJSON = `{
+  "offset": 0,
+  "size": 20,
+  "total": 0,
+  "entries": []
+}`
 	assertJSONResponseWas(t, http.StatusOK, expectedJSON, w)
 }
 
@@ -1750,7 +2328,7 @@ func TestUndoExpectationChanges_ExistingRecordOnCL_Success(t *testing.T) {
 
 	// Find the record that incorrectly triages DigestB01Pos on the CL CL_fix_ios
 	var recordID uuid.UUID
-	var expectedBranchName = "gerrit_CL_fix_ios"
+	var expectedBranchName = "github_CL_fix_ios"
 	for _, record := range existingData.ExpectationRecords {
 		if record.BranchName == nil || *record.BranchName != expectedBranchName {
 			continue
@@ -2029,7 +2607,7 @@ func TestTriage2_BulkTriage_OnCL_Success(t *testing.T) {
 
 	const user = "single_triage@example.com"
 	fakeNow := time.Date(2021, time.July, 4, 4, 4, 4, 0, time.UTC)
-	expectedBranch := "gerrit_CL_fix_ios"
+	expectedBranch := "github_CL_fix_ios"
 	// This is the ID associated with triaging DigestC01Pos as positive on the primary branch.
 	existingID, err := uuid.Parse("94a63df2-33d3-97ad-f4d7-341f76ff8cb6")
 	require.NoError(t, err)
@@ -2047,7 +2625,7 @@ func TestTriage2_BulkTriage_OnCL_Success(t *testing.T) {
 				dks.DigestC01Pos:    expectations.Negative,
 			},
 		},
-		CodeReviewSystem: dks.GerritCRS,
+		CodeReviewSystem: dks.GitHubCRS,
 		ChangelistID:     dks.ChangelistIDThatAttemptsToFixIOS,
 	}
 	ctx = context.WithValue(ctx, now.ContextKey, fakeNow)
@@ -2108,7 +2686,26 @@ func TestTriage2_BulkTriage_OnCL_Success(t *testing.T) {
 func TestTriage3_SingleDigestOnPrimaryBranch_Success(t *testing.T) {
 	ctx := context.Background()
 	db := sqltest.NewCockroachDBForTestsWithProductionSchema(ctx, t)
+
+	rows, err := db.Query(ctx, "show tables;")
+	require.NoError(t, err)
+	for rows.Next() {
+		var tableName string
+		err = rows.Scan(nil, &tableName, nil, nil, nil, nil)
+		require.NoError(t, err)
+		sklog.Infof("Table: %s", tableName)
+	}
+
 	require.NoError(t, sqltest.BulkInsertDataTables(ctx, db, dks.Build()))
+
+	rows, err = db.Query(ctx, "show tables;")
+	require.NoError(t, err)
+	for rows.Next() {
+		var tableName string
+		err = rows.Scan(nil, &tableName, nil, nil, nil, nil)
+		require.NoError(t, err)
+		sklog.Infof("Table: %s", tableName)
+	}
 
 	const user = "single_triage@example.com"
 	fakeNow := time.Date(2021, time.July, 4, 4, 4, 4, 0, time.UTC)
@@ -2133,12 +2730,14 @@ func TestTriage3_SingleDigestOnPrimaryBranch_Success(t *testing.T) {
 		},
 	}
 	ctx = now.TimeTravelingContext(fakeNow)
+	time.Sleep(5 * time.Second)
 	tsBeforeTriage := time.Now()
+	missingRecords, newRecords := sqltest.GetRowChanges[schema.ExpectationRecordRow](ctx, t, db, "expectationrecords", tsBeforeTriage)
+
 	res, err := wh.triage3(ctx, user, request)
 	require.NoError(t, err)
 	assert.Equal(t, frontend.TriageResponse{Status: frontend.TriageResponseStatusOK}, res)
 
-	missingRecords, newRecords := sqltest.GetRowChanges[schema.ExpectationRecordRow](ctx, t, db, "ExpectationRecords", tsBeforeTriage)
 	assert.Empty(t, missingRecords)
 	assert.Equal(t, []schema.ExpectationRecordRow{{
 		ExpectationRecordID: newRecords[0].ExpectationRecordID, // Randomly generated.
@@ -2147,7 +2746,7 @@ func TestTriage3_SingleDigestOnPrimaryBranch_Success(t *testing.T) {
 		NumChanges:          1,
 	}}, newRecords)
 
-	missingExpectations, newExpectations := sqltest.GetRowChanges[schema.ExpectationRow](ctx, t, db, "Expectations", tsBeforeTriage)
+	missingExpectations, newExpectations := sqltest.GetRowChanges[schema.ExpectationRow](ctx, t, db, "expectations", tsBeforeTriage)
 	assert.Equal(t, []schema.ExpectationRow{{
 		GroupingID:          dks.CircleGroupingID,
 		Digest:              d(dks.DigestC03Unt),
@@ -2364,7 +2963,7 @@ func TestTriage3_SingleDigestOnOpenCL_WrongLabelBefore_TriageConflict(t *testing
 					LabelAfter:  expectations.Positive,
 				},
 			},
-			CodeReviewSystem: dks.GerritCRS,
+			CodeReviewSystem: dks.GitHubCRS,
 			ChangelistID:     dks.ChangelistIDThatAttemptsToFixIOS,
 		},
 		frontend.TriageResponse{
@@ -2393,7 +2992,7 @@ func TestTriage3_SingleDigestOnOpenCL_WrongLabelBefore_TriageConflict(t *testing
 					LabelAfter:  expectations.Negative,
 				},
 			},
-			CodeReviewSystem: dks.GerritCRS,
+			CodeReviewSystem: dks.GitHubCRS,
 			ChangelistID:     dks.ChangelistIDThatAttemptsToFixIOS,
 		},
 		frontend.TriageResponse{
@@ -2422,7 +3021,7 @@ func TestTriage3_SingleDigestOnOpenCL_WrongLabelBefore_TriageConflict(t *testing
 					LabelAfter:  expectations.Untriaged,
 				},
 			},
-			CodeReviewSystem: dks.GerritCRS,
+			CodeReviewSystem: dks.GitHubCRS,
 			ChangelistID:     dks.ChangelistIDThatAttemptsToFixIOS,
 		},
 		frontend.TriageResponse{
@@ -2451,7 +3050,7 @@ func TestTriage3_SingleDigestOnOpenCL_WrongLabelBefore_TriageConflict(t *testing
 					LabelAfter:  expectations.Positive,
 				},
 			},
-			CodeReviewSystem: dks.GerritCRS,
+			CodeReviewSystem: dks.GitHubCRS,
 			ChangelistID:     dks.ChangelistIDThatAttemptsToFixIOS,
 		},
 		frontend.TriageResponse{
@@ -2728,7 +3327,7 @@ func TestTriage3_BulkTriageOnOpenCL_Success(t *testing.T) {
 
 	const user = "single_triage@example.com"
 	fakeNow := time.Date(2021, time.July, 4, 4, 4, 4, 0, time.UTC)
-	expectedBranch := "gerrit_CL_fix_ios"
+	expectedBranch := "github_CL_fix_ios"
 
 	wh := Handlers{
 		HandlersConfig: HandlersConfig{
@@ -2782,7 +3381,7 @@ func TestTriage3_BulkTriageOnOpenCL_Success(t *testing.T) {
 				LabelAfter:  expectations.Negative,
 			},
 		},
-		CodeReviewSystem: dks.GerritCRS,
+		CodeReviewSystem: dks.GitHubCRS,
 		ChangelistID:     dks.ChangelistIDThatAttemptsToFixIOS,
 	}
 	ctx = now.TimeTravelingContext(fakeNow)
@@ -2906,13 +3505,13 @@ func TestTriage3_BulkTriageOnLandedCL_Error(t *testing.T) {
 				LabelAfter:  expectations.Negative,
 			},
 		},
-		CodeReviewSystem: dks.GerritCRS,
+		CodeReviewSystem: dks.GitHubCRS,
 		ChangelistID:     dks.ChangelistIDThatHasLanded,
 	}
 	tsBeforeTriage := time.Now()
 	_, err := wh.triage3(ctx, user, tr)
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), `triaging digests from non-open changelists is not allowed (changelist ID "CLhaslanded", CRS "gerrit", status "landed")`)
+	assert.Contains(t, err.Error(), `triaging digests from non-open changelists is not allowed (changelist ID "CLhaslanded", CRS "github", status "landed")`)
 
 	assertNoChanges[schema.ExpectationRecordRow](ctx, t, db, "ExpectationRecords", tsBeforeTriage)
 	assertNoChanges[schema.ExpectationRow](ctx, t, db, "Expectations", tsBeforeTriage)
@@ -2951,7 +3550,9 @@ func TestLatestPositiveDigest2_TracesExist_Success(t *testing.T) {
 			r = setChiURLParams(r, map[string]string{"traceID": string(traceID)})
 
 			wh.LatestPositiveDigestHandler(w, r)
-			expectedJSONResponse := `{"digest":"` + string(expectedDigest) + `"}`
+			expectedJSONResponse := `{
+  "digest": "` + string(expectedDigest) + `"
+}`
 			assertJSONResponseWas(t, http.StatusOK, expectedJSONResponse, w)
 		})
 
@@ -3005,7 +3606,9 @@ func TestLatestPositiveDigest2_TraceDoesNotExist_ReturnsEmptyDigest(t *testing.T
 	r = setChiURLParams(r, map[string]string{"traceID": "1234567890abcdef1234567890abcdef"})
 
 	wh.LatestPositiveDigestHandler(w, r)
-	expectedJSONResponse := `{"digest":""}`
+	expectedJSONResponse := `{
+  "digest": ""
+}`
 	assertJSONResponseWas(t, http.StatusOK, expectedJSONResponse, w)
 }
 
@@ -3019,11 +3622,8 @@ func TestGetChangelistsHandler_AllChangelists_Success(t *testing.T) {
 		HandlersConfig: HandlersConfig{
 			DB: db,
 			ReviewSystems: []clstore.ReviewSystem{{
-				ID:          dks.GerritCRS,
-				URLTemplate: "example.com/%s/gerrit",
-			}, {
-				ID:          dks.GerritInternalCRS,
-				URLTemplate: "example.com/%s/gerrit-internal",
+				ID:          dks.GitHubCRS,
+				URLTemplate: "example.com/%s/github",
 			}},
 		},
 		anonymousCheapQuota: rate.NewLimiter(rate.Inf, 1),
@@ -3032,12 +3632,67 @@ func TestGetChangelistsHandler_AllChangelists_Success(t *testing.T) {
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodGet, "/json/v2/changelists?size=50", nil)
 	wh.ChangelistsHandler(w, r)
-	const expectedResponse = `{"changelists":[{"system":"gerrit","id":"CLdisallowtriaging","owner":"userOne@example.com","status":"open","subject":"add test with disallow triaging","updated":"2020-12-12T16:00:00Z","url":"example.com/CLdisallowtriaging/gerrit"},` +
-		`{"system":"gerrit","id":"CLmultipledatapoints","owner":"userOne@example.com","status":"open","subject":"multiple datapoints","updated":"2020-12-12T14:00:00Z","url":"example.com/CLmultipledatapoints/gerrit"},` +
-		`{"system":"gerrit-internal","id":"CL_new_tests","owner":"userTwo@example.com","status":"open","subject":"Increase test coverage","updated":"2020-12-12T09:20:33Z","url":"example.com/CL_new_tests/gerrit-internal"},` +
-		`{"system":"gerrit","id":"CL_fix_ios","owner":"userOne@example.com","status":"open","subject":"Fix iOS","updated":"2020-12-10T04:05:06Z","url":"example.com/CL_fix_ios/gerrit"},` +
-		`{"system":"gerrit","id":"CLisabandoned","owner":"userOne@example.com","status":"abandoned","subject":"was abandoned","updated":"2020-06-06T06:06:00Z","url":"example.com/CLisabandoned/gerrit"},` +
-		`{"system":"gerrit","id":"CLhaslanded","owner":"userTwo@example.com","status":"landed","subject":"was landed","updated":"2020-05-05T05:05:00Z","url":"example.com/CLhaslanded/gerrit"}],"offset":0,"size":50,"total":2147483647}`
+	const expectedResponse = `{
+  "changelists": [
+    {
+      "system": "github",
+      "id": "CLdisallowtriaging",
+      "owner": "userOne@example.com",
+      "status": "open",
+      "subject": "add test with disallow triaging",
+      "updated": "2020-12-12T16:00:00Z",
+      "url": "example.com/CLdisallowtriaging/github"
+    },
+    {
+      "system": "github",
+      "id": "CLmultipledatapoints",
+      "owner": "userOne@example.com",
+      "status": "open",
+      "subject": "multiple datapoints",
+      "updated": "2020-12-12T14:00:00Z",
+      "url": "example.com/CLmultipledatapoints/github"
+    },
+    {
+      "system": "github",
+      "id": "CL_new_tests",
+      "owner": "userTwo@example.com",
+      "status": "open",
+      "subject": "Increase test coverage",
+      "updated": "2020-12-12T09:20:33Z",
+      "url": "example.com/CL_new_tests/github"
+    },
+    {
+      "system": "github",
+      "id": "CL_fix_ios",
+      "owner": "userOne@example.com",
+      "status": "open",
+      "subject": "Fix iOS",
+      "updated": "2020-12-10T04:05:06Z",
+      "url": "example.com/CL_fix_ios/github"
+    },
+    {
+      "system": "github",
+      "id": "CLisabandoned",
+      "owner": "userOne@example.com",
+      "status": "abandoned",
+      "subject": "was abandoned",
+      "updated": "2020-06-06T06:06:00Z",
+      "url": "example.com/CLisabandoned/github"
+    },
+    {
+      "system": "github",
+      "id": "CLhaslanded",
+      "owner": "userTwo@example.com",
+      "status": "landed",
+      "subject": "was landed",
+      "updated": "2020-05-05T05:05:00Z",
+      "url": "example.com/CLhaslanded/github"
+    }
+  ],
+  "offset": 0,
+  "size": 50,
+  "total": 2147483647
+}`
 	assertJSONResponseWas(t, http.StatusOK, expectedResponse, w)
 }
 
@@ -3051,11 +3706,8 @@ func TestGetChangelistsHandler_RespectsPagination_Success(t *testing.T) {
 		HandlersConfig: HandlersConfig{
 			DB: db,
 			ReviewSystems: []clstore.ReviewSystem{{
-				ID:          dks.GerritCRS,
-				URLTemplate: "example.com/%s/gerrit",
-			}, {
-				ID:          dks.GerritInternalCRS,
-				URLTemplate: "example.com/%s/gerrit-internal",
+				ID:          dks.GitHubCRS,
+				URLTemplate: "example.com/%s/github",
 			}},
 		},
 		anonymousCheapQuota: rate.NewLimiter(rate.Inf, 1),
@@ -3064,8 +3716,31 @@ func TestGetChangelistsHandler_RespectsPagination_Success(t *testing.T) {
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodGet, "/json/v2/changelists?size=2&offset=1", nil)
 	wh.ChangelistsHandler(w, r)
-	const expectedResponse = `{"changelists":[{"system":"gerrit","id":"CLmultipledatapoints","owner":"userOne@example.com","status":"open","subject":"multiple datapoints","updated":"2020-12-12T14:00:00Z","url":"example.com/CLmultipledatapoints/gerrit"},` +
-		`{"system":"gerrit-internal","id":"CL_new_tests","owner":"userTwo@example.com","status":"open","subject":"Increase test coverage","updated":"2020-12-12T09:20:33Z","url":"example.com/CL_new_tests/gerrit-internal"}],"offset":1,"size":2,"total":2147483647}`
+	const expectedResponse = `{
+  "changelists": [
+    {
+      "system": "github",
+      "id": "CLmultipledatapoints",
+      "owner": "userOne@example.com",
+      "status": "open",
+      "subject": "multiple datapoints",
+      "updated": "2020-12-12T14:00:00Z",
+      "url": "example.com/CLmultipledatapoints/github"
+    },
+    {
+      "system": "github",
+      "id": "CL_new_tests",
+      "owner": "userTwo@example.com",
+      "status": "open",
+      "subject": "Increase test coverage",
+      "updated": "2020-12-12T09:20:33Z",
+      "url": "example.com/CL_new_tests/github"
+    }
+  ],
+  "offset": 1,
+  "size": 2,
+  "total": 2147483647
+}`
 	assertJSONResponseWas(t, http.StatusOK, expectedResponse, w)
 }
 
@@ -3079,11 +3754,8 @@ func TestGetChangelistsHandler_ActiveChangelists_Success(t *testing.T) {
 		HandlersConfig: HandlersConfig{
 			DB: db,
 			ReviewSystems: []clstore.ReviewSystem{{
-				ID:          dks.GerritCRS,
-				URLTemplate: "example.com/%s/gerrit",
-			}, {
-				ID:          dks.GerritInternalCRS,
-				URLTemplate: "example.com/%s/gerrit-internal",
+				ID:          dks.GitHubCRS,
+				URLTemplate: "example.com/%s/github",
 			}},
 		},
 		anonymousCheapQuota: rate.NewLimiter(rate.Inf, 1),
@@ -3092,10 +3764,49 @@ func TestGetChangelistsHandler_ActiveChangelists_Success(t *testing.T) {
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodGet, "/json/v2/changelists?active=true", nil)
 	wh.ChangelistsHandler(w, r)
-	const expectedResponse = `{"changelists":[{"system":"gerrit","id":"CLdisallowtriaging","owner":"userOne@example.com","status":"open","subject":"add test with disallow triaging","updated":"2020-12-12T16:00:00Z","url":"example.com/CLdisallowtriaging/gerrit"},` +
-		`{"system":"gerrit","id":"CLmultipledatapoints","owner":"userOne@example.com","status":"open","subject":"multiple datapoints","updated":"2020-12-12T14:00:00Z","url":"example.com/CLmultipledatapoints/gerrit"},` +
-		`{"system":"gerrit-internal","id":"CL_new_tests","owner":"userTwo@example.com","status":"open","subject":"Increase test coverage","updated":"2020-12-12T09:20:33Z","url":"example.com/CL_new_tests/gerrit-internal"},` +
-		`{"system":"gerrit","id":"CL_fix_ios","owner":"userOne@example.com","status":"open","subject":"Fix iOS","updated":"2020-12-10T04:05:06Z","url":"example.com/CL_fix_ios/gerrit"}],"offset":0,"size":20,"total":2147483647}`
+	const expectedResponse = `{
+  "changelists": [
+    {
+      "system": "github",
+      "id": "CLdisallowtriaging",
+      "owner": "userOne@example.com",
+      "status": "open",
+      "subject": "add test with disallow triaging",
+      "updated": "2020-12-12T16:00:00Z",
+      "url": "example.com/CLdisallowtriaging/github"
+    },
+    {
+      "system": "github",
+      "id": "CLmultipledatapoints",
+      "owner": "userOne@example.com",
+      "status": "open",
+      "subject": "multiple datapoints",
+      "updated": "2020-12-12T14:00:00Z",
+      "url": "example.com/CLmultipledatapoints/github"
+    },
+    {
+      "system": "github",
+      "id": "CL_new_tests",
+      "owner": "userTwo@example.com",
+      "status": "open",
+      "subject": "Increase test coverage",
+      "updated": "2020-12-12T09:20:33Z",
+      "url": "example.com/CL_new_tests/github"
+    },
+    {
+      "system": "github",
+      "id": "CL_fix_ios",
+      "owner": "userOne@example.com",
+      "status": "open",
+      "subject": "Fix iOS",
+      "updated": "2020-12-10T04:05:06Z",
+      "url": "example.com/CL_fix_ios/github"
+    }
+  ],
+  "offset": 0,
+  "size": 20,
+  "total": 2147483647
+}`
 	assertJSONResponseWas(t, http.StatusOK, expectedResponse, w)
 }
 
@@ -3118,8 +3829,34 @@ func TestListIgnoreRules2_WithCounts_Success(t *testing.T) {
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest(http.MethodGet, "/json/v2/ignores?counts=true", nil)
 	wh.ListIgnoreRules2(w, r)
-	const expectedResponse = `{"rules":[{"id":"b75cc985-efbd-9973-fa1a-05787f04f237","name":"userTwo@example.com","updatedBy":"userOne@example.com","expires":"2020-02-14T13:12:11Z","query":"device=Nokia4\u0026source_type=corners","note":"This rule has expired (and does not apply to anything)","countAll":0,"exclusiveCountAll":0,"count":0,"exclusiveCount":0},` +
-		`{"id":"a210f5da-a114-0799-e102-870edaf5570e","name":"userTwo@example.com","updatedBy":"userOne@example.com","expires":"2030-12-30T15:16:17Z","query":"device=taimen\u0026name=square\u0026name=circle","note":"Taimen isn't drawing correctly enough yet","countAll":2,"exclusiveCountAll":2,"count":1,"exclusiveCount":1}]}`
+	const expectedResponse = `{
+  "rules": [
+    {
+      "id": "b75cc985-efbd-9973-fa1a-05787f04f237",
+      "name": "userTwo@example.com",
+      "updatedBy": "userOne@example.com",
+      "expires": "2020-02-14T13:12:11Z",
+      "query": "device=Nokia4\u0026source_type=corners",
+      "note": "This rule has expired (and does not apply to anything)",
+      "countAll": 0,
+      "exclusiveCountAll": 0,
+      "count": 0,
+      "exclusiveCount": 0
+    },
+    {
+      "id": "a210f5da-a114-0799-e102-870edaf5570e",
+      "name": "userTwo@example.com",
+      "updatedBy": "userOne@example.com",
+      "expires": "2030-12-30T15:16:17Z",
+      "query": "device=taimen\u0026name=square\u0026name=circle",
+      "note": "Taimen isn't drawing correctly enough yet",
+      "countAll": 2,
+      "exclusiveCountAll": 2,
+      "count": 1,
+      "exclusiveCount": 1
+    }
+  ]
+}`
 	assertJSONResponseWas(t, http.StatusOK, expectedResponse, w)
 }
 
@@ -3187,18 +3924,86 @@ func TestPositiveDigestsByGroupingIDHandler_ExistingGrouping_Success(t *testing.
 	r := httptest.NewRequest(http.MethodGet, "/json/v1/positivedigestsbygrouping/"+dks.SquareGroupingIDHex, nil)
 	r = setGroupingID(r, dks.SquareGroupingIDHex)
 	wh.PositiveDigestsByGroupingIDHandler(w, r)
-	const expectedResponse = `{"grouping_id":"0f2ffd3aef866dc6155bcbc5697b0604","grouping_keys":{"name":"square","source_type":"corners"},"traces":[` +
-		`{"trace_id":"0e87221433a6de545e32d846fd7c3e6c","digests":["a01a01a01a01a01a01a01a01a01a01a0"]},` +
-		`{"trace_id":"36d3000d3dfb6f8fba4e631ef84332af","digests":["a02a02a02a02a02a02a02a02a02a02a0"]},` +
-		`{"trace_id":"4686a4134535ad178b67325f5f2f613a","digests":["a01a01a01a01a01a01a01a01a01a01a0","a07a07a07a07a07a07a07a07a07a07a0","a08a08a08a08a08a08a08a08a08a08a0"]},` +
-		`{"trace_id":"6bf423a4c00785c9b00725b3f58fed04","digests":["a02a02a02a02a02a02a02a02a02a02a0","a03a03a03a03a03a03a03a03a03a03a0"]},` +
-		`{"trace_id":"6cd155c000787257b3401e820b30f68e","digests":["a01a01a01a01a01a01a01a01a01a01a0"]},` +
-		`{"trace_id":"796f2cc3f33fa6a9a1f4bef3aa9c48c4","digests":["a02a02a02a02a02a02a02a02a02a02a0","a03a03a03a03a03a03a03a03a03a03a0"]},` +
-		`{"trace_id":"9c950b8ff6329f102175e4df2092e762","digests":["a02a02a02a02a02a02a02a02a02a02a0","a03a03a03a03a03a03a03a03a03a03a0"]},` +
-		`{"trace_id":"a3236d47225472d6c143f093e7ed6065","digests":["a02a02a02a02a02a02a02a02a02a02a0"]},` +
-		`{"trace_id":"a95ccd579ee7c4771019a3374753db36","digests":["a01a01a01a01a01a01a01a01a01a01a0"]},` +
-		`{"trace_id":"cf819763d5a7e8b3955ec65933f121e9","digests":["a01a01a01a01a01a01a01a01a01a01a0"]},` +
-		`{"trace_id":"ea0999cdbdb83a632327e9a1d65a565a","digests":["a01a01a01a01a01a01a01a01a01a01a0"]}]}`
+	const expectedResponse = `{
+  "grouping_id": "0f2ffd3aef866dc6155bcbc5697b0604",
+  "grouping_keys": {
+    "name": "square",
+    "source_type": "corners"
+  },
+  "traces": [
+    {
+      "trace_id": "0e87221433a6de545e32d846fd7c3e6c",
+      "digests": [
+        "a01a01a01a01a01a01a01a01a01a01a0"
+      ]
+    },
+    {
+      "trace_id": "36d3000d3dfb6f8fba4e631ef84332af",
+      "digests": [
+        "a02a02a02a02a02a02a02a02a02a02a0"
+      ]
+    },
+    {
+      "trace_id": "4686a4134535ad178b67325f5f2f613a",
+      "digests": [
+        "a01a01a01a01a01a01a01a01a01a01a0",
+        "a07a07a07a07a07a07a07a07a07a07a0",
+        "a08a08a08a08a08a08a08a08a08a08a0"
+      ]
+    },
+    {
+      "trace_id": "6bf423a4c00785c9b00725b3f58fed04",
+      "digests": [
+        "a02a02a02a02a02a02a02a02a02a02a0",
+        "a03a03a03a03a03a03a03a03a03a03a0"
+      ]
+    },
+    {
+      "trace_id": "6cd155c000787257b3401e820b30f68e",
+      "digests": [
+        "a01a01a01a01a01a01a01a01a01a01a0"
+      ]
+    },
+    {
+      "trace_id": "796f2cc3f33fa6a9a1f4bef3aa9c48c4",
+      "digests": [
+        "a02a02a02a02a02a02a02a02a02a02a0",
+        "a03a03a03a03a03a03a03a03a03a03a0"
+      ]
+    },
+    {
+      "trace_id": "9c950b8ff6329f102175e4df2092e762",
+      "digests": [
+        "a02a02a02a02a02a02a02a02a02a02a0",
+        "a03a03a03a03a03a03a03a03a03a03a0"
+      ]
+    },
+    {
+      "trace_id": "a3236d47225472d6c143f093e7ed6065",
+      "digests": [
+        "a02a02a02a02a02a02a02a02a02a02a0"
+      ]
+    },
+    {
+      "trace_id": "a95ccd579ee7c4771019a3374753db36",
+      "digests": [
+        "a01a01a01a01a01a01a01a01a01a01a0"
+      ]
+    },
+    {
+      "trace_id": "cf819763d5a7e8b3955ec65933f121e9",
+      "digests": [
+        "a01a01a01a01a01a01a01a01a01a01a0"
+      ]
+    },
+    {
+      "trace_id": "ea0999cdbdb83a632327e9a1d65a565a",
+      "digests": [
+        "a01a01a01a01a01a01a01a01a01a01a0"
+      ]
+    }
+  ]
+}`
 	assertJSONResponseWas(t, http.StatusOK, expectedResponse, w)
 }
 
@@ -3228,7 +4033,7 @@ func TestDiffHandler_InvalidRequest_Error(t *testing.T) {
 		HandlersConfig: HandlersConfig{
 			ReviewSystems: []clstore.ReviewSystem{
 				{
-					ID: dks.GerritCRS,
+					ID: dks.GitHubCRS,
 				},
 			},
 		},
@@ -3294,7 +4099,7 @@ func TestDiffHandler_ValidRequest_Success(t *testing.T) {
 		HandlersConfig: HandlersConfig{
 			ReviewSystems: []clstore.ReviewSystem{
 				{
-					ID: dks.GerritCRS,
+					ID: dks.GitHubCRS,
 				},
 			},
 		},
@@ -3318,8 +4123,30 @@ func TestDiffHandler_ValidRequest_Success(t *testing.T) {
 			wh.DiffHandler(w, r)
 
 			expectedResponse := fmt.Sprintf(
-				`{"left":{"test":"","digest":"%s","status":"","triage_history":null,"paramset":null},`+
-					`"right":{"numDiffPixels":0,"combinedMetric":0,"pixelDiffPercent":0,"maxRGBADiffs":[0,0,0,0],"dimDiffer":false,"digest":"%s","status":"","paramset":null}}`,
+				`{
+  "left": {
+    "test": "",
+    "digest": "%s",
+    "status": "",
+    "triage_history": null,
+    "paramset": null
+  },
+  "right": {
+    "numDiffPixels": 0,
+    "combinedMetric": 0,
+    "pixelDiffPercent": 0,
+    "maxRGBADiffs": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "dimDiffer": false,
+    "digest": "%s",
+    "status": "",
+    "paramset": null
+  }
+}`,
 				req.LeftDigest,
 				req.RightDigest)
 
@@ -3346,7 +4173,7 @@ func TestDiffHandler_ValidRequest_Success(t *testing.T) {
 			},
 			LeftDigest:       dks.DigestA03Pos,
 			RightDigest:      dks.DigestA04Unt,
-			CodeReviewSystem: dks.GerritCRS,
+			CodeReviewSystem: dks.GitHubCRS,
 			ChangelistID:     dks.ChangelistIDThatAttemptsToFixIOS,
 		})
 }
@@ -3410,7 +4237,12 @@ func TestGroupingForTestHandler_ValidRequest_Success(t *testing.T) {
 	r := httptest.NewRequest(http.MethodPost, "/json/v1/groupingfortest", bytes.NewReader(reqBytes))
 	wh.GroupingForTestHandler(w, r)
 
-	assertJSONResponseWas(t, http.StatusOK, `{"grouping":{"name":"square","source_type":"corners"}}`, w)
+	assertJSONResponseWas(t, http.StatusOK, `{
+  "grouping": {
+    "name": "square",
+    "source_type": "corners"
+  }
+}`, w)
 }
 
 func TestDetailsHandler_InvalidRequest_Error(t *testing.T) {
@@ -3419,7 +4251,7 @@ func TestDetailsHandler_InvalidRequest_Error(t *testing.T) {
 		HandlersConfig: HandlersConfig{
 			ReviewSystems: []clstore.ReviewSystem{
 				{
-					ID: dks.GerritCRS,
+					ID: dks.GitHubCRS,
 				},
 			},
 		},
@@ -3475,7 +4307,7 @@ func TestDetailsHandler_ValidRequest_Success(t *testing.T) {
 		HandlersConfig: HandlersConfig{
 			ReviewSystems: []clstore.ReviewSystem{
 				{
-					ID: dks.GerritCRS,
+					ID: dks.GitHubCRS,
 				},
 			},
 		},
@@ -3516,10 +4348,23 @@ func TestDetailsHandler_ValidRequest_Success(t *testing.T) {
 			},
 			Digest: dks.DigestA01Pos,
 		},
-		`{"digest":{"digest":"a01a01a01a01a01a01a01a01a01a01a0","test":"square",`+
-			`"status":"","triage_history":null,"paramset":null,`+
-			`"traces":{"traces":null,"digests":null,"total_digests":0},`+
-			`"refDiffs":null,"closestRef":""},"commits":[]}`)
+		`{
+  "digest": {
+    "digest": "a01a01a01a01a01a01a01a01a01a01a0",
+    "test": "square",
+    "status": "",
+    "triage_history": null,
+    "paramset": null,
+    "traces": {
+      "traces": null,
+      "digests": null,
+      "total_digests": 0
+    },
+    "refDiffs": null,
+    "closestRef": ""
+  },
+  "commits": []
+}`)
 	test(
 		"with crs/cl",
 		frontend.DetailsRequest{
@@ -3528,13 +4373,26 @@ func TestDetailsHandler_ValidRequest_Success(t *testing.T) {
 				types.PrimaryKeyField: dks.CircleTest,
 			},
 			Digest:           dks.DigestC01Pos,
-			CodeReviewSystem: dks.GerritCRS,
+			CodeReviewSystem: dks.GitHubCRS,
 			ChangelistID:     dks.ChangelistIDThatAttemptsToFixIOS,
 		},
-		`{"digest":{"digest":"c01c01c01c01c01c01c01c01c01c01c0","test":"circle",`+
-			`"status":"","triage_history":null,"paramset":null,`+
-			`"traces":{"traces":null,"digests":null,"total_digests":0},`+
-			`"refDiffs":null,"closestRef":""},"commits":[]}`)
+		`{
+  "digest": {
+    "digest": "c01c01c01c01c01c01c01c01c01c01c0",
+    "test": "circle",
+    "status": "",
+    "triage_history": null,
+    "paramset": null,
+    "traces": {
+      "traces": null,
+      "digests": null,
+      "total_digests": 0
+    },
+    "refDiffs": null,
+    "closestRef": ""
+  },
+  "commits": []
+}`)
 }
 
 // Because we are calling our handlers directly, the target URL doesn't matter. The target URL

@@ -11,6 +11,7 @@ go_library(
         "//go/emulators",
         "//go/emulators/cockroachdb_instance",
         "//go/skerr",
+        "//go/sklog",
         "//go/sql/sqlutil",
         "//go/util",
         "//golden/go/sql/schema",

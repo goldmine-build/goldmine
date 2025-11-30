@@ -19,6 +19,7 @@ import (
 	"go.goldmine.build/go/emulators"
 	"go.goldmine.build/go/emulators/cockroachdb_instance"
 	"go.goldmine.build/go/skerr"
+	"go.goldmine.build/go/sklog"
 	"go.goldmine.build/go/sql/sqlutil"
 	"go.goldmine.build/go/util"
 	"go.goldmine.build/golden/go/sql/schema"
@@ -38,6 +39,7 @@ func NewCockroachDBForTests(ctx context.Context, t testing.TB) *pgxpool.Pool {
 	n, err := rand.Int(rand.Reader, big.NewInt(math.MaxInt64))
 	require.NoError(t, err)
 	dbName := "for_tests" + n.String()
+	sklog.Infof("Creating test database: %s", dbName)
 	host := emulators.GetEmulatorHostEnvVar(emulators.CockroachDB)
 
 	out, err = exec.Command(cockroach, "sql", "--insecure", "--host="+host,
@@ -230,8 +232,8 @@ func GetRowChanges[T any](ctx context.Context, t *testing.T, db *pgxpool.Pool, t
 		orderByClause = rowsOrder.RowsOrderBy()
 	}
 
-	pastRows := getRows(fmt.Sprintf("SELECT * FROM %s AS OF SYSTEM TIME '%s' %s", table, t0.Format("2006-01-02 15:04:05.000000"), orderByClause))
 	currentRows := getRows(fmt.Sprintf("SELECT * FROM %s %s", table, orderByClause))
+	pastRows := getRows(fmt.Sprintf("SELECT * FROM %s AS OF SYSTEM TIME '%s' %s", table, t0.Format("2006-01-02 15:04:05.000000"), orderByClause))
 
 	// Find all past rows that are not in the set of current rows.
 	for _, pastRow := range pastRows {
