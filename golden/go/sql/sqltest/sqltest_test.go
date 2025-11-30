@@ -143,7 +143,6 @@ func TestGetAllRows_RowsOrderNotDefined_ReturnsInAnyOrder(t *testing.T) {
 }
 
 func TestGetRowChanges_RowsOrderDefined_ReturnsInOrder(t *testing.T) {
-
 	ctx := context.Background()
 	db := sqltest.NewCockroachDBForTests(ctx, t)
 	_, err := db.Exec(ctx, testSchema)
@@ -158,7 +157,8 @@ func TestGetRowChanges_RowsOrderDefined_ReturnsInOrder(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	t0 := time.Now()
+	rc := sqltest.NewRowChanges[tableThreeRow](ctx, t, db, "TableThree")
+
 	_, err = db.Exec(ctx, "INSERT INTO TableThree VALUES ('onions', true, '2021-05-01T00:00:00Z')")
 	require.NoError(t, err)
 	_, err = db.Exec(ctx, "UPDATE TableThree SET column_bool = true WHERE column_one = 'chorizo'")
@@ -166,7 +166,8 @@ func TestGetRowChanges_RowsOrderDefined_ReturnsInOrder(t *testing.T) {
 	_, err = db.Exec(ctx, "DELETE FROM TableThree WHERE column_one = 'apricots'")
 	require.NoError(t, err)
 
-	missingRows, newRows := sqltest.GetRowChanges[tableThreeRow](ctx, t, db, "TableThree", t0)
+	missingRows, newRows := sqltest.GetChangedRows(rc)
+	//missingRows, newRows := sqltest.GetRowChanges[tableThreeRow](ctx, t, db, "TableThree", t0)
 	assert.Equal(t, []tableThreeRow{
 		{ColumnOne: "chorizo", ColumnBool: schema.NBFalse, ColumnTS: ts("2021-04-01T00:00:00Z")},
 		{ColumnOne: "apricots", ColumnBool: schema.NBNull, ColumnTS: ts("2021-02-01T00:00:00Z")},
