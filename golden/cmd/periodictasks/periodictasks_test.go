@@ -166,7 +166,7 @@ func TestGatherFromChangelists_OnlyReportsGroupingsWithDataNotOnPrimaryBranch(t 
 	actualWork := sqltest.GetAllRows(ctx, t, db, "SecondaryBranchDiffCalculationWork", &schema.SecondaryBranchDiffCalculationRow{})
 	assert.ElementsMatch(t, []schema.SecondaryBranchDiffCalculationRow{
 		{
-			BranchName:           "gerrit_CL_fix_ios",
+			BranchName:           "github_CL_fix_ios",
 			GroupingID:           dks.CircleGroupingID,
 			LastUpdated:          ts("2020-12-10T04:05:06Z"),
 			LastCalculated:       beginningOfTime,
@@ -176,7 +176,7 @@ func TestGatherFromChangelists_OnlyReportsGroupingsWithDataNotOnPrimaryBranch(t 
 			},
 		},
 		{
-			BranchName:           "gerrit-internal_CL_new_tests",
+			BranchName:           "github_CL_new_tests",
 			GroupingID:           dks.RoundRectGroupingID,
 			LastUpdated:          ts("2020-12-12T09:20:33Z"),
 			LastCalculated:       beginningOfTime,
@@ -186,7 +186,7 @@ func TestGatherFromChangelists_OnlyReportsGroupingsWithDataNotOnPrimaryBranch(t 
 			},
 		},
 		{
-			BranchName:           "gerrit-internal_CL_new_tests",
+			BranchName:           "github_CL_new_tests",
 			GroupingID:           dks.TextSevenGroupingID,
 			LastUpdated:          ts("2020-12-12T09:20:33Z"),
 			LastCalculated:       beginningOfTime,
@@ -196,7 +196,7 @@ func TestGatherFromChangelists_OnlyReportsGroupingsWithDataNotOnPrimaryBranch(t 
 			},
 		},
 		{
-			BranchName:           "gerrit_CLdisallowtriaging",
+			BranchName:           "github_CLdisallowtriaging",
 			GroupingID:           dks.TriangleGroupingID,
 			LastUpdated:          ts("2020-12-12T16:00:00Z"),
 			LastCalculated:       beginningOfTime,
@@ -206,7 +206,7 @@ func TestGatherFromChangelists_OnlyReportsGroupingsWithDataNotOnPrimaryBranch(t 
 			},
 		},
 		{
-			BranchName:           "gerrit_CLmultipledatapoints",
+			BranchName:           "github_CLmultipledatapoints",
 			GroupingID:           dks.SquareGroupingID,
 			LastUpdated:          ts("2020-12-12T14:00:00Z"),
 			LastCalculated:       beginningOfTime,
@@ -228,7 +228,7 @@ func TestGatherFromChangelists_UpdatesExistingWork(t *testing.T) {
 	sentinelTime := ts("2020-05-25T00:00:00Z")
 	existingData.SecondaryBranchDiffCalculationWork = []schema.SecondaryBranchDiffCalculationRow{
 		{
-			BranchName:           "gerrit-internal_CL_new_tests",
+			BranchName:           "github_CL_new_tests",
 			GroupingID:           dks.TextSevenGroupingID,
 			DigestsNotOnPrimary:  []types.Digest{dks.DigestBlank},
 			LastUpdated:          sentinelTime,
@@ -236,7 +236,7 @@ func TestGatherFromChangelists_UpdatesExistingWork(t *testing.T) {
 			CalculationLeaseEnds: sentinelTime,
 		},
 		{
-			BranchName:           "gerrit_CL_fix_ios",
+			BranchName:           "github_CL_fix_ios",
 			GroupingID:           dks.CircleGroupingID,
 			DigestsNotOnPrimary:  []types.Digest{dks.DigestBlank},
 			LastUpdated:          sentinelTime,
@@ -256,7 +256,7 @@ func TestGatherFromChangelists_UpdatesExistingWork(t *testing.T) {
 	actualWork := sqltest.GetAllRows(ctx, t, db, "SecondaryBranchDiffCalculationWork", &schema.SecondaryBranchDiffCalculationRow{})
 	assert.ElementsMatch(t, []schema.SecondaryBranchDiffCalculationRow{
 		{
-			BranchName:           "gerrit_CL_fix_ios",
+			BranchName:           "github_CL_fix_ios",
 			GroupingID:           dks.CircleGroupingID,
 			LastUpdated:          ts("2020-12-10T04:05:06Z"),
 			LastCalculated:       sentinelTime, // not changed
@@ -266,7 +266,7 @@ func TestGatherFromChangelists_UpdatesExistingWork(t *testing.T) {
 			},
 		},
 		{
-			BranchName:           "gerrit-internal_CL_new_tests",
+			BranchName:           "github_CL_new_tests",
 			GroupingID:           dks.RoundRectGroupingID,
 			LastUpdated:          ts("2020-12-12T09:20:33Z"),
 			LastCalculated:       beginningOfTime,
@@ -276,7 +276,7 @@ func TestGatherFromChangelists_UpdatesExistingWork(t *testing.T) {
 			},
 		},
 		{
-			BranchName:           "gerrit-internal_CL_new_tests",
+			BranchName:           "github_CL_new_tests",
 			GroupingID:           dks.TextSevenGroupingID,
 			LastUpdated:          ts("2020-12-12T09:20:33Z"),
 			LastCalculated:       sentinelTime, // not changed
@@ -286,7 +286,7 @@ func TestGatherFromChangelists_UpdatesExistingWork(t *testing.T) {
 			},
 		},
 		{
-			BranchName:           "gerrit_CLdisallowtriaging",
+			BranchName:           "github_CLdisallowtriaging",
 			GroupingID:           dks.TriangleGroupingID,
 			LastUpdated:          ts("2020-12-12T16:00:00Z"),
 			LastCalculated:       beginningOfTime,
@@ -296,7 +296,7 @@ func TestGatherFromChangelists_UpdatesExistingWork(t *testing.T) {
 			},
 		},
 		{
-			BranchName:           "gerrit_CLmultipledatapoints",
+			BranchName:           "github_CLmultipledatapoints",
 			GroupingID:           dks.SquareGroupingID,
 			LastUpdated:          ts("2020-12-12T14:00:00Z"),
 			LastCalculated:       beginningOfTime,

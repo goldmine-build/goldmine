@@ -70,6 +70,18 @@ func main() {
 
 	ctx := context.Background()
 
+	// Initialize client and start the ingesters.
+
+	// Set up authenticated HTTP client.
+	// TODO(jcgregorio): Uncomment and configure authentication as needed for GitHub API access.
+	//
+	// tokenSrc, err := google.DefaultTokenSource(ctx)
+	// if err != nil {
+	// 	sklog.Fatalf("Failed to auth: %s", err)
+	// }
+	//client := httputils.DefaultClientConfig().WithTokenSource(tokenSrc).With2xxOnly().WithDialTimeout(time.Second * 10).Client()
+	client := httputils.DefaultClientConfig().With2xxOnly().WithDialTimeout(time.Second * 10).Client()
+
 	if cfg.SQLDatabaseName == "" {
 		sklog.Fatalf("Must have SQL database config")
 	}
@@ -102,15 +114,30 @@ func main() {
 	}
 	sourcesToScan := []ingestion.FileSearcher{src}
 
+	var secondaryBranchLiveness metrics2.Liveness
+	tryjobProcessor, src, err := getSecondaryBranchIngester(ctx, cfg.IngestionServerConfig.SecondaryBranchConfig, gcsClient, client, sqlDB)
+	if err != nil {
+		sklog.Fatalf("Setting up secondary branch ingestion: %s", err)
+	}
+	if src != nil {
+		sourcesToScan = append(sourcesToScan, src)
+		secondaryBranchLiveness = metrics2.NewLiveness("gold_ingestion", map[string]string{
+			"metric": "since_last_successful_streaming_result",
+			"source": "secondary_branch",
+		})
+	}
+
 	pss := &pubSubSource{
 		IngestionStore:         ingestionStore,
 		PrimaryBranchProcessor: primaryBranchProcessor,
+		TryjobProcessor:        tryjobProcessor,
 		PrimaryBranchStreamingLiveness: metrics2.NewLiveness("gold_ingestion", map[string]string{
 			"metric": "since_last_successful_streaming_result",
 			"source": "primary_branch",
 		}),
-		SuccessCounter: metrics2.GetCounter("gold_ingestion_success"),
-		FailedCounter:  metrics2.GetCounter("gold_ingestion_failure"),
+		SecondaryBranchStreamingLiveness: secondaryBranchLiveness,
+		SuccessCounter:                   metrics2.GetCounter("gold_ingestion_success"),
+		FailedCounter:                    metrics2.GetCounter("gold_ingestion_failure"),
 	}
 
 	go func() {
@@ -147,6 +174,32 @@ func getPrimaryBranchIngester(ctx context.Context, conf config.IngesterConfig, g
 		return nil, nil, skerr.Fmt("unknown ingestion backend: %q", conf.Type)
 	}
 	return primaryBranchProcessor, src, nil
+}
+
+func getSecondaryBranchIngester(ctx context.Context, conf *config.IngesterConfig, gcsClient *storage.Client, hClient *http.Client, db *pgxpool.Pool) (ingestion.Processor, ingestion.FileSearcher, error) {
+	if conf == nil { // not configured for secondary branch (e.g. tryjob) ingestion.
+		return nil, nil, nil
+	}
+	src := &ingestion.GCSSource{
+		Client: gcsClient,
+		Bucket: conf.Source.Bucket,
+		Prefix: conf.Source.Prefix,
+	}
+	if ok := src.Validate(); !ok {
+		return nil, nil, skerr.Fmt("Invalid GCS Source %#v", src)
+	}
+	var sbProcessor ingestion.Processor
+	var err error
+	if conf.Type == ingestion_processors.SQLSecondaryBranch {
+		sbProcessor, err = ingestion_processors.TryjobSQL(ctx, src, conf.ExtraParams, hClient, db)
+		if err != nil {
+			return nil, nil, skerr.Wrap(err)
+		}
+		sklog.Infof("Configured SQL-backed secondary branch ingestion")
+	} else {
+		return nil, nil, skerr.Fmt("unknown ingestion backend: %q", conf.Type)
+	}
+	return sbProcessor, src, nil
 }
 
 // listen begins listening to the PubSub topic with the configured PubSub subscription. It will
@@ -195,11 +248,17 @@ func listen(ctx context.Context, cfg config.Common, p *pubSubSource) error {
 type pubSubSource struct {
 	IngestionStore         ingestion.Store
 	PrimaryBranchProcessor ingestion.Processor
+	TryjobProcessor        ingestion.Processor
 
 	// PrimaryBranchStreamingLiveness lets us have a metric to monitor the successful
 	// streaming of data. It will be reset after each successful ingestion of a file from
 	// the primary branch.
 	PrimaryBranchStreamingLiveness metrics2.Liveness
+
+	// SecondaryBranchStreamingLiveness lets us have a metric to monitor the successful
+	// streaming of data. It will be reset after each successful ingestion of a file from
+	// the secondary branch.
+	SecondaryBranchStreamingLiveness metrics2.Liveness
 
 	SuccessCounter metrics2.Counter
 	FailedCounter  metrics2.Counter

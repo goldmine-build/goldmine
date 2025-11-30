@@ -38,10 +38,9 @@
       "md5": "c07c07c07c07c07c07c07c07c07c07c0"
     }
   ],
-  "crs": "gerrit",
+  "crs": "github",
   "change_list_id": "CL_fix_ios",
   "patch_set_order": 3,
-
-  "cis": "buildbucket",
+  "cis": "github",
   "try_job_id": "tryjob_01_iphonergb"
 }

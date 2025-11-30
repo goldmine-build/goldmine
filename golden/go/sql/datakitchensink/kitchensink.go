@@ -301,7 +301,7 @@ func RawBuilder() databuilder.TablesBuilder {
 
 	// This changelist has one patchset that adds some data which corrects the iOS glitch on the
 	// iPads, but not for the iPhones.
-	cl := b.AddChangelist(ChangelistIDThatAttemptsToFixIOS, GerritCRS, UserOne, "Fix iOS", schema.StatusOpen)
+	cl := b.AddChangelist(ChangelistIDThatAttemptsToFixIOS, GitHubCRS, UserOne, "Fix iOS", schema.StatusOpen)
 	ps := cl.AddPatchset(PatchSetIDFixesIPadButNotIPhone, "ffff111111111111111111111111111111111111", 3)
 	ps.DataWithCommonKeys(paramtools.Params{
 		OSKey: IOS, DeviceKey: IPhoneDevice, ColorModeKey: RGBColorMode,
@@ -313,7 +313,7 @@ func RawBuilder() databuilder.TablesBuilder {
 		{types.CorpusField: CornersCorpus, types.PrimaryKeyField: TriangleTest},
 		{types.CorpusField: RoundCorpus, types.PrimaryKeyField: CircleTest},
 	}).OptionsAll(paramtools.Params{"ext": "png"}).
-		FromTryjob(Tryjob01IPhoneRGB, BuildBucketCIS, "Test-iPhone-RGB", Tryjob01FileIPhoneRGB, "2020-12-10T04:05:06Z")
+		FromTryjob(Tryjob01IPhoneRGB, GitHubCIS, "Test-iPhone-RGB", Tryjob01FileIPhoneRGB, "2020-12-10T04:05:06Z")
 	ps.DataWithCommonKeys(paramtools.Params{
 		OSKey: IOS, DeviceKey: IPadDevice,
 	}).Digests(DigestA01Pos, // same as primary branch
@@ -331,7 +331,7 @@ func RawBuilder() databuilder.TablesBuilder {
 			{types.CorpusField: RoundCorpus, types.PrimaryKeyField: CircleTest, ColorModeKey: GreyColorMode},
 		}).
 		OptionsAll(paramtools.Params{"ext": "png"}).
-		FromTryjob(Tryjob02IPad, BuildBucketCIS, "Test-iPad-ALL", Tryjob02FileIPad, "2020-12-10T03:02:01Z")
+		FromTryjob(Tryjob02IPad, GitHubCIS, "Test-iPad-ALL", Tryjob02FileIPad, "2020-12-10T03:02:01Z")
 	ps.DataWithCommonKeys(paramtools.Params{
 		OSKey: AndroidOS, DeviceKey: TaimenDevice, ColorModeKey: RGBColorMode,
 	}).Digests(DigestA09Neg, // On primary branch, should be ignored.
@@ -345,7 +345,7 @@ func RawBuilder() databuilder.TablesBuilder {
 		{"ext": "png"},
 		{"ext": "png", "disallow_triaging": "true", "image_matching_algorithm": "positive_if_only_image"},
 		{"ext": "png"},
-	}).FromTryjob(Tryjob03TaimenRGB, BuildBucketCIS, "Test-taimen-RGB", Tryjob03FileTaimenRGB, "2020-12-10T03:44:44Z")
+	}).FromTryjob(Tryjob03TaimenRGB, GitHubCIS, "Test-taimen-RGB", Tryjob03FileTaimenRGB, "2020-12-10T03:44:44Z")
 	cl.AddTriageEvent(UserOne, "2020-12-10T05:00:00Z").
 		ExpectationsForGrouping(paramtools.Params{types.CorpusField: CornersCorpus, types.PrimaryKeyField: TriangleTest}).
 		Triage(DigestB01Pos, schema.LabelPositive, schema.LabelUntriaged) // accidental triage
@@ -355,7 +355,7 @@ func RawBuilder() databuilder.TablesBuilder {
 
 	// This CL adds some new tests over two patchsets. Additionally, this CL has data coming in
 	// from an internal CRS and CIS.
-	cl = b.AddChangelist(ChangelistIDThatAddsNewTests, GerritInternalCRS, UserTwo, "Increase test coverage", schema.StatusOpen)
+	cl = b.AddChangelist(ChangelistIDThatAddsNewTests, GitHubCIS, UserTwo, "Increase test coverage", schema.StatusOpen)
 	ps1 := cl.AddPatchset(PatchsetIDAddsNewCorpus, "eeee222222222222222222222222222222222222", 1)
 	ps2 := cl.AddPatchset(PatchsetIDAddsNewCorpusAndTest, "eeee333333333333333333333333333333333333", 4)
 	// Oops, the first PS adds a new corpus (containing one test), but the output is all blank.
@@ -375,7 +375,7 @@ func RawBuilder() databuilder.TablesBuilder {
 			{ColorModeKey: GreyColorMode, types.CorpusField: RoundCorpus, types.PrimaryKeyField: CircleTest},
 			{ColorModeKey: GreyColorMode, types.CorpusField: TextCorpus, types.PrimaryKeyField: SevenTest}}).
 		OptionsAll(paramtools.Params{"ext": "png"}).
-		FromTryjob(Tryjob04Windows, BuildBucketInternalCIS, "Test-Windows10.3-ALL", Tryjob04FileWindows, "2020-12-12T08:09:10Z")
+		FromTryjob(Tryjob04Windows, GitHubCIS, "Test-Windows10.3-ALL", Tryjob04FileWindows, "2020-12-12T08:09:10Z")
 	// The second PS fixes the text corpus test and adds a round rect test to the existing
 	// round corpus. Windows draws the new RoundRect test fine, but not the walleye device.
 	ps2.DataWithCommonKeys(paramtools.Params{
@@ -399,7 +399,7 @@ func RawBuilder() databuilder.TablesBuilder {
 		{ColorModeKey: GreyColorMode, types.CorpusField: RoundCorpus, types.PrimaryKeyField: RoundRectTest},
 		{ColorModeKey: GreyColorMode, types.CorpusField: TextCorpus, types.PrimaryKeyField: SevenTest}}).
 		OptionsAll(paramtools.Params{"ext": "png"}).
-		FromTryjob(Tryjob05Windows, BuildBucketInternalCIS, "Test-Windows10.3-ALL", Tryjob05FileWindows, "2020-12-12T09:00:00Z")
+		FromTryjob(Tryjob05Windows, GitHubCIS, "Test-Windows10.3-ALL", Tryjob05FileWindows, "2020-12-12T09:00:00Z")
 	// Data from the walleye is the same as head, except it draws the RoundRect incorrectly in RGB.
 	ps2.DataWithCommonKeys(paramtools.Params{
 		OSKey:     AndroidOS,
@@ -424,7 +424,7 @@ func RawBuilder() databuilder.TablesBuilder {
 			walleyeFuzzyParams, {"ext": "png"}, {"ext": "png"}, {"ext": "png"}, {"ext": "png"},
 			{"ext": "png"}, {"ext": "png"}, {"ext": "png"}, {"ext": "png"}, {"ext": "png"},
 		}).
-		FromTryjob(Tryjob06Walleye, BuildBucketInternalCIS, "Test-Walleye-ALL", Tryjob06FileWalleye, "2020-12-12T09:20:33Z")
+		FromTryjob(Tryjob06Walleye, GitHubCIS, "Test-Walleye-ALL", Tryjob06FileWalleye, "2020-12-12T09:20:33Z")
 
 	cl.AddTriageEvent(UserTwo, "2020-12-12T09:30:00Z").
 		ExpectationsForGrouping(paramtools.Params{
@@ -446,7 +446,7 @@ func RawBuilder() databuilder.TablesBuilder {
 		}).Triage(DigestE03Unt_CL, schema.LabelNegative, schema.LabelUntriaged)
 
 	// Add two CLs that have a small amount of data, but are landed and/or abandoned
-	cl = b.AddChangelist(ChangelistIDThatHasLanded, GerritCRS, UserTwo, "was landed", schema.StatusLanded)
+	cl = b.AddChangelist(ChangelistIDThatHasLanded, GitHubCRS, UserTwo, "was landed", schema.StatusLanded)
 	ps = cl.AddPatchset(PatchsetIDIsLanded, "aaaaa11111111111111111111111111111111111", 1)
 	ps.DataWithCommonKeys(paramtools.Params{
 		OSKey:     Windows10dot3OS,
@@ -455,9 +455,9 @@ func RawBuilder() databuilder.TablesBuilder {
 		Keys([]paramtools.Params{
 			{ColorModeKey: RGBColorMode, types.CorpusField: CornersCorpus, types.PrimaryKeyField: SquareTest}}).
 		OptionsAll(paramtools.Params{"ext": "png"}).
-		FromTryjob(Tryjob07Windows, BuildBucketCIS, "Test-Windows10.3-Some", Tryjob07FileWindows, "2020-05-05T05:05:00Z")
+		FromTryjob(Tryjob07Windows, GitHubCIS, "Test-Windows10.3-Some", Tryjob07FileWindows, "2020-05-05T05:05:00Z")
 
-	cl = b.AddChangelist(ChangelistIDThatIsAbandoned, GerritCRS, UserOne, "was abandoned", schema.StatusAbandoned)
+	cl = b.AddChangelist(ChangelistIDThatIsAbandoned, GitHubCRS, UserOne, "was abandoned", schema.StatusAbandoned)
 	ps = cl.AddPatchset(PatchsetIDIsAbandoned, "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb55555", 1)
 	ps.DataWithCommonKeys(paramtools.Params{
 		OSKey:     Windows10dot3OS,
@@ -466,12 +466,12 @@ func RawBuilder() databuilder.TablesBuilder {
 		Keys([]paramtools.Params{
 			{ColorModeKey: RGBColorMode, types.CorpusField: CornersCorpus, types.PrimaryKeyField: SquareTest}}).
 		OptionsAll(paramtools.Params{"ext": "png"}).
-		FromTryjob(Tryjob08Windows, BuildBucketCIS, "Test-Windows10.3-Some", Tryjob08FileWindows, "2020-06-06T06:06:00Z")
+		FromTryjob(Tryjob08Windows, GitHubCIS, "Test-Windows10.3-Some", Tryjob08FileWindows, "2020-06-06T06:06:00Z")
 
 	// Add a CL that has multiple datapoints at the same patchset for the same trace. In this CL,
 	// a tryjob was executed multiple times at the same patchset in order to investigate a flaky
 	// test.
-	cl = b.AddChangelist(ChangelistIDWithMultipleDatapointsPerTrace, GerritCRS, UserOne, "multiple datapoints", schema.StatusOpen)
+	cl = b.AddChangelist(ChangelistIDWithMultipleDatapointsPerTrace, GitHubCRS, UserOne, "multiple datapoints", schema.StatusOpen)
 	ps = cl.AddPatchset(PatchsetIDWithMultipleDatapointsPerTrace, "ccccccccccccccccccccccccccccccccccc66666", 1)
 	ps.DataWithCommonKeys(paramtools.Params{
 		OSKey:     Windows10dot3OS,
@@ -481,27 +481,27 @@ func RawBuilder() databuilder.TablesBuilder {
 		Keys([]paramtools.Params{
 			{ColorModeKey: RGBColorMode, types.CorpusField: CornersCorpus, types.PrimaryKeyField: SquareTest}}).
 		OptionsAll(paramtools.Params{"ext": "png"}).
-		FromTryjob(Tryjob09Windows, BuildBucketCIS, "Test-Windows10.3-Some", Tryjob09FileWindows, "2020-12-12T10:00:00Z").
+		FromTryjob(Tryjob09Windows, GitHubCIS, "Test-Windows10.3-Some", Tryjob09FileWindows, "2020-12-12T10:00:00Z").
 		Digests(DigestC04Unt). // This CL/PS also makes SquareTest flaky.
 		Keys([]paramtools.Params{
 			{ColorModeKey: RGBColorMode, types.CorpusField: CornersCorpus, types.PrimaryKeyField: SquareTest}}).
 		OptionsAll(paramtools.Params{"ext": "png"}).
-		FromTryjob(Tryjob10Windows, BuildBucketCIS, "Test-Windows10.3-Some", Tryjob10FileWindows, "2020-12-12T11:00:00Z").
+		FromTryjob(Tryjob10Windows, GitHubCIS, "Test-Windows10.3-Some", Tryjob10FileWindows, "2020-12-12T11:00:00Z").
 		Digests(DigestC03Unt). // The third run produces the same digest as the first run.
 		Keys([]paramtools.Params{
 			{ColorModeKey: RGBColorMode, types.CorpusField: CornersCorpus, types.PrimaryKeyField: SquareTest}}).
 		OptionsAll(paramtools.Params{"ext": "png"}).
-		FromTryjob(Tryjob11Windows, BuildBucketCIS, "Test-Windows10.3-Some", Tryjob11FileWindows, "2020-12-12T12:00:00Z").
+		FromTryjob(Tryjob11Windows, GitHubCIS, "Test-Windows10.3-Some", Tryjob11FileWindows, "2020-12-12T12:00:00Z").
 		Digests(DigestC01Pos). // Produces a new digest which we accidentally triaged positive.
 		Keys([]paramtools.Params{
 			{ColorModeKey: RGBColorMode, types.CorpusField: CornersCorpus, types.PrimaryKeyField: SquareTest}}).
 		OptionsAll(paramtools.Params{"ext": "png"}).
-		FromTryjob(Tryjob12Windows, BuildBucketCIS, "Test-Windows10.3-Some", Tryjob12FileWindows, "2020-12-12T13:00:00Z").
+		FromTryjob(Tryjob12Windows, GitHubCIS, "Test-Windows10.3-Some", Tryjob12FileWindows, "2020-12-12T13:00:00Z").
 		Digests(DigestC01Pos). // Same digest as previous run.
 		Keys([]paramtools.Params{
 			{ColorModeKey: RGBColorMode, types.CorpusField: CornersCorpus, types.PrimaryKeyField: SquareTest}}).
 		OptionsAll(paramtools.Params{"ext": "png"}).
-		FromTryjob(Tryjob13Windows, BuildBucketCIS, "Test-Windows10.3-Some", Tryjob13FileWindows, "2020-12-12T14:00:00Z")
+		FromTryjob(Tryjob13Windows, GitHubCIS, "Test-Windows10.3-Some", Tryjob13FileWindows, "2020-12-12T14:00:00Z")
 	// Accidental triage.
 	cl.AddTriageEvent(UserOne, "2020-12-12T15:00:00Z").
 		ExpectationsForGrouping(paramtools.Params{
@@ -509,7 +509,7 @@ func RawBuilder() databuilder.TablesBuilder {
 		}).Positive(DigestC01Pos)
 
 	// Add a CL that defines a new test with disallow_triaging=true.
-	cl = b.AddChangelist(ChangelistIDWithDisallowTriagingTest, GerritCRS, UserOne, "add test with disallow triaging", schema.StatusOpen)
+	cl = b.AddChangelist(ChangelistIDWithDisallowTriagingTest, GitHubCRS, UserOne, "add test with disallow triaging", schema.StatusOpen)
 	ps = cl.AddPatchset(PatchsetIDWithDisallowTriagingTest, "ddddddddddddddddddddddddddddddddddd77777", 1)
 	ps.DataWithCommonKeys(paramtools.Params{
 		OSKey: AndroidOS, DeviceKey: TaimenDevice, ColorModeKey: GreyColorMode,
@@ -520,7 +520,7 @@ func RawBuilder() databuilder.TablesBuilder {
 		"ext":                      "png",
 		"disallow_triaging":        "true",
 		"image_matching_algorithm": "positive_if_only_image",
-	}).FromTryjob(Tryjob14TaimenGrey, BuildBucketCIS, "Test-taimen-Grey", Tryjob14FileTaimenGrey, "2020-12-12T16:00:00Z")
+	}).FromTryjob(Tryjob14TaimenGrey, GitHubCIS, "Test-taimen-Grey", Tryjob14FileTaimenGrey, "2020-12-12T16:00:00Z")
 	// The digest was automatically triaged as positive by goldctl due to the positive_if_only_image
 	// image matching algorithm.
 	cl.AddTriageEvent(UserOne, "2020-12-12T17:00:00Z").
@@ -622,11 +622,8 @@ const (
 	UserFour       = "userFour@example.com"
 	AutoTriageUser = "fuzzy" // we use the algorithm name as the user name for auto triaging.
 
-	GerritCRS         = "gerrit"
-	GerritInternalCRS = "gerrit-internal"
-
-	BuildBucketCIS         = "buildbucket"
-	BuildBucketInternalCIS = "buildbucket-internal"
+	GitHubCRS = "github"
+	GitHubCIS = "github"
 
 	ChangelistIDThatAttemptsToFixIOS = "CL_fix_ios"
 	PatchSetIDFixesIPadButNotIPhone  = "PS_fixes_ipad_but_not_iphone"

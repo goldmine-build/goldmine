@@ -9,7 +9,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"go.goldmine.build/go/mockhttpclient"
-	"go.goldmine.build/go/vcsinfo"
 	"go.goldmine.build/golden/go/code_review"
 )
 
@@ -248,37 +247,6 @@ func TestGetPatchset_InvalidIDForChangelist_ReturnsError(t *testing.T) {
 	_, err := c.GetPatchset(context.Background(), "bad", "nope", omitOrder)
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "invalid")
-}
-
-func TestGetChangelistForCommitSunnyDay(t *testing.T) {
-
-	m := mockhttpclient.NewURLMock()
-	resp := mockhttpclient.MockGetDialogue([]byte(landedPullRequestResponse))
-	m.Mock("https://api.github.com/repos/unit/test/pulls/44380", resp)
-	c := New(m.Client(), "unit/test")
-
-	clID, err := c.GetChangelistIDForCommit(context.Background(), &vcsinfo.LongCommit{
-		// This is the only field the implementation cares about.
-		ShortCommit: &vcsinfo.ShortCommit{
-			Subject: "Roll engine ddceed5f7af1..629930e8887c (1 commits) (#44380)",
-		},
-	})
-	require.NoError(t, err)
-	assert.Equal(t, "44380", clID)
-}
-
-func TestGetChangelistForCommitMalformed(t *testing.T) {
-
-	c := New(nil, "unit/test")
-
-	_, err := c.GetChangelistIDForCommit(context.Background(), &vcsinfo.LongCommit{
-		// This is the only field the implementation cares about.
-		ShortCommit: &vcsinfo.ShortCommit{
-			Subject: "Roll engine ddceed5f7af1..629930e8887c (1 commits)",
-		},
-	})
-	require.Error(t, err)
-	assert.Equal(t, code_review.ErrNotFound, err)
 }
 
 func TestCommentOnSunnyDay(t *testing.T) {

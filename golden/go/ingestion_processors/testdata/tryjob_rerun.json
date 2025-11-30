@@ -18,10 +18,9 @@
       "md5": "c04c04c04c04c04c04c04c04c04c04c0"
     }
   ],
-  "crs": "gerrit",
+  "crs": "github",
   "change_list_id": "CLmultipledatapoints",
   "patch_set_id": "PSmultipledatapoints",
-
-  "cis": "buildbucket",
+  "cis": "github",
   "try_job_id": "tryjob_10_windows"
 }

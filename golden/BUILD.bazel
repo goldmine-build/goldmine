@@ -41,15 +41,6 @@ app_container(
 )
 
 app_container(
-    name = "gold_gitilesfollower_container",
-    base = "@base",
-    cmd = [],
-    entrypoint = "/usr/local/bin/gitilesfollower",
-    exe = "//golden/cmd/gitilesfollower:gitilesfollower",
-    repository = "ghcr.io/goldmine-build/gold_gitilesfollower",
-)
-
-app_container(
     name = "gold_ingestion_container",
     base = "@base",
     cmd = [],

@@ -16,7 +16,6 @@ import (
 	"go.goldmine.build/go/skerr"
 	"go.goldmine.build/go/sklog"
 	"go.goldmine.build/go/util"
-	"go.goldmine.build/go/vcsinfo"
 	"go.goldmine.build/golden/go/code_review"
 	"golang.org/x/time/rate"
 )
@@ -124,6 +123,8 @@ type person struct {
 type commitsOnPullRequestResponse []commit
 
 // GetPatchset implements the code_review.Client interface.
+//
+// Note that psOrder can be 0, in which case we only use psID to find the patchset.
 func (c *CRSImpl) GetPatchset(ctx context.Context, clID, psID string, psOrder int) (code_review.Patchset, error) {
 	if _, err := strconv.ParseInt(clID, 10, 64); err != nil {
 		return code_review.Patchset{}, skerr.Fmt("invalid Changelist ID")
@@ -175,19 +176,6 @@ func (c *CRSImpl) GetPatchset(ctx context.Context, clID, psID string, psOrder in
 		}
 	}
 	return code_review.Patchset{}, code_review.ErrNotFound
-}
-
-// GetChangelistIDForCommit implements the code_review.Client interface.
-func (c *CRSImpl) GetChangelistIDForCommit(ctx context.Context, commit *vcsinfo.LongCommit) (string, error) {
-	if commit == nil {
-		return "", skerr.Fmt("commit cannot be nil")
-	}
-	id, err := extractPRFromTitle(commit.Subject)
-	if err != nil {
-		sklog.Debugf("Could not find github issue: %s", err)
-		return "", code_review.ErrNotFound
-	}
-	return id, nil
 }
 
 // We assume a PR has the pull request number in the Subject/Title, at the end.

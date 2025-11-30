@@ -21,10 +21,6 @@ type Client interface {
 	// Returns ErrNotFound if the Patchset or Changelist doesn't exist.
 	GetPatchset(ctx context.Context, clID, psID string, psOrder int) (Patchset, error)
 
-	// GetChangelistIDForCommit returns the Changelist id corresponding to the given git commit.
-	// Returns ErrNotFound if one could not be identified.
-	GetChangelistIDForCommit(ctx context.Context, commit *vcsinfo.LongCommit) (string, error)
-
 	// CommentOn creates a comment on the CRS for the given CL with the given message.
 	CommentOn(ctx context.Context, clID, message string) error
 }

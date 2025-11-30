@@ -292,93 +292,6 @@ func TestValidate_ValidResults_Success(t *testing.T) {
 	})
 }
 
-// TestUpdateLegacyFields_Success tests a variety of valid inputs to make sure our parsing logic
-// does not regress. It handles a variety of legacy and non legacy data.
-func TestUpdateLegacyFields_Success(t *testing.T) {
-	r := parseUpdateValidate(t, legacySkiaTryjobJSON)
-
-	require.Equal(t, "c4711517219f333c1116f47706eb57b51b5f8fc7", r.GitHash)
-	require.Equal(t, "12345", r.ChangelistID)
-	require.Equal(t, 10, r.PatchsetOrder)
-	require.Equal(t, "549340494940393", r.TryJobID)
-	// When we detect a legacy system, default to gerrit and buildbucket
-	require.Equal(t, "gerrit", r.CodeReviewSystem)
-	require.Equal(t, "buildbucket", r.ContinuousIntegrationSystem)
-	require.Len(t, r.Results, 3)
-
-	r = parseUpdateValidate(t, legacySkiaJSON)
-	require.Empty(t, r.ChangelistID)
-	require.Empty(t, r.TryJobID)
-	require.Equal(t, r.Results[0].Key[types.PrimaryKeyField], "skottie_multiframe")
-	require.Contains(t, r.Results[0].Options, "color_type")
-
-	r = parseUpdateValidate(t, legacyGoldCtlTryjobJSON)
-	require.Equal(t, "1762193", r.ChangelistID)
-	require.Equal(t, 2, r.PatchsetOrder)
-	require.Equal(t, "8904604368086838672", r.TryJobID)
-	// When we detect a legacy system, default to gerrit and buildbucket
-	require.Equal(t, "gerrit", r.CodeReviewSystem)
-	require.Equal(t, "buildbucket", r.ContinuousIntegrationSystem)
-	require.Contains(t, r.Key, "vendor_id")
-
-	r = parseUpdateValidate(t, goldCtlTryjobJSON)
-	require.Equal(t, "1762193", r.ChangelistID)
-	require.Equal(t, 2, r.PatchsetOrder)
-	require.Equal(t, "8904604368086838672", r.TryJobID)
-	require.Equal(t, "gerrit", r.CodeReviewSystem)
-	require.Equal(t, "buildbucket", r.ContinuousIntegrationSystem)
-	require.Contains(t, r.Key, "vendor_id")
-
-	r = parseUpdateValidate(t, goldCtlTryjobPSIDJSON)
-	require.Equal(t, "1762193", r.ChangelistID)
-	require.Equal(t, "42191ad7b6f31d823d2d9904df24c0649ca3766c", r.PatchsetID)
-
-	r = parseUpdateValidate(t, goldCtlMasterBranchJSON)
-	require.Empty(t, r.ChangelistID)
-	require.Empty(t, r.TryJobID)
-	require.Equal(t, map[string]string{
-		"device_id": "0x1cb3",
-		"msaa":      "True",
-	}, r.Key)
-
-	r = parseUpdateValidate(t, legacyGoldCtlJSON)
-	require.Empty(t, r.ChangelistID)
-	require.Empty(t, r.TryJobID)
-	require.Contains(t, r.Key, "vendor_id")
-
-	r = parseUpdateValidate(t, legacyMasterBranchJSON)
-	require.Empty(t, r.ChangelistID)
-	require.Empty(t, r.TryJobID)
-
-	r = parseUpdateValidate(t, negativeMasterBranchJSON)
-	require.Empty(t, r.ChangelistID)
-	require.Empty(t, r.TryJobID)
-
-	r = parseUpdateValidate(t, emptyIssueJSON)
-	require.Empty(t, r.ChangelistID)
-	require.Empty(t, r.TryJobID)
-
-	parseUpdateValidate(t, inverted_results)
-}
-
-func TestUpdateLegacyFields_LexicographicalOrderOfCommitIDsFixed(t *testing.T) {
-
-	test := func(oldID, fixedID string) {
-		t.Run(oldID, func(t *testing.T) {
-			g := GoldResults{CommitID: oldID}
-			require.NoError(t, g.UpdateLegacyFields())
-			assert.Equal(t, g.CommitID, fixedID)
-		})
-	}
-	test("R99-14469.8.1", "R099-14469.8.1")
-	test("R23-14469.8.1", "R023-14469.8.1")
-
-	// No changes
-	test("R100-14470.0.0", "R100-14470.0.0")
-	test("R987-14470.0.0", "R987-14470.0.0")
-	test("R012-14470.0.0", "R012-14470.0.0")
-}
-
 func TestGenJson(t *testing.T) {
 
 	// Test parsing the test JSON.
@@ -399,7 +312,6 @@ func parseUpdateValidate(t *testing.T, jsonStr string) *GoldResults {
 	buf := bytes.NewBuffer([]byte(jsonStr))
 	gr := &GoldResults{}
 	require.NoError(t, json.NewDecoder(buf).Decode(gr))
-	require.NoError(t, gr.UpdateLegacyFields())
 	require.NoError(t, gr.Validate())
 	return gr
 }

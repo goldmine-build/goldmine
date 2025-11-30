@@ -13,7 +13,6 @@ import (
 	"go.goldmine.build/go/gerrit"
 	"go.goldmine.build/go/skerr"
 	"go.goldmine.build/go/sklog"
-	"go.goldmine.build/go/vcsinfo"
 	"go.goldmine.build/golden/go/code_review"
 )
 
@@ -99,19 +98,6 @@ func (c *CRSImpl) GetPatchset(ctx context.Context, clID, psID string, psOrder in
 		}
 	}
 	return code_review.Patchset{}, code_review.ErrNotFound
-}
-
-// GetChangelistIDForCommit implements the code_review.Client interface.
-func (c *CRSImpl) GetChangelistIDForCommit(_ context.Context, commit *vcsinfo.LongCommit) (string, error) {
-	if commit == nil {
-		return "", skerr.Fmt("commit cannot be nil")
-	}
-	i, err := c.gClient.ExtractIssueFromCommit(commit.Body)
-	if err != nil {
-		sklog.Debugf("Could not find gerrit issue in %q: %s", commit.Body, err)
-		return "", code_review.ErrNotFound
-	}
-	return strconv.FormatInt(i, 10), nil
 }
 
 // CommentOn implements the code_review.Client interface.

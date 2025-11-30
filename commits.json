@@ -1,0 +1,740 @@
+[
+  {
+    "sha": "2d684f232895befcb43bdd21554a284b5695834e",
+    "node_id": "C_kwDOPxTrJtoAKDJkNjg0ZjIzMjg5NWJlZmNiNDNiZGQyMTU1NGEyODRiNTY5NTgzNGU",
+    "commit": {
+      "author": {
+        "name": "Joe Gregorio",
+        "email": "joe@bitworking.org",
+        "date": "2025-11-28T17:39:22Z"
+      },
+      "committer": {
+        "name": "Joe Gregorio",
+        "email": "joe@bitworking.org",
+        "date": "2025-11-28T17:39:22Z"
+      },
+      "message": "starting on adding github trybot support to Gold.",
+      "tree": {
+        "sha": "2d06811c2dec5959233c9f286fdd7f7da58cb90c",
+        "url": "https://api.github.com/repos/goldmine-build/goldmine/git/trees/2d06811c2dec5959233c9f286fdd7f7da58cb90c"
+      },
+      "url": "https://api.github.com/repos/goldmine-build/goldmine/git/commits/2d684f232895befcb43bdd21554a284b5695834e",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/goldmine-build/goldmine/commits/2d684f232895befcb43bdd21554a284b5695834e",
+    "html_url": "https://github.com/goldmine-build/goldmine/commit/2d684f232895befcb43bdd21554a284b5695834e",
+    "comments_url": "https://api.github.com/repos/goldmine-build/goldmine/commits/2d684f232895befcb43bdd21554a284b5695834e/comments",
+    "author": {
+      "login": "jcgregorio",
+      "id": 1726460,
+      "node_id": "MDQ6VXNlcjE3MjY0NjA=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1726460?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/jcgregorio",
+      "html_url": "https://github.com/jcgregorio",
+      "followers_url": "https://api.github.com/users/jcgregorio/followers",
+      "following_url": "https://api.github.com/users/jcgregorio/following{/other_user}",
+      "gists_url": "https://api.github.com/users/jcgregorio/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/jcgregorio/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/jcgregorio/subscriptions",
+      "organizations_url": "https://api.github.com/users/jcgregorio/orgs",
+      "repos_url": "https://api.github.com/users/jcgregorio/repos",
+      "events_url": "https://api.github.com/users/jcgregorio/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/jcgregorio/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "jcgregorio",
+      "id": 1726460,
+      "node_id": "MDQ6VXNlcjE3MjY0NjA=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1726460?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/jcgregorio",
+      "html_url": "https://github.com/jcgregorio",
+      "followers_url": "https://api.github.com/users/jcgregorio/followers",
+      "following_url": "https://api.github.com/users/jcgregorio/following{/other_user}",
+      "gists_url": "https://api.github.com/users/jcgregorio/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/jcgregorio/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/jcgregorio/subscriptions",
+      "organizations_url": "https://api.github.com/users/jcgregorio/orgs",
+      "repos_url": "https://api.github.com/users/jcgregorio/repos",
+      "events_url": "https://api.github.com/users/jcgregorio/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/jcgregorio/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "1ab21ddb5a0411241c8ac064c554e0674db29913",
+        "url": "https://api.github.com/repos/goldmine-build/goldmine/commits/1ab21ddb5a0411241c8ac064c554e0674db29913",
+        "html_url": "https://github.com/goldmine-build/goldmine/commit/1ab21ddb5a0411241c8ac064c554e0674db29913"
+      }
+    ]
+  },
+  {
+    "sha": "df7260addec35db8ab1afd4be86f7388113add22",
+    "node_id": "C_kwDOPxTrJtoAKGRmNzI2MGFkZGVjMzVkYjhhYjFhZmQ0YmU4NmY3Mzg4MTEzYWRkMjI",
+    "commit": {
+      "author": {
+        "name": "Joe Gregorio",
+        "email": "joe@bitworking.org",
+        "date": "2025-11-28T18:00:48Z"
+      },
+      "committer": {
+        "name": "Joe Gregorio",
+        "email": "joe@bitworking.org",
+        "date": "2025-11-28T18:00:48Z"
+      },
+      "message": "second patchset",
+      "tree": {
+        "sha": "b6d038f4fc7a693f5adf2a5ba6e37ad03683d14c",
+        "url": "https://api.github.com/repos/goldmine-build/goldmine/git/trees/b6d038f4fc7a693f5adf2a5ba6e37ad03683d14c"
+      },
+      "url": "https://api.github.com/repos/goldmine-build/goldmine/git/commits/df7260addec35db8ab1afd4be86f7388113add22",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/goldmine-build/goldmine/commits/df7260addec35db8ab1afd4be86f7388113add22",
+    "html_url": "https://github.com/goldmine-build/goldmine/commit/df7260addec35db8ab1afd4be86f7388113add22",
+    "comments_url": "https://api.github.com/repos/goldmine-build/goldmine/commits/df7260addec35db8ab1afd4be86f7388113add22/comments",
+    "author": {
+      "login": "jcgregorio",
+      "id": 1726460,
+      "node_id": "MDQ6VXNlcjE3MjY0NjA=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1726460?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/jcgregorio",
+      "html_url": "https://github.com/jcgregorio",
+      "followers_url": "https://api.github.com/users/jcgregorio/followers",
+      "following_url": "https://api.github.com/users/jcgregorio/following{/other_user}",
+      "gists_url": "https://api.github.com/users/jcgregorio/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/jcgregorio/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/jcgregorio/subscriptions",
+      "organizations_url": "https://api.github.com/users/jcgregorio/orgs",
+      "repos_url": "https://api.github.com/users/jcgregorio/repos",
+      "events_url": "https://api.github.com/users/jcgregorio/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/jcgregorio/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "jcgregorio",
+      "id": 1726460,
+      "node_id": "MDQ6VXNlcjE3MjY0NjA=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1726460?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/jcgregorio",
+      "html_url": "https://github.com/jcgregorio",
+      "followers_url": "https://api.github.com/users/jcgregorio/followers",
+      "following_url": "https://api.github.com/users/jcgregorio/following{/other_user}",
+      "gists_url": "https://api.github.com/users/jcgregorio/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/jcgregorio/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/jcgregorio/subscriptions",
+      "organizations_url": "https://api.github.com/users/jcgregorio/orgs",
+      "repos_url": "https://api.github.com/users/jcgregorio/repos",
+      "events_url": "https://api.github.com/users/jcgregorio/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/jcgregorio/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "2d684f232895befcb43bdd21554a284b5695834e",
+        "url": "https://api.github.com/repos/goldmine-build/goldmine/commits/2d684f232895befcb43bdd21554a284b5695834e",
+        "html_url": "https://github.com/goldmine-build/goldmine/commit/2d684f232895befcb43bdd21554a284b5695834e"
+      }
+    ]
+  },
+  {
+    "sha": "b401674f88f0171a410076219f78ceca18a705ff",
+    "node_id": "C_kwDOPxTrJtoAKGI0MDE2NzRmODhmMDE3MWE0MTAwNzYyMTlmNzhjZWNhMThhNzA1ZmY",
+    "commit": {
+      "author": {
+        "name": "Joe Gregorio",
+        "email": "joe@bitworking.org",
+        "date": "2025-11-28T18:51:17Z"
+      },
+      "committer": {
+        "name": "Joe Gregorio",
+        "email": "joe@bitworking.org",
+        "date": "2025-11-28T18:51:17Z"
+      },
+      "message": "three",
+      "tree": {
+        "sha": "da8064042314bf79df724c06bdd52e63843a2ce3",
+        "url": "https://api.github.com/repos/goldmine-build/goldmine/git/trees/da8064042314bf79df724c06bdd52e63843a2ce3"
+      },
+      "url": "https://api.github.com/repos/goldmine-build/goldmine/git/commits/b401674f88f0171a410076219f78ceca18a705ff",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/goldmine-build/goldmine/commits/b401674f88f0171a410076219f78ceca18a705ff",
+    "html_url": "https://github.com/goldmine-build/goldmine/commit/b401674f88f0171a410076219f78ceca18a705ff",
+    "comments_url": "https://api.github.com/repos/goldmine-build/goldmine/commits/b401674f88f0171a410076219f78ceca18a705ff/comments",
+    "author": {
+      "login": "jcgregorio",
+      "id": 1726460,
+      "node_id": "MDQ6VXNlcjE3MjY0NjA=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1726460?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/jcgregorio",
+      "html_url": "https://github.com/jcgregorio",
+      "followers_url": "https://api.github.com/users/jcgregorio/followers",
+      "following_url": "https://api.github.com/users/jcgregorio/following{/other_user}",
+      "gists_url": "https://api.github.com/users/jcgregorio/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/jcgregorio/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/jcgregorio/subscriptions",
+      "organizations_url": "https://api.github.com/users/jcgregorio/orgs",
+      "repos_url": "https://api.github.com/users/jcgregorio/repos",
+      "events_url": "https://api.github.com/users/jcgregorio/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/jcgregorio/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "jcgregorio",
+      "id": 1726460,
+      "node_id": "MDQ6VXNlcjE3MjY0NjA=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1726460?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/jcgregorio",
+      "html_url": "https://github.com/jcgregorio",
+      "followers_url": "https://api.github.com/users/jcgregorio/followers",
+      "following_url": "https://api.github.com/users/jcgregorio/following{/other_user}",
+      "gists_url": "https://api.github.com/users/jcgregorio/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/jcgregorio/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/jcgregorio/subscriptions",
+      "organizations_url": "https://api.github.com/users/jcgregorio/orgs",
+      "repos_url": "https://api.github.com/users/jcgregorio/repos",
+      "events_url": "https://api.github.com/users/jcgregorio/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/jcgregorio/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "df7260addec35db8ab1afd4be86f7388113add22",
+        "url": "https://api.github.com/repos/goldmine-build/goldmine/commits/df7260addec35db8ab1afd4be86f7388113add22",
+        "html_url": "https://github.com/goldmine-build/goldmine/commit/df7260addec35db8ab1afd4be86f7388113add22"
+      }
+    ]
+  },
+  {
+    "sha": "55ab257a68a8f523fb25bcfc30d9ed53a2d5edda",
+    "node_id": "C_kwDOPxTrJtoAKDU1YWIyNTdhNjhhOGY1MjNmYjI1YmNmYzMwZDllZDUzYTJkNWVkZGE",
+    "commit": {
+      "author": {
+        "name": "Joe Gregorio",
+        "email": "joe@bitworking.org",
+        "date": "2025-11-28T19:04:32Z"
+      },
+      "committer": {
+        "name": "Joe Gregorio",
+        "email": "joe@bitworking.org",
+        "date": "2025-11-28T19:04:32Z"
+      },
+      "message": "Third or fourth",
+      "tree": {
+        "sha": "1948f9f02fb3c31c6011a0c2eeb9fa01590d826b",
+        "url": "https://api.github.com/repos/goldmine-build/goldmine/git/trees/1948f9f02fb3c31c6011a0c2eeb9fa01590d826b"
+      },
+      "url": "https://api.github.com/repos/goldmine-build/goldmine/git/commits/55ab257a68a8f523fb25bcfc30d9ed53a2d5edda",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/goldmine-build/goldmine/commits/55ab257a68a8f523fb25bcfc30d9ed53a2d5edda",
+    "html_url": "https://github.com/goldmine-build/goldmine/commit/55ab257a68a8f523fb25bcfc30d9ed53a2d5edda",
+    "comments_url": "https://api.github.com/repos/goldmine-build/goldmine/commits/55ab257a68a8f523fb25bcfc30d9ed53a2d5edda/comments",
+    "author": {
+      "login": "jcgregorio",
+      "id": 1726460,
+      "node_id": "MDQ6VXNlcjE3MjY0NjA=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1726460?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/jcgregorio",
+      "html_url": "https://github.com/jcgregorio",
+      "followers_url": "https://api.github.com/users/jcgregorio/followers",
+      "following_url": "https://api.github.com/users/jcgregorio/following{/other_user}",
+      "gists_url": "https://api.github.com/users/jcgregorio/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/jcgregorio/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/jcgregorio/subscriptions",
+      "organizations_url": "https://api.github.com/users/jcgregorio/orgs",
+      "repos_url": "https://api.github.com/users/jcgregorio/repos",
+      "events_url": "https://api.github.com/users/jcgregorio/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/jcgregorio/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "jcgregorio",
+      "id": 1726460,
+      "node_id": "MDQ6VXNlcjE3MjY0NjA=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1726460?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/jcgregorio",
+      "html_url": "https://github.com/jcgregorio",
+      "followers_url": "https://api.github.com/users/jcgregorio/followers",
+      "following_url": "https://api.github.com/users/jcgregorio/following{/other_user}",
+      "gists_url": "https://api.github.com/users/jcgregorio/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/jcgregorio/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/jcgregorio/subscriptions",
+      "organizations_url": "https://api.github.com/users/jcgregorio/orgs",
+      "repos_url": "https://api.github.com/users/jcgregorio/repos",
+      "events_url": "https://api.github.com/users/jcgregorio/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/jcgregorio/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "b401674f88f0171a410076219f78ceca18a705ff",
+        "url": "https://api.github.com/repos/goldmine-build/goldmine/commits/b401674f88f0171a410076219f78ceca18a705ff",
+        "html_url": "https://github.com/goldmine-build/goldmine/commit/b401674f88f0171a410076219f78ceca18a705ff"
+      }
+    ]
+  },
+  {
+    "sha": "fd6a4e7cacdb2868bddb282ef67b27c692c7dcae",
+    "node_id": "C_kwDOPxTrJtoAKGZkNmE0ZTdjYWNkYjI4NjhiZGRiMjgyZWY2N2IyN2M2OTJjN2RjYWU",
+    "commit": {
+      "author": {
+        "name": "Joe Gregorio",
+        "email": "joe@bitworking.org",
+        "date": "2025-11-28T20:10:09Z"
+      },
+      "committer": {
+        "name": "Joe Gregorio",
+        "email": "joe@bitworking.org",
+        "date": "2025-11-28T20:10:09Z"
+      },
+      "message": "Adding notes",
+      "tree": {
+        "sha": "dd6a23ee7b328106f5d20a00e6ff4f3f45b457f8",
+        "url": "https://api.github.com/repos/goldmine-build/goldmine/git/trees/dd6a23ee7b328106f5d20a00e6ff4f3f45b457f8"
+      },
+      "url": "https://api.github.com/repos/goldmine-build/goldmine/git/commits/fd6a4e7cacdb2868bddb282ef67b27c692c7dcae",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/goldmine-build/goldmine/commits/fd6a4e7cacdb2868bddb282ef67b27c692c7dcae",
+    "html_url": "https://github.com/goldmine-build/goldmine/commit/fd6a4e7cacdb2868bddb282ef67b27c692c7dcae",
+    "comments_url": "https://api.github.com/repos/goldmine-build/goldmine/commits/fd6a4e7cacdb2868bddb282ef67b27c692c7dcae/comments",
+    "author": {
+      "login": "jcgregorio",
+      "id": 1726460,
+      "node_id": "MDQ6VXNlcjE3MjY0NjA=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1726460?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/jcgregorio",
+      "html_url": "https://github.com/jcgregorio",
+      "followers_url": "https://api.github.com/users/jcgregorio/followers",
+      "following_url": "https://api.github.com/users/jcgregorio/following{/other_user}",
+      "gists_url": "https://api.github.com/users/jcgregorio/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/jcgregorio/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/jcgregorio/subscriptions",
+      "organizations_url": "https://api.github.com/users/jcgregorio/orgs",
+      "repos_url": "https://api.github.com/users/jcgregorio/repos",
+      "events_url": "https://api.github.com/users/jcgregorio/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/jcgregorio/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "jcgregorio",
+      "id": 1726460,
+      "node_id": "MDQ6VXNlcjE3MjY0NjA=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1726460?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/jcgregorio",
+      "html_url": "https://github.com/jcgregorio",
+      "followers_url": "https://api.github.com/users/jcgregorio/followers",
+      "following_url": "https://api.github.com/users/jcgregorio/following{/other_user}",
+      "gists_url": "https://api.github.com/users/jcgregorio/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/jcgregorio/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/jcgregorio/subscriptions",
+      "organizations_url": "https://api.github.com/users/jcgregorio/orgs",
+      "repos_url": "https://api.github.com/users/jcgregorio/repos",
+      "events_url": "https://api.github.com/users/jcgregorio/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/jcgregorio/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "55ab257a68a8f523fb25bcfc30d9ed53a2d5edda",
+        "url": "https://api.github.com/repos/goldmine-build/goldmine/commits/55ab257a68a8f523fb25bcfc30d9ed53a2d5edda",
+        "html_url": "https://github.com/goldmine-build/goldmine/commit/55ab257a68a8f523fb25bcfc30d9ed53a2d5edda"
+      }
+    ]
+  },
+  {
+    "sha": "ac5a5ea872d125cfb0b4c7eb718bdf9257b6de27",
+    "node_id": "C_kwDOPxTrJtoAKGFjNWE1ZWE4NzJkMTI1Y2ZiMGI0YzdlYjcxOGJkZjkyNTdiNmRlMjc",
+    "commit": {
+      "author": {
+        "name": "Joe Gregorio",
+        "email": "joe@bitworking.org",
+        "date": "2025-11-28T20:12:47Z"
+      },
+      "committer": {
+        "name": "Joe Gregorio",
+        "email": "joe@bitworking.org",
+        "date": "2025-11-28T20:12:47Z"
+      },
+      "message": "Fifth",
+      "tree": {
+        "sha": "ee5b36420027c236608f8ca733bb14c87a2bd07c",
+        "url": "https://api.github.com/repos/goldmine-build/goldmine/git/trees/ee5b36420027c236608f8ca733bb14c87a2bd07c"
+      },
+      "url": "https://api.github.com/repos/goldmine-build/goldmine/git/commits/ac5a5ea872d125cfb0b4c7eb718bdf9257b6de27",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/goldmine-build/goldmine/commits/ac5a5ea872d125cfb0b4c7eb718bdf9257b6de27",
+    "html_url": "https://github.com/goldmine-build/goldmine/commit/ac5a5ea872d125cfb0b4c7eb718bdf9257b6de27",
+    "comments_url": "https://api.github.com/repos/goldmine-build/goldmine/commits/ac5a5ea872d125cfb0b4c7eb718bdf9257b6de27/comments",
+    "author": {
+      "login": "jcgregorio",
+      "id": 1726460,
+      "node_id": "MDQ6VXNlcjE3MjY0NjA=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1726460?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/jcgregorio",
+      "html_url": "https://github.com/jcgregorio",
+      "followers_url": "https://api.github.com/users/jcgregorio/followers",
+      "following_url": "https://api.github.com/users/jcgregorio/following{/other_user}",
+      "gists_url": "https://api.github.com/users/jcgregorio/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/jcgregorio/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/jcgregorio/subscriptions",
+      "organizations_url": "https://api.github.com/users/jcgregorio/orgs",
+      "repos_url": "https://api.github.com/users/jcgregorio/repos",
+      "events_url": "https://api.github.com/users/jcgregorio/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/jcgregorio/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "jcgregorio",
+      "id": 1726460,
+      "node_id": "MDQ6VXNlcjE3MjY0NjA=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1726460?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/jcgregorio",
+      "html_url": "https://github.com/jcgregorio",
+      "followers_url": "https://api.github.com/users/jcgregorio/followers",
+      "following_url": "https://api.github.com/users/jcgregorio/following{/other_user}",
+      "gists_url": "https://api.github.com/users/jcgregorio/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/jcgregorio/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/jcgregorio/subscriptions",
+      "organizations_url": "https://api.github.com/users/jcgregorio/orgs",
+      "repos_url": "https://api.github.com/users/jcgregorio/repos",
+      "events_url": "https://api.github.com/users/jcgregorio/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/jcgregorio/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "fd6a4e7cacdb2868bddb282ef67b27c692c7dcae",
+        "url": "https://api.github.com/repos/goldmine-build/goldmine/commits/fd6a4e7cacdb2868bddb282ef67b27c692c7dcae",
+        "html_url": "https://github.com/goldmine-build/goldmine/commit/fd6a4e7cacdb2868bddb282ef67b27c692c7dcae"
+      }
+    ]
+  },
+  {
+    "sha": "fba259ee4e6f97cbd56ce8ecb15c7060b05624b9",
+    "node_id": "C_kwDOPxTrJtoAKGZiYTI1OWVlNGU2Zjk3Y2JkNTZjZThlY2IxNWM3MDYwYjA1NjI0Yjk",
+    "commit": {
+      "author": {
+        "name": "Joe Gregorio",
+        "email": "joe@bitworking.org",
+        "date": "2025-11-28T20:36:29Z"
+      },
+      "committer": {
+        "name": "Joe Gregorio",
+        "email": "joe@bitworking.org",
+        "date": "2025-11-28T20:36:29Z"
+      },
+      "message": "Sixth?",
+      "tree": {
+        "sha": "6829954ed65ea27fe271318a35bd069d286f5ae8",
+        "url": "https://api.github.com/repos/goldmine-build/goldmine/git/trees/6829954ed65ea27fe271318a35bd069d286f5ae8"
+      },
+      "url": "https://api.github.com/repos/goldmine-build/goldmine/git/commits/fba259ee4e6f97cbd56ce8ecb15c7060b05624b9",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/goldmine-build/goldmine/commits/fba259ee4e6f97cbd56ce8ecb15c7060b05624b9",
+    "html_url": "https://github.com/goldmine-build/goldmine/commit/fba259ee4e6f97cbd56ce8ecb15c7060b05624b9",
+    "comments_url": "https://api.github.com/repos/goldmine-build/goldmine/commits/fba259ee4e6f97cbd56ce8ecb15c7060b05624b9/comments",
+    "author": {
+      "login": "jcgregorio",
+      "id": 1726460,
+      "node_id": "MDQ6VXNlcjE3MjY0NjA=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1726460?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/jcgregorio",
+      "html_url": "https://github.com/jcgregorio",
+      "followers_url": "https://api.github.com/users/jcgregorio/followers",
+      "following_url": "https://api.github.com/users/jcgregorio/following{/other_user}",
+      "gists_url": "https://api.github.com/users/jcgregorio/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/jcgregorio/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/jcgregorio/subscriptions",
+      "organizations_url": "https://api.github.com/users/jcgregorio/orgs",
+      "repos_url": "https://api.github.com/users/jcgregorio/repos",
+      "events_url": "https://api.github.com/users/jcgregorio/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/jcgregorio/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "jcgregorio",
+      "id": 1726460,
+      "node_id": "MDQ6VXNlcjE3MjY0NjA=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1726460?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/jcgregorio",
+      "html_url": "https://github.com/jcgregorio",
+      "followers_url": "https://api.github.com/users/jcgregorio/followers",
+      "following_url": "https://api.github.com/users/jcgregorio/following{/other_user}",
+      "gists_url": "https://api.github.com/users/jcgregorio/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/jcgregorio/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/jcgregorio/subscriptions",
+      "organizations_url": "https://api.github.com/users/jcgregorio/orgs",
+      "repos_url": "https://api.github.com/users/jcgregorio/repos",
+      "events_url": "https://api.github.com/users/jcgregorio/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/jcgregorio/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "ac5a5ea872d125cfb0b4c7eb718bdf9257b6de27",
+        "url": "https://api.github.com/repos/goldmine-build/goldmine/commits/ac5a5ea872d125cfb0b4c7eb718bdf9257b6de27",
+        "html_url": "https://github.com/goldmine-build/goldmine/commit/ac5a5ea872d125cfb0b4c7eb718bdf9257b6de27"
+      }
+    ]
+  },
+  {
+    "sha": "93013110b3ada7f465472c7c5432bb924f091b78",
+    "node_id": "C_kwDOPxTrJtoAKDkzMDEzMTEwYjNhZGE3ZjQ2NTQ3MmM3YzU0MzJiYjkyNGYwOTFiNzg",
+    "commit": {
+      "author": {
+        "name": "Joe Gregorio",
+        "email": "joe@bitworking.org",
+        "date": "2025-11-28T20:42:34Z"
+      },
+      "committer": {
+        "name": "Joe Gregorio",
+        "email": "joe@bitworking.org",
+        "date": "2025-11-28T20:42:34Z"
+      },
+      "message": "Seventh",
+      "tree": {
+        "sha": "4046f5d3812fadaa65be160bc4a61a7e9c5935dd",
+        "url": "https://api.github.com/repos/goldmine-build/goldmine/git/trees/4046f5d3812fadaa65be160bc4a61a7e9c5935dd"
+      },
+      "url": "https://api.github.com/repos/goldmine-build/goldmine/git/commits/93013110b3ada7f465472c7c5432bb924f091b78",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/goldmine-build/goldmine/commits/93013110b3ada7f465472c7c5432bb924f091b78",
+    "html_url": "https://github.com/goldmine-build/goldmine/commit/93013110b3ada7f465472c7c5432bb924f091b78",
+    "comments_url": "https://api.github.com/repos/goldmine-build/goldmine/commits/93013110b3ada7f465472c7c5432bb924f091b78/comments",
+    "author": {
+      "login": "jcgregorio",
+      "id": 1726460,
+      "node_id": "MDQ6VXNlcjE3MjY0NjA=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1726460?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/jcgregorio",
+      "html_url": "https://github.com/jcgregorio",
+      "followers_url": "https://api.github.com/users/jcgregorio/followers",
+      "following_url": "https://api.github.com/users/jcgregorio/following{/other_user}",
+      "gists_url": "https://api.github.com/users/jcgregorio/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/jcgregorio/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/jcgregorio/subscriptions",
+      "organizations_url": "https://api.github.com/users/jcgregorio/orgs",
+      "repos_url": "https://api.github.com/users/jcgregorio/repos",
+      "events_url": "https://api.github.com/users/jcgregorio/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/jcgregorio/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "jcgregorio",
+      "id": 1726460,
+      "node_id": "MDQ6VXNlcjE3MjY0NjA=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1726460?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/jcgregorio",
+      "html_url": "https://github.com/jcgregorio",
+      "followers_url": "https://api.github.com/users/jcgregorio/followers",
+      "following_url": "https://api.github.com/users/jcgregorio/following{/other_user}",
+      "gists_url": "https://api.github.com/users/jcgregorio/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/jcgregorio/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/jcgregorio/subscriptions",
+      "organizations_url": "https://api.github.com/users/jcgregorio/orgs",
+      "repos_url": "https://api.github.com/users/jcgregorio/repos",
+      "events_url": "https://api.github.com/users/jcgregorio/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/jcgregorio/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "fba259ee4e6f97cbd56ce8ecb15c7060b05624b9",
+        "url": "https://api.github.com/repos/goldmine-build/goldmine/commits/fba259ee4e6f97cbd56ce8ecb15c7060b05624b9",
+        "html_url": "https://github.com/goldmine-build/goldmine/commit/fba259ee4e6f97cbd56ce8ecb15c7060b05624b9"
+      }
+    ]
+  },
+  {
+    "sha": "403e9b69508e292a06bc02be27cb5e4330a71c89",
+    "node_id": "C_kwDOPxTrJtoAKDQwM2U5YjY5NTA4ZTI5MmEwNmJjMDJiZTI3Y2I1ZTQzMzBhNzFjODk",
+    "commit": {
+      "author": {
+        "name": "Joe Gregorio",
+        "email": "joe@bitworking.org",
+        "date": "2025-11-28T20:50:11Z"
+      },
+      "committer": {
+        "name": "Joe Gregorio",
+        "email": "joe@bitworking.org",
+        "date": "2025-11-28T20:50:11Z"
+      },
+      "message": "Eight",
+      "tree": {
+        "sha": "749516e54f2ffe39774feebe8a537cfe710f7a4b",
+        "url": "https://api.github.com/repos/goldmine-build/goldmine/git/trees/749516e54f2ffe39774feebe8a537cfe710f7a4b"
+      },
+      "url": "https://api.github.com/repos/goldmine-build/goldmine/git/commits/403e9b69508e292a06bc02be27cb5e4330a71c89",
+      "comment_count": 0,
+      "verification": {
+        "verified": false,
+        "reason": "unsigned",
+        "signature": null,
+        "payload": null,
+        "verified_at": null
+      }
+    },
+    "url": "https://api.github.com/repos/goldmine-build/goldmine/commits/403e9b69508e292a06bc02be27cb5e4330a71c89",
+    "html_url": "https://github.com/goldmine-build/goldmine/commit/403e9b69508e292a06bc02be27cb5e4330a71c89",
+    "comments_url": "https://api.github.com/repos/goldmine-build/goldmine/commits/403e9b69508e292a06bc02be27cb5e4330a71c89/comments",
+    "author": {
+      "login": "jcgregorio",
+      "id": 1726460,
+      "node_id": "MDQ6VXNlcjE3MjY0NjA=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1726460?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/jcgregorio",
+      "html_url": "https://github.com/jcgregorio",
+      "followers_url": "https://api.github.com/users/jcgregorio/followers",
+      "following_url": "https://api.github.com/users/jcgregorio/following{/other_user}",
+      "gists_url": "https://api.github.com/users/jcgregorio/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/jcgregorio/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/jcgregorio/subscriptions",
+      "organizations_url": "https://api.github.com/users/jcgregorio/orgs",
+      "repos_url": "https://api.github.com/users/jcgregorio/repos",
+      "events_url": "https://api.github.com/users/jcgregorio/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/jcgregorio/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "committer": {
+      "login": "jcgregorio",
+      "id": 1726460,
+      "node_id": "MDQ6VXNlcjE3MjY0NjA=",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1726460?v=4",
+      "gravatar_id": "",
+      "url": "https://api.github.com/users/jcgregorio",
+      "html_url": "https://github.com/jcgregorio",
+      "followers_url": "https://api.github.com/users/jcgregorio/followers",
+      "following_url": "https://api.github.com/users/jcgregorio/following{/other_user}",
+      "gists_url": "https://api.github.com/users/jcgregorio/gists{/gist_id}",
+      "starred_url": "https://api.github.com/users/jcgregorio/starred{/owner}{/repo}",
+      "subscriptions_url": "https://api.github.com/users/jcgregorio/subscriptions",
+      "organizations_url": "https://api.github.com/users/jcgregorio/orgs",
+      "repos_url": "https://api.github.com/users/jcgregorio/repos",
+      "events_url": "https://api.github.com/users/jcgregorio/events{/privacy}",
+      "received_events_url": "https://api.github.com/users/jcgregorio/received_events",
+      "type": "User",
+      "user_view_type": "public",
+      "site_admin": false
+    },
+    "parents": [
+      {
+        "sha": "93013110b3ada7f465472c7c5432bb924f091b78",
+        "url": "https://api.github.com/repos/goldmine-build/goldmine/commits/93013110b3ada7f465472c7c5432bb924f091b78",
+        "html_url": "https://github.com/goldmine-build/goldmine/commit/93013110b3ada7f465472c7c5432bb924f091b78"
+      }
+    ]
+  }
+]

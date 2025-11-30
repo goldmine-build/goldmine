@@ -24,9 +24,6 @@ func parseGoldResultsFromReader(r io.ReadCloser) (*jsonio.GoldResults, error) {
 	if err := json.NewDecoder(r).Decode(gr); err != nil {
 		return nil, skerr.Wrapf(err, "could not parse JSON")
 	}
-	if err := gr.UpdateLegacyFields(); err != nil {
-		return nil, skerr.Wrap(err)
-	}
 	if err := gr.Validate(); err != nil {
 		return nil, skerr.Wrap(err)
 	}
