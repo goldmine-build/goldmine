@@ -68,8 +68,7 @@ bazel run //gold-client/cmd/goldctl -- imgtest init \
   --crs=github \
 	--cis=github \
   --changelist $PULL_NUMBER \
-  --patchset 0 \  # Using 0 here to indicate we are using patchset_id
-  --patchset_id $COMMIT_HASH
+  --patchset_id $COMMIT_HASH \
   --jobid $PULL_NUMBER-$COMMIT_HASH # The GitHub lookupSystem can parse this and map the COMMIT_HASH to a patch number.
 
 fi
