@@ -45,14 +45,4 @@ export const DOT_FILL_COLORS = [
   '#FFFFFF',
   '#FFFFFF', // Used when the number of unique digests >= MAX_UNIQUE_DIGESTS.
 ];
-export const DOT_FILL_COLORS_HIGHLIGHTED = [
-  '#AAAAAA', // light grey
-  '#009F81', // jungle green
-  '#FF6E3A', // outrageous orange
-  '#8400CD', // dark violet
-  '#FF5AAF', // brilliant rose
-  '#A40122', // strong crimson
-  '#FFC33B', // bright spark
-  '#008DF9', // brilliant azure
-  '#999999', // grey; Used when the number of unique digests >= MAX_UNIQUE_DIGESTS.
-];
+

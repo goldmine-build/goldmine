@@ -18,7 +18,7 @@ describe('dots-sk', () => {
 
   it('should render the demo page', async () => {
     // Smoke test.
-    expect(await testBed.page.$$('dots-sk')).to.have.length(1);
+    expect(await testBed.page.$$('dots-sk')).to.have.length(2);
   });
 
   describe('screenshots', () => {
