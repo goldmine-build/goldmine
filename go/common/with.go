@@ -11,7 +11,6 @@ import (
 
 	"cloud.google.com/go/logging"
 	"go.goldmine.build/go/cleanup"
-	"go.goldmine.build/go/ephemeral_storage"
 	"go.goldmine.build/go/metrics2"
 	"go.goldmine.build/go/sklog"
 	"go.goldmine.build/go/sklog/cloudlogging"
@@ -77,7 +76,7 @@ func (b *baseInitOpt) preinit(appName string) error {
 
 func (b *baseInitOpt) init(appName string) error {
 	// Start logging ephemeral disk usage periodically.
-	go ephemeral_storage.Start(context.Background())
+	// go ephemeral_storage.Start(context.Background())
 
 	// Log all flags and their values.
 	FlagSet.VisitAll(func(f *flag.Flag) {

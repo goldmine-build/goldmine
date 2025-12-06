@@ -6,10 +6,8 @@ import {
   dotToCanvasX,
   dotToCanvasY,
   DOT_FILL_COLORS,
-  DOT_RADIUS,
   DOT_STROKE_COLORS,
   MAX_UNIQUE_DIGESTS,
-  TRACE_LINE_COLOR,
 } from './constants';
 import {
   eventPromise,
