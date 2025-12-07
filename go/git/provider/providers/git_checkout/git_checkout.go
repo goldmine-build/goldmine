@@ -120,12 +120,16 @@ func (i Impl) CommitsFromMostRecentGitHashToHead(ctx context.Context, mostRecent
 	if mostRecentGitHash == "" {
 		mostRecentGitHash = i.startCommit
 	}
+	if err := i.Update(ctx); err != nil {
+		return skerr.Wrap(err)
+	}
 	if mostRecentGitHash == "" {
 		cmd = exec.CommandContext(ctx, i.gitFullPath, "rev-list", "HEAD", `--pretty=%aN <%aE>%n%s%n%ct`, "--reverse")
 	} else {
 		// Add all the commits from the repo since the last time we looked.
 		cmd = exec.CommandContext(ctx, i.gitFullPath, "rev-list", "HEAD", "^"+mostRecentGitHash, `--pretty=%aN <%aE>%n%s%n%ct`, "--reverse")
 	}
+	sklog.Infof("About to run: %q", cmd.String())
 
 	cmd.Dir = i.repoFullPath
 	stdout, err := cmd.StdoutPipe()
