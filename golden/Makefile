@@ -17,32 +17,33 @@ goldpushk: kube-conf-gen
 # Build the gold-frontend container with Bazel and push it to GCR.
 .PHONY: release_frontend_container
 release_frontend_container:
-	$(BAZEL) run --config=mayberemote //golden:push_gold_frontend_container
-
-# Build the gold-baseline-server container with Bazel and push it to GCR.
-.PHONY: release_baseline_server_container
-release_baseline_server_container:
-	$(BAZEL) run --config=mayberemote //golden:push_baseline_server_container
-
-# Build the gold-diffcalculator container with Bazel and push it to GCR.
-.PHONY: release_diffcalculator_container
-release_diffcalculator_container:
-	$(BAZEL) run --config=mayberemote //golden:push_diffcalculator_container
-
-# Build the gold-gitilesfollower container with Bazel and push it to GCR.
-.PHONY: release_gitilesfollower_container
-release_gitilesfollower_container:
-	$(BAZEL) run --config=mayberemote //golden:push_gitilesfollower_container
+	$(BAZEL) run --stamp //golden:gold_frontend_container_push
 
 # Build the gold-ingestion container with Bazel and push it to GCR.
 .PHONY: release_ingestion_container
 release_ingestion_container:
-	$(BAZEL) run --config=mayberemote --stamp //golden:gold_ingestion_container_push
+	$(BAZEL) run --stamp //golden:gold_ingestion_container_push
+
+# Build the gold-baseline-server container with Bazel and push it to GCR.
+.PHONY: release_baseline_server_container
+release_baseline_server_container:
+	$(BAZEL) run --stamp //golden:baseline_server_container_push
 
 # Build the gold-periodictasks container with Bazel and push it to GCR.
 .PHONY: release_periodictasks_container
 release_periodictasks_container:
-	$(BAZEL) run --config=mayberemote //golden:push_periodictasks_container
+	$(BAZEL) run --stamp //golden:periodictasks_container_push
+
+# Build the gold-diffcalculator container with Bazel and push it to GCR.
+.PHONY: release_diffcalculator_container
+release_diffcalculator_container:
+	$(BAZEL) run --stamp //golden:diffcalculator_container_push
+
+# Must run before in a separate shell:  kubectl port-forward service/cockroachdb-public 26257:26257
+#
+# Also need to update common.json5 to update the address of the database to localhost.
+run_local_ingestion:
+	go run ./cmd/gold_ingestion --config=${HOME}/k8s-config/gold/gold-config/common.json5  
 
 .PHONY: mocks
 mocks:
