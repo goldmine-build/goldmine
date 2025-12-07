@@ -325,6 +325,7 @@ var cisTemplates = map[string]string{
 	"cirrus":               "https://cirrus-ci.com/task/%s",
 	"buildbucket":          "https://cr-buildbucket.appspot.com/build/%s",
 	"buildbucket-internal": "https://cr-buildbucket.appspot.com/build/%s",
+	"github":               "https://github.com/goldmine-build/goldmine/pulls", // Placeholder. TODO(jcgregoro) Supply this on a per-instance basis.
 }
 
 // PatchsetsAndTryjobsForCL2 returns a summary of the data we have collected

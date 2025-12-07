@@ -215,7 +215,7 @@ func listen(ctx context.Context, cfg config.Common, p *pubSubSource) error {
 	if exists, err := t.Exists(ctx); err != nil {
 		return skerr.Wrapf(err, "checking for existing topic %s", cfg.IngestionServerConfig.IngestionFilesTopic)
 	} else if !exists {
-		return skerr.Fmt("Diff work topic %s does not exist in project %s", cfg.IngestionServerConfig.IngestionFilesTopic, cfg.PubsubProjectID)
+		return skerr.Fmt("Diff work topic %q does not exist in project %q", cfg.IngestionServerConfig.IngestionFilesTopic, cfg.PubsubProjectID)
 	}
 
 	// Check that the subscription exists. Fail if it does not.
@@ -288,6 +288,7 @@ func (p *pubSubSource) ingestFromPubSubMessage(ctx context.Context, msg *pubsub.
 // ingestFile ingests the file and returns true if the ingestion was successful or it got
 // a non-retryable error. It returns false if it got a retryable error.
 func (p *pubSubSource) ingestFile(ctx context.Context, name string) bool {
+	sklog.Infof("Ingesting file: %s", name)
 	if !strings.HasSuffix(name, ".json") {
 		return true
 	}
@@ -311,6 +312,17 @@ func (p *pubSubSource) ingestFile(ctx context.Context, name string) bool {
 		p.PrimaryBranchStreamingLiveness.Reset()
 		p.SuccessCounter.Inc(1)
 		return true
+	}
+	if p.TryjobProcessor == nil || !p.TryjobProcessor.HandlesFile(name) {
+		sklog.Warningf("Got a file that no processor is configured for: %s", name)
+		p.FailedCounter.Inc(1)
+		return true
+	}
+	err := p.TryjobProcessor.Process(ctx, name)
+	if skerr.Unwrap(err) == ingestion.ErrRetryable {
+		sklog.Warningf("Got retryable error for tryjob data for file %s", name)
+		p.FailedCounter.Inc(1)
+		return false
 	}
 	// TODO(kjlubick) Processors should mark the SourceFiles table as ingested, not here.
 	if err := p.IngestionStore.SetIngested(ctx, name, time.Now()); err != nil {
