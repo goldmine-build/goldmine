@@ -323,7 +323,7 @@ func main() {
 	if len(changed) != 0 {
 
 		if *verbose {
-			fmt.Printf("Starting to apply changes to cluster context: %s\n", kcontext)
+			fmt.Printf("Starting to apply changes to cluster context: %s\n", *kcontext)
 		}
 
 		// Switch to the provided kubernetes context.

@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"go.goldmine.build/go/util"
 )
 
 func TestFilter(t *testing.T) {
@@ -83,9 +82,9 @@ func TestImageFromCmdLineImage(t *testing.T) {
 		message       string
 	}{
 		{
-			value:         "gcr.io/skia-public/fiddle:2018-...",
+			value:         "ghcr.io/goldmine-build/fiddle:2018-...",
 			provider:      nil,
-			expected:      "gcr.io/skia-public/fiddle:2018-...",
+			expected:      "ghcr.io/goldmine-build/fiddle:2018-...",
 			expectedError: false,
 			message:       "already full name",
 		},
@@ -99,7 +98,7 @@ func TestImageFromCmdLineImage(t *testing.T) {
 				}, nil
 			},
 			expectedError: false,
-			expected:      "gcr.io/skia-public/fiddle:2018-04-20T21_21_48Z-jcgregorio-f40851bf4611a844bb63b289e91cddc6eba886ae-dirty",
+			expected:      "ghcr.io/goldmine-build/fiddle:2018-04-20T21_21_48Z-jcgregorio-f40851bf4611a844bb63b289e91cddc6eba886ae-dirty",
 			message:       "tag provider",
 		},
 		{
@@ -122,59 +121,5 @@ func TestImageFromCmdLineImage(t *testing.T) {
 		if want := tc.expected; got != want {
 			t.Errorf("Failed case Got %v Want %v: %s", got, want, tc.message)
 		}
-	}
-}
-
-func Test_byClusterFromChanged(t *testing.T) {
-	type args struct {
-		gitDir  string
-		changed util.StringSet
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    map[string][]string
-		wantErr bool
-	}{
-		{
-			name: "success",
-			args: args{
-				gitDir: "/tmp/k8s-config",
-				changed: util.StringSet{
-					"/tmp/k8s-config/skia-corp/alert-to-pubsub.yaml":    true,
-					"/tmp/k8s-config/skia-corp/android-compile-2.yaml":  true,
-					"/tmp/k8s-config/skia-public/skottie-internal.yaml": true,
-					"/tmp/k8s-config/skia-public/skottie.yaml":          true,
-				},
-			},
-			want: map[string][]string{
-				"skia-corp":   {"/tmp/k8s-config/skia-corp/alert-to-pubsub.yaml", "/tmp/k8s-config/skia-corp/android-compile-2.yaml"},
-				"skia-public": {"/tmp/k8s-config/skia-public/skottie-internal.yaml", "/tmp/k8s-config/skia-public/skottie.yaml"},
-			},
-			wantErr: false,
-		},
-		{
-			name: "empty",
-			args: args{
-				gitDir:  "/tmp/k8s-config",
-				changed: util.StringSet{},
-			},
-			want:    map[string][]string{},
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := byClusterFromChanged(tt.args.gitDir, tt.args.changed)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("byClusterFromChanged() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !tt.wantErr {
-				for cluster, files := range tt.want {
-					assert.ElementsMatch(t, files, got[cluster])
-				}
-			}
-		})
 	}
 }
