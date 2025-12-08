@@ -20,7 +20,6 @@ import (
 
 	"go.goldmine.build/go/common"
 	"go.goldmine.build/go/exec"
-	"go.goldmine.build/go/gcr"
 	"go.goldmine.build/go/gerrit/rubberstamper"
 	"go.goldmine.build/go/git"
 	"go.goldmine.build/go/sklog"
@@ -28,9 +27,6 @@ import (
 )
 
 const (
-	// containerRegistryProject is the GCP project in which we store our Docker
-	// images via Google Cloud Container Registry.
-	containerRegistryProject = "skia-public"
 
 	// Max number of revisions of an image to print when using --list.
 	maxListSize = 10
@@ -90,16 +86,17 @@ ENV:
 
 // flags
 var (
-	kcontext                = flag.String("context", "", "The kubernetes context to use when applying the changes.")
-	k8sConfigRepoDir        = flag.String("repo_dir", "", "The directory the k8s config repo is checked out to locally. Should be checked out with push permissions.")
-	githubOrg               = flag.String("github_org", "goldmine-build", "The GitHub organization that has the container registry.")
-	dryRun                  = flag.Bool("dry-run", false, "If true then do not run the kubectl command to apply the changes, and do not commit the changes to the config repo.")
-	ignoreDirty             = flag.Bool("ignore-dirty", false, "If true, then do not fail out if the git repo is dirty.")
-	list                    = flag.Bool("list", false, "List the last few versions of the given image.")
-	message                 = flag.String("message", "Push", "Message to go along with the change.")
-	rollback                = flag.Bool("rollback", false, "If true go back to the second most recent image, otherwise use most recent image.")
-	doNotOverrideDirtyImage = flag.Bool("do-not-override-dirty-image", false, "If true, then do not push if the latest checkedin image is dirty. Caveat: This only checks the k8s-config repository to determine if image is dirty, it does not check the live running k8s containers.")
-	verbose                 = flag.Bool("verbose", false, "Verbose runtime diagnostics.")
+	containerRegistryProject = flag.String("github_project", "goldmine-build", "The github project that contains the container regsitry.")
+	kcontext                 = flag.String("context", "", "The kubernetes context to use when applying the changes.")
+	k8sConfigRepoDir         = flag.String("repo_dir", "", "The directory the k8s config repo is checked out to locally. Should be checked out with push permissions.")
+	githubOrg                = flag.String("github_org", "goldmine-build", "The GitHub organization that has the container registry.")
+	dryRun                   = flag.Bool("dry-run", false, "If true then do not run the kubectl command to apply the changes, and do not commit the changes to the config repo.")
+	ignoreDirty              = flag.Bool("ignore-dirty", false, "If true, then do not fail out if the git repo is dirty.")
+	list                     = flag.Bool("list", false, "List the last few versions of the given image.")
+	message                  = flag.String("message", "Push", "Message to go along with the change.")
+	rollback                 = flag.Bool("rollback", false, "If true go back to the second most recent image, otherwise use most recent image.")
+	doNotOverrideDirtyImage  = flag.Bool("do-not-override-dirty-image", false, "If true, then do not push if the latest checkedin image is dirty. Caveat: This only checks the k8s-config repository to determine if image is dirty, it does not check the live running k8s containers.")
+	verbose                  = flag.Bool("verbose", false, "Verbose runtime diagnostics.")
 )
 
 var (
@@ -171,35 +168,7 @@ func imageFromCmdLineImage(imageName string, tp tagProvider) (string, error) {
 	}
 
 	// The full docker image name and tag of the image we want to deploy.
-	return fmt.Sprintf("%s/%s/%s:%s", gcr.Server, containerRegistryProject, imageName, tag), nil
-}
-
-// byClusterFromChanged returns a map from cluster name to the list of modified
-// files in that cluster.
-func byClusterFromChanged(gitDir string, changed util.StringSet) (map[string][]string, error) {
-	// Find all the directory names, which are really cluster names.
-	// filenames will be absolute directory names, e.g.
-	// /tmp/k8s-config/skia-public/task-scheduler-be-staging.yaml
-	byCluster := map[string][]string{}
-
-	// The first part of that is
-	for _, filename := range changed.Keys() {
-		// /tmp/k8s-config/skia-public/task-scheduler-be-staging.yaml => skia-public/task-scheduler-be-staging.yaml
-		rel, err := filepath.Rel(gitDir, filename)
-		if err != nil {
-			return nil, err
-		}
-		// skia-public/task-scheduler-be-staging.yaml => skia-public
-		cluster := filepath.Dir(rel)
-		arr, ok := byCluster[cluster]
-		if !ok {
-			arr = []string{filename}
-		} else {
-			arr = append(arr, filename)
-		}
-		byCluster[cluster] = arr
-	}
-	return byCluster, nil
+	return fmt.Sprintf("%s/%s/%s:%s", "ghcr.io", *containerRegistryProject, imageName, tag), nil
 }
 
 type Container struct {
@@ -309,10 +278,12 @@ func main() {
 			sklog.Fatalf("Failed to split imageName: %v", parts)
 		}
 		imageNoTag := parts[0]
+		sklog.Infof("imageNoTag: %q", imageNoTag)
 		imageRegex := regexp.MustCompile(fmt.Sprintf(`^(\s+image:\s+)(%s)[:@](.*)$`, imageNoTag))
 
 		// Loop over all the yaml files and update tags for the given imageName.
 		for _, filename := range filenames {
+			sklog.Infof("file: %s", filename)
 			b, err := os.ReadFile(filename)
 			if err != nil {
 				sklog.Errorf("Failed to read %q (skipping): %s", filename, err)

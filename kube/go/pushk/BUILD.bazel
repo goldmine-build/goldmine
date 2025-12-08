@@ -7,13 +7,10 @@ go_library(
     importpath = "go.goldmine.build/kube/go/pushk",
     visibility = ["//visibility:private"],
     deps = [
-        "//go/auth",
         "//go/common",
         "//go/exec",
-        "//go/gcr",
         "//go/gerrit/rubberstamper",
         "//go/git",
-        "//go/kube/clusterconfig",
         "//go/skerr",
         "//go/sklog",
         "//go/util",

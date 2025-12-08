@@ -45,6 +45,13 @@ release_diffcalculator_container:
 run_local_ingestion:
 	go run ./cmd/gold_ingestion --config=${HOME}/k8s-config/gold/gold-config/common.json5  
 
+
+
+# These all assume the k8s-config file is checked out in $HOME and checked out
+# using `gh` so that perms are setup to push.
+build_and_push_ingestion: release_ingestion_container
+	$(BAZEL) run //kube/go/pushk:pushk -- --repo_dir=${HOME}/k8s-config  --verbose  gold_ingestion 
+
 .PHONY: mocks
 mocks:
 	go generate ./...
