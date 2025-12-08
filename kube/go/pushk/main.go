@@ -4,26 +4,25 @@
 package main
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 	"regexp"
-	"runtime"
 	"sort"
 	"strings"
 
 	"go.goldmine.build/go/skerr"
 
-	"go.goldmine.build/go/auth"
 	"go.goldmine.build/go/common"
 	"go.goldmine.build/go/exec"
 	"go.goldmine.build/go/gcr"
 	"go.goldmine.build/go/gerrit/rubberstamper"
 	"go.goldmine.build/go/git"
-	"go.goldmine.build/go/kube/clusterconfig"
 	"go.goldmine.build/go/sklog"
 	"go.goldmine.build/go/util"
 )
@@ -49,7 +48,7 @@ The command:
   1. Searches through the checked in kubernetes yaml files to determine which use the image(s).
   2. Modifies the kubernetes yaml files with the new version of the image(s).
   3. Applies the changes with kubectl.
-  4. Commits the changes to the config repo via AutoSubmit, with approval by Rubber Stamper.
+  4. Commits the changes to the config repo.
 
 The config is stored in a separate repo that will automaticaly be checked out
 under /tmp by default, or the value of the PUSHK_GITDIR environment variable if set.
@@ -91,17 +90,15 @@ ENV:
 
 // flags
 var (
-	onlyCluster             = flag.String("only-cluster", "", "If set then only push to the specified cluster.")
-	configFile              = flag.String("config-file", "", "Absolute filename of the config.json file.")
+	kcontext                = flag.String("context", "", "The kubernetes context to use when applying the changes.")
+	k8sConfigRepoDir        = flag.String("repo_dir", "", "The directory the k8s config repo is checked out to locally. Should be checked out with push permissions.")
+	githubOrg               = flag.String("github_org", "goldmine-build", "The GitHub organization that has the container registry.")
 	dryRun                  = flag.Bool("dry-run", false, "If true then do not run the kubectl command to apply the changes, and do not commit the changes to the config repo.")
 	ignoreDirty             = flag.Bool("ignore-dirty", false, "If true, then do not fail out if the git repo is dirty.")
 	list                    = flag.Bool("list", false, "List the last few versions of the given image.")
 	message                 = flag.String("message", "Push", "Message to go along with the change.")
 	rollback                = flag.Bool("rollback", false, "If true go back to the second most recent image, otherwise use most recent image.")
-	runningInK8s            = flag.Bool("running-in-k8s", false, "If true, then does not use flags that do not work in the k8s environment. Eg: '--cluster' when doing 'kubectl apply'.")
 	doNotOverrideDirtyImage = flag.Bool("do-not-override-dirty-image", false, "If true, then do not push if the latest checkedin image is dirty. Caveat: This only checks the k8s-config repository to determine if image is dirty, it does not check the live running k8s containers.")
-	overrideSHA256Digests   = flag.Bool("override-sha256-digests", false, "If true, then do not change images that reference sha256 digests. These are managed by continuous deployment and should usually be ignored.")
-	useTempCheckout         = flag.Bool("use-temp-checkout", false, "If true, checks out the config repo into a temporary directory and pushes from there.")
 	verbose                 = flag.Bool("verbose", false, "Verbose runtime diagnostics.")
 )
 
@@ -134,7 +131,7 @@ type tagProvider func(imageName string) ([]string, error)
 // such as gcr.io/skia-public/fiddler:694900e3ca9468784a5794dc53382d1c8411ab07, both of which can
 // appear on the command-line.
 func imageFromCmdLineImage(imageName string, tp tagProvider) (string, error) {
-	if strings.HasPrefix(imageName, "gcr.io/") {
+	if strings.HasPrefix(imageName, "ghcr.io/") {
 		if *rollback {
 			return "", skerr.Fmt("Supplying a fully qualified image name and the --rollback flag are mutually exclusive.")
 		}
@@ -205,21 +202,28 @@ func byClusterFromChanged(gitDir string, changed util.StringSet) (map[string][]s
 	return byCluster, nil
 }
 
+type Container struct {
+	Tags []string `json:"tags"`
+}
+
+type Metadata struct {
+	Container Container `json:"container"`
+}
+
+type ContainerVersion struct {
+	Metadata Metadata `json:"metadata"`
+}
+
+type GitHubContainerVersions []ContainerVersion
+
 func main() {
 	common.Init()
 
 	ctx := context.Background()
-	cfg, checkout, err := clusterconfig.NewWithCheckout(ctx, *configFile)
+
+	checkout, err := git.NewCheckout(ctx, "", *k8sConfigRepoDir)
 	if err != nil {
-		sklog.Fatal(err)
-	}
-	if *useTempCheckout {
-		tmp, err := git.NewTempCheckout(ctx, cfg.Repo)
-		if err != nil {
-			sklog.Fatal(err)
-		}
-		defer tmp.Delete()
-		checkout = tmp.Checkout
+		sklog.Fatalf("Failed finding k8s-config checkout: %s", err)
 	}
 
 	output, err := checkout.Git(ctx, "status", "-s")
@@ -237,9 +241,6 @@ func main() {
 	}
 
 	dirMatch := "*"
-	if *onlyCluster != "" {
-		dirMatch = *onlyCluster
-	}
 	glob := fmt.Sprintf("/%s/*.yaml", dirMatch)
 	// Get all the yaml files.
 	filenames, err := filepath.Glob(filepath.Join(checkout.Dir(), glob))
@@ -247,7 +248,6 @@ func main() {
 		sklog.Fatal(err)
 	}
 
-	tokenSource := auth.NewGCloudTokenSource(containerRegistryProject)
 	imageNames := flag.Args()
 	if len(imageNames) == 0 {
 		fmt.Println("At least one image name needs to be supplied.")
@@ -257,11 +257,30 @@ func main() {
 	sklog.Infof("Pushing the following images: %q", imageNames)
 
 	gcrTagProvider := func(imageName string) ([]string, error) {
-		tagsResp, err := gcr.NewClient(tokenSource, containerRegistryProject, imageName).Tags(ctx)
-		if err != nil {
-			return nil, err
+		//  gh auth refresh --scopes=gist,repo,workflow,read:packages,read:org
+
+		//  gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /orgs/goldmine-build/packages/container/gold_ingestion/versions
+		stdout := &bytes.Buffer{}
+		apiEndpoint := fmt.Sprintf("/orgs/%s/packages/container/%s/versions", *githubOrg, imageName)
+		if err := exec.Run(context.Background(), &exec.Command{
+			Name:   `gh`,
+			Args:   []string{"api", "-H", "Accept: application/vnd.github+json", "-H", "X-GitHub-Api-Version: 2022-11-28", apiEndpoint},
+			Stdout: stdout,
+		}); err != nil {
+			sklog.Fatalf("Failed to run gh api: %s Got %s", err, stdout.String())
 		}
-		return tagsResp.Tags, nil
+
+		var versions GitHubContainerVersions
+		err := json.NewDecoder(stdout).Decode(&versions)
+		if err != nil {
+			sklog.Fatalf("Failed to retrieve container versions: %s, Got: %s", err, stdout.String())
+		}
+		ret := []string{}
+		for _, v := range versions {
+			ret = append(ret, v.Metadata.Container.Tags...)
+		}
+
+		return ret, nil
 	}
 
 	// Search through the yaml files looking for those that use the provided image names.
@@ -309,10 +328,6 @@ func main() {
 					sklog.Infof("%s is dirty. Not pushing to it since --do-not-override-dirty-image is set.", matches[3])
 					continue
 				}
-				if !*overrideSHA256Digests && strings.Contains(matches[3], "sha256:") {
-					sklog.Infof("%s refers to an sha256 digest. Not pushing to it since --do-not-override-sha256-digests is set.", matches[3])
-					continue
-				}
 
 				if *verbose {
 					fmt.Printf("Changed file: %s to image: %s\n", filename, image)
@@ -335,55 +350,46 @@ func main() {
 
 	// Were any files updated?
 	if len(changed) != 0 {
-		byCluster, err := byClusterFromChanged(checkout.Dir(), changed)
-		if err != nil {
-			sklog.Fatal(err)
+
+		if *verbose {
+			fmt.Printf("Starting to apply changes to cluster context: %s\n", kcontext)
 		}
 
-		// Find the location of the attach.sh shell script.
-		_, filename, _, _ := runtime.Caller(0)
-		attachFilename := filepath.Join(filepath.Dir(filename), "../../attach.sh")
+		// Switch to the provided kubernetes context.
+		if *kcontext != "" {
+			err := exec.Run(context.Background(), &exec.Command{
+				Name: "kubectl",
+				Args: []string{"config", "use-context", *kcontext},
+			})
+			if err != nil {
+				sklog.Fatalf("Failed to switch to kubernetes context %q: $s", *kcontext, err)
+			}
+		}
 
-		// Then loop over cluster names and apply all changed files for that
-		// cluster.
-		for cluster, files := range byCluster {
-			if *verbose {
-				fmt.Printf("Starting to apply changes to cluster: %s\n", cluster)
+		files := changed.Keys()
+		filenameFlag := fmt.Sprintf("--filename=%s\n", strings.Join(files, ","))
+		kubectlArgs := []string{"apply", filenameFlag}
+
+		if !*dryRun {
+			for filename := range changed {
+				// /tmp/k8s-config/skia-public/task-scheduler-be-staging.yaml => skia-public/task-scheduler-be-staging.yaml
+				rel, err := filepath.Rel(checkout.Dir(), filename)
+				if err != nil {
+					sklog.Fatal(err)
+				}
+				msg, err := checkout.Git(ctx, "add", rel)
+				if err != nil {
+					sklog.Fatalf("Failed to stage changes to the config repo: %s: %q", err, msg)
+				}
 			}
 
-			filenameFlag := fmt.Sprintf("--filename=%s\n", strings.Join(files, ","))
-
-			// By default run everything through infra/kube/attach.sh.
-			name := attachFilename
-			kubectlArgs := []string{cluster, "kubectl", "apply", filenameFlag}
-			// But not if we are running in k8s.
-			if *runningInK8s {
-				name = "kubectl"
-				kubectlArgs = []string{"apply", filenameFlag}
-			}
-			fmt.Printf("\n%s %s\n", name, strings.Join(kubectlArgs, " "))
-
-			if !*dryRun {
-				for filename := range changed {
-					// /tmp/k8s-config/skia-public/task-scheduler-be-staging.yaml => skia-public/task-scheduler-be-staging.yaml
-					rel, err := filepath.Rel(checkout.Dir(), filename)
-					if err != nil {
-						sklog.Fatal(err)
-					}
-					msg, err := checkout.Git(ctx, "add", rel)
-					if err != nil {
-						sklog.Fatalf("Failed to stage changes to the config repo: %s: %q", err, msg)
-					}
-				}
-
-				if err := exec.Run(context.Background(), &exec.Command{
-					Name:      name,
-					Args:      kubectlArgs,
-					LogStderr: true,
-					LogStdout: true,
-				}); err != nil {
-					sklog.Errorf("Failed to run: %s", err)
-				}
+			if err := exec.Run(context.Background(), &exec.Command{
+				Name:      "kubectl",
+				Args:      kubectlArgs,
+				LogStderr: true,
+				LogStdout: true,
+			}); err != nil {
+				sklog.Errorf("Failed to run: %s", err)
 			}
 		}
 
@@ -407,7 +413,7 @@ func main() {
 			sklog.Fatalf("Failed to commit to the config repo: %s: %q", err, msg)
 		}
 
-		msg, err = checkout.Git(ctx, "push", git.DefaultRemote, rubberstamper.PushRequestAutoSubmit)
+		msg, err = checkout.Git(ctx, "push")
 		if err != nil {
 			sklog.Fatalf("Failed to push the config repo: %s: %q", err, msg)
 		}
