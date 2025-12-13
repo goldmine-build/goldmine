@@ -1,0 +1,20 @@
+load("@rules_go//go:def.bzl", "go_library")
+load("//bazel/go:go_test.bzl", "go_test")
+
+go_library(
+    name = "services",
+    srcs = ["services.go"],
+    importpath = "go.goldmine.build/golden/go/services",
+    visibility = ["//visibility:public"],
+    deps = ["//go/skerr"],
+)
+
+go_test(
+    name = "services_test",
+    srcs = ["services_test.go"],
+    embed = [":services"],
+    deps = [
+        "//go/deepequal/assertdeep",
+        "@com_github_stretchr_testify//assert",
+    ],
+)

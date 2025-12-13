@@ -32,8 +32,5 @@ go_test(
     srcs = ["main_test.go"],
     data = glob(["testdata/**"]),
     embed = [":pushk_lib"],
-    deps = [
-        "//go/util",
-        "@com_github_stretchr_testify//assert",
-    ],
+    deps = ["@com_github_stretchr_testify//assert"],
 )
