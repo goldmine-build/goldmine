@@ -46,15 +46,12 @@ The command:
   3. Applies the changes with kubectl.
   4. Commits the changes to the config repo.
 
-The config is stored in a separate repo that will automaticaly be checked out
-under /tmp by default, or the value of the PUSHK_GITDIR environment variable if set.
-
 The command applies the changes by default, or just changes the local yaml files
 if --dry-run is supplied.
 
 Examples:
   # Push an exact tag.
-  pushk gcr.io/skia-public/fiddler:694900e3ca9468784a5794dc53382d1c8411ab07
+  pushk gcr.io/goldmine-build/fiddler:694900e3ca9468784a5794dc53382d1c8411ab07
 
   # Push the latest version of docserver.
   pushk docserver --message="Fix bug #1234"
@@ -75,10 +72,6 @@ Examples:
   # Note that the YAML file(s) will be updated, but not committed or pushed.
   pushk --dry-run docserver
 
-ENV:
-
-  The config repo is checked out by default into '/tmp'. This can be
-  changed by setting the environment variable PUSHK_GITDIR.
 `)
 		flag.PrintDefaults()
 	}
@@ -125,7 +118,7 @@ func filter(tags []string) ([]string, error) {
 type tagProvider func(imageName string) ([]string, error)
 
 // imageFromCmdLineImage handles image names, which can be either short, ala 'fiddler', or exact,
-// such as gcr.io/skia-public/fiddler:694900e3ca9468784a5794dc53382d1c8411ab07, both of which can
+// such as gcr.io/goldmine-build/fiddler:694900e3ca9468784a5794dc53382d1c8411ab07, both of which can
 // appear on the command-line.
 func imageFromCmdLineImage(imageName string, tp tagProvider) (string, error) {
 	if strings.HasPrefix(imageName, "ghcr.io/") {
@@ -343,7 +336,7 @@ func main() {
 
 		if !*dryRun {
 			for filename := range changed {
-				// /tmp/k8s-config/skia-public/task-scheduler-be-staging.yaml => skia-public/task-scheduler-be-staging.yaml
+				// /tmp/k8s-config/goldmine-build/task-scheduler-be-staging.yaml => goldmine-build/task-scheduler-be-staging.yaml
 				rel, err := filepath.Rel(checkout.Dir(), filename)
 				if err != nil {
 					sklog.Fatal(err)

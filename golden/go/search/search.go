@@ -4033,7 +4033,7 @@ GROUP BY grouping_id, grouping, label ORDER BY grouping->>'name'`
 }
 
 // digestCountTracesStatement returns a statement and arguments that will return all tests,
-// digests and their grouping ids. The results will be in a table called DigestsWithLabels.
+// digests and their grouping ids. The results will be in a table called DigestsOfInterest.
 func digestCountTracesStatement(q frontend.ListTestsQuery) (string, []interface{}, error) {
 	arguments := []interface{}{q.Corpus}
 	statement := `DigestsOfInterest AS (
