@@ -2,6 +2,7 @@ package gitapi
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"slices"
@@ -13,7 +14,7 @@ import (
 	"github.com/google/go-github/v80/github"
 	"go.goldmine.build/go/git/provider"
 	"go.goldmine.build/go/skerr"
-	"go.goldmine.build/golden/go/config"
+	"go.goldmine.build/go/sklog"
 	"go.goldmine.build/perf/go/types"
 )
 
@@ -27,7 +28,9 @@ type gitApi struct {
 func New(
 	ctx context.Context,
 	patPath string, // Path to file that contains a GitHub Personal Access Token (PAT).
-	cfg config.Common,
+	owner string,
+	repo string,
+	branch string,
 ) (*gitApi, error) {
 	b, err := os.ReadFile(patPath)
 	if err != nil {
@@ -38,24 +41,24 @@ func New(
 		httpcache.NewClient("memcache://"),
 	).WithAuthToken(strings.TrimSpace(string(b)))
 
-	if len(cfg.CodeReviewSystems) == 0 {
-		return nil, skerr.Fmt("At least on CodeReviewSystem must be defined.")
-	}
-	githubRepo := cfg.CodeReviewSystems[0].GitHubRepo
-	if strings.Count(githubRepo, "/") != 1 {
-		return nil, skerr.Fmt("Invalid format for github_repo, expected a string in the form <owner>/<repo>, instead got: %q", githubRepo)
-	}
-	parts := strings.Split(githubRepo, "/")
-	owner := parts[0]
-	repo := parts[1]
-
-	strings.Contains(githubRepo, "/")
+	/*
+		if len(cfg.CodeReviewSystems) == 0 {
+			return nil, skerr.Fmt("At least on CodeReviewSystem must be defined.")
+		}
+		githubRepo := cfg.CodeReviewSystems[0].GitHubRepo
+		if strings.Count(githubRepo, "/") != 1 {
+			return nil, skerr.Fmt("Invalid format for github_repo, expected a string in the form <owner>/<repo>, instead got: %q", githubRepo)
+		}
+		parts := strings.Split(githubRepo, "/")
+		owner := parts[0]
+		repo := parts[1]
+	*/
 
 	return &gitApi{
 		client: client,
 		owner:  owner,
 		repo:   repo,
-		branch: cfg.GitRepoBranch,
+		branch: branch,
 	}, nil
 }
 
@@ -65,7 +68,10 @@ func (g *gitApi) timeStampForCommit(ctx context.Context, hash string) (time.Time
 		return time.Now(), skerr.Wrap(err)
 	}
 
-	return commit.Committer.UpdatedAt.Time, nil
+	b, err := json.MarshalIndent(commit, "", "  ")
+	sklog.Info(string(b))
+
+	return commit.Commit.Committer.Date.Time, nil
 }
 
 func (g *gitApi) CommitsFromMostRecentGitHashToHead(ctx context.Context, mostRecentGitHash string, cb provider.CommitProcessor) error {
@@ -79,7 +85,7 @@ func (g *gitApi) CommitsFromMostRecentGitHashToHead(ctx context.Context, mostRec
 		Since: since,
 	}
 
-	commits, _, err := g.client.Repositories.ListCommits(ctx, g.owner, g.branch, opt)
+	commits, _, err := g.client.Repositories.ListCommits(ctx, g.owner, g.repo, opt)
 	if err != nil {
 		return skerr.Wrap(err)
 	}
@@ -153,7 +159,6 @@ func (g *gitApi) GitHashesInRangeForFile(ctx context.Context, begin, end, filena
 
 // LogEntry implements provider.Provider.
 func (g *gitApi) LogEntry(ctx context.Context, gitHash string) (string, error) {
-
 	commit, _, err := g.client.Repositories.GetCommit(ctx, g.owner, g.repo, gitHash, nil)
 	if err != nil {
 		return "", skerr.Wrap(err)

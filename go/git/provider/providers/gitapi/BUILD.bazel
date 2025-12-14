@@ -8,7 +8,7 @@ go_library(
     deps = [
         "//go/git/provider",
         "//go/skerr",
-        "//golden/go/config",
+        "//go/sklog",
         "//perf/go/types",
         "@com_github_bartventer_httpcache//:httpcache",
         "@com_github_bartventer_httpcache//store/memcache",
