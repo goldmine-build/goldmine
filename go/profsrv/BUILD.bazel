@@ -1,0 +1,13 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "profsrv",
+    srcs = ["profsrv.go"],
+    importpath = "go.goldmine.build/go/profsrv",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//go/httputils",
+        "//go/sklog",
+        "@com_github_go_chi_chi_v5//:chi",
+    ],
+)

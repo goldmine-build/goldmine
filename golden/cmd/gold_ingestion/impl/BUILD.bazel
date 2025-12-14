@@ -1,0 +1,43 @@
+load("@rules_go//go:def.bzl", "go_library")
+load("//bazel/go:go_test.bzl", "go_test")
+
+go_library(
+    name = "impl",
+    srcs = ["impl.go"],
+    importpath = "go.goldmine.build/golden/cmd/gold_ingestion/impl",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//go/httputils",
+        "//go/metrics2",
+        "//go/now",
+        "//go/skerr",
+        "//go/sklog",
+        "//go/util",
+        "//golden/cmd/gitilesfollower/impl",
+        "//golden/go/config",
+        "//golden/go/ingestion",
+        "//golden/go/ingestion/sqlingestionstore",
+        "//golden/go/ingestion_processors",
+        "//golden/go/sql",
+        "@com_github_jackc_pgx_v4//pgxpool",
+        "@com_google_cloud_go_pubsub//:pubsub",
+        "@com_google_cloud_go_storage//:storage",
+        "@io_opencensus_go//trace",
+    ],
+)
+
+go_test(
+    name = "impl_test",
+    srcs = ["impl_test.go"],
+    embed = [":impl"],
+    deps = [
+        "//go/metrics2",
+        "//go/now",
+        "//go/testutils",
+        "//golden/go/config",
+        "//golden/go/ingestion",
+        "//golden/go/ingestion/mocks",
+        "@com_github_stretchr_testify//assert",
+        "@com_github_stretchr_testify//mock",
+    ],
+)
