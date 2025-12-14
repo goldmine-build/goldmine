@@ -15,5 +15,6 @@ import (
 	_ "github.com/skia-dev/protoc-gen-twirp_typescript"
 	_ "github.com/twitchtv/twirp/protoc-gen-twirp"
 	_ "github.com/vektra/mockery/v2"
+	_ "github.com/vektra/mockery/v3"
 	_ "golang.org/x/tools/cmd/goimports"
 )
