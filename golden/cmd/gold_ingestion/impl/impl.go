@@ -103,14 +103,6 @@ func IngestionMain(ctx context.Context, cfg config.Common) {
 		FailedCounter:                    metrics2.GetCounter("gold_ingestion_failure"),
 	}
 
-	go func() {
-		// Wait at least 5 seconds for the pubsub connection to be initialized before saying
-		// we are healthy.
-		time.Sleep(5 * time.Second)
-		http.HandleFunc("/healthz", httputils.ReadyHandleFunc)
-		sklog.Fatal(http.ListenAndServe(cfg.ReadyPort, nil))
-	}()
-
 	startBackupPolling(ctx, cfg, sourcesToScan, pss)
 	startMetrics(ctx, pss)
 
