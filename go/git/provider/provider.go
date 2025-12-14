@@ -20,6 +20,9 @@ const (
 	// default is no authentication.
 	GitAuthNone GitAuthType = ""
 
+	// A Git Personal Access Token.
+	GitAuthPAT GitAuthType = "gitpat"
+
 	// GitAuthGerrit is for repos that are hosted by Gerrit and require
 	// authentication. This setting implies that a
 	// GOOGLE_APPLICATION_CREDENTIALS environment variable will be set and the
@@ -36,12 +39,16 @@ const (
 
 	// GitProviderGitiles uses the Gitiles API.
 	GitProviderGitiles GitProvider = "gitiles"
+
+	// GitProviderCLI uses a local copy of git to checkout the repo.
+	GitProviderAPI GitProvider = "gitapi"
 )
 
 // AllGitProviders is a slice of all valid GitProviders.
 var AllGitProviders []GitProvider = []GitProvider{
 	GitProviderCLI,
 	GitProviderGitiles,
+	GitProviderAPI,
 }
 
 // Commit represents a single commit stored in the database.

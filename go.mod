@@ -11,6 +11,7 @@ require (
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/a8m/envsubst v1.2.0
 	github.com/aclements/go-moremath v0.0.0-20190830160640-d16893ddf098
+	github.com/bartventer/httpcache v0.12.0
 	github.com/bazelbuild/bazel-gazelle v0.45.0
 	github.com/blakesmith/ar v0.0.0-20190502131153-809d4375e1fb
 	github.com/bradfitz/gomemcache v0.0.0-20190913173617-a41fca850d0b
@@ -25,6 +26,7 @@ require (
 	github.com/go-python/gpython v0.0.3
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da
 	github.com/golang/protobuf v1.5.4
+	github.com/google/go-github/v80 v80.0.0
 	github.com/google/go-licenses v0.0.0-20210816172045-3099c18c36e1
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/securecookie v1.1.1
@@ -113,7 +115,8 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/glog v1.2.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
-	github.com/google/go-cmp v0.6.0 // indirect
+	github.com/google/go-cmp v0.7.0 // indirect
+	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/google/licenseclassifier v0.0.0-20210722185704-3043a050f148 // indirect
 	github.com/google/s2a-go v0.1.8 // indirect

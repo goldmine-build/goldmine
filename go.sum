@@ -118,6 +118,8 @@ github.com/aws/aws-sdk-go v1.23.20/go.mod h1:KmX6BPdI08NWTb3/sm4ZGu5ShLoqVDhKgpi
 github.com/aws/aws-sdk-go v1.29.11/go.mod h1:1KvfttTE3SPKMpo8g2c6jL3ZKfXtFvKscTgahTma5Xg=
 github.com/aws/aws-sdk-go v1.35.18 h1:Gka1bopihF2e9XFhuVZPrgafmOFpCsRtAPMYLp/0AfA=
 github.com/aws/aws-sdk-go v1.35.18/go.mod h1:tlPOdRjfxPBpNIwqDj61rmsnA85v9jc0Ps9+muhnW+k=
+github.com/bartventer/httpcache v0.12.0 h1:GzOgiAD0fuM+PTmhxlsai3WJKr9dk6NBvjkuEZyLCpA=
+github.com/bartventer/httpcache v0.12.0/go.mod h1:78LO7c36hcyx2GQanbDozHTozNaIL32MT4N+lErHHFs=
 github.com/bazelbuild/bazel-gazelle v0.45.0 h1:ZfbDRyNppw0Sd42lXVX7ybar63MJofb58Yvl4SvbtYY=
 github.com/bazelbuild/bazel-gazelle v0.45.0/go.mod h1:XdBdWhrTc5x50CKzKXOcwrZWdLuX58IX1KcSaWPtEGo=
 github.com/bazelbuild/buildtools v0.0.0-20240918101019-be1c24cc9a44 h1:FGzENZi+SX9I7h9xvMtRA3rel8hCEfyzSixteBgn7MU=
@@ -327,10 +329,14 @@ github.com/google/go-cmp v0.5.2/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/
 github.com/google/go-cmp v0.5.3/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/go-cmp v0.5.4/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/go-cmp v0.5.5/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
-github.com/google/go-cmp v0.6.0 h1:ofyhxvXcZhMsU5ulbFiLKl/XBFqE1GSq7atu8tAmTRI=
-github.com/google/go-cmp v0.6.0/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
+github.com/google/go-cmp v0.7.0 h1:wk8382ETsv4JYUZwIsn6YpYiWiBsYLSJiTsyBybVuN8=
+github.com/google/go-cmp v0.7.0/go.mod h1:pXiqmnSA92OHEEa9HXL2W4E7lf9JzCmGVUdgjX3N/iU=
+github.com/google/go-github/v80 v80.0.0 h1:BTyk3QOHekrk5VF+jIGz1TNEsmeoQG9K/UWaaP+EWQs=
+github.com/google/go-github/v80 v80.0.0/go.mod h1:pRo4AIMdHW83HNMGfNysgSAv0vmu+/pkY8nZO9FT9Yo=
 github.com/google/go-licenses v0.0.0-20210816172045-3099c18c36e1 h1:ZK63Yns/0Y8hE5y50WuSsfFWNPmpYDQ9tzh/J2vWV8c=
 github.com/google/go-licenses v0.0.0-20210816172045-3099c18c36e1/go.mod h1:WkPB6PtjnM1pF4qeK8RcFmk7z+TIsrPYOng7OPlFDiw=
+github.com/google/go-querystring v1.1.0 h1:AnCroh3fv4ZBgVIf1Iwtovgjaw/GiKJo8M8yD/fhyJ8=
+github.com/google/go-querystring v1.1.0/go.mod h1:Kcdr2DB4koayq7X8pmAG4sNG59So17icRSOU623lUBU=
 github.com/google/gofuzz v1.0.0/go.mod h1:dBl0BpW6vV/+mYPU4Po3pmUjxk6FQPldtuIdl/M65Eg=
 github.com/google/gofuzz v1.1.0/go.mod h1:dBl0BpW6vV/+mYPU4Po3pmUjxk6FQPldtuIdl/M65Eg=
 github.com/google/gofuzz v1.2.0 h1:xRy4A+RhZaiKjJ1bPfwQ8sedCA+YS2YcCHW6ec7JMi0=

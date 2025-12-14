@@ -1,0 +1,17 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "gitapi",
+    srcs = ["gitapi.go"],
+    importpath = "go.goldmine.build/go/git/provider/providers/gitapi",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//go/git/provider",
+        "//go/skerr",
+        "//golden/go/config",
+        "//perf/go/types",
+        "@com_github_bartventer_httpcache//:httpcache",
+        "@com_github_bartventer_httpcache//store/memcache",
+        "@com_github_google_go_github_v80//github",
+    ],
+)
