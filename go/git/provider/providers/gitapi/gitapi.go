@@ -2,7 +2,6 @@ package gitapi
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"os"
 	"slices"
@@ -68,9 +67,6 @@ func (g *gitApi) timeStampForCommit(ctx context.Context, hash string) (time.Time
 		return time.Now(), skerr.Wrap(err)
 	}
 
-	b, err := json.MarshalIndent(commit, "", "  ")
-	sklog.Info(string(b))
-
 	return commit.Commit.Committer.Date.Time, nil
 }
 
@@ -79,41 +75,68 @@ func (g *gitApi) CommitsFromMostRecentGitHashToHead(ctx context.Context, mostRec
 	if err != nil {
 		return err
 	}
+	since = since.Add(-time.Hour * 24)
+
+	// Can we test if the mostRecentGitHash exists in the given branch?
 
 	opt := &github.CommitsListOptions{
 		SHA:   g.branch,
 		Since: since,
+		ListOptions: github.ListOptions{
+			Page:    0,
+			PerPage: 10,
+		},
 	}
 
-	commits, _, err := g.client.Repositories.ListCommits(ctx, g.owner, g.repo, opt)
-	if err != nil {
-		return skerr.Wrap(err)
+	// TODO Will consume enormous memory before failing if mostRecentGitHash is
+	// never found on this branch. Maybe we can test for that above?
+	foundCommits := []provider.Commit{}
+	for {
+		commits, resp, err := g.client.Repositories.ListCommits(ctx, g.owner, g.repo, opt)
+		if err != nil {
+			return skerr.Wrap(err)
+		}
+
+		for _, c := range commits {
+			if *c.SHA == mostRecentGitHash {
+				sklog.Infof("=== Found mostRecentGitHash")
+				goto foundMostRecentGitHash
+			}
+
+			subject := ""
+			body := ""
+
+			if c.Commit.Message != nil {
+				parts := strings.SplitN(*c.Commit.Message, "\n", 2)
+				subject = parts[0]
+				if len(parts) > 1 {
+					body = parts[1]
+				}
+			}
+
+			foundCommits = append(foundCommits, provider.Commit{
+				CommitNumber: types.BadCommitNumber,
+				GitHash:      *c.SHA,
+				Timestamp:    c.Commit.Committer.Date.Unix(),
+				Author:       *c.Commit.Author.Email,
+				Subject:      subject,
+				URL:          *c.HTMLURL,
+				Body:         body,
+			})
+		}
+		if resp.NextPage == 0 {
+			break
+		}
+		opt.ListOptions.Page = resp.NextPage
 	}
+
+foundMostRecentGitHash:
 
 	// Commits are returned from newest to oldest, so we need to reverse the
 	// list first.
-	slices.Reverse(commits)
-	for _, c := range commits {
-		subject := ""
-		body := ""
-
-		if c.Commit.Message != nil {
-			parts := strings.SplitN(*c.Commit.Message, "\n", 2)
-			subject = parts[0]
-			if len(parts) > 1 {
-				body = parts[1]
-			}
-		}
-
-		err := cb(provider.Commit{
-			CommitNumber: types.BadCommitNumber,
-			GitHash:      *c.SHA,
-			Timestamp:    c.Commit.Committer.Date.Unix(),
-			Author:       *c.Commit.Author.Email,
-			Subject:      subject,
-			URL:          *c.HTMLURL,
-			Body:         body,
-		})
+	slices.Reverse(foundCommits)
+	for _, c := range foundCommits {
+		err := cb(c)
 		if err != nil {
 			return skerr.Wrapf(err, "processing callback")
 		}
