@@ -7,9 +7,13 @@ go_library(
     visibility = ["//visibility:private"],
     deps = [
         "//go/common",
+        "//go/httputils",
+        "//go/profsrv",
         "//go/sklog",
+        "//golden/cmd/gold_ingestion/impl",
         "//golden/go/config",
         "//golden/go/services",
+        "@org_golang_x_net//context",
     ],
 )
 
