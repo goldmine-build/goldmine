@@ -1,4 +1,5 @@
 load("@rules_go//go:def.bzl", "go_library")
+load("//bazel/go:go_test.bzl", "go_test")
 
 go_library(
     name = "providers",
@@ -8,8 +9,16 @@ go_library(
     deps = [
         "//go/git/provider",
         "//go/git/provider/providers/git_checkout",
+        "//go/git/provider/providers/gitapi",
         "//go/git/provider/providers/gitiles",
         "//go/skerr",
         "//go/util",
     ],
+)
+
+go_test(
+    name = "providers_test",
+    srcs = ["builder_test.go"],
+    embed = [":providers"],
+    deps = ["@com_github_stretchr_testify//assert"],
 )

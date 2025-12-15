@@ -39,7 +39,7 @@ type CheckForNewCommitsFunc func(ctx context.Context) error
 // StartGitFollower sets up and starts the gitiles follower. It returns a function that can be called to
 // manually check for new commits outside of the normal polling cycle.
 func StartGitFollower(ctx context.Context, cfg config.Common, db *pgxpool.Pool) (CheckForNewCommitsFunc, error) {
-	gitp, err := providers.New(ctx, cfg.Provider, cfg.GitRepoURL, cfg.GitRepoBranch, cfg.RepoFollowerConfig.InitialCommit, cfg.GitAuthType, "")
+	gitp, err := providers.New(ctx, cfg.Provider, cfg.GitRepoURL, cfg.GitRepoBranch, cfg.RepoFollowerConfig.InitialCommit, cfg.GitAuthType, "", cfg.CodeReviewSystems[0].GitHubCredPath)
 	if err != nil {
 		sklog.Fatalf("Could not set up git provider: %s", err)
 	}
