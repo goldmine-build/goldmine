@@ -1,4 +1,5 @@
 load("@rules_go//go:def.bzl", "go_library")
+load("//bazel/go:go_test.bzl", "go_test")
 
 go_library(
     name = "gitapi",
@@ -13,5 +14,17 @@ go_library(
         "@com_github_bartventer_httpcache//:httpcache",
         "@com_github_bartventer_httpcache//store/memcache",
         "@com_github_google_go_github_v80//github",
+    ],
+)
+
+go_test(
+    name = "gitapi_test",
+    srcs = ["gitapi_manual_test.go"],
+    embed = [":gitapi"],
+    deps = [
+        "//go/deepequal/assertdeep",
+        "//go/git/provider",
+        "//go/skerr",
+        "@com_github_stretchr_testify//assert",
     ],
 )

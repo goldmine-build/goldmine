@@ -17,7 +17,7 @@ import (
 	"go.goldmine.build/perf/go/types"
 )
 
-type gitApi struct {
+type GitApi struct {
 	client *github.Client
 	owner  string
 	repo   string
@@ -30,30 +30,24 @@ func New(
 	owner string,
 	repo string,
 	branch string,
-) (*gitApi, error) {
-	b, err := os.ReadFile(patPath)
-	if err != nil {
-		return nil, skerr.Wrap(err)
+) (*GitApi, error) {
+	authToken := ""
+	if patPath != "" {
+		b, err := os.ReadFile(patPath)
+		if err != nil {
+			return nil, skerr.Wrap(err)
+		}
+		authToken = strings.TrimSpace(string(b))
 	}
 
 	client := github.NewClient(
 		httpcache.NewClient("memcache://"),
-	).WithAuthToken(strings.TrimSpace(string(b)))
+	)
+	if authToken != "" {
+		client = client.WithAuthToken(authToken)
+	}
 
-	/*
-		if len(cfg.CodeReviewSystems) == 0 {
-			return nil, skerr.Fmt("At least on CodeReviewSystem must be defined.")
-		}
-		githubRepo := cfg.CodeReviewSystems[0].GitHubRepo
-		if strings.Count(githubRepo, "/") != 1 {
-			return nil, skerr.Fmt("Invalid format for github_repo, expected a string in the form <owner>/<repo>, instead got: %q", githubRepo)
-		}
-		parts := strings.Split(githubRepo, "/")
-		owner := parts[0]
-		repo := parts[1]
-	*/
-
-	return &gitApi{
+	return &GitApi{
 		client: client,
 		owner:  owner,
 		repo:   repo,
@@ -61,7 +55,7 @@ func New(
 	}, nil
 }
 
-func (g *gitApi) timeStampForCommit(ctx context.Context, hash string) (time.Time, error) {
+func (g *GitApi) timeStampForCommit(ctx context.Context, hash string) (time.Time, error) {
 	commit, _, err := g.client.Repositories.GetCommit(ctx, g.owner, g.repo, hash, nil)
 	if err != nil {
 		return time.Now(), skerr.Wrap(err)
@@ -70,14 +64,14 @@ func (g *gitApi) timeStampForCommit(ctx context.Context, hash string) (time.Time
 	return commit.Commit.Committer.Date.Time, nil
 }
 
-func (g *gitApi) CommitsFromMostRecentGitHashToHead(ctx context.Context, mostRecentGitHash string, cb provider.CommitProcessor) error {
+func (g *GitApi) CommitsFromMostRecentGitHashToHead(ctx context.Context, mostRecentGitHash string, cb provider.CommitProcessor) error {
+	// This is also a test that the mostRecentGitHash is actually on the given
+	// branch.
 	since, err := g.timeStampForCommit(ctx, mostRecentGitHash)
 	if err != nil {
 		return err
 	}
 	since = since.Add(-time.Hour * 24)
-
-	// Can we test if the mostRecentGitHash exists in the given branch?
 
 	opt := &github.CommitsListOptions{
 		SHA:   g.branch,
@@ -88,8 +82,6 @@ func (g *gitApi) CommitsFromMostRecentGitHashToHead(ctx context.Context, mostRec
 		},
 	}
 
-	// TODO Will consume enormous memory before failing if mostRecentGitHash is
-	// never found on this branch. Maybe we can test for that above?
 	foundCommits := []provider.Commit{}
 	for {
 		commits, resp, err := g.client.Repositories.ListCommits(ctx, g.owner, g.repo, opt)
@@ -135,6 +127,8 @@ foundMostRecentGitHash:
 	// Commits are returned from newest to oldest, so we need to reverse the
 	// list first.
 	slices.Reverse(foundCommits)
+
+	// Now trigger the callback on each commit found.
 	for _, c := range foundCommits {
 		err := cb(c)
 		if err != nil {
@@ -145,7 +139,7 @@ foundMostRecentGitHash:
 }
 
 // GitHashesInRangeForFile implements provider.Provider.
-func (g *gitApi) GitHashesInRangeForFile(ctx context.Context, begin, end, filename string) ([]string, error) {
+func (g *GitApi) GitHashesInRangeForFile(ctx context.Context, begin, end, filename string) ([]string, error) {
 	since, err := g.timeStampForCommit(ctx, begin)
 	if err != nil {
 		return nil, err
@@ -161,16 +155,22 @@ func (g *gitApi) GitHashesInRangeForFile(ctx context.Context, begin, end, filena
 		Until: until,
 	}
 
-	commits, _, err := g.client.Repositories.ListCommits(ctx, g.owner, g.branch, opt)
+	commits, _, err := g.client.Repositories.ListCommits(ctx, g.owner, g.repo, opt)
 	if err != nil {
 		return nil, skerr.Wrap(err)
 	}
+	sklog.Infof("Found %d commits in range", len(commits))
+
 	slices.Reverse(commits)
 	ret := []string{}
-
 	for _, c := range commits {
-		for _, f := range c.Files {
+		fullCommit, _, err := g.client.Repositories.GetCommit(ctx, g.owner, g.repo, *c.SHA, nil)
+		if err != nil {
+			return nil, skerr.Wrap(err)
+		}
+		for _, f := range fullCommit.Files {
 			if *f.Filename == filename {
+				sklog.Infof("Filename match: %q", *f.Filename)
 				ret = append(ret, *c.SHA)
 				break
 			}
@@ -181,7 +181,7 @@ func (g *gitApi) GitHashesInRangeForFile(ctx context.Context, begin, end, filena
 }
 
 // LogEntry implements provider.Provider.
-func (g *gitApi) LogEntry(ctx context.Context, gitHash string) (string, error) {
+func (g *GitApi) LogEntry(ctx context.Context, gitHash string) (string, error) {
 	commit, _, err := g.client.Repositories.GetCommit(ctx, g.owner, g.repo, gitHash, nil)
 	if err != nil {
 		return "", skerr.Wrap(err)
@@ -191,14 +191,14 @@ func (g *gitApi) LogEntry(ctx context.Context, gitHash string) (string, error) {
 Author %s
 Date %s
 
-%s
+    %s
 `, *commit.SHA, *commit.Commit.Author.Email, commit.Commit.Committer.Date.Format(time.RFC822Z), *commit.Commit.Message), nil
 }
 
 // Update implements provider.Provider.
-func (g *gitApi) Update(ctx context.Context) error {
+func (g *GitApi) Update(ctx context.Context) error {
 	return nil
 }
 
 // Confirm *Gitiles implements provider.Provider.
-var _ provider.Provider = (*gitApi)(nil)
+var _ provider.Provider = (*GitApi)(nil)
