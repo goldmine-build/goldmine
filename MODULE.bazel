@@ -98,6 +98,7 @@ use_repo(
     "com_github_kisielk_errcheck",
     "com_github_masterminds_sprig",
     "com_github_miekg_dns",
+    "com_github_minio_minio",
     "com_github_mohae_deepcopy",
     "com_github_nfnt_resize",
     "com_github_otiai10_copy",
