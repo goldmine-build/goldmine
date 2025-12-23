@@ -158,9 +158,6 @@ type Common struct {
 	// GCS path, where the known hashes file should be stored. Format: <bucket>/<path>.
 	KnownHashesGCSPath string `json:"known_hashes_gcs_path"`
 
-	// Metrics service address (e.g., ':20000')
-	PromPort string `json:"prom_port"`
-
 	// Project ID that houses the pubsub topic.
 	PubsubProjectID string `json:"pubsub_project_id"`
 

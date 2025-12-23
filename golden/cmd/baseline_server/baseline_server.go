@@ -60,7 +60,7 @@ func main() {
 	_, appName := filepath.Split(os.Args[0])
 	common.InitWithMust(
 		appName,
-		common.PrometheusOpt(&cfg.PromPort),
+		common.PrometheusOpt(&flags.PromPort),
 	)
 
 	gsClientOpt := storage.GCSClientOptions{
