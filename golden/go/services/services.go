@@ -13,7 +13,7 @@ type Service string
 
 // All the services as constants.
 const (
-	Baseline Service = "baseline"
+	// Baseline, if needed, is run as a separate application baseline_server.
 	DiffCalc Service = "diffcalc"
 	Frontend Service = "frontend"
 	Ingester Service = "ingester"
@@ -21,7 +21,6 @@ const (
 )
 
 var AllServices []Service = []Service{
-	Baseline,
 	DiffCalc,
 	Frontend,
 	Ingester,

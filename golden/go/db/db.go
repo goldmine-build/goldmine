@@ -21,6 +21,8 @@ var (
 	dbOnce sync.Once
 )
 
+// MustInitSQLDatabase initializes a SQL database. If there are any errors, it
+// will panic via sklog.Fatal.
 func MustInitSQLDatabase(ctx context.Context, cfg config.Common, logSQLQueries bool) *pgxpool.Pool {
 	dbOnce.Do(func() {
 		db = mustInitSQLDatabaseImpl(ctx, cfg, logSQLQueries)
@@ -35,8 +37,8 @@ func (l crdbLogger) Log(ctx context.Context, level pgx.LogLevel, msg string, dat
 	sklog.Infof("[pgxpool %s] %q\n%+v\n", level, msg, data)
 }
 
-// mustInitSQLDatabase initializes a SQL database. If there are any errors, it will panic via
-// sklog.Fatal.
+// mustInitSQLDatabase initializes a SQL database. If there are any errors, it
+// will panic via sklog.Fatal.
 func mustInitSQLDatabaseImpl(ctx context.Context, cfg config.Common, logSQLQueries bool) *pgxpool.Pool {
 	if cfg.SQLDatabaseName == "" {
 		sklog.Fatalf("Must have SQL Database Information")

@@ -29,7 +29,6 @@ import (
 	"go.goldmine.build/golden/go/db"
 	"go.goldmine.build/golden/go/diff"
 	"go.goldmine.build/golden/go/diff/worker"
-	"go.goldmine.build/golden/go/sql"
 	"go.goldmine.build/golden/go/sql/schema"
 	"go.goldmine.build/golden/go/types"
 )
@@ -132,25 +131,6 @@ func beginPolling(ctx context.Context, sqlProcessor *processor) error {
 		}
 		sqlProcessor.setBusy(true)
 	}
-}
-
-func mustInitSQLDatabase(ctx context.Context, cfg config.Common) *pgxpool.Pool {
-	if cfg.SQLDatabaseName == "" {
-		sklog.Fatalf("Must have SQL Database Information")
-	}
-	url := sql.GetConnectionURL(cfg.SQLConnection, cfg.SQLDatabaseName)
-	conf, err := pgxpool.ParseConfig(url)
-	if err != nil {
-		sklog.Fatalf("error getting postgres config %s: %s", url, err)
-	}
-
-	conf.MaxConns = maxSQLConnections
-	db, err := pgxpool.ConnectConfig(ctx, conf)
-	if err != nil {
-		sklog.Fatalf("error connecting to the database: %s", err)
-	}
-	sklog.Infof("Connected to SQL database %s", cfg.SQLDatabaseName)
-	return db
 }
 
 func mustMakeGCSImageSource(ctx context.Context, cfg config.Common) worker.ImageSource {

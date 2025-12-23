@@ -6,14 +6,12 @@ package main
 
 import (
 	"context"
-	"flag"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/jackc/pgx/v4/pgxpool"
 	"golang.org/x/oauth2/google"
 	gstorage "google.golang.org/api/storage/v1"
 
@@ -24,55 +22,50 @@ import (
 	"go.goldmine.build/go/sklog"
 	"go.goldmine.build/golden/go/clstore"
 	"go.goldmine.build/golden/go/config"
-	"go.goldmine.build/golden/go/sql"
+	"go.goldmine.build/golden/go/db"
 	"go.goldmine.build/golden/go/storage"
-	"go.goldmine.build/golden/go/tracing"
 	"go.goldmine.build/golden/go/web"
 	"go.goldmine.build/golden/go/web/frontend"
 )
 
-const (
-	// Arbitrary number
-	maxSQLConnections = 12
-)
+var flags config.ServerFlags
 
 func main() {
-	// Command line flags.
-	var (
-		configPath = flag.String("config", "", "Path to the json5 file containing the configuration.")
-		hang       = flag.Bool("hang", false, "Stop and do nothing after reading the flags. Good for debugging containers.")
+	common.InitWithMust(
+		"gold-ingestion",
+		common.PrometheusOpt(&flags.PromPort),
+		common.FlagSetOpt((&flags).Flagset()),
 	)
 
-	// Parse the flags, so we can load the configuration files.
-	flag.Parse()
-
-	if *hang {
+	if flags.Hang {
 		sklog.Info("Hanging")
 		select {}
 	}
 
-	bsc, err := config.LoadConfigFromJSON5(*configPath)
+	var cfg config.Common
+	cfg, err := config.LoadConfigFromJSON5(flags.ConfigPath)
 	if err != nil {
 		sklog.Fatalf("Reading config: %s", err)
 	}
-	sklog.Infof("Loaded config %#v", bsc)
+	sklog.Infof("Loaded config %#v", cfg)
 
-	if err := tracing.Initialize(0.1, bsc.SQLDatabaseName); err != nil {
-		sklog.Fatalf("Could not initialize tracing: %s", err)
+	if flags.Hang {
+		sklog.Info("Hanging")
+		select {}
 	}
 
 	ctx := context.Background()
-	db := mustInitSQLDatabase(ctx, bsc)
+	db := db.MustInitSQLDatabase(ctx, cfg, flags.LogSQLQueries)
 
 	_, appName := filepath.Split(os.Args[0])
 	common.InitWithMust(
 		appName,
-		common.PrometheusOpt(&bsc.PromPort),
+		common.PrometheusOpt(&cfg.PromPort),
 	)
 
 	gsClientOpt := storage.GCSClientOptions{
-		Bucket:             bsc.GCSBucket,
-		KnownHashesGCSPath: bsc.KnownHashesGCSPath,
+		Bucket:             cfg.GCSBucket,
+		KnownHashesGCSPath: cfg.KnownHashesGCSPath,
 	}
 
 	tokenSource, err := google.DefaultTokenSource(ctx, gstorage.CloudPlatformScope)
@@ -89,7 +82,7 @@ func main() {
 
 	// Baselines just need a list of valid CRS; we can leave all other fields blank.
 	var reviewSystems []clstore.ReviewSystem
-	for _, cfg := range bsc.CodeReviewSystems {
+	for _, cfg := range cfg.CodeReviewSystems {
 		reviewSystems = append(reviewSystems, clstore.ReviewSystem{ID: cfg.ID})
 	}
 
@@ -99,7 +92,7 @@ func main() {
 		DB:                        db,
 		GCSClient:                 gsClient,
 		ReviewSystems:             reviewSystems,
-		GroupingParamKeysByCorpus: bsc.GroupingParamKeysByCorpus,
+		GroupingParamKeysByCorpus: cfg.GroupingParamKeysByCorpus,
 	}, web.BaselineSubset, proxylogin.NewWithDefaults())
 	if err != nil {
 		sklog.Fatalf("Failed to initialize web handlers: %s", err)
@@ -160,25 +153,6 @@ func main() {
 	router.Handle("/*", httputils.LoggingGzipRequestResponse(appRouter))
 
 	// Start the server
-	sklog.Infof("Serving on http://127.0.0.1" + bsc.ReadyPort)
-	sklog.Fatal(http.ListenAndServe(bsc.ReadyPort, router))
-}
-
-func mustInitSQLDatabase(ctx context.Context, bsc config.Common) *pgxpool.Pool {
-	if bsc.SQLDatabaseName == "" {
-		sklog.Fatalf("Must have SQL Database Information")
-	}
-	url := sql.GetConnectionURL(bsc.SQLConnection, bsc.SQLDatabaseName)
-	conf, err := pgxpool.ParseConfig(url)
-	if err != nil {
-		sklog.Fatalf("error getting postgres config %s: %s", url, err)
-	}
-
-	conf.MaxConns = maxSQLConnections
-	db, err := pgxpool.ConnectConfig(ctx, conf)
-	if err != nil {
-		sklog.Fatalf("error connecting to the database: %s", err)
-	}
-	sklog.Infof("Connected to SQL database %s", bsc.SQLDatabaseName)
-	return db
+	sklog.Infof("Serving on http://127.0.0.1" + cfg.ReadyPort)
+	sklog.Fatal(http.ListenAndServe(cfg.ReadyPort, router))
 }
