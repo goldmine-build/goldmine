@@ -2,6 +2,27 @@ load("//bazel:app_container.bzl", "app_container")
 load(":gold_launcher.bzl", "gold_launcher")
 
 app_container(
+    name = "gold_server",
+    base = "@base",
+    cmd = [],
+    entrypoint = "/usr/local/bin/gold-server",
+    exe = "//golden/cmd/gold-server:gold-server",
+    pages = [
+        "//golden/pages:by_test_list",
+        "//golden/pages:byblame",
+        "//golden/pages:changelists",
+        "//golden/pages:cluster",
+        "//golden/pages:details",
+        "//golden/pages:diff",
+        "//golden/pages:help",
+        "//golden/pages:ignorelist",
+        "//golden/pages:search",
+        "//golden/pages:triagelog",
+    ],
+    repository = "ghcr.io/goldmine-build/gold_server",
+)
+
+app_container(
     name = "gold_frontend_container",
     base = "@base",
     cmd = [],

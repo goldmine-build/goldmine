@@ -14,6 +14,12 @@ frontend:
 goldpushk: kube-conf-gen
 	go install ./cmd/goldpushk/...
 
+
+# Build the gold_server container with Bazel and push it to the container registry.
+.PHONY: release_gold_server
+release_gold_server:
+	$(BAZEL) run --stamp //golden:gold_server_push
+
 # Build the gold-frontend container with Bazel and push it to GCR.
 .PHONY: release_frontend_container
 release_frontend_container:
