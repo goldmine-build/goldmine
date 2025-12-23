@@ -1,5 +1,4 @@
 load("@rules_go//go:def.bzl", "go_binary", "go_library")
-load("//bazel/go:go_test.bzl", "go_test")
 
 go_library(
     name = "gold_frontend_lib",
@@ -7,35 +6,10 @@ go_library(
     importpath = "go.goldmine.build/golden/cmd/gold_frontend",
     visibility = ["//visibility:private"],
     deps = [
-        "//go/alogin",
-        "//go/alogin/proxylogin",
-        "//go/auth",
         "//go/common",
-        "//go/gerrit",
-        "//go/httputils",
-        "//go/metrics2",
         "//go/sklog",
-        "//go/tracing/loggingtracer",
-        "//golden/go/clstore",
-        "//golden/go/code_review",
-        "//golden/go/code_review/gerrit_crs",
-        "//golden/go/code_review/github_crs",
+        "//golden/cmd/gold_frontend/impl",
         "//golden/go/config",
-        "//golden/go/ignore",
-        "//golden/go/ignore/sqlignorestore",
-        "//golden/go/publicparams",
-        "//golden/go/search",
-        "//golden/go/sql",
-        "//golden/go/storage",
-        "//golden/go/web",
-        "//golden/go/web/frontend",
-        "@com_github_go_chi_chi_v5//:chi",
-        "@com_github_jackc_pgx_v4//:pgx",
-        "@com_github_jackc_pgx_v4//pgxpool",
-        "@org_golang_google_api//storage/v1:storage",
-        "@org_golang_google_grpc//:grpc",
-        "@org_golang_x_oauth2//:oauth2",
-        "@org_golang_x_oauth2//google",
     ],
 )
 
@@ -43,17 +17,4 @@ go_binary(
     name = "gold_frontend",
     embed = [":gold_frontend_lib"],
     visibility = ["//visibility:public"],
-)
-
-go_test(
-    name = "gold_frontend_test",
-    srcs = ["gold_frontend_test.go"],
-    embed = [":gold_frontend_lib"],
-    deps = [
-        "//go/metrics2",
-        "//golden/go/web",
-        "@com_github_go_chi_chi_v5//:chi",
-        "@com_github_stretchr_testify//assert",
-        "@com_github_stretchr_testify//require",
-    ],
 )
