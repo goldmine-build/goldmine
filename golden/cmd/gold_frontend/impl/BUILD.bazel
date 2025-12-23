@@ -1,0 +1,51 @@
+load("@rules_go//go:def.bzl", "go_library")
+load("//bazel/go:go_test.bzl", "go_test")
+
+go_library(
+    name = "impl",
+    srcs = ["impl.go"],
+    importpath = "go.goldmine.build/golden/cmd/gold_frontend/impl",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//go/alogin",
+        "//go/alogin/proxylogin",
+        "//go/auth",
+        "//go/gerrit",
+        "//go/httputils",
+        "//go/metrics2",
+        "//go/sklog",
+        "//golden/go/clstore",
+        "//golden/go/code_review",
+        "//golden/go/code_review/gerrit_crs",
+        "//golden/go/code_review/github_crs",
+        "//golden/go/config",
+        "//golden/go/db",
+        "//golden/go/ignore",
+        "//golden/go/ignore/sqlignorestore",
+        "//golden/go/publicparams",
+        "//golden/go/search",
+        "//golden/go/sql",
+        "//golden/go/storage",
+        "//golden/go/web",
+        "//golden/go/web/frontend",
+        "@com_github_go_chi_chi_v5//:chi",
+        "@com_github_jackc_pgx_v4//:pgx",
+        "@com_github_jackc_pgx_v4//pgxpool",
+        "@org_golang_google_api//storage/v1:storage",
+        "@org_golang_x_oauth2//:oauth2",
+        "@org_golang_x_oauth2//google",
+    ],
+)
+
+go_test(
+    name = "impl_test",
+    srcs = ["impl_test.go"],
+    embed = [":impl"],
+    deps = [
+        "//go/metrics2",
+        "//golden/go/web",
+        "@com_github_go_chi_chi_v5//:chi",
+        "@com_github_stretchr_testify//assert",
+        "@com_github_stretchr_testify//require",
+    ],
+)

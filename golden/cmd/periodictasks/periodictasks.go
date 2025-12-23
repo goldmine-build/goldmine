@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"flag"
 
 	"go.goldmine.build/go/common"
 	"go.goldmine.build/go/sklog"
@@ -10,32 +9,26 @@ import (
 	"go.goldmine.build/golden/go/config"
 )
 
+var flags config.ServerFlags
+
 func main() {
-	// Command line flags.
-	var (
-		configPath = flag.String("config", "", "Path to the json5 file containing the configuration.")
-		hang       = flag.Bool("hang", false, "Stop and do nothing after reading the flags. Good for debugging containers.")
+	common.InitWithMust(
+		"periodictasks",
+		common.PrometheusOpt(&flags.PromPort),
+		common.FlagSetOpt((&flags).Flagset()),
 	)
 
-	// Parse the options. So we can configure logging.
-	flag.Parse()
-
-	if *hang {
+	if flags.Hang {
 		sklog.Info("Hanging")
 		select {}
 	}
 
-	cfg, err := config.LoadConfigFromJSON5(*configPath)
+	cfg, err := config.LoadConfigFromJSON5(flags.ConfigPath)
 	if err != nil {
 		sklog.Fatalf("Reading config: %s", err)
 	}
 	sklog.Infof("Loaded config %#v", cfg)
 
-	common.InitWithMust(
-		"periodictasks",
-		common.PrometheusOpt(&cfg.PromPort),
-	)
-
 	ctx := context.Background()
-	impl.PeriodicTasksMain(ctx, cfg)
+	impl.PeriodicTasksMain(ctx, cfg, flags)
 }

@@ -4,7 +4,6 @@ package main
 
 import (
 	"context"
-	"flag"
 
 	"go.goldmine.build/go/common"
 	"go.goldmine.build/go/sklog"
@@ -12,32 +11,27 @@ import (
 	"go.goldmine.build/golden/go/config"
 )
 
+var flags config.ServerFlags
+
 func main() {
-	// Command line flags.
-	var (
-		configPath = flag.String("config", "", "Path to the json5 file containing the instance configuration.")
-		hang       = flag.Bool("hang", false, "Stop and do nothing after reading the flags. Good for debugging containers.")
+	common.InitWithMust(
+		"gold-ingestion",
+		common.PrometheusOpt(&flags.PromPort),
+		common.FlagSetOpt((&flags).Flagset()),
 	)
 
-	// Parse the options. So we can configure logging.
-	flag.Parse()
-
-	if *hang {
+	if flags.Hang {
 		sklog.Info("Hanging")
 		select {}
 	}
 
 	var cfg config.Common
-	cfg, err := config.LoadConfigFromJSON5(*configPath)
+	cfg, err := config.LoadConfigFromJSON5(flags.ConfigPath)
 	if err != nil {
 		sklog.Fatalf("Reading config: %s", err)
 	}
 	sklog.Infof("Loaded config %#v", cfg)
 
-	common.InitWithMust(
-		"gold-ingestion",
-		common.PrometheusOpt(&cfg.PromPort),
-	)
 	// We expect there to be a lot of ingestion work, so we sample 1% of them to avoid incurring
 	// too much overhead.
 	//	if err := tracing.Initialize(0.01, isc.SQLDatabaseName); err != nil {
@@ -45,5 +39,5 @@ func main() {
 	//	}
 
 	ctx := context.Background()
-	impl.IngestionMain(ctx, cfg)
+	impl.IngestionMain(ctx, cfg, flags)
 }

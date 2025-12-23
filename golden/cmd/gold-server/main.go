@@ -8,6 +8,7 @@ import (
 	"go.goldmine.build/go/httputils"
 	"go.goldmine.build/go/profsrv"
 	"go.goldmine.build/go/sklog"
+	frontend "go.goldmine.build/golden/cmd/gold_frontend/impl"
 	ingestion "go.goldmine.build/golden/cmd/gold_ingestion/impl"
 	periodic "go.goldmine.build/golden/cmd/periodictasks/impl"
 	"go.goldmine.build/golden/go/config"
@@ -62,6 +63,8 @@ func main() {
 			go ingestion.IngestionMain(ctx, cfg, flags)
 		case services.Periodic:
 			periodic.PeriodicTasksMain(ctx, cfg, flags)
+		case services.Frontend:
+			go frontend.FrontendMain(ctx, cfg, flags)
 		}
 
 	}
