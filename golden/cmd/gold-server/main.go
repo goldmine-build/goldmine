@@ -8,6 +8,7 @@ import (
 	"go.goldmine.build/go/httputils"
 	"go.goldmine.build/go/profsrv"
 	"go.goldmine.build/go/sklog"
+	diffcalc "go.goldmine.build/golden/cmd/diffcalculator/impl"
 	frontend "go.goldmine.build/golden/cmd/gold_frontend/impl"
 	ingestion "go.goldmine.build/golden/cmd/gold_ingestion/impl"
 	periodic "go.goldmine.build/golden/cmd/periodictasks/impl"
@@ -65,8 +66,9 @@ func main() {
 			periodic.PeriodicTasksMain(ctx, cfg, flags)
 		case services.Frontend:
 			go frontend.FrontendMain(ctx, cfg, flags)
+		case services.DiffCalc:
+			go diffcalc.DiffCalculatorMain(ctx, cfg, flags)
 		}
-
 	}
 
 	// Handle healthz.

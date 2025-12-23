@@ -10,6 +10,7 @@ go_library(
         "//go/httputils",
         "//go/profsrv",
         "//go/sklog",
+        "//golden/cmd/diffcalculator/impl",
         "//golden/cmd/gold_frontend/impl",
         "//golden/cmd/gold_ingestion/impl",
         "//golden/cmd/periodictasks/impl",

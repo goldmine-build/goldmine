@@ -1,0 +1,52 @@
+load("@rules_go//go:def.bzl", "go_library")
+load("//bazel/go:go_test.bzl", "go_test")
+
+go_library(
+    name = "impl",
+    srcs = ["impl.go"],
+    importpath = "go.goldmine.build/golden/cmd/diffcalculator/impl",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//go/metrics2",
+        "//go/now",
+        "//go/paramtools",
+        "//go/skerr",
+        "//go/sklog",
+        "//go/util",
+        "//golden/go/config",
+        "//golden/go/db",
+        "//golden/go/diff",
+        "//golden/go/diff/worker",
+        "//golden/go/sql",
+        "//golden/go/sql/schema",
+        "//golden/go/types",
+        "@com_github_cockroachdb_cockroach_go_v2//crdb/crdbpgx",
+        "@com_github_hashicorp_golang_lru//:golang-lru",
+        "@com_github_jackc_pgx_v4//:pgx",
+        "@com_github_jackc_pgx_v4//pgxpool",
+        "@com_google_cloud_go_storage//:storage",
+        "@io_opencensus_go//trace",
+    ],
+)
+
+go_test(
+    name = "impl_test",
+    srcs = ["impl_test.go"],
+    embed = [":impl"],
+    deps = [
+        "//go/now",
+        "//go/paramtools",
+        "//go/testutils",
+        "//golden/go/diff",
+        "//golden/go/diff/mocks",
+        "//golden/go/sql/datakitchensink",
+        "//golden/go/sql/schema",
+        "//golden/go/sql/sqltest",
+        "//golden/go/types",
+        "@com_github_hashicorp_golang_lru//:golang-lru",
+        "@com_github_jackc_pgx_v4//pgxpool",
+        "@com_github_stretchr_testify//assert",
+        "@com_github_stretchr_testify//mock",
+        "@com_github_stretchr_testify//require",
+    ],
+)
