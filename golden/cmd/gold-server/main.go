@@ -9,7 +9,8 @@ import (
 	"go.goldmine.build/go/httputils"
 	"go.goldmine.build/go/profsrv"
 	"go.goldmine.build/go/sklog"
-	"go.goldmine.build/golden/cmd/gold_ingestion/impl"
+	ingestion "go.goldmine.build/golden/cmd/gold_ingestion/impl"
+	periodic "go.goldmine.build/golden/cmd/periodictasks/impl"
 	"go.goldmine.build/golden/go/config"
 	"go.goldmine.build/golden/go/services"
 	"golang.org/x/net/context"
@@ -65,8 +66,11 @@ func main() {
 		sklog.Infof("Starting service: %q", s)
 		switch s {
 		case services.Ingester:
-			go impl.IngestionMain(ctx, cfg)
+			go ingestion.IngestionMain(ctx, cfg)
+		case services.Periodic:
+			periodic.PeriodicTasksMain(ctx, cfg)
 		}
+
 	}
 
 	// Handle healthz.

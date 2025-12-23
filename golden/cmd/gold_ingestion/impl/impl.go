@@ -19,16 +19,11 @@ import (
 	"go.goldmine.build/go/util"
 	"go.goldmine.build/golden/cmd/gitilesfollower/impl"
 	"go.goldmine.build/golden/go/config"
+	"go.goldmine.build/golden/go/db"
 	"go.goldmine.build/golden/go/ingestion"
 	"go.goldmine.build/golden/go/ingestion/sqlingestionstore"
 	"go.goldmine.build/golden/go/ingestion_processors"
-	"go.goldmine.build/golden/go/sql"
 	"go.opencensus.io/trace"
-)
-
-const (
-	// Arbitrarily picked.
-	maxSQLConnections = 20
 )
 
 func IngestionMain(ctx context.Context, cfg config.Common) {
@@ -45,20 +40,8 @@ func IngestionMain(ctx context.Context, cfg config.Common) {
 	//client := httputils.DefaultClientConfig().WithTokenSource(tokenSrc).With2xxOnly().WithDialTimeout(time.Second * 10).Client()
 	client := httputils.DefaultClientConfig().With2xxOnly().WithDialTimeout(time.Second * 10).Client()
 
-	if cfg.SQLDatabaseName == "" {
-		sklog.Fatalf("Must have SQL database config")
-	}
-	url := sql.GetConnectionURL(cfg.SQLConnection, cfg.SQLDatabaseName)
-	conf, err := pgxpool.ParseConfig(url)
-	if err != nil {
-		sklog.Fatalf("error getting postgres config %s: %s", url, err)
-	}
+	sqlDB := db.MustInitSQLDatabase(ctx, cfg)
 
-	conf.MaxConns = maxSQLConnections
-	sqlDB, err := pgxpool.ConnectConfig(ctx, conf)
-	if err != nil {
-		sklog.Fatalf("error connecting to the database: %s", err)
-	}
 	ingestionStore := sqlingestionstore.New(sqlDB)
 	sklog.Infof("Using new SQL ingestion store")
 

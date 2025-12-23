@@ -1,0 +1,14 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "db",
+    srcs = ["db.go"],
+    importpath = "go.goldmine.build/golden/go/db",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//go/sklog",
+        "//golden/go/config",
+        "//golden/go/sql",
+        "@com_github_jackc_pgx_v4//pgxpool",
+    ],
+)
