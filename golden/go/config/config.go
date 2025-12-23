@@ -180,10 +180,6 @@ type Common struct {
 	// tile size.
 	WindowSize int `json:"window_size"`
 
-	// If provided (e.g. ":9002"), a port serving performance-related and other debugging RPCS will
-	// be opened up. This RPC will not require authentication.
-	DebugPort string `json:"debug_port" optional:"true"`
-
 	// If running locally (not in production).
 	Local bool `json:"local"`
 
