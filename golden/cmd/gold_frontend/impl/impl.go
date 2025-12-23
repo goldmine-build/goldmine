@@ -71,8 +71,8 @@ func FrontendMain(ctx context.Context, cfg config.Common, flags config.ServerFla
 	rootRouter := mustMakeRootRouter(cfg, handlers, plogin)
 
 	// Start the server
-	sklog.Infof("Serving on http://127.0.0.1" + cfg.ReadyPort)
-	sklog.Fatal(http.ListenAndServe(cfg.ReadyPort, rootRouter))
+	sklog.Infof("Serving on http://127.0.0.1" + flags.Port)
+	sklog.Fatal(http.ListenAndServe(flags.Port, rootRouter))
 }
 
 func mustLoadSearchAPI(ctx context.Context, cfg config.Common, sqlDB *pgxpool.Pool, publiclyViewableParams publicparams.Matcher, systems []clstore.ReviewSystem) *search.Impl {

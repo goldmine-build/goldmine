@@ -153,6 +153,6 @@ func main() {
 	router.Handle("/*", httputils.LoggingGzipRequestResponse(appRouter))
 
 	// Start the server
-	sklog.Infof("Serving on http://127.0.0.1" + cfg.ReadyPort)
-	sklog.Fatal(http.ListenAndServe(cfg.ReadyPort, router))
+	sklog.Infof("Serving on http://127.0.0.1" + flags.Port)
+	sklog.Fatal(http.ListenAndServe(flags.Port, router))
 }

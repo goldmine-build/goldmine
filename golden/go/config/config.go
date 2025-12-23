@@ -17,6 +17,7 @@ type ServerFlags struct {
 	ConfigPath    string
 	ServicesFlag  string
 	Hang          bool
+	Port          string
 	PromPort      string
 	PprofPort     string
 	HealthzPort   string
@@ -29,6 +30,7 @@ func (s *ServerFlags) Flagset() *flag.FlagSet {
 	fs.StringVar(&s.ConfigPath, "config", "", "Path to the json5 file containing the instance configuration.")
 	fs.StringVar(&s.ServicesFlag, "services", "", "The list of services to run. If not provided then all services wil be run.")
 	fs.BoolVar(&s.Hang, "hang", false, "Stop and do nothing after reading the flags. Good for debugging containers.")
+	fs.StringVar(&s.Port, "port", ":8000", "Main UI address (e.g., ':8000')")
 	fs.StringVar(&s.PromPort, "prom_port", ":20000", "Metrics service address (e.g., ':20000')")
 	fs.StringVar(&s.PprofPort, "pprof_port", "", "PProf handler (e.g., ':9001'). PProf not enabled if the empty string (default).")
 	fs.StringVar(&s.HealthzPort, "healthz", ":10000", "Port that handles the healthz endpoint.")
@@ -160,9 +162,6 @@ type Common struct {
 
 	// Project ID that houses the pubsub topic.
 	PubsubProjectID string `json:"pubsub_project_id"`
-
-	// The port to provide a web handler for /healthz and any other web requests.
-	ReadyPort string `json:"ready_port"`
 
 	// URL where this app is hosted.
 	SiteURL string `json:"site_url"`
