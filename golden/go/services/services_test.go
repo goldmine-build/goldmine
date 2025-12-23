@@ -11,31 +11,25 @@ func TestValidate(t *testing.T) {
 	tests := []struct {
 		name string // description of this test case
 		// Named input parameters for target function.
-		flags   []string
+		flags   string
 		want    []Service
 		wantErr bool
 	}{
 		{
 			name:    "empty is valid",
-			flags:   []string{},
-			want:    AllServices,
-			wantErr: false,
-		},
-		{
-			name:    "nil is valid",
-			flags:   nil,
+			flags:   "",
 			want:    AllServices,
 			wantErr: false,
 		},
 		{
 			name:    "invalid services are caught",
-			flags:   []string{"this is not a valid service"},
+			flags:   "this is not a valid service",
 			want:    nil,
 			wantErr: true,
 		},
 		{
 			name:    "valid services are passed through",
-			flags:   []string{"frontend", "ingester"},
+			flags:   "frontend,ingester",
 			want:    []Service{Frontend, Ingester},
 			wantErr: false,
 		},

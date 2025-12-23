@@ -4,6 +4,7 @@ import (
 	"context"
 	"sync"
 
+	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"go.goldmine.build/go/sklog"
 	"go.goldmine.build/golden/go/config"
@@ -20,14 +21,23 @@ var (
 	dbOnce sync.Once
 )
 
-func MustInitSQLDatabase(ctx context.Context, cfg config.Common) *pgxpool.Pool {
+func MustInitSQLDatabase(ctx context.Context, cfg config.Common, logSQLQueries bool) *pgxpool.Pool {
 	dbOnce.Do(func() {
-		db = mustInitSQLDatabaseImpl(ctx, cfg)
+		db = mustInitSQLDatabaseImpl(ctx, cfg, logSQLQueries)
 	})
 	return db
 }
 
-func mustInitSQLDatabaseImpl(ctx context.Context, cfg config.Common) *pgxpool.Pool {
+// crdbLogger logs all SQL statements sent to the database.
+type crdbLogger struct{}
+
+func (l crdbLogger) Log(ctx context.Context, level pgx.LogLevel, msg string, data map[string]interface{}) {
+	sklog.Infof("[pgxpool %s] %q\n%+v\n", level, msg, data)
+}
+
+// mustInitSQLDatabase initializes a SQL database. If there are any errors, it will panic via
+// sklog.Fatal.
+func mustInitSQLDatabaseImpl(ctx context.Context, cfg config.Common, logSQLQueries bool) *pgxpool.Pool {
 	if cfg.SQLDatabaseName == "" {
 		sklog.Fatalf("Must have SQL Database Information")
 	}
@@ -36,7 +46,9 @@ func mustInitSQLDatabaseImpl(ctx context.Context, cfg config.Common) *pgxpool.Po
 	if err != nil {
 		sklog.Fatalf("error getting postgres config %s: %s", url, err)
 	}
-
+	if logSQLQueries && cfg.Local {
+		conf.ConnConfig.Logger = crdbLogger{}
+	}
 	conf.MaxConns = maxSQLConnections
 	db, err := pgxpool.ConnectConfig(ctx, conf)
 	if err != nil {

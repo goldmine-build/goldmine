@@ -4,6 +4,7 @@ package services
 
 import (
 	"slices"
+	"strings"
 
 	"go.goldmine.build/go/skerr"
 )
@@ -29,7 +30,12 @@ var AllServices []Service = []Service{
 
 // Validate takes in a list from command line flags and confirms each service
 // name is a valid value.
-func Validate(flags []string) ([]Service, error) {
+func Validate(flagsAsString string) ([]Service, error) {
+	flagsAsString = strings.TrimSpace(flagsAsString)
+	if flagsAsString == "" {
+		return AllServices, nil
+	}
+	flags := strings.Split(flagsAsString, ",")
 	ret := []Service{}
 
 	for _, f := range flags {

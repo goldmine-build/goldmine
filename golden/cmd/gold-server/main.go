@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"flag"
 	"net/http"
 
 	"go.goldmine.build/go/common"
@@ -16,28 +15,22 @@ import (
 	"golang.org/x/net/context"
 )
 
+var flags config.ServerFlags
+
 func main() {
 	// Command line flags.
-	var (
-		configPath   = flag.String("config", "", "Path to the json5 file containing the instance configuration.")
-		servicesFlag = common.NewMultiStringFlag("services", nil, "The list of services to run. If not provided then all services wil be run.")
-		hang         = flag.Bool("hang", false, "Stop and do nothing after reading the flags. Good for debugging containers.")
-		promPort     = flag.String("prom_port", ":20000", "Metrics service address (e.g., ':20000')")
-		pprofPort    = flag.String("pprof_port", "", "PProf handler (e.g., ':9001'). PProf not enabled if the empty string (default).")
-		healthzPort  = flag.String("healthz", ":10000", "Port that handles the healthz endpoint.")
-	)
-
 	common.InitWithMust(
 		"gold-server",
-		common.PrometheusOpt(promPort),
+		common.PrometheusOpt(&flags.PromPort),
+		common.FlagSetOpt((&flags).Flagset()),
 	)
 
-	activeServices, err := services.Validate(*servicesFlag)
+	activeServices, err := services.Validate(flags.ServicesFlag)
 	if err != nil {
 		sklog.Fatal(err)
 	}
 
-	if *hang {
+	if flags.Hang {
 		sklog.Info("Hanging")
 		select {}
 	}
@@ -45,7 +38,7 @@ func main() {
 	ctx := context.Background()
 
 	// Load the config file.
-	cfg, err := config.LoadConfigFromJSON5(*configPath)
+	cfg, err := config.LoadConfigFromJSON5(flags.ConfigPath)
 	if err != nil {
 		sklog.Fatalf("Reading config: %s", err)
 	}
@@ -57,7 +50,7 @@ func main() {
 	sklog.Infof("Loaded config\n %s", cfgAsJSON)
 
 	// Start pprof services.
-	profsrv.Start(*pprofPort)
+	profsrv.Start(flags.PprofPort)
 
 	// Each service will sklog.Fatal if they fail, so we don't need extra error
 	// handling here.
@@ -66,14 +59,14 @@ func main() {
 		sklog.Infof("Starting service: %q", s)
 		switch s {
 		case services.Ingester:
-			go ingestion.IngestionMain(ctx, cfg)
+			go ingestion.IngestionMain(ctx, cfg, flags)
 		case services.Periodic:
-			periodic.PeriodicTasksMain(ctx, cfg)
+			periodic.PeriodicTasksMain(ctx, cfg, flags)
 		}
 
 	}
 
 	// Handle healthz.
 	http.HandleFunc("/healthz", httputils.ReadyHandleFunc)
-	sklog.Fatal(http.ListenAndServe(*healthzPort, nil))
+	sklog.Fatal(http.ListenAndServe(flags.HealthzPort, nil))
 }

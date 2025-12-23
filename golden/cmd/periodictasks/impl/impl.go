@@ -48,9 +48,9 @@ const (
 
 // TODO(kjlubick) Add a task to check for abandoned CLs.
 
-func PeriodicTasksMain(ctx context.Context, cfg config.Common) {
+func PeriodicTasksMain(ctx context.Context, cfg config.Common, flags config.ServerFlags) {
 
-	db := db.MustInitSQLDatabase(ctx, cfg)
+	db := db.MustInitSQLDatabase(ctx, cfg, flags.LogSQLQueries)
 
 	startUpdateTracesIgnoreStatus(ctx, db, cfg)
 

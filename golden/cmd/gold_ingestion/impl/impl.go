@@ -26,7 +26,7 @@ import (
 	"go.opencensus.io/trace"
 )
 
-func IngestionMain(ctx context.Context, cfg config.Common) {
+func IngestionMain(ctx context.Context, cfg config.Common, flags config.ServerFlags) {
 
 	// Initialize client and start the ingesters.
 
@@ -40,7 +40,7 @@ func IngestionMain(ctx context.Context, cfg config.Common) {
 	//client := httputils.DefaultClientConfig().WithTokenSource(tokenSrc).With2xxOnly().WithDialTimeout(time.Second * 10).Client()
 	client := httputils.DefaultClientConfig().With2xxOnly().WithDialTimeout(time.Second * 10).Client()
 
-	sqlDB := db.MustInitSQLDatabase(ctx, cfg)
+	sqlDB := db.MustInitSQLDatabase(ctx, cfg, flags.LogSQLQueries)
 
 	ingestionStore := sqlingestionstore.New(sqlDB)
 	sklog.Infof("Using new SQL ingestion store")
