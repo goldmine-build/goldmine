@@ -65,6 +65,8 @@ go_deps = use_extension("@gazelle//:extensions.bzl", "go_deps")
 
 go_sdk = use_extension("@rules_go//go:extensions.bzl", "go_sdk")
 
+# `bazel mod tidy` will sometimes keep this list up to date, other times it
+# needs to be manually updated. :shrug:
 go_deps.from_file(go_mod = "//:go.mod")
 use_repo(
     go_deps,
