@@ -5,7 +5,6 @@ import (
 	"net/http/pprof"
 
 	"github.com/go-chi/chi/v5"
-	"go.goldmine.build/go/httputils"
 	"go.goldmine.build/go/sklog"
 )
 
@@ -15,9 +14,6 @@ func Start(port string) {
 	if port != "" {
 		// Add the profiling endpoints to the internal router.
 		internalRouter := chi.NewRouter()
-
-		// Set up the health check endpoint.
-		internalRouter.HandleFunc("/healthz", httputils.ReadyHandleFunc)
 
 		// Register pprof handlers
 		internalRouter.HandleFunc("/debug/pprof/", pprof.Index)

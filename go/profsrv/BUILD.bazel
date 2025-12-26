@@ -6,7 +6,6 @@ go_library(
     importpath = "go.goldmine.build/go/profsrv",
     visibility = ["//visibility:public"],
     deps = [
-        "//go/httputils",
         "//go/sklog",
         "@com_github_go_chi_chi_v5//:chi",
     ],
