@@ -16,6 +16,7 @@ import (
 
 	"github.com/cenkalti/backoff"
 	"github.com/fiorix/go-web/autogzip"
+	"github.com/go-chi/chi/v5"
 	"golang.org/x/oauth2"
 
 	"go.goldmine.build/go/metrics2"
@@ -699,6 +700,18 @@ func RunHealthCheckServer(port string) {
 	h = HealthzAndHTTPS(h)
 	http.Handle("/", h)
 	sklog.Fatal(http.ListenAndServe(port, nil))
+}
+
+func StartHealthzServer(port string) {
+	if port == "" {
+		sklog.Info("Not starting /healthz server, no port provided.")
+	}
+	go func() {
+		c := chi.NewRouter()
+		c.HandleFunc("/healthz", ReadyHandleFunc)
+		sklog.Infof("Healthz server on %q", port)
+		sklog.Fatal(http.ListenAndServe(port, c))
+	}()
 }
 
 // GetWithContext is a helper function to execute a GET request to the given url using the

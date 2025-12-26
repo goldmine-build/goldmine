@@ -80,6 +80,7 @@ use_repo(
     "com_github_cockroachdb_cockroach_go_v2",
     "com_github_davecgh_go_spew",
     "com_github_dustin_go_humanize",
+    "com_github_ejholmes_hookshot",
     "com_github_fiorix_go_web",
     "com_github_flynn_json5",
     "com_github_go_chi_chi_v5",

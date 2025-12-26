@@ -17,7 +17,6 @@ go_library(
         "//golden/go/db",
         "//golden/go/diff",
         "//golden/go/diff/worker",
-        "//golden/go/sql",
         "//golden/go/sql/schema",
         "//golden/go/types",
         "@com_github_cockroachdb_cockroach_go_v2//crdb/crdbpgx",
