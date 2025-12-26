@@ -24,6 +24,7 @@ type ServerFlags struct {
 	HealthzPort string
 	Secret      string
 	// TODO Need a list of approved accounts that can run CI workloads.
+	// TODO Need the ref to track for main, e.g. "refs/heads/main".
 }
 
 // Flagset constructs a flag.FlagSet for the App.

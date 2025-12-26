@@ -6,7 +6,7 @@
 Note that this is a push to a PR, so not necessarily to main.
 
 * `.ref` = "refs/heads/github-webhook" which is not main, but a PR.'. If it was main the value would be "refs/heads/main".
-* `.after` = 6ae9c29e1c2e591cad5e816311fb10a4f83acf64 is the git hash to checkout if not checking out main.
+* `.after` = 6ae9c29e1c2e591cad5e816311fb10a4f83acf64 is the git hash to checkout if not checking out via "main".
 
 ```shell
 git fetch origin refs/heads/main
@@ -183,8 +183,11 @@ Important pieces of info:
 * `.pull_request.commits` = 2 is the revision number of the PR, kinda. But maybe we should just count them ourselves?
 * `.pull_request.state` = "open" is the state of the PR.
 * `.pull_request.user.login` = "jcgregorio" is the login of the user creating the pull request.
+* `.pull_request.sender.login` = "jcgregorio" how is this different from user?
 * `.pull_request.sha` = "38b2d792066ed72ed07c464b0be27351d1d8fbfc" is the sha we can checkout in detached head.
 
+Storage is a JSON file, just a list, with the PR events in order, so we always append. Stored in S3/GCS where
+the PR number is the filename, e.g. `gcs://pull_requests_bucket/6.json`.
 
 ```shell
 $ git fetch origin pull/6/head
@@ -199,7 +202,6 @@ $ git checkout FETCH_HEAD
 $ git checkout 38b2d792066ed72ed07c464b0be27351d1d8fbfc
 HEAD is now at 38b2d7920 Decode ping, push, and pr events.
 jcgregorio@joelegion ~/goldmine ((38b2d7920...) %) 
-
 ```
 
 ```json
