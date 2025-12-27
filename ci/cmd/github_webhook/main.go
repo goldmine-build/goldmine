@@ -1,8 +1,9 @@
 // Application that accepts github webhook events and then queues the
-// appropriate work to temporal for CI.
+// appropriate work to Temporal for CI.
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"flag"
 	"net/http"
@@ -11,6 +12,7 @@ import (
 	"github.com/ejholmes/hookshot"
 	"github.com/ejholmes/hookshot/events"
 	"github.com/go-chi/chi/v5"
+	"go.goldmine.build/ci/go/triggers/github"
 	"go.goldmine.build/go/common"
 	"go.goldmine.build/go/httputils"
 	"go.goldmine.build/go/profsrv"
@@ -23,23 +25,39 @@ type ServerFlags struct {
 	PprofPort   string
 	HealthzPort string
 	Secret      string
-	// TODO Need a list of approved accounts that can run CI workloads.
-	// TODO Need the ref to track for main, e.g. "refs/heads/main".
+	Main        string
+
+	// Storage info need by PRConvert.
+	StorageCredentialsDir string
+	StorageEndpoint       string
+	StorageUseSSL         bool
+	StorageBucketName     string
+	StoragePRPath         string
 }
 
 // Flagset constructs a flag.FlagSet for the App.
 func (s *ServerFlags) Flagset() *flag.FlagSet {
 	fs := flag.NewFlagSet("gold-server", flag.ExitOnError)
-	fs.StringVar(&s.Port, "port", ":8000", "Main UI address (e.g., ':8000')")
-	fs.StringVar(&s.PromPort, "prom_port", ":20000", "Metrics service address (e.g., ':20000')")
+	fs.StringVar(&s.Port, "port", ":8000", "Main UI address (e.g., ':8000').")
+	fs.StringVar(&s.PromPort, "prom_port", ":20000", "Metrics service address (e.g., ':20000').")
 	fs.StringVar(&s.PprofPort, "pprof_port", "", "PProf handler (e.g., ':9001'). PProf not enabled if the empty string (default).")
 	fs.StringVar(&s.HealthzPort, "healthz_port", ":10000", "The port for health checks.")
-	fs.StringVar(&s.Secret, "secret", "", "The file location of the github-webhook-secret")
+	fs.StringVar(&s.Secret, "secret", "", "The file location of the github-webhook-secret.")
+	fs.StringVar(&s.Main, "main", "refs/heads/main", "The name of the main branch to follow.")
+
+	fs.StringVar(&s.StorageCredentialsDir, "store_cred_dir", "", "Directory that contains storage credentials in two files, 'key' and 'secret'.")
+	fs.StringVar(&s.StorageEndpoint, "store_endpoint", "", "Storage endpoint, such as play.min.io")
+	fs.BoolVar(&s.StorageUseSSL, "store_ssl", true, "Use SSL when connecting to --store_endpoint")
+	fs.StringVar(&s.StorageBucketName, "store_bucket", "", "Storage bucket name.")
+	fs.StringVar(&s.StoragePRPath, "store_pr_path", "", "Storage directory in the bucket that holds the Pull Request info.")
 
 	return fs
 }
 
-var flags ServerFlags
+var (
+	flags     ServerFlags
+	prConvert *github.PRConvert
+)
 
 func HandlePing(w http.ResponseWriter, r *http.Request) {
 	sklog.Infof("Got ping")
@@ -62,8 +80,14 @@ func HandlePush(w http.ResponseWriter, r *http.Request) {
 	var push events.Push
 	err := json.NewDecoder(r.Body).Decode(&push)
 	if err != nil {
-		sklog.Errorf("decoding ping: %s", err)
+		sklog.Errorf("decoding push: %s", err)
 	}
+
+	if push.Ref != flags.Main {
+		sklog.Infof("Ignoring push to non-main branch %q", push.Ref)
+		return
+	}
+
 	b, err := json.MarshalIndent(push, "", "  ")
 	if err != nil {
 		sklog.Error(err)
@@ -77,8 +101,25 @@ func HandlePullRequest(w http.ResponseWriter, r *http.Request) {
 	var pull events.PullRequest
 	err := json.NewDecoder(r.Body).Decode(&pull)
 	if err != nil {
-		sklog.Errorf("decoding ping: %s", err)
+		sklog.Errorf("decoding pull request: %s", err)
 	}
+
+	// Now trigger the Temporal workflow by passing in the prNumber,
+	// patchsetNumber, login, and sha. Well do the checking in the Workflow for
+	// login being a valid CI user, so that way errors here will be visible, as
+	// opposed to silently swallowing them.
+	wf, err := prConvert.WorkflowArgsFromPullRequest(context.Background(), github.Patchset{
+		PRNumber: pull.Number,
+		Login:    pull.PullRequest.User.Login,
+		SHA:      pull.PullRequest.Head.Sha,
+	})
+	if err != nil {
+		sklog.Errorf("Failed to create/update pull request: %s", err)
+	}
+
+	// Just log for now until we have the workflow to trigger.
+	sklog.Infof("Workflow: %#v", wf)
+
 	b, err := json.MarshalIndent(pull, "", "  ")
 	if err != nil {
 		sklog.Error(err)
@@ -93,6 +134,18 @@ func main() {
 		common.PrometheusOpt(&flags.PromPort),
 		common.FlagSetOpt((&flags).Flagset()),
 	)
+
+	var err error
+	prConvert, err = github.New(
+		flags.StorageCredentialsDir,
+		flags.StorageEndpoint,
+		flags.StorageUseSSL,
+		flags.StoragePRPath,
+		flags.StorageBucketName,
+	)
+	if err != nil {
+		sklog.Fatalf("Creating PRConvert: %s", err)
+	}
 
 	// Start pprof services.
 	profsrv.Start(flags.PprofPort)

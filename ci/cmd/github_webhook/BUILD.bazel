@@ -1,0 +1,37 @@
+load("@rules_go//go:def.bzl", "go_binary", "go_library")
+load("//bazel:app_container.bzl", "app_container")
+
+go_library(
+    name = "github_webhook_lib",
+    srcs = ["main.go"],
+    importpath = "go.goldmine.build/ci/cmd/github_webhook",
+    visibility = ["//visibility:private"],
+    deps = [
+        "//ci/go/triggers/github:github_lib",
+        "//go/common",
+        "//go/httputils",
+        "//go/profsrv",
+        "//go/skerr",
+        "//go/sklog",
+        "@com_github_ejholmes_hookshot//:hookshot",
+        "@com_github_ejholmes_hookshot//events",
+        "@com_github_go_chi_chi_v5//:chi",
+        "@com_github_minio_minio_go_v7//:minio-go",
+        "@com_github_minio_minio_go_v7//pkg/credentials",
+    ],
+)
+
+go_binary(
+    name = "github_webhook",
+    embed = [":github_webhook_lib"],
+    visibility = ["//visibility:public"],
+)
+
+app_container(
+    name = "github_webhook_container",
+    base = "@base",
+    cmd = [],
+    entrypoint = "/usr/local/bin/github_webhook",
+    exe = "//ci/cmd/github_webhook:github_webhook",
+    repository = "ghcr.io/goldmine-build/github-webhook",
+)
