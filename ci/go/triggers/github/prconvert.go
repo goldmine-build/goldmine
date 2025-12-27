@@ -12,6 +12,7 @@ import (
 
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
+	shared "go.goldmine.build/ci/go"
 	"go.goldmine.build/go/skerr"
 	"go.goldmine.build/go/sklog"
 )
@@ -79,14 +80,6 @@ type Patchset struct {
 	SHA      string
 }
 
-// TrybotWorkflowArgs is all the info we need to send off to Temporal to run the
-// CI.
-type TrybotWorkflowArgs struct {
-	PRNumber       int
-	PatchsetNumber int
-	SHA            string
-}
-
 // allPatchsets is the file format (in JSON) of the file we write to the storage
 // system to keep track of all the Pull Request updated we've seen.
 type allPatchsets []Patchset
@@ -94,7 +87,7 @@ type allPatchsets []Patchset
 // WorkflowArgsFromPullRequest adds the latest Patchset to the given PR and then
 // returns a TryotWorkflowArgs that contains all the information the CI will
 // need to run the tests.
-func (prc *PRConvert) WorkflowArgsFromPullRequest(ctx context.Context, p Patchset) (*TrybotWorkflowArgs, error) {
+func (prc *PRConvert) WorkflowArgsFromPullRequest(ctx context.Context, p Patchset) (*shared.TrybotWorkflowArgs, error) {
 	filename := fmt.Sprintf("%s/%d.txt", prc.path, p.PRNumber)
 
 	// TODO if the GetObject fails we should probably retry.
@@ -122,7 +115,7 @@ func (prc *PRConvert) WorkflowArgsFromPullRequest(ctx context.Context, p Patchse
 		sklog.Errorf("Failed to store file back to storage: %s", err)
 	}
 
-	return &TrybotWorkflowArgs{
+	return &shared.TrybotWorkflowArgs{
 		PRNumber:       p.PRNumber,
 		PatchsetNumber: patchsetNumber,
 		SHA:            p.SHA,
