@@ -12,6 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# BuildBuddy
+# Follow the instructions at https://app.buildbuddy.io/docs/setup/ to get an API key and place
+build --bes_results_url=https://app.buildbuddy.io/invocation/
+build --bes_backend=grpcs://remote.buildbuddy.io
+
 # Enable Bzlmod for every Bazel command
 common --enable_bzlmod
 

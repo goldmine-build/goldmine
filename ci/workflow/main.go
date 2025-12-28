@@ -5,7 +5,6 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"time"
@@ -13,6 +12,7 @@ import (
 	shared "go.goldmine.build/ci/go"
 	"go.goldmine.build/go/common"
 	"go.goldmine.build/go/git"
+	"go.goldmine.build/go/sklog"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/temporal"
 	"go.temporal.io/sdk/worker"
@@ -51,7 +51,7 @@ func main() {
 
 	c, err := client.Dial(client.Options{})
 	if err != nil {
-		log.Fatalln("Unable to create Temporal client.", err)
+		sklog.Fatalf("Unable to create Temporal client: %s", err)
 	}
 	defer c.Close()
 
@@ -66,7 +66,7 @@ func main() {
 	// Start listening to the Task Queue.
 	err = w.Run(worker.InterruptCh())
 	if err != nil {
-		log.Fatalln("unable to start Worker", err)
+		sklog.Fatalf("Unable to start Worker: %s", err)
 	}
 
 }
@@ -96,7 +96,8 @@ func GoldmineCI(ctx workflow.Context, input shared.TrybotWorkflowArgs) (string, 
 		return "", err
 	}
 
-	err = workflow.ExecuteActivity(ctx, RunTests, input).Get(ctx, nil)
+	var logs string
+	err = workflow.ExecuteActivity(ctx, RunTests, input).Get(ctx, &logs)
 	if err != nil {
 		return "", err
 	}
@@ -105,24 +106,26 @@ func GoldmineCI(ctx workflow.Context, input shared.TrybotWorkflowArgs) (string, 
 	if err != nil {
 		return "", err
 	}
-
 	return "CI run complete", nil
 }
 
 func CheckoutCode(ctx context.Context, input shared.TrybotWorkflowArgs) (string, error) {
 	checkout, err := git.NewCheckout(ctx, "https://github.com/goldmine-build/goldmine.git", flags.CheckoutDir)
 	if err != nil {
+		sklog.Errorf("Failed checkout: %s", err)
 		return "Failed checkout", err
 	}
 
 	refs := fmt.Sprintf("refs/pull/%d/head", input.PRNumber)
 	_, err = checkout.Git(ctx, "fetch", "origin", refs)
 	if err != nil {
+		sklog.Errorf("Failed to pull ref: %s", err)
 		return "Failed to pull the ref", err
 	}
 
 	_, err = checkout.Git(ctx, "checkout", "FETCH_HEAD")
 	if err != nil {
+		sklog.Errorf("Failed to checkout FETCH_HEAD: %s", err)
 		return "Failed to checkout the ref", err
 	}
 
@@ -137,9 +140,11 @@ func RunTests(ctx context.Context, input shared.TrybotWorkflowArgs) (string, err
 	cmd := exec.CommandContext(ctx, bazel, "test", "//golden/modules/...", "//perf/modules/...", "//go/...")
 	cmd.Env = os.Environ()
 	cmd.Env = append(cmd.Env, "PWD="+flags.CheckoutDir)
+
+	// TODO Use streaming output and pull the BuildBuddy URL from the output and write that back to the GitHub PR.
 	b, err := cmd.CombinedOutput()
 	if err != nil {
-		return string(b), err
+		return "Bokeh!", temporal.NewApplicationError(string(b), "bazel failure")
 	}
 
 	return "RunTests Success", nil

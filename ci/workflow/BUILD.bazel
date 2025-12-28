@@ -5,6 +5,16 @@ go_library(
     srcs = ["main.go"],
     importpath = "go.goldmine.build/ci/workflow",
     visibility = ["//visibility:private"],
+    deps = [
+        "//ci/go",
+        "//go/common",
+        "//go/git",
+        "@io_temporal_go_sdk//activity",
+        "@io_temporal_go_sdk//client",
+        "@io_temporal_go_sdk//temporal",
+        "@io_temporal_go_sdk//worker",
+        "@io_temporal_go_sdk//workflow",
+    ],
 )
 
 go_binary(
