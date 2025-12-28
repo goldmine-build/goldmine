@@ -98,15 +98,22 @@ func GoldmineCI(ctx workflow.Context, input shared.TrybotWorkflowArgs) (string, 
 	// Apply the options.
 	ctx = workflow.WithActivityOptions(ctx, options)
 
+	// TODO Is there a way to start bazel and keep it running?
+
 	err := workflow.ExecuteActivity(ctx, CheckoutCode, input).Get(ctx, nil)
 	if err != nil {
 		return "", err
 	}
 
+	// TODO Spin up emulators.
+
 	err = workflow.ExecuteActivity(ctx, RunTests, input).Get(ctx, nil)
 	if err != nil {
 		return "", err
 	}
+
+	// TODO Spin down emulators. Note we spin up and down because there might be
+	// new emulators added or updated.
 
 	err = workflow.ExecuteActivity(ctx, UploadGoldResults, input).Get(ctx, nil)
 	if err != nil {
@@ -156,7 +163,7 @@ func RunTests(ctx context.Context, input shared.TrybotWorkflowArgs) error {
 	//     INFO: Streaming build results to: https://app.buildbuddy.io/invocation/some-uuid-here
 	b, err := cmd.CombinedOutput()
 	if err != nil {
-		return appError(err, string(b))
+		return appError(err, "Failed to build:\n%s", string(b))
 	}
 
 	return nil
