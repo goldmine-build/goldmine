@@ -8,4 +8,5 @@ type TrybotWorkflowArgs struct {
 	PRNumber       int    `json:"pr"`
 	PatchsetNumber int    `json:"patchset"`
 	SHA            string `json:"sha"`
+	Login          string `json:"login"`
 }

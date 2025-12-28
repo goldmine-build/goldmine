@@ -119,5 +119,6 @@ func (prc *PRConvert) WorkflowArgsFromPullRequest(ctx context.Context, p Patchse
 		PRNumber:       p.PRNumber,
 		PatchsetNumber: patchsetNumber,
 		SHA:            p.SHA,
+		Login:          p.Login,
 	}, nil
 }

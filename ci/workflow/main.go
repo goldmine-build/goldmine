@@ -7,11 +7,13 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"slices"
 	"time"
 
 	shared "go.goldmine.build/ci/go"
 	"go.goldmine.build/go/common"
 	"go.goldmine.build/go/git"
+	"go.goldmine.build/go/skerr"
 	"go.goldmine.build/go/sklog"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/temporal"
@@ -40,6 +42,8 @@ func (s *ServerFlags) Flagset() *flag.FlagSet {
 }
 
 var flags ServerFlags
+
+var approvedCIUsers = []string{"jcgregorio"}
 
 func main() {
 	// Command line flags.
@@ -72,6 +76,9 @@ func main() {
 }
 
 func GoldmineCI(ctx workflow.Context, input shared.TrybotWorkflowArgs) (string, error) {
+	if !slices.Contains(approvedCIUsers, input.Login) {
+		return "", temporal.NewApplicationError(input.Login+" is not approved CI user.", "auth failure")
+	}
 	// RetryPolicy specifies how to automatically handle retries if an Activity fails.
 	retrypolicy := &temporal.RetryPolicy{
 		InitialInterval:        time.Second,
@@ -96,8 +103,7 @@ func GoldmineCI(ctx workflow.Context, input shared.TrybotWorkflowArgs) (string, 
 		return "", err
 	}
 
-	var logs string
-	err = workflow.ExecuteActivity(ctx, RunTests, input).Get(ctx, &logs)
+	err = workflow.ExecuteActivity(ctx, RunTests, input).Get(ctx, nil)
 	if err != nil {
 		return "", err
 	}
@@ -109,48 +115,54 @@ func GoldmineCI(ctx workflow.Context, input shared.TrybotWorkflowArgs) (string, 
 	return "CI run complete", nil
 }
 
-func CheckoutCode(ctx context.Context, input shared.TrybotWorkflowArgs) (string, error) {
+func appError(err error, format string, args ...interface{}) error {
+	fullErrorMsg := fmt.Sprintf("%s:%s", fmt.Sprintf(format, args...), err)
+	sklog.Error(fullErrorMsg)
+	return temporal.NewApplicationError(fullErrorMsg, "app error")
+}
+
+func CheckoutCode(ctx context.Context, input shared.TrybotWorkflowArgs) error {
 	checkout, err := git.NewCheckout(ctx, "https://github.com/goldmine-build/goldmine.git", flags.CheckoutDir)
 	if err != nil {
-		sklog.Errorf("Failed checkout: %s", err)
-		return "Failed checkout", err
+		return appError(err, "Failed checkout")
 	}
 
 	refs := fmt.Sprintf("refs/pull/%d/head", input.PRNumber)
 	_, err = checkout.Git(ctx, "fetch", "origin", refs)
 	if err != nil {
-		sklog.Errorf("Failed to pull ref: %s", err)
-		return "Failed to pull the ref", err
+		return appError(err, "Failed to pull ref: %s", refs)
 	}
 
 	_, err = checkout.Git(ctx, "checkout", "FETCH_HEAD")
 	if err != nil {
-		sklog.Errorf("Failed to checkout FETCH_HEAD: %s", err)
-		return "Failed to checkout the ref", err
+		return appError(err, "Failed to checkout FETCH_HEAD")
 	}
 
-	return "Checkout Success", nil
+	return nil
 }
 
-func RunTests(ctx context.Context, input shared.TrybotWorkflowArgs) (string, error) {
+func RunTests(ctx context.Context, input shared.TrybotWorkflowArgs) error {
 	bazel, err := exec.LookPath("bazelisk")
 	if err != nil {
-		return "Could not find bazelisk", err
+		return skerr.Wrap(err)
 	}
 	cmd := exec.CommandContext(ctx, bazel, "test", "//golden/modules/...", "//perf/modules/...", "//go/...")
 	cmd.Env = os.Environ()
 	cmd.Env = append(cmd.Env, "PWD="+flags.CheckoutDir)
 
 	// TODO Use streaming output and pull the BuildBuddy URL from the output and write that back to the GitHub PR.
+	// The line looks like:
+	//
+	//     INFO: Streaming build results to: https://app.buildbuddy.io/invocation/some-uuid-here
 	b, err := cmd.CombinedOutput()
 	if err != nil {
-		return "Bokeh!", temporal.NewApplicationError(string(b), "bazel failure")
+		return appError(err, string(b))
 	}
 
-	return "RunTests Success", nil
+	return nil
 }
 
-func UploadGoldResults(ctx context.Context, input shared.TrybotWorkflowArgs) (string, error) {
+func UploadGoldResults(ctx context.Context, input shared.TrybotWorkflowArgs) error {
 	// TBD
-	return "UploadGoldResults not implemented yet.", nil
+	return nil
 }
