@@ -5,16 +5,20 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"net/url"
 	"os"
 	"os/exec"
+	"path"
 	"slices"
 	"time"
 
 	shared "go.goldmine.build/ci/go"
 	"go.goldmine.build/go/common"
 	"go.goldmine.build/go/git"
+	"go.goldmine.build/go/git/provider/providers/gitapi"
 	"go.goldmine.build/go/skerr"
 	"go.goldmine.build/go/sklog"
+	"go.temporal.io/sdk/activity"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/temporal"
 	"go.temporal.io/sdk/worker"
@@ -27,6 +31,13 @@ type ServerFlags struct {
 	PprofPort   string
 	HealthzPort string
 	CheckoutDir string
+
+	PatPath string
+	Owner   string
+	Repo    string
+	Branch  string
+
+	TemporalDomain string
 }
 
 // Flagset constructs a flag.FlagSet for the App.
@@ -38,12 +49,20 @@ func (s *ServerFlags) Flagset() *flag.FlagSet {
 	fs.StringVar(&s.HealthzPort, "healthz_port", ":10000", "The port for health checks.")
 	fs.StringVar(&s.CheckoutDir, "checkout_dir", "", "The file location of the git checkout.")
 
+	fs.StringVar(&s.PatPath, "pat_path", "", "The file location of the git auth token in a file.")
+	fs.StringVar(&s.Owner, "owner", "goldmine-build", "GitHub user or organization.")
+	fs.StringVar(&s.Repo, "repo", "goldmine", "GitHub repo.")
+	fs.StringVar(&s.Branch, "branch", "main", "GitHub repo branch.")
+	fs.StringVar(&s.TemporalDomain, "domain", "https://temporal.tail433733.ts.net", "Temporal UI domain name.")
+
 	return fs
 }
 
 var flags ServerFlags
 
 var approvedCIUsers = []string{"jcgregorio"}
+var gitApi *gitapi.GitApi = nil
+var temporalDomain *url.URL
 
 func main() {
 	// Command line flags.
@@ -59,10 +78,22 @@ func main() {
 	}
 	defer c.Close()
 
+	gitApi, err = gitapi.New(context.Background(), flags.PatPath, flags.Owner, flags.Repo, flags.Branch)
+	if err != nil {
+		sklog.Fatalf("Unable to create GitHub API: %s", err)
+	}
+
+	temporalDomain, err = url.Parse(flags.TemporalDomain)
+	if err != nil {
+		sklog.Fatalf("Failed to parse Temporal Domain %q: %s", flags.TemporalDomain, err)
+	}
+
 	w := worker.New(c, shared.GitHubGoldMineCIQueue, worker.Options{})
 
 	// This worker hosts both Workflow and Activity functions.
 	w.RegisterWorkflow(GoldmineCI)
+
+	// And set the status, url, description, and context.
 	w.RegisterActivity(CheckoutCode)
 	w.RegisterActivity(RunTests)
 	w.RegisterActivity(UploadGoldResults)
@@ -83,7 +114,7 @@ func GoldmineCI(ctx workflow.Context, input shared.TrybotWorkflowArgs) (string, 
 	retrypolicy := &temporal.RetryPolicy{
 		InitialInterval:        time.Second,
 		BackoffCoefficient:     2.0,
-		MaximumAttempts:        2,
+		MaximumAttempts:        1,
 		NonRetryableErrorTypes: []string{},
 	}
 
@@ -122,27 +153,60 @@ func GoldmineCI(ctx workflow.Context, input shared.TrybotWorkflowArgs) (string, 
 	return "CI run complete", nil
 }
 
-func appError(err error, format string, args ...interface{}) error {
+type Context string
+
+const (
+	Infra Context = "Infra"
+	CI    Context = "CI"
+)
+
+func infraError(ctx context.Context, input shared.TrybotWorkflowArgs, err error, format string, args ...interface{}) error {
+	return _error(ctx, Infra, input, err, format, args...)
+}
+
+func buildError(ctx context.Context, input shared.TrybotWorkflowArgs, err error, format string, args ...interface{}) error {
+	return _error(ctx, CI, input, err, format, args...)
+}
+
+func _error(ctx context.Context, context Context, input shared.TrybotWorkflowArgs, err error, format string, args ...interface{}) error {
 	fullErrorMsg := fmt.Sprintf("%s:%s", fmt.Sprintf(format, args...), err)
 	sklog.Error(fullErrorMsg)
+	info := activity.GetInfo(ctx)
+	workflowID := info.WorkflowExecution.ID
+	runID := info.WorkflowExecution.RunID
+	ns := info.WorkflowNamespace
+
+	// Construct URL from workflow ID?
+	// https://your-ui-host/namespaces/{namespace}/workflows/{workflowId}/{runId}/history
+
+	u := url.URL{
+		Scheme: temporalDomain.Scheme,
+		Host:   temporalDomain.Host,
+		Path:   path.Join("namespaces", ns, "workflows", workflowID, runID, "history"),
+	}
+
+	err = gitApi.SetStatus(ctx, input.SHA, gitapi.Error, u.String(), fullErrorMsg, string(context))
+	if err != nil {
+		sklog.Errorf("Failed to set GitHub status: %s", err)
+	}
 	return temporal.NewApplicationError(fullErrorMsg, "app error")
 }
 
 func CheckoutCode(ctx context.Context, input shared.TrybotWorkflowArgs) error {
 	checkout, err := git.NewCheckout(ctx, "https://github.com/goldmine-build/goldmine.git", flags.CheckoutDir)
 	if err != nil {
-		return appError(err, "Failed checkout")
+		return infraError(ctx, input, err, "Failed checkout")
 	}
 
 	refs := fmt.Sprintf("refs/pull/%d/head", input.PRNumber)
 	_, err = checkout.Git(ctx, "fetch", "origin", refs)
 	if err != nil {
-		return appError(err, "Failed to pull ref: %s", refs)
+		return infraError(ctx, input, err, "Failed to pull ref: %s", refs)
 	}
 
 	_, err = checkout.Git(ctx, "checkout", "FETCH_HEAD")
 	if err != nil {
-		return appError(err, "Failed to checkout FETCH_HEAD")
+		return infraError(ctx, input, err, "Failed to checkout FETCH_HEAD")
 	}
 
 	return nil
@@ -161,9 +225,10 @@ func RunTests(ctx context.Context, input shared.TrybotWorkflowArgs) error {
 	// The line looks like:
 	//
 	//     INFO: Streaming build results to: https://app.buildbuddy.io/invocation/some-uuid-here
-	b, err := cmd.CombinedOutput()
+	_, err = cmd.CombinedOutput()
 	if err != nil {
-		return appError(err, "Failed to build:\n%s", string(b))
+		// TODO, pass in the buildbuddy URL to buildError handler.
+		return buildError(ctx, input, err, "Failed to build")
 	}
 
 	return nil
