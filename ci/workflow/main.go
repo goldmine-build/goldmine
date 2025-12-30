@@ -2,14 +2,17 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"flag"
 	"fmt"
+	"io"
 	"net/url"
 	"os"
 	"os/exec"
 	"path"
 	"slices"
+	"strings"
 	"time"
 
 	shared "go.goldmine.build/ci/go"
@@ -60,6 +63,13 @@ func (s *ServerFlags) Flagset() *flag.FlagSet {
 
 var flags ServerFlags
 
+type Context string
+
+const (
+	Infra Context = "Infra"
+	CI    Context = "CI"
+)
+
 var approvedCIUsers = []string{"jcgregorio"}
 var gitApi *gitapi.GitApi = nil
 var temporalDomain *url.URL
@@ -108,7 +118,7 @@ func main() {
 
 func GoldmineCI(ctx workflow.Context, input shared.TrybotWorkflowArgs) (string, error) {
 	if !slices.Contains(approvedCIUsers, input.Login) {
-		return "", temporal.NewApplicationError(input.Login+" is not approved CI user.", "auth failure")
+		return "", temporal.NewApplicationError(input.Login+" is not an approved CI user.", "auth failure")
 	}
 	// RetryPolicy specifies how to automatically handle retries if an Activity fails.
 	retrypolicy := &temporal.RetryPolicy{
@@ -129,15 +139,13 @@ func GoldmineCI(ctx workflow.Context, input shared.TrybotWorkflowArgs) (string, 
 	// Apply the options.
 	ctx = workflow.WithActivityOptions(ctx, options)
 
-	// TODO Is there a way to start bazel and keep it running?
-
 	err := workflow.ExecuteActivity(ctx, CheckoutCode, input).Get(ctx, nil)
 	if err != nil {
 		return "", err
 	}
 
 	// TODO Spin up emulators.
-
+	// TODO Is there a way to start bazel and keep it running?
 	err = workflow.ExecuteActivity(ctx, RunTests, input).Get(ctx, nil)
 	if err != nil {
 		return "", err
@@ -146,6 +154,7 @@ func GoldmineCI(ctx workflow.Context, input shared.TrybotWorkflowArgs) (string, 
 	// TODO Spin down emulators. Note we spin up and down because there might be
 	// new emulators added or updated.
 
+	// Upload Gold results.
 	err = workflow.ExecuteActivity(ctx, UploadGoldResults, input).Get(ctx, nil)
 	if err != nil {
 		return "", err
@@ -153,22 +162,7 @@ func GoldmineCI(ctx workflow.Context, input shared.TrybotWorkflowArgs) (string, 
 	return "CI run complete", nil
 }
 
-type Context string
-
-const (
-	Infra Context = "Infra"
-	CI    Context = "CI"
-)
-
 func infraError(ctx context.Context, input shared.TrybotWorkflowArgs, err error, format string, args ...interface{}) error {
-	return _error(ctx, Infra, input, err, format, args...)
-}
-
-func buildError(ctx context.Context, input shared.TrybotWorkflowArgs, err error, format string, args ...interface{}) error {
-	return _error(ctx, CI, input, err, format, args...)
-}
-
-func _error(ctx context.Context, context Context, input shared.TrybotWorkflowArgs, err error, format string, args ...interface{}) error {
 	fullErrorMsg := fmt.Sprintf("%s:%s", fmt.Sprintf(format, args...), err)
 	sklog.Error(fullErrorMsg)
 	info := activity.GetInfo(ctx)
@@ -185,11 +179,22 @@ func _error(ctx context.Context, context Context, input shared.TrybotWorkflowArg
 		Path:   path.Join("namespaces", ns, "workflows", workflowID, runID, "history"),
 	}
 
-	err = gitApi.SetStatus(ctx, input.SHA, gitapi.Error, u.String(), fullErrorMsg, string(context))
+	err = gitApi.SetStatus(ctx, input.SHA, gitapi.Error, u.String(), fullErrorMsg, string(Infra))
 	if err != nil {
 		sklog.Errorf("Failed to set GitHub status: %s", err)
 	}
 	return temporal.NewApplicationError(fullErrorMsg, "app error")
+}
+
+func buildStatus(ctx context.Context, input shared.TrybotWorkflowArgs, state gitapi.State, link string, msg string, buildErr error) error {
+	err := gitApi.SetStatus(ctx, input.SHA, state, link, msg, string(CI))
+	if err != nil {
+		sklog.Errorf("Failed to set GitHub status: %s", err)
+	}
+	if buildErr != nil {
+		return temporal.NewApplicationError(fmt.Sprintf("%s: %s", msg, buildErr), "ci error")
+	}
+	return nil
 }
 
 func CheckoutCode(ctx context.Context, input shared.TrybotWorkflowArgs) error {
@@ -221,17 +226,46 @@ func RunTests(ctx context.Context, input shared.TrybotWorkflowArgs) error {
 	cmd.Env = os.Environ()
 	cmd.Env = append(cmd.Env, "PWD="+flags.CheckoutDir)
 
-	// TODO Use streaming output and pull the BuildBuddy URL from the output and write that back to the GitHub PR.
-	// The line looks like:
-	//
-	//     INFO: Streaming build results to: https://app.buildbuddy.io/invocation/some-uuid-here
-	_, err = cmd.CombinedOutput()
+	stderr, err := cmd.StderrPipe()
 	if err != nil {
-		// TODO, pass in the buildbuddy URL to buildError handler.
-		return buildError(ctx, input, err, "Failed to build")
+		return skerr.Wrap(err)
+	}
+
+	err = cmd.Start()
+	if err != nil {
+		return infraError(ctx, input, err, "Failed to start build")
+	}
+
+	link, err := findBuildBuddyLink(stderr)
+	sklog.Infof("LINK: %q", link)
+	if err != nil {
+		_ = buildStatus(ctx, input, gitapi.Pending, link, "Running tests", nil)
+	}
+
+	if err := cmd.Wait(); err != nil {
+		return buildStatus(ctx, input, gitapi.Error, link, "Tests failed", err)
 	}
 
 	return nil
+}
+
+const bazelStreamingTargetPrefix = "INFO: Streaming build results to: "
+
+// TODO Use streaming output and pull the BuildBuddy URL from the output and write that back to the GitHub PR.
+// The line looks like:
+//
+//	INFO: Streaming build results to: https://app.buildbuddy.io/invocation/some-uuid-here
+func findBuildBuddyLink(stderr io.ReadCloser) (string, error) {
+	s := bufio.NewScanner(stderr)
+	for s.Scan() {
+		line := s.Text()
+		if strings.HasPrefix(line, bazelStreamingTargetPrefix) {
+			link := strings.TrimSpace(line[len(bazelStreamingTargetPrefix):])
+			sklog.Infof("link: %q", link)
+			return link, nil
+		}
+	}
+	return "", skerr.Fmt("BuildBuddy link not found")
 }
 
 func UploadGoldResults(ctx context.Context, input shared.TrybotWorkflowArgs) error {
