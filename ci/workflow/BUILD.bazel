@@ -12,11 +12,8 @@ go_library(
         "//go/git/provider/providers/gitapi",
         "//go/skerr",
         "//go/sklog",
-        "@io_temporal_go_sdk//activity",
-        "@io_temporal_go_sdk//client",
-        "@io_temporal_go_sdk//temporal",
-        "@io_temporal_go_sdk//worker",
-        "@io_temporal_go_sdk//workflow",
+        "@com_github_restatedev_sdk_go//:sdk-go",
+        "@com_github_restatedev_sdk_go//server",
     ],
 )
 

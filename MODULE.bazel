@@ -110,6 +110,7 @@ use_repo(
     "com_github_pmezard_go_difflib",
     "com_github_prometheus_client_golang",
     "com_github_r3labs_sse_v2",
+    "com_github_restatedev_sdk_go",
     "com_github_sendgrid_sendgrid_go",
     "com_github_skia_dev_google_api_go_client",
     "com_github_skia_dev_protoc_gen_twirp_typescript",
