@@ -62,6 +62,11 @@ python.toolchain(
 ####################################################################################################
 
 go_deps = use_extension("@gazelle//:extensions.bzl", "go_deps")
+go_deps.gazelle_default_attributes(
+    directives = [
+        "gazelle:proto disable",
+    ],
+)
 
 go_sdk = use_extension("@rules_go//go:extensions.bzl", "go_sdk")
 
