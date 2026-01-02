@@ -1,4 +1,6 @@
 load("@rules_go//go:def.bzl", "go_library")
+load("@rules_go//proto:def.bzl", "go_proto_library")
+load("@rules_proto//proto:defs.bzl", "proto_library")
 load("//bazel/go:go_test.bzl", "go_test")
 
 go_library(
@@ -31,4 +33,17 @@ go_test(
         "@com_github_golang_protobuf//proto",
         "@com_github_stretchr_testify//require",
     ],
+)
+
+proto_library(
+    name = "protoheader_proto",
+    srcs = ["header.proto"],
+    visibility = ["//visibility:public"],
+)
+
+go_proto_library(
+    name = "protoheader_go_proto",
+    importpath = "go.goldmine.build/kube/go/authproxy/protoheader",
+    proto = ":protoheader_proto",
+    visibility = ["//visibility:public"],
 )
