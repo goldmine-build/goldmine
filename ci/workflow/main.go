@@ -9,6 +9,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"slices"
 	"strings"
 
 	restate "github.com/restatedev/sdk-go"
@@ -51,10 +52,13 @@ func (s *ServerFlags) Flagset() *flag.FlagSet {
 	return fs
 }
 
-var flags ServerFlags
+var (
+	flags  ServerFlags
+	gitApi *gitapi.GitApi = nil
 
-var approvedCIUsers = []string{"jcgregorio"}
-var gitApi *gitapi.GitApi = nil
+	// https://bazel.build/run/scripts#exit-codes
+	bazelExitCodesForNonInfraErrors = []int{1, 3, 4}
+)
 
 type CI struct{}
 
@@ -110,13 +114,10 @@ func infraError(ctx context.Context, input shared.TrybotWorkflowArgs, err error,
 	return skerr.Wrap(err)
 }
 
-func buildStatus(ctx context.Context, input shared.TrybotWorkflowArgs, state gitapi.State, link string, msg string, buildErr error) error {
+func buildStatus(ctx context.Context, input shared.TrybotWorkflowArgs, state gitapi.State, link string, msg string) error {
 	err := gitApi.SetStatus(ctx, input.SHA, state, link, msg, "CI")
 	if err != nil {
 		sklog.Errorf("Failed to set GitHub status: %s", err)
-	}
-	if buildErr != nil {
-		return skerr.Wrapf(buildErr, "%s", msg)
 	}
 	return nil
 }
@@ -162,10 +163,18 @@ func RunTests(ctx context.Context, input shared.TrybotWorkflowArgs) error {
 
 	link, err := findBuildBuddyLink(stderr)
 	sklog.Infof("LINK: %q", link)
-	buildStatus(ctx, input, gitapi.Pending, link, "Running tests", nil)
+	buildStatus(ctx, input, gitapi.Pending, link, "Running tests")
 
 	if err := cmd.Wait(); err != nil {
-		return buildStatus(ctx, input, gitapi.Error, link, "Tests failed", err)
+		if exitError, ok := err.(*exec.ExitError); ok {
+			if slices.Contains(bazelExitCodesForNonInfraErrors, exitError.ProcessState.ExitCode()) {
+				// The build or one or more tests failed.
+				return buildStatus(ctx, input, gitapi.Error, link, "Build/Tests failed")
+			} else {
+				// Something more fundamental broke.
+				return infraError(ctx, input, err, "Infrastructure error")
+			}
+		}
 	}
 
 	return nil
@@ -192,5 +201,6 @@ func findBuildBuddyLink(stderr io.ReadCloser) (string, error) {
 
 func UploadGoldResults(ctx context.Context, input shared.TrybotWorkflowArgs) error {
 	// TBD
+	sklog.Info("UploadGoldResults")
 	return nil
 }

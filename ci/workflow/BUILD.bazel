@@ -1,4 +1,5 @@
 load("@rules_go//go:def.bzl", "go_binary", "go_library")
+load("//bazel:app_container.bzl", "app_container")
 
 go_library(
     name = "workflow_lib",
@@ -21,4 +22,13 @@ go_binary(
     name = "workflow",
     embed = [":workflow_lib"],
     visibility = ["//visibility:public"],
+)
+
+app_container(
+    name = "ci_worker_container",
+    base = "@base",
+    cmd = [],
+    entrypoint = "/usr/local/bin/workflow",
+    exe = "//ci/workflow:workflow",
+    repository = "ghcr.io/goldmine-build/ci_workflow_server",
 )

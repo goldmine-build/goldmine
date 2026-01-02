@@ -1,8 +1,12 @@
 # Keep the tag for base-cipd in sync with the tag used here for debian.
 FROM debian:testing-slim AS base
 RUN apt-get update && apt-get upgrade -y && apt-get install -y  \
-  adduser ca-certificates git \
+  adduser ca-certificates git golang \
   && rm -rf /var/lib/apt/lists/* \
   && addgroup --gid 2000 goldminer \
   && adduser --uid 2000 --gid 2000 goldminer
+RUN mkdir -p /home/goldminer/bin
+ENV GOPATH=/home/goldminer
+ENV PATH="$PATH:$GOPATH/bin"
+RUN go install github.com/bazelbuild/bazelisk@latest
 # USER goldminer:goldminer
