@@ -9,6 +9,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"slices"
 	"strings"
 
@@ -103,7 +104,7 @@ func main() {
 }
 
 func infraError(ctx context.Context, input shared.TrybotWorkflowArgs, err error, format string, args ...interface{}) error {
-	fullErrorMsg := fmt.Sprintf("%s:%s", fmt.Sprintf(format, args...), err)
+	fullErrorMsg := fmt.Sprintf("%s: %s", fmt.Sprintf(format, args...), err)
 	sklog.Error(fullErrorMsg)
 
 	// TODO Construct URL to report infra errors.
@@ -142,6 +143,11 @@ func CheckoutCode(ctx context.Context, input shared.TrybotWorkflowArgs) error {
 	return nil
 }
 
+type ReadCloserDup struct {
+	buf []byte
+	r   io.ReadCloser
+}
+
 func RunTests(ctx context.Context, input shared.TrybotWorkflowArgs) error {
 	bazel, err := exec.LookPath("bazelisk")
 	if err != nil {
@@ -149,7 +155,10 @@ func RunTests(ctx context.Context, input shared.TrybotWorkflowArgs) error {
 	}
 	cmd := exec.CommandContext(ctx, bazel, "test", "//golden/modules/...", "//perf/modules/...", "//go/...")
 	cmd.Env = os.Environ()
-	cmd.Env = append(cmd.Env, "PWD="+flags.CheckoutDir)
+	runDir := filepath.Join(flags.CheckoutDir, flags.Repo)
+	os.Chdir(runDir)
+	sklog.Infof("runDir: %s", runDir)
+	cmd.Env = append(cmd.Env, "PWD="+runDir)
 
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
@@ -158,11 +167,20 @@ func RunTests(ctx context.Context, input shared.TrybotWorkflowArgs) error {
 
 	err = cmd.Start()
 	if err != nil {
-		return infraError(ctx, input, err, "Failed to start build")
+		return infraError(ctx, input, err, "Infrastructure error starting build")
 	}
 
 	link, err := findBuildBuddyLink(stderr)
 	sklog.Infof("LINK: %q", link)
+	go func() {
+		scanner := bufio.NewScanner(stderr)
+		for scanner.Scan() {
+			sklog.Info(scanner.Text())
+		}
+		if err := scanner.Err(); err != nil {
+			sklog.Errorf("reading stderr: %s", err)
+		}
+	}()
 	buildStatus(ctx, input, gitapi.Pending, link, "Running tests")
 
 	if err := cmd.Wait(); err != nil {
@@ -172,7 +190,7 @@ func RunTests(ctx context.Context, input shared.TrybotWorkflowArgs) error {
 				return buildStatus(ctx, input, gitapi.Error, link, "Build/Tests failed")
 			} else {
 				// Something more fundamental broke.
-				return infraError(ctx, input, err, "Infrastructure error")
+				return infraError(ctx, input, err, "Infrastructure error trying to build")
 			}
 		}
 	}
