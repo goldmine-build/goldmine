@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
+	"time"
 
 	restate "github.com/restatedev/sdk-go"
 	"github.com/restatedev/sdk-go/server"
@@ -92,7 +93,13 @@ func main() {
 		sklog.Fatalf("Unable to create GitHub API: %s", err)
 	}
 
-	server := server.NewRestate().Bind(restate.Reflect(CI{}))
+	server := server.NewRestate().Bind(
+		restate.Reflect(
+			CI{}, 
+			restate.WithAbortTimeout(30*time.Minute), 
+			restate.WithDocumentation("Goldmine CI Build and Test workflow.")
+			)
+		)
 
 	sklog.Fatal(server.Start(context.Background(), flags.Port))
 }
@@ -118,6 +125,7 @@ func buildStatus(ctx context.Context, input shared.TrybotWorkflowArgs, state git
 }
 
 func RunTests(ctx context.Context, input shared.TrybotWorkflowArgs) error {
+	sklog.Info("Checking out code.")
 	checkout, err := git.NewCheckout(ctx, "https://github.com/goldmine-build/goldmine.git", flags.CheckoutDir)
 	if err != nil {
 		return infraError(ctx, input, err, "Failed checkout")
@@ -134,6 +142,7 @@ func RunTests(ctx context.Context, input shared.TrybotWorkflowArgs) error {
 		return infraError(ctx, input, err, "Failed to checkout FETCH_HEAD")
 	}
 
+	sklog.Info("Starting emulators.")
 	bazel, err := exec.LookPath("bazelisk")
 	if err != nil {
 		return skerr.Wrap(err)
@@ -149,6 +158,7 @@ func RunTests(ctx context.Context, input shared.TrybotWorkflowArgs) error {
 		return infraError(ctx, input, err, "Failed to start emulators: %s", string(b))
 	}
 
+	sklog.Info("Starting build and test.")
 	cmd = exec.CommandContext(ctx, bazel, "test", "//golden/modules/...", "//perf/modules/...", "//go/...")
 	cmd.Env = os.Environ()
 
