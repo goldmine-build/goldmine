@@ -1,7 +1,7 @@
 # Keep the tag for base-cipd in sync with the tag used here for debian.
 FROM debian:testing-slim AS base
 RUN apt-get update && apt-get upgrade -y && apt-get install -y  \
-  adduser ca-certificates git golang \
+  adduser ca-certificates git golang procps \
   && rm -rf /var/lib/apt/lists/* \
   && addgroup --gid 2000 goldminer \
   && adduser --uid 2000 --gid 2000 goldminer
