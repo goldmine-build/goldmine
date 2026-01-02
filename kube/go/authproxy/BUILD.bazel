@@ -13,7 +13,6 @@ go_library(
         "//go/httputils",
         "//go/metrics2",
         "//go/roles",
-        "//go/secret",
         "//go/skerr",
         "//go/sklog",
         "//kube/go/authproxy/auth",

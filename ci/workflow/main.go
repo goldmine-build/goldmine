@@ -66,13 +66,7 @@ type CI struct{}
 func (CI) BuildAndTest(ctx restate.Context, input shared.TrybotWorkflowArgs) error {
 	if _, err := restate.Run(ctx,
 		func(ctx restate.RunContext) (restate.Void, error) {
-			if err := CheckoutCode(ctx, input); err != nil {
-				return restate.Void{}, skerr.Wrap(err)
-			}
 			if err := RunTests(ctx, input); err != nil {
-				return restate.Void{}, skerr.Wrap(err)
-			}
-			if err := UploadGoldResults(ctx, input); err != nil {
 				return restate.Void{}, skerr.Wrap(err)
 			}
 			return restate.Void{}, nil
@@ -123,7 +117,7 @@ func buildStatus(ctx context.Context, input shared.TrybotWorkflowArgs, state git
 	return nil
 }
 
-func CheckoutCode(ctx context.Context, input shared.TrybotWorkflowArgs) error {
+func RunTests(ctx context.Context, input shared.TrybotWorkflowArgs) error {
 	checkout, err := git.NewCheckout(ctx, "https://github.com/goldmine-build/goldmine.git", flags.CheckoutDir)
 	if err != nil {
 		return infraError(ctx, input, err, "Failed checkout")
@@ -140,25 +134,27 @@ func CheckoutCode(ctx context.Context, input shared.TrybotWorkflowArgs) error {
 		return infraError(ctx, input, err, "Failed to checkout FETCH_HEAD")
 	}
 
-	return nil
-}
-
-type ReadCloserDup struct {
-	buf []byte
-	r   io.ReadCloser
-}
-
-func RunTests(ctx context.Context, input shared.TrybotWorkflowArgs) error {
 	bazel, err := exec.LookPath("bazelisk")
 	if err != nil {
 		return skerr.Wrap(err)
 	}
-	cmd := exec.CommandContext(ctx, bazel, "test", "//golden/modules/...", "//perf/modules/...", "//go/...")
+
+	cmd := exec.CommandContext(ctx, bazel, "run", "//scripts/run_emulators", "start")
 	cmd.Env = os.Environ()
 	runDir := filepath.Join(flags.CheckoutDir, flags.Repo)
 	os.Chdir(runDir)
-	sklog.Infof("runDir: %s", runDir)
-	cmd.Env = append(cmd.Env, "PWD="+runDir)
+
+	b, err := cmd.CombinedOutput()
+	if err != nil {
+		return infraError(ctx, input, err, "Failed to start emulators: %s", string(b))
+	}
+
+	cmd = exec.CommandContext(ctx, bazel, "test", "//golden/modules/...", "//perf/modules/...", "//go/...")
+	cmd.Env = os.Environ()
+
+	// Point to the running emulators.
+	cmd.Env = append(cmd.Env, "COCKROACHDB_EMULATOR_HOST=localhost:8895", "PUBSUB_EMULATOR_HOST=localhost:8893")
+	os.Chdir(filepath.Join(flags.CheckoutDir, flags.Repo))
 
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
@@ -187,13 +183,16 @@ func RunTests(ctx context.Context, input shared.TrybotWorkflowArgs) error {
 		if exitError, ok := err.(*exec.ExitError); ok {
 			if slices.Contains(bazelExitCodesForNonInfraErrors, exitError.ProcessState.ExitCode()) {
 				// The build or one or more tests failed.
-				return buildStatus(ctx, input, gitapi.Error, link, "Build/Tests failed")
+				buildStatus(ctx, input, gitapi.Error, link, "Build/Tests failed")
 			} else {
 				// Something more fundamental broke.
 				return infraError(ctx, input, err, "Infrastructure error trying to build")
 			}
 		}
 	}
+
+	// TBD
+	sklog.Info("UploadGoldResults")
 
 	return nil
 }
@@ -215,10 +214,4 @@ func findBuildBuddyLink(stderr io.ReadCloser) (string, error) {
 		}
 	}
 	return "", skerr.Fmt("BuildBuddy link not found")
-}
-
-func UploadGoldResults(ctx context.Context, input shared.TrybotWorkflowArgs) error {
-	// TBD
-	sklog.Info("UploadGoldResults")
-	return nil
 }
