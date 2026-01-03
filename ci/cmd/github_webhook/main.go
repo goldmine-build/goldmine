@@ -124,10 +124,11 @@ func HandlePullRequest(w http.ResponseWriter, r *http.Request) {
 
 	// Log the struct we are going to send to restate.
 	sklog.Infof("Workflow: %#v", wf)
+	sklog.Infof("Client: %v", restateClient)
 
-	invocation, err := ingress.ServiceSend[shared.TrybotWorkflowArgs](
+	invocation, err := ingress.ServiceSend[*shared.TrybotWorkflowArgs](
 		restateClient, "CI", "RunAllBuildsAndTestsV1").
-		Send(r.Context(), *wf,
+		Send(context.Background(), wf,
 			restate.WithIdempotencyKey(fmt.Sprintf("PR-%d-%d-%s", wf.PRNumber, wf.PatchsetNumber, wf.SHA)))
 
 	if err != nil {
