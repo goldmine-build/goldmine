@@ -3,6 +3,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"flag"
@@ -13,9 +14,6 @@ import (
 	"github.com/ejholmes/hookshot"
 	"github.com/ejholmes/hookshot/events"
 	"github.com/go-chi/chi/v5"
-	restate "github.com/restatedev/sdk-go"
-	"github.com/restatedev/sdk-go/ingress"
-	shared "go.goldmine.build/ci/go"
 	"go.goldmine.build/ci/go/triggers/github"
 	"go.goldmine.build/go/common"
 	"go.goldmine.build/go/httputils"
@@ -59,9 +57,8 @@ func (s *ServerFlags) Flagset() *flag.FlagSet {
 }
 
 var (
-	flags         ServerFlags
-	prConvert     *github.PRConvert
-	restateClient *ingress.Client
+	flags     ServerFlags
+	prConvert *github.PRConvert
 )
 
 func HandlePing(w http.ResponseWriter, r *http.Request) {
@@ -124,21 +121,44 @@ func HandlePullRequest(w http.ResponseWriter, r *http.Request) {
 
 	// Log the struct we are going to send to restate.
 	sklog.Infof("Workflow: %#v", wf)
-	sklog.Infof("Client: %v", restateClient)
+	idempotencyKey := fmt.Sprintf("PR-%d-%d-%s", wf.PRNumber, wf.PatchsetNumber, wf.SHA)
 
-	invocation, err := ingress.ServiceSend[*shared.TrybotWorkflowArgs](
-		restateClient, "CI", "RunAllBuildsAndTestsV1").
-		Send(context.Background(), wf,
-			restate.WithIdempotencyKey(fmt.Sprintf("PR-%d-%d-%s", wf.PRNumber, wf.PatchsetNumber, wf.SHA)))
+	requestURL := "http://restate-requests:8080/CI/RunAllBuildsAndTestsV1/send"
+
+	b, err := json.MarshalIndent(wf, "", "  ")
+	if err != nil {
+		sklog.Errorf("Failed to encode request body: %s", err)
+		return
+	}
+	body := bytes.NewBuffer(b)
+
+	client := httputils.DefaultClientConfig().With2xxOnly().Client()
+	req, err := http.NewRequest("POST", requestURL, body)
+	if err != nil {
+		sklog.Errorf("Failed to build request object: %s", err)
+		return
+	}
+	req.Header.Add("idempotency-key", idempotencyKey)
+	resp, err := client.Do(req)
+	if err != nil {
+		sklog.Errorf("Failed to make request: %s: %q", err, resp.Status)
+	}
+
+	/*
+	   curl --include --request POST \
+	     --url http://127.0.0.1:8080/CI/RunAllBuildsAndTestsV1/send \
+	     --header 'Accept: application/json' \
+	     --header 'Content-Type: application/json' \
+	     --header 'idempotency-key: ' \
+	     --data '{  "login": "jcgregorio",  "patchset": 13,  "pr": 7, "sha": "01482eb651c1881437dc8f9e928677222943e1dc" }'
+	*/
 
 	if err != nil {
 		sklog.Errorf("Failed to send request to restate: %s", err)
 	}
 
-	fmt.Println("ServiceSend invocation ID:", invocation.Id())
-
 	// Log the pull request.
-	b, err := json.MarshalIndent(pull, "", "  ")
+	b, err = json.MarshalIndent(pull, "", "  ")
 	if err != nil {
 		sklog.Error(err)
 	}
@@ -164,8 +184,6 @@ func main() {
 	if err != nil {
 		sklog.Fatalf("Creating PRConvert: %s", err)
 	}
-
-	restateClient = ingress.NewClient("http://restate-requests:8080")
 
 	// Start pprof services.
 	profsrv.Start(flags.PprofPort)
