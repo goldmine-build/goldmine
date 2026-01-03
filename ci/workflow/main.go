@@ -129,6 +129,11 @@ func RunTests(ctx context.Context, input shared.TrybotWorkflowArgs) error {
 		return infraError(ctx, input, err, "Failed checkout")
 	}
 
+	_, err = checkout.Git(ctx, "reset", "--hard", "origin/main")
+	if err != nil {
+		return infraError(ctx, input, err, "Failed to reset --hard origin/main")
+	}
+
 	refs := fmt.Sprintf("refs/pull/%d/head", input.PRNumber)
 	_, err = checkout.Git(ctx, "fetch", "origin", refs)
 	if err != nil {
