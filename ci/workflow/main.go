@@ -165,6 +165,9 @@ func main() {
 	}
 
 	go func() {
+		// TODO Don't bother trying to use Bazel for this, instead install cdb
+		// and gcloud cmd line tools in the container.
+
 		// Start emulators, but don't wait for the launch to complete.
 		emuCtx, cancel := context.WithTimeout(ctx, 5*time.Minute)
 		defer cancel()
