@@ -7,6 +7,7 @@ go_library(
     importpath = "go.goldmine.build/ci/cmd/github_webhook",
     visibility = ["//visibility:private"],
     deps = [
+        "//ci/go",
         "//ci/go/triggers/github:github_lib",
         "//go/common",
         "//go/httputils",
@@ -15,6 +16,8 @@ go_library(
         "@com_github_ejholmes_hookshot//:hookshot",
         "@com_github_ejholmes_hookshot//events",
         "@com_github_go_chi_chi_v5//:chi",
+        "@com_github_restatedev_sdk_go//:sdk-go",
+        "@com_github_restatedev_sdk_go//ingress",
     ],
 )
 
