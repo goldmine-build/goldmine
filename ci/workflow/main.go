@@ -64,65 +64,7 @@ var (
 
 type CI struct{}
 
-func (CI) BuildAndTest(ctx restate.Context, input shared.TrybotWorkflowArgs) error {
-	if _, err := restate.Run(ctx,
-		func(ctx restate.RunContext) (restate.Void, error) {
-			if err := RunTests(ctx, input); err != nil {
-				return restate.Void{}, skerr.Wrap(err)
-			}
-			return restate.Void{}, nil
-		},
-		restate.WithName("CI"),
-	); err != nil {
-		return err
-	}
-	return nil
-}
-
-func main() {
-	// Command line flags.
-	common.InitWithMust(
-		"github-ci-workflow",
-		common.PrometheusOpt(&flags.PromPort),
-		common.FlagSetOpt((&flags).Flagset()),
-	)
-
-	var err error
-	gitApi, err = gitapi.New(context.Background(), flags.PatPath, flags.Owner, flags.Repo, flags.Branch)
-	if err != nil {
-		sklog.Fatalf("Unable to create GitHub API: %s", err)
-	}
-
-	server := server.NewRestate().Bind(
-		restate.Reflect(
-			CI{},
-			restate.WithAbortTimeout(30*time.Minute),
-			restate.WithDocumentation("Goldmine CI Build and Test workflow.")))
-
-	sklog.Fatal(server.Start(context.Background(), flags.Port))
-}
-
-func infraError(ctx context.Context, input shared.TrybotWorkflowArgs, err error, format string, args ...interface{}) error {
-	fullErrorMsg := fmt.Sprintf("%s: %s", fmt.Sprintf(format, args...), err)
-	sklog.Error(fullErrorMsg)
-
-	// TODO Construct URL to report infra errors.
-	err = gitApi.SetStatus(ctx, input.SHA, gitapi.Error, "https://restate.tail433733.ts.net", fullErrorMsg, "Infra")
-	if err != nil {
-		sklog.Errorf("Failed to set GitHub status: %s", err)
-	}
-	return skerr.Wrap(err)
-}
-
-func buildStatus(ctx context.Context, input shared.TrybotWorkflowArgs, state gitapi.State, link string, msg string) error {
-	err := gitApi.SetStatus(ctx, input.SHA, state, link, msg, "CI")
-	if err != nil {
-		sklog.Errorf("Failed to set GitHub status: %s", err)
-	}
-	return nil
-}
-
-func RunTests(ctx context.Context, input shared.TrybotWorkflowArgs) error {
+func (CI) BuildAndTests(ctx context.Context, input shared.TrybotWorkflowArgs) error {
 	sklog.Info("Checking out code.")
 	checkout, err := git.NewCheckout(ctx, "https://github.com/goldmine-build/goldmine.git", flags.CheckoutDir)
 	if err != nil {
@@ -207,6 +149,49 @@ func RunTests(ctx context.Context, input shared.TrybotWorkflowArgs) error {
 	// TBD
 	sklog.Info("UploadGoldResults")
 
+	return nil
+}
+
+func main() {
+	// Command line flags.
+	common.InitWithMust(
+		"github-ci-workflow",
+		common.PrometheusOpt(&flags.PromPort),
+		common.FlagSetOpt((&flags).Flagset()),
+	)
+
+	var err error
+	gitApi, err = gitapi.New(context.Background(), flags.PatPath, flags.Owner, flags.Repo, flags.Branch)
+	if err != nil {
+		sklog.Fatalf("Unable to create GitHub API: %s", err)
+	}
+
+	server := server.NewRestate().Bind(
+		restate.Reflect(
+			CI{},
+			restate.WithAbortTimeout(30*time.Minute),
+			restate.WithDocumentation("Goldmine CI Build and Test workflow.")))
+
+	sklog.Fatal(server.Start(context.Background(), flags.Port))
+}
+
+func infraError(ctx context.Context, input shared.TrybotWorkflowArgs, err error, format string, args ...interface{}) error {
+	fullErrorMsg := fmt.Sprintf("%s: %s", fmt.Sprintf(format, args...), err)
+	sklog.Error(fullErrorMsg)
+
+	// TODO Construct URL to report infra errors.
+	err = gitApi.SetStatus(ctx, input.SHA, gitapi.Error, "https://restate.tail433733.ts.net", fullErrorMsg, "Infra")
+	if err != nil {
+		sklog.Errorf("Failed to set GitHub status: %s", err)
+	}
+	return skerr.Wrap(err)
+}
+
+func buildStatus(ctx context.Context, input shared.TrybotWorkflowArgs, state gitapi.State, link string, msg string) error {
+	err := gitApi.SetStatus(ctx, input.SHA, state, link, msg, "CI")
+	if err != nil {
+		sklog.Errorf("Failed to set GitHub status: %s", err)
+	}
 	return nil
 }
 
