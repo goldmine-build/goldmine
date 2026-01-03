@@ -165,7 +165,7 @@ func main() {
 		sklog.Fatalf("Creating PRConvert: %s", err)
 	}
 
-	restateClient = ingress.NewClient("http://restate-server:8080")
+	restateClient = ingress.NewClient("http://restate-requests:8080")
 
 	// Start pprof services.
 	profsrv.Start(flags.PprofPort)
