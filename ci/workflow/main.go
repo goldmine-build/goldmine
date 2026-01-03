@@ -95,11 +95,9 @@ func main() {
 
 	server := server.NewRestate().Bind(
 		restate.Reflect(
-			CI{}, 
-			restate.WithAbortTimeout(30*time.Minute), 
-			restate.WithDocumentation("Goldmine CI Build and Test workflow.")
-			)
-		)
+			CI{},
+			restate.WithAbortTimeout(30*time.Minute),
+			restate.WithDocumentation("Goldmine CI Build and Test workflow.")))
 
 	sklog.Fatal(server.Start(context.Background(), flags.Port))
 }
