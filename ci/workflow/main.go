@@ -64,7 +64,7 @@ var (
 
 type CI struct{}
 
-func (CI) BuildAndTests(ctx context.Context, input shared.TrybotWorkflowArgs) error {
+func (c CI) RunAllBuildsAndTestsV1(ctx restate.Context, input shared.TrybotWorkflowArgs) error {
 	sklog.Info("Checking out code.")
 	checkout, err := git.NewCheckout(ctx, "https://github.com/goldmine-build/goldmine.git", flags.CheckoutDir)
 	if err != nil {
@@ -87,28 +87,18 @@ func (CI) BuildAndTests(ctx context.Context, input shared.TrybotWorkflowArgs) er
 		return infraError(ctx, input, err, "Failed to checkout FETCH_HEAD")
 	}
 
-	sklog.Info("Starting emulators.")
 	bazel, err := exec.LookPath("bazelisk")
 	if err != nil {
 		return skerr.Wrap(err)
 	}
 
-	cmd := exec.CommandContext(ctx, bazel, "run", "//scripts/run_emulators", "start")
-	cmd.Env = os.Environ()
-	runDir := filepath.Join(flags.CheckoutDir, flags.Repo)
-	os.Chdir(runDir)
-
-	b, err := cmd.CombinedOutput()
-	if err != nil {
-		return infraError(ctx, input, err, "Failed to start emulators: %s", string(b))
-	}
-
 	sklog.Info("Starting build and test.")
-	cmd = exec.CommandContext(ctx, bazel, "test", "//golden/modules/...", "//perf/modules/...", "//go/...")
-	cmd.Env = os.Environ()
+	cmd := exec.CommandContext(ctx, bazel, "test", "//golden/modules/...", "//perf/modules/...", "//go/...")
 
 	// Point to the running emulators.
+	cmd.Env = os.Environ()
 	cmd.Env = append(cmd.Env, "COCKROACHDB_EMULATOR_HOST=localhost:8895", "PUBSUB_EMULATOR_HOST=localhost:8893")
+
 	os.Chdir(filepath.Join(flags.CheckoutDir, flags.Repo))
 
 	stderr, err := cmd.StderrPipe()
@@ -161,6 +151,33 @@ func main() {
 	)
 
 	var err error
+	ctx := context.Background()
+
+	sklog.Info("Checking out code.")
+	_, err = git.NewCheckout(ctx, "https://github.com/goldmine-build/goldmine.git", "tmp/emulators")
+	if err != nil {
+		sklog.Fatalf("Failed to check out code for emulators: %s", err)
+	}
+
+	bazel, err := exec.LookPath("bazelisk")
+	if err != nil {
+		sklog.Fatal(err)
+	}
+
+	go func() {
+		// Start emulators, but don't wait for the launch to complete.
+		emuCtx, cancel := context.WithTimeout(ctx, 5*time.Minute)
+		defer cancel()
+		cmd := exec.CommandContext(emuCtx, bazel, "run", "//scripts/run_emulators", "start")
+		cmd.Env = os.Environ()
+		os.Chdir("/tmp/emulators/goldmine")
+		b, err := cmd.CombinedOutput()
+		if err != nil {
+			sklog.Fatalf("Failed starting emulators: %s: %s", err, string(b))
+		}
+		sklog.Info("Emulators started")
+	}()
+
 	gitApi, err = gitapi.New(context.Background(), flags.PatPath, flags.Owner, flags.Repo, flags.Branch)
 	if err != nil {
 		sklog.Fatalf("Unable to create GitHub API: %s", err)
