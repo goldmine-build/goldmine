@@ -123,7 +123,7 @@ func HandlePullRequest(w http.ResponseWriter, r *http.Request) {
 	sklog.Infof("Workflow: %#v", wf)
 	idempotencyKey := fmt.Sprintf("PR-%d-%d-%s", wf.PRNumber, wf.PatchsetNumber, wf.SHA)
 
-	requestURL := "http://restate-requests:8080/CI/RunAllBuildsAndTestsV1/send"
+	requestURL := "http://restate-server-0:8080/CI/RunAllBuildsAndTestsV1/send"
 
 	b, err := json.MarshalIndent(wf, "", "  ")
 	if err != nil {
