@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"go.goldmine.build/go/emulators/cockroachdb_instance"
 	"go.goldmine.build/go/emulators/gcp_emulator"
@@ -53,4 +54,6 @@ func main() {
 			fmt.Println(fmt.Sprintf("export %s=", emulators.GetEmulatorHostEnvVarName(e)))
 		}
 	}
+	time.Sleep(time.Minute)
+	fmt.Println("Finished!")
 }

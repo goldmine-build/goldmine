@@ -3,9 +3,11 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"flag"
+	"fmt"
 	"net/http"
 	"os"
 
@@ -117,10 +119,46 @@ func HandlePullRequest(w http.ResponseWriter, r *http.Request) {
 		sklog.Errorf("Failed to create/update pull request: %s", err)
 	}
 
-	// Just log for now until we have the workflow to trigger.
+	// Log the struct we are going to send to restate.
 	sklog.Infof("Workflow: %#v", wf)
+	idempotencyKey := fmt.Sprintf("PR-%d-%d-%s", wf.PRNumber, wf.PatchsetNumber, wf.SHA)
 
-	b, err := json.MarshalIndent(pull, "", "  ")
+	requestURL := "http://restate-server-0:8080/CI/RunAllBuildsAndTestsV1/send"
+
+	b, err := json.MarshalIndent(wf, "", "  ")
+	if err != nil {
+		sklog.Errorf("Failed to encode request body: %s", err)
+		return
+	}
+	body := bytes.NewBuffer(b)
+
+	client := httputils.DefaultClientConfig().With2xxOnly().Client()
+	req, err := http.NewRequest("POST", requestURL, body)
+	if err != nil {
+		sklog.Errorf("Failed to build request object: %s", err)
+		return
+	}
+	req.Header.Add("idempotency-key", idempotencyKey)
+	resp, err := client.Do(req)
+	if err != nil {
+		sklog.Errorf("Failed to make request: %s: %q", err, resp.Status)
+	}
+
+	/*
+	   curl --include --request POST \
+	     --url http://127.0.0.1:8080/CI/RunAllBuildsAndTestsV1/send \
+	     --header 'Accept: application/json' \
+	     --header 'Content-Type: application/json' \
+	     --header 'idempotency-key: ' \
+	     --data '{  "login": "jcgregorio",  "patchset": 13,  "pr": 7, "sha": "01482eb651c1881437dc8f9e928677222943e1dc" }'
+	*/
+
+	if err != nil {
+		sklog.Errorf("Failed to send request to restate: %s", err)
+	}
+
+	// Log the pull request.
+	b, err = json.MarshalIndent(pull, "", "  ")
 	if err != nil {
 		sklog.Error(err)
 	}

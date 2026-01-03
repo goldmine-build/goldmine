@@ -200,5 +200,32 @@ func (g *GitApi) Update(ctx context.Context) error {
 	return nil
 }
 
+type State string
+
+const (
+	Pending State = "pending"
+	Success State = "success"
+	Error   State = "error"
+	Failure State = "failure"
+)
+
+func (g *GitApi) SetStatus(ctx context.Context, sha string, state State, url string, description string, context string) error {
+	stateAsString := string(state)
+	status := github.RepoStatus{
+		State:       &stateAsString,
+		TargetURL:   &url,
+		Description: &description,
+		Context:     &context,
+	}
+	_, resp, err := g.client.Repositories.CreateStatus(ctx, g.owner, g.repo, sha, status)
+	if err != nil {
+		return skerr.Wrapf(err, "Failed to set status (%d): %s", resp.StatusCode, resp.Status)
+	}
+	if resp.StatusCode > 201 {
+		return skerr.Fmt("Failed to set status (%d): %s", resp.StatusCode, resp.Status)
+	}
+	return nil
+}
+
 // Confirm *Gitiles implements provider.Provider.
 var _ provider.Provider = (*GitApi)(nil)

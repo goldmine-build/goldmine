@@ -5,8 +5,9 @@ set -Eexuo pipefail
 REL=$(dirname "$BASH_SOURCE")
 TAG=`${REL}/../bash/release_tag.sh`
 
-podman build -t base -f ./base/Containerfile 
-podman tag base:latest ghcr.io/goldmine-build/base:${TAG}
-podman push ghcr.io/goldmine-build/base:${TAG}
+cd ./base
+docker build -t base .
+docker tag base:latest ghcr.io/goldmine-build/base:${TAG}
+docker push ghcr.io/goldmine-build/base:${TAG}
 
 echo ghcr.io/goldmine-build/base:${TAG}

@@ -47,12 +47,10 @@ import (
 	"go.goldmine.build/go/httputils"
 	"go.goldmine.build/go/metrics2"
 	"go.goldmine.build/go/roles"
-	"go.goldmine.build/go/secret"
 	"go.goldmine.build/go/skerr"
 	"go.goldmine.build/go/sklog"
 	"go.goldmine.build/kube/go/authproxy/auth"
 	"go.goldmine.build/kube/go/authproxy/mockedauth"
-	"go.goldmine.build/kube/go/authproxy/protoheader"
 	"golang.org/x/net/http2"
 	"golang.org/x/oauth2/google"
 )
@@ -185,9 +183,6 @@ const (
 	// OAuth2 uses the legacy OAuth 2.0 flow.
 	OAuth2 AuthType = "oauth2"
 
-	// ProtoHeader uses an incoming HTTP header with a serialized proto.
-	ProtoHeader AuthType = "protoheader"
-
 	// Mocked uses a string provided on the command line for the user identity
 	Mocked AuthType = "mocked"
 
@@ -196,7 +191,7 @@ const (
 )
 
 // AllValidAuthTypes is a list of all valid AuthTypes.
-var AllValidAuthTypes = []AuthType{OAuth2, ProtoHeader, Mocked}
+var AllValidAuthTypes = []AuthType{OAuth2, Mocked}
 
 // ToAuthType converts a string to AuthType, returning Invalid if it is not a
 // valid type.
@@ -280,15 +275,6 @@ func New(ctx context.Context) (*App, error) {
 
 	var authInstance auth.Auth
 	switch ToAuthType(ret.authType) {
-	case ProtoHeader:
-		secretClient, err := secret.NewClient(ctx)
-		if err != nil {
-			return ret, skerr.Wrap(err)
-		}
-		authInstance, err = protoheader.New(ctx, secretClient)
-		if err != nil {
-			return nil, skerr.Wrap(err)
-		}
 	case OAuth2:
 		authInstance = auth.New()
 	case Mocked:
