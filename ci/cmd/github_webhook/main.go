@@ -143,6 +143,7 @@ func HandlePullRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	req.Header.Add("idempotency-key", idempotencyKey)
+	req.Header.Add("Content-Type", "application/json")
 	resp, err := client.Do(req)
 	if err != nil {
 		sklog.Errorf("Failed to make request: %s", err)
