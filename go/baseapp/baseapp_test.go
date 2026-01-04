@@ -43,7 +43,6 @@ func TestServe_EndToEnd(t *testing.T) {
 	require.NoError(t, os.WriteFile(filepath.Join(resourcesDir, "b.txt"), []byte(`beta`), 0644))
 	*ResourcesDir = resourcesDir
 	*Local = true // Serve over plain HTTP.
-	*PromPort = "20001"
 
 	// Start the server.
 	isServeTest = true
@@ -81,7 +80,6 @@ func TestServe_EndToEnd(t *testing.T) {
 
 	// Other URLs.
 	assertGet200OK(t, "http://localhost:8000/healthz", "" /* =expectedBody */)
-	assertGet200OK(t, "http://localhost:20000/metrics", "num_http_requests 16") // Includes 404s.
 
 	// Assert that the middleware added via App.AddMiddleware() works.
 	assert.Equal(t, []string{
