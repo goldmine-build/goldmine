@@ -42,8 +42,8 @@ func TestServe_EndToEnd(t *testing.T) {
 	require.NoError(t, os.WriteFile(filepath.Join(resourcesDir, "a.txt"), []byte(`alpha`), 0644))
 	require.NoError(t, os.WriteFile(filepath.Join(resourcesDir, "b.txt"), []byte(`beta`), 0644))
 	*ResourcesDir = resourcesDir
-
 	*Local = true // Serve over plain HTTP.
+	*PromPort = "20001"
 
 	// Start the server.
 	isServeTest = true
