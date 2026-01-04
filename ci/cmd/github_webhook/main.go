@@ -163,13 +163,6 @@ func HandlePullRequest(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		sklog.Errorf("Failed to send request to restate: %s", err)
 	}
-
-	// Log the pull request.
-	b, err = json.MarshalIndent(pull, "", "  ")
-	if err != nil {
-		sklog.Error(err)
-	}
-	sklog.Infof("Pull: \n%s", string(b))
 }
 
 func main() {
