@@ -193,8 +193,8 @@ oci.pull(
 )
 oci.pull(
     name = "base",
-    # docker pull ghcr.io/goldmine-build/base:2026-01-04T03_40_16Z-jcgregorio-b50557e-dirty
-    digest = "sha256:f54c7b3d9bd12e94e318a49b4a739b8e133f04014d1770755a47cc8f7db9b3e5",
+    # docker pull ghcr.io/goldmine-build/base:2026-01-04T04_01_04Z-jcgregorio-bcf13c5-dirty
+    digest = "sha256:c20374d2ca893674bf7c0821dd8d9625c5e6967d0e62546ec5a43162ff2156de",
     image = "ghcr.io/goldmine-build/base",
     platforms = [
         "linux/amd64",
