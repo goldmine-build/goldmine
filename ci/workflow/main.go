@@ -39,7 +39,7 @@ type ServerFlags struct {
 
 // Flagset constructs a flag.FlagSet for the App.
 func (s *ServerFlags) Flagset() *flag.FlagSet {
-	fs := flag.NewFlagSet("gold-server", flag.ExitOnError)
+	fs := flag.NewFlagSet("ci-workflow", flag.ExitOnError)
 	fs.StringVar(&s.Port, "port", ":8000", "Main UI address (e.g., ':8000').")
 	fs.StringVar(&s.PromPort, "prom_port", ":20000", "Metrics service address (e.g., ':20000').")
 	fs.StringVar(&s.PprofPort, "pprof_port", "", "PProf handler (e.g., ':9001'). PProf not enabled if the empty string (default).")
