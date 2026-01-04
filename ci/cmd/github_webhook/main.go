@@ -121,15 +121,21 @@ func HandlePullRequest(w http.ResponseWriter, r *http.Request) {
 
 	// Log the struct we are going to send to restate.
 	sklog.Infof("Workflow: %#v", wf)
+
 	idempotencyKey := fmt.Sprintf("PR-%d-%d-%s", wf.PRNumber, wf.PatchsetNumber, wf.SHA)
 
-	requestURL := "http://restate-requests:8080/CI/RunAllBuildsAndTestsV1/send"
+	restateServer := os.Getenv("RESTATE_REQUESTS_PORT_8080_TCP_ADDR")
+
+	// Work around some weirdness in k3s dns resolution.
+	requestURL := fmt.Sprintf("http://%s:8080/CI/RunAllBuildsAndTestsV1/send", restateServer)
 
 	b, err := json.MarshalIndent(wf, "", "  ")
 	if err != nil {
 		sklog.Errorf("Failed to encode request body: %s", err)
 		return
 	}
+	sklog.Infof("Body: \n%s", string(b))
+	sklog.Infof("Idempotency: %s", idempotencyKey)
 	body := bytes.NewBuffer(b)
 
 	client := httputils.DefaultClientConfig().With2xxOnly().Client()
