@@ -80,6 +80,7 @@ func TestServe_EndToEnd(t *testing.T) {
 
 	// Other URLs.
 	assertGet200OK(t, "http://localhost:8000/healthz", "" /* =expectedBody */)
+	assertGet200OK(t, "http://localhost:20000/metrics", "num_http_requests 16") // Includes 404s.
 
 	// Assert that the middleware added via App.AddMiddleware() works.
 	assert.Equal(t, []string{
