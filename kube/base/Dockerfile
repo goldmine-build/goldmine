@@ -12,7 +12,8 @@ ENV GOPATH=/home/goldminer
 ENV PATH="$PATH:$GOPATH/bin"
 RUN go install github.com/bazelbuild/bazelisk@latest
 
+# USER goldminer:goldminer
+
 # Needed for git unit tests.
 RUN git config --global user.email "you@example.com"
 RUN git config --global user.name "Your Name"
-# USER goldminer:goldminer
