@@ -1,5 +1,7 @@
 # Keep the tag for base-cipd in sync with the tag used here for debian.
 FROM debian:testing-slim AS base
+
+# procps openjdk-21-jre python3 - needed for goldmine tests.
 RUN apt-get update && apt-get upgrade -y && apt-get install -y  \
   adduser ca-certificates git golang procps openjdk-21-jre python3 \
   && rm -rf /var/lib/apt/lists/* \
