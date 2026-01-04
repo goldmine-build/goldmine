@@ -145,8 +145,10 @@ func HandlePullRequest(w http.ResponseWriter, r *http.Request) {
 	req.Header.Add("idempotency-key", idempotencyKey)
 	resp, err := client.Do(req)
 	if err != nil {
-		sklog.Errorf("Failed to make request: %s: %q", err, resp.Status)
+		sklog.Errorf("Failed to make request: %s", err)
+		return
 	}
+	sklog.Infof("Status: %q", resp.Status)
 
 	/*
 	   curl --include --request POST \
