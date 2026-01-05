@@ -156,10 +156,14 @@ func (c CI) RunAllBuildsAndTestsV1(ctx restate.Context, input shared.TrybotWorkf
 
 	sklog.Info("UploadGoldResults")
 	if input.PRNumber > 0 {
-		exec.CommandContext(ctx, "./upload_to_gold/upload.sh", input.SHA, fmt.Sprintf("%d", input.PRNumber))
+		cmd = exec.CommandContext(ctx, "./upload_to_gold/upload.sh", input.SHA, fmt.Sprintf("%d", input.PRNumber))
 	} else {
 		// Passing in an empty PR Number indicates this is on main and not in a PR.
-		exec.CommandContext(ctx, "./upload_to_gold/upload.sh", input.SHA)
+		cmd = exec.CommandContext(ctx, "./upload_to_gold/upload.sh", input.SHA)
+	}
+	if b, err := cmd.CombinedOutput(); err != nil {
+		sklog.Errorf("Failed to run upload.sh script: %s: %s", err, string(b))
+		return infraError(ctx, input, err, "Infrastructure error trying to upload to Gold.")
 	}
 
 	return nil
