@@ -36,17 +36,17 @@ bazelisk run //gold-client/cmd/goldctl -- auth --service-account /etc/gcs/servic
 # Determine if we are running in a tryjob context by using that variable.
 if [[ "$GITHUB_REF_NAME" == "main" ]]; then
 
-# Initialize goldctl with the appropriate parameters.
-bazelisk run //gold-client/cmd/goldctl -- imgtest init \
-  --bucket goldmine-build-private \
-  --git_hash $GITHUB_SHA \
-  --work-dir $WORKDIR \
-  --upload-only \
-  --corpus goldmine \
-  --instance goldmine \
-  --key browser:chrome \
-  --key os:`uname -o` \
-  --key machine:`uname -m`
+  # Initialize goldctl with the appropriate parameters.
+  bazelisk run //gold-client/cmd/goldctl -- imgtest init \
+    --bucket goldmine-build-private \
+    --git_hash $GITHUB_SHA \
+    --work-dir $WORKDIR \
+    --upload-only \
+    --corpus goldmine \
+    --instance goldmine \
+    --key browser:chrome \
+    --key os:`uname -o` \
+    --key machine:`uname -m`
 
 else
   printf "Running in tryjob context.\n"
@@ -62,22 +62,22 @@ else
   printf "PULL_NUMBER: %s\n" "$PULL_NUMBER"
   printf "COMMIT_HASH: %s\n" "$COMMIT_HASH"
 
-# Initialize goldctl with the appropriate parameters.
-bazelisk run //gold-client/cmd/goldctl -- imgtest init \
-  --bucket goldmine-build-private \
-  --git_hash $COMMIT_HASH \
-  --work-dir $WORKDIR \
-  --upload-only \
-  --corpus goldmine \
-  --instance goldmine \
-  --key browser:chrome \
-  --key os:`uname -o` \
-  --key machine:`uname -m` \
-  --crs=github \
-	--cis=github \
-  --changelist $PULL_NUMBER \
-  --patchset_id $COMMIT_HASH \
-  --jobid $PULL_NUMBER-$COMMIT_HASH # The GitHub lookupSystem can parse this and map the COMMIT_HASH to a patch number.
+  # Initialize goldctl with the appropriate parameters.
+  bazelisk run //gold-client/cmd/goldctl -- imgtest init \
+    --bucket goldmine-build-private \
+    --git_hash $COMMIT_HASH \
+    --work-dir $WORKDIR \
+    --upload-only \
+    --corpus goldmine \
+    --instance goldmine \
+    --key browser:chrome \
+    --key os:`uname -o` \
+    --key machine:`uname -m` \
+    --crs=github \
+    --cis=github \
+    --changelist $PULL_NUMBER \
+    --patchset_id $COMMIT_HASH \
+    --jobid $PULL_NUMBER-$COMMIT_HASH # The GitHub lookupSystem can parse this and map the COMMIT_HASH to a patch number.
 
 fi
 

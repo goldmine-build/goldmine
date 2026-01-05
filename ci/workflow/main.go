@@ -1,4 +1,18 @@
 // This will be the main workflow for the goldmine CI.
+//
+// Can be triggered manually by sending a message to the restate server, for
+// example:
+//
+//
+//     kubectl port-forward svc/restate-requests 8080:8080
+//
+//     curl --include --request POST \
+//       --url http://127.0.0.1:8080/CI/RunAllBuildsAndTestsV1/send \
+//       --header 'Accept: application/json' \
+//       --header 'Content-Type: application/json' \
+//       --header 'idempotency-key: ' \
+//       --data '{  "login": "jcgregorio",  "patchset": 13,  "pr": 7, "sha": "01482eb651c1881437dc8f9e928677222943e1dc" }'
+
 package main
 
 import (
@@ -70,16 +84,22 @@ type CI struct{}
 
 func (c CI) RunAllBuildsAndTestsV1(ctx restate.Context, input shared.TrybotWorkflowArgs) error {
 	sklog.Info("Checking out code.")
+
+	// TODO Always send an infra link.
+
+	// Check out the code.
 	checkout, err := git.NewCheckout(ctx, "https://github.com/goldmine-build/goldmine.git", flags.CheckoutDir)
 	if err != nil {
 		return infraError(ctx, input, err, "Failed checkout")
 	}
 
+	// Clean up any lingering files from the last run.
 	_, err = checkout.Git(ctx, "reset", "--hard", "origin/main")
 	if err != nil {
 		return infraError(ctx, input, err, "Failed to reset --hard origin/main")
 	}
 
+	// Check out either the PR or a commit on main.
 	if input.PRNumber > 0 {
 		refs := fmt.Sprintf("refs/pull/%d/head", input.PRNumber)
 		_, err = checkout.Git(ctx, "fetch", "origin", refs)
@@ -110,23 +130,20 @@ func (c CI) RunAllBuildsAndTestsV1(ctx restate.Context, input shared.TrybotWorkf
 
 	sklog.Info("Starting build and test.")
 	cmd := exec.CommandContext(ctx, bazel, "test", "//golden/modules/...", "//perf/modules/...", "//go/...")
-
 	// Point to the running emulators.
 	cmd.Env = os.Environ()
 	cmd.Env = append(cmd.Env, "COCKROACHDB_EMULATOR_HOST=localhost:8895", "PUBSUB_EMULATOR_HOST=localhost:8893")
-
 	os.Chdir(filepath.Join(flags.CheckoutDir, flags.Repo))
-
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
 		return skerr.Wrap(err)
 	}
-
 	err = cmd.Start()
 	if err != nil {
 		return infraError(ctx, input, err, "Infrastructure error starting build")
 	}
 
+	// Extract the link to the BuildBuddy run.
 	link, err := findBuildBuddyLink(stderr)
 	sklog.Infof("LINK: %q", link)
 	go func() {
