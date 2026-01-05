@@ -1,7 +1,6 @@
 package git
 
 import (
-	"context"
 	"os"
 	"path"
 	"path/filepath"
@@ -103,10 +102,10 @@ func TestCheckout(t *testing.T) {
 }
 
 func TestCheckout_IsDirty(t *testing.T) {
-	ctx := context.Background()
+	ctx, gb, _ := setup(t)
+	defer gb.Cleanup()
+
 	test := func(name string, expectDirty bool, fn func(*testing.T, *Checkout)) {
-		ctx, gb, _ := setup(t)
-		defer gb.Cleanup()
 
 		t.Run(name, func(t *testing.T) {
 			tmp, err := os.MkdirTemp("", "")

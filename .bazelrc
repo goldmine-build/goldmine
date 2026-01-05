@@ -154,6 +154,7 @@ query --@aspect_rules_ts//ts:skipLibCheck=honor_tsconfig
 # One of the purposes of this file is to override the "mayberemote" configuration so that it
 # actually produces remote builds on RBE. See below for more on the "mayberemote" configuration.
 try-import %workspace%/bazel/user/bazelrc
+try-import /etc/bazel/.bazelrc
 
 # The "mayberemote" config is used for scripted actions that *may* perform RBE builds with Bazel.
 # For example, take the following Makefile:
