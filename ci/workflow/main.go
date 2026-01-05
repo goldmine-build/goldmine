@@ -80,15 +80,27 @@ func (c CI) RunAllBuildsAndTestsV1(ctx restate.Context, input shared.TrybotWorkf
 		return infraError(ctx, input, err, "Failed to reset --hard origin/main")
 	}
 
-	refs := fmt.Sprintf("refs/pull/%d/head", input.PRNumber)
-	_, err = checkout.Git(ctx, "fetch", "origin", refs)
-	if err != nil {
-		return infraError(ctx, input, err, "Failed to pull ref: %s", refs)
-	}
+	if input.PRNumber > 0 {
+		refs := fmt.Sprintf("refs/pull/%d/head", input.PRNumber)
+		_, err = checkout.Git(ctx, "fetch", "origin", refs)
+		if err != nil {
+			return infraError(ctx, input, err, "Failed to pull ref: %s", refs)
+		}
 
-	_, err = checkout.Git(ctx, "checkout", "FETCH_HEAD")
-	if err != nil {
-		return infraError(ctx, input, err, "Failed to checkout FETCH_HEAD")
+		_, err = checkout.Git(ctx, "checkout", "FETCH_HEAD")
+		if err != nil {
+			return infraError(ctx, input, err, "Failed to checkout FETCH_HEAD")
+		}
+	} else {
+		_, err = checkout.Git(ctx, "fetch", "origin", "refs/heads/main")
+		if err != nil {
+			return infraError(ctx, input, err, "Failed to pull ref: refs/heads/main")
+		}
+
+		_, err = checkout.Git(ctx, "checkout", input.SHA)
+		if err != nil {
+			return infraError(ctx, input, err, "Failed to checkout git hash: %s", input.SHA)
+		}
 	}
 
 	bazel, err := exec.LookPath("bazelisk")
@@ -142,8 +154,13 @@ func (c CI) RunAllBuildsAndTestsV1(ctx restate.Context, input shared.TrybotWorkf
 		buildStatus(ctx, input, gitapi.Success, link, "All Builds/Tests succeeded")
 	}
 
-	// TBD
 	sklog.Info("UploadGoldResults")
+	if input.PRNumber > 0 {
+		exec.CommandContext(ctx, "./upload_to_gold/upload.sh", input.SHA, fmt.Sprintf("%d", input.PRNumber))
+	} else {
+		// Passing in an empty PR Number indicates this is on main and not in a PR.
+		exec.CommandContext(ctx, "./upload_to_gold/upload.sh", input.SHA)
+	}
 
 	return nil
 }

@@ -3,23 +3,34 @@ set -e
 set -x
 set -o pipefail 
 
+GITHUB_SHA="$1"
+PULL_NUMBER="$2"
+
+if [[ "$PULL_NUMBER" == ""]]; then
+  GITHUB_REF_NAME="main"
+else
+  GITHUB_REF_NAME=""
+fi
+
 # Create working directory for goldctl.
 WORKDIR=/tmp/goldctl
 mkdir -p "$WORKDIR"
+
+# Clean up the working directory on exit.
+cleanUpWorkDir() {
+  rm -rf $WORKDIR
+}
+
+trap 'cleanUpWorkDir' EXIT
+
 
 # Create directory to extract images to.
 EXTRACT_DIR=/tmp/gold
 mkdir -p "$EXTRACT_DIR"
 
-
-echo "$GCP_GCS_SERVICE_ACCT" > /tmp/serice-account.json
-
-bazel run //gold-client/cmd/goldctl -- auth --service-account /tmp/serice-account.json --work-dir $WORKDIR`
+bazel run //gold-client/cmd/goldctl -- auth --service-account /etc/gcs/serice-account.json --work-dir $WORKDIR`
 
 # bazel run //gold-client/cmd/goldctl -- auth --service-account ~/Downloads/api-project-146332866891-3816d0d33259.json --work-dir $WORKDIR`
-
-# Run all the modules tests which generate images to be uploaded to Gold.
-bazel test //golden/modules/... //perf/modules/...
 
 # GITHUB_REF_NAME looks like either main or 1/merge for a pull request.
 # Determine if we are running in a tryjob context by using that variable.
@@ -28,7 +39,7 @@ if [[ "$GITHUB_REF_NAME" == "main" ]]; then
 # Initialize goldctl with the appropriate parameters.
 bazel run //gold-client/cmd/goldctl -- imgtest init \
   --bucket goldmine-build-private \
-  --git_hash `git rev-parse HEAD` \
+  --git_hash $GITHUB_SHA \
   --work-dir $WORKDIR \
   --upload-only \
   --corpus goldmine \
@@ -39,9 +50,6 @@ bazel run //gold-client/cmd/goldctl -- imgtest init \
 
 else
   printf "Running in tryjob context.\n"
-
-  # Slice the '1' off of '1/merge'.
-  PULL_NUMBER=$(echo $GITHUB_REF_NAME | cut -d'/' -f1) 
 
   # GitHub does not have patchset numbers, so we use the commit hash of the
   # commit being tested as the patchset ID. BUT, GitHub does a merge commit for
