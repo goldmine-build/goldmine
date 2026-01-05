@@ -28,7 +28,7 @@ trap 'cleanUpWorkDir' EXIT
 EXTRACT_DIR=/tmp/gold
 mkdir -p "$EXTRACT_DIR"
 
-bazelisk run //gold-client/cmd/goldctl -- auth --service-account /etc/gcs/serice-account.json --work-dir $WORKDIR`
+bazelisk run //gold-client/cmd/goldctl -- auth --service-account /etc/gcs/service-account.json --work-dir $WORKDIR`
 
 # bazelisk run //gold-client/cmd/goldctl -- auth --service-account ~/Downloads/api-project-146332866891-3816d0d33259.json --work-dir $WORKDIR`
 
