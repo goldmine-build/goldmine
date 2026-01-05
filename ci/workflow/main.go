@@ -85,7 +85,8 @@ type CI struct{}
 func (c CI) RunAllBuildsAndTestsV1(ctx restate.Context, input shared.TrybotWorkflowArgs) error {
 	sklog.Info("Checking out code.")
 
-	// TODO Always send an infra link.
+	// Always send an infra link.
+	infraStatus(ctx, input, gitapi.Pending, "Running...")
 
 	// Check out the code.
 	checkout, err := git.NewCheckout(ctx, "https://github.com/goldmine-build/goldmine.git", flags.CheckoutDir)
@@ -146,6 +147,7 @@ func (c CI) RunAllBuildsAndTestsV1(ctx restate.Context, input shared.TrybotWorkf
 	// Extract the link to the BuildBuddy run.
 	link, err := findBuildBuddyLink(stderr)
 	sklog.Infof("LINK: %q", link)
+	// Keep reading from stderr and pipe that into the logs.
 	go func() {
 		scanner := bufio.NewScanner(stderr)
 		for scanner.Scan() {
@@ -166,11 +168,14 @@ func (c CI) RunAllBuildsAndTestsV1(ctx restate.Context, input shared.TrybotWorkf
 				// Something more fundamental broke.
 				return infraError(ctx, input, err, "Infrastructure error trying to build")
 			}
+		} else {
+			return infraError(ctx, input, err, "Infrastructure I/O error trying to build")
 		}
 	} else {
 		buildStatus(ctx, input, gitapi.Success, link, "All Builds/Tests succeeded")
 	}
 
+	// TODO Make this into a bazel command also?
 	sklog.Info("UploadGoldResults")
 	if input.PRNumber > 0 {
 		cmd = exec.CommandContext(ctx, "./upload_to_gold/upload.sh", input.SHA, fmt.Sprintf("%d", input.PRNumber))
@@ -183,6 +188,8 @@ func (c CI) RunAllBuildsAndTestsV1(ctx restate.Context, input shared.TrybotWorkf
 		return infraError(ctx, input, err, "Infrastructure error trying to upload to Gold.")
 	}
 	sklog.Info("UploadGoldResults Complete")
+
+	infraStatus(ctx, input, gitapi.Success, "Success.")
 
 	return nil
 }
@@ -240,27 +247,38 @@ func main() {
 	sklog.Fatal(server.Start(context.Background(), flags.Port))
 }
 
-func infraError(ctx restate.Context, input shared.TrybotWorkflowArgs, err error, format string, args ...interface{}) error {
-	fullErrorMsg := fmt.Sprintf("%s: %s", fmt.Sprintf(format, args...), err)
-	sklog.Error(fullErrorMsg)
-
+func getRestateRequestPermalink(ctx restate.Context) string {
 	// URLs for the invocations look like this:
 	//
 	//
 	// https://restate-server.tail433733.ts.net/ui/invocations/inv_1eRfTha6XtFP4NKbOvV7i2k9b5coF1dmvy
-	err = gitApi.SetStatus(ctx, input.SHA, gitapi.Error, flags.RestateURL+"/ui/invocations/"+ctx.Request().ID, fullErrorMsg, "Infra")
+	return flags.RestateURL + "/ui/invocations/" + ctx.Request().ID
+}
+
+func infraStatus(ctx restate.Context, input shared.TrybotWorkflowArgs, state gitapi.State, msg string) {
+	err := gitApi.SetStatus(ctx, input.SHA, gitapi.Pending, getRestateRequestPermalink(ctx), msg, "Infra")
+	if err != nil {
+		sklog.Errorf("Failed to set GitHub status: %s", err)
+	}
+
+}
+
+func infraError(ctx restate.Context, input shared.TrybotWorkflowArgs, err error, format string, args ...interface{}) error {
+	fullErrorMsg := fmt.Sprintf("%s: %s", fmt.Sprintf(format, args...), err)
+	sklog.Error(fullErrorMsg)
+
+	err = gitApi.SetStatus(ctx, input.SHA, gitapi.Error, getRestateRequestPermalink(ctx), fullErrorMsg, "Infra")
 	if err != nil {
 		sklog.Errorf("Failed to set GitHub status: %s", err)
 	}
 	return skerr.Wrap(err)
 }
 
-func buildStatus(ctx context.Context, input shared.TrybotWorkflowArgs, state gitapi.State, link string, msg string) error {
+func buildStatus(ctx context.Context, input shared.TrybotWorkflowArgs, state gitapi.State, link string, msg string) {
 	err := gitApi.SetStatus(ctx, input.SHA, state, link, msg, "CI")
 	if err != nil {
 		sklog.Errorf("Failed to set GitHub status: %s", err)
 	}
-	return nil
 }
 
 const bazelStreamingTargetPrefix = "INFO: Streaming build results to: "
