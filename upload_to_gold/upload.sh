@@ -6,7 +6,7 @@ set -o pipefail
 GITHUB_SHA="$1"
 PULL_NUMBER="$2"
 
-if [[ "$PULL_NUMBER" == ""]]; then
+if [[ "$PULL_NUMBER" == "" ]]; then
   GITHUB_REF_NAME="main"
 else
   GITHUB_REF_NAME=""
@@ -28,9 +28,9 @@ trap 'cleanUpWorkDir' EXIT
 EXTRACT_DIR=/tmp/gold
 mkdir -p "$EXTRACT_DIR"
 
-bazel run //gold-client/cmd/goldctl -- auth --service-account /etc/gcs/serice-account.json --work-dir $WORKDIR`
+# bazel run //gold-client/cmd/goldctl -- auth --service-account /etc/gcs/serice-account.json --work-dir $WORKDIR`
 
-# bazel run //gold-client/cmd/goldctl -- auth --service-account ~/Downloads/api-project-146332866891-3816d0d33259.json --work-dir $WORKDIR`
+bazel run //gold-client/cmd/goldctl -- auth --service-account ~/Downloads/api-project-146332866891-3816d0d33259.json --work-dir $WORKDIR`
 
 # GITHUB_REF_NAME looks like either main or 1/merge for a pull request.
 # Determine if we are running in a tryjob context by using that variable.

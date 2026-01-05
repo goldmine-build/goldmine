@@ -53,7 +53,7 @@ func (s *ServerFlags) Flagset() *flag.FlagSet {
 	fs.StringVar(&s.Repo, "repo", "goldmine", "GitHub repo.")
 	fs.StringVar(&s.Branch, "branch", "main", "GitHub repo branch.")
 
-	fs.StringVar(&s.RestateURL, "restate_url", "https://restate.tail433733.ts.net", "The URL of the Restate UI.")
+	fs.StringVar(&s.RestateURL, "restate_url", "https://restate-server.tail433733.ts.net", "The URL of the Restate UI.")
 
 	return fs
 }
