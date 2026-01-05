@@ -35,6 +35,8 @@ type ServerFlags struct {
 	Owner   string
 	Repo    string
 	Branch  string
+
+	RestateURL string
 }
 
 // Flagset constructs a flag.FlagSet for the App.
@@ -50,6 +52,8 @@ func (s *ServerFlags) Flagset() *flag.FlagSet {
 	fs.StringVar(&s.Owner, "owner", "goldmine-build", "GitHub user or organization.")
 	fs.StringVar(&s.Repo, "repo", "goldmine", "GitHub repo.")
 	fs.StringVar(&s.Branch, "branch", "main", "GitHub repo branch.")
+
+	fs.StringVar(&s.RestateURL, "restate_url", "https://restate.tail433733.ts.net", "The URL of the Restate UI.")
 
 	return fs
 }
@@ -197,12 +201,15 @@ func main() {
 	sklog.Fatal(server.Start(context.Background(), flags.Port))
 }
 
-func infraError(ctx context.Context, input shared.TrybotWorkflowArgs, err error, format string, args ...interface{}) error {
+func infraError(ctx restate.Context, input shared.TrybotWorkflowArgs, err error, format string, args ...interface{}) error {
 	fullErrorMsg := fmt.Sprintf("%s: %s", fmt.Sprintf(format, args...), err)
 	sklog.Error(fullErrorMsg)
 
-	// TODO Construct URL to report infra errors.
-	err = gitApi.SetStatus(ctx, input.SHA, gitapi.Error, "https://restate.tail433733.ts.net", fullErrorMsg, "Infra")
+	// URLs for the invocations look like this:
+	//
+	//
+	// https://restate-server.tail433733.ts.net/ui/invocations/inv_1eRfTha6XtFP4NKbOvV7i2k9b5coF1dmvy
+	err = gitApi.SetStatus(ctx, input.SHA, gitapi.Error, flags.RestateURL+"/ui/invocations/"+ctx.Request().ID, fullErrorMsg, "Infra")
 	if err != nil {
 		sklog.Errorf("Failed to set GitHub status: %s", err)
 	}
