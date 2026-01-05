@@ -165,6 +165,7 @@ func (c CI) RunAllBuildsAndTestsV1(ctx restate.Context, input shared.TrybotWorkf
 		sklog.Errorf("Failed to run upload.sh script: %s: %s", err, string(b))
 		return infraError(ctx, input, err, "Infrastructure error trying to upload to Gold.")
 	}
+	sklog.Info("UploadGoldResults Complete")
 
 	return nil
 }
