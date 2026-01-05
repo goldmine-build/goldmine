@@ -256,7 +256,7 @@ func getRestateRequestPermalink(ctx restate.Context) string {
 }
 
 func infraStatus(ctx restate.Context, input shared.TrybotWorkflowArgs, state gitapi.State, msg string) {
-	err := gitApi.SetStatus(ctx, input.SHA, gitapi.Pending, getRestateRequestPermalink(ctx), msg, "Infra")
+	err := gitApi.SetStatus(ctx, input.SHA, state, getRestateRequestPermalink(ctx), msg, "Infra")
 	if err != nil {
 		sklog.Errorf("Failed to set GitHub status: %s", err)
 	}
