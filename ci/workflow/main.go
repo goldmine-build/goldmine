@@ -128,12 +128,14 @@ func (c CI) RunAllBuildsAndTestsV1(ctx restate.Context, input shared.TrybotWorkf
 		if exitError, ok := err.(*exec.ExitError); ok {
 			if slices.Contains(bazelExitCodesForNonInfraErrors, exitError.ProcessState.ExitCode()) {
 				// The build or one or more tests failed.
-				buildStatus(ctx, input, gitapi.Error, link, "Build/Tests failed")
+				buildStatus(ctx, input, gitapi.Error, link, "Builds/Tests failed")
 			} else {
 				// Something more fundamental broke.
 				return infraError(ctx, input, err, "Infrastructure error trying to build")
 			}
 		}
+	} else {
+		buildStatus(ctx, input, gitapi.Success, link, "All Builds/Tests succeeded")
 	}
 
 	// TBD
