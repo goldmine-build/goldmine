@@ -91,7 +91,7 @@ func HandlePullRequest(w http.ResponseWriter, r *http.Request) {
 		sklog.Errorf("decoding pull request: %s", err)
 	}
 
-	wf := shared.TrybotWorkflowArgs{
+	wf := shared.CIWorkflowArgs{
 		PRNumber: pull.Number,
 		Login:    pull.PullRequest.User.Login,
 		SHA:      pull.PullRequest.Head.Sha,

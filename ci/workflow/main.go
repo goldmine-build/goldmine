@@ -82,7 +82,7 @@ var (
 
 type CI struct{}
 
-func (c CI) RunAllBuildsAndTestsV1(ctx restate.Context, input shared.TrybotWorkflowArgs) error {
+func (c CI) RunAllBuildsAndTestsV1(ctx restate.Context, input shared.CIWorkflowArgs) error {
 	sklog.Info("Checking out code.")
 
 	// Always send an infra link.
@@ -255,7 +255,7 @@ func getRestateRequestPermalink(ctx restate.Context) string {
 	return flags.RestateURL + "/ui/invocations/" + ctx.Request().ID
 }
 
-func infraStatus(ctx restate.Context, input shared.TrybotWorkflowArgs, state gitapi.State, msg string) {
+func infraStatus(ctx restate.Context, input shared.CIWorkflowArgs, state gitapi.State, msg string) {
 	err := gitApi.SetStatus(ctx, input.SHA, state, getRestateRequestPermalink(ctx), msg, "Infra")
 	if err != nil {
 		sklog.Errorf("Failed to set GitHub status: %s", err)
@@ -263,7 +263,7 @@ func infraStatus(ctx restate.Context, input shared.TrybotWorkflowArgs, state git
 
 }
 
-func infraError(ctx restate.Context, input shared.TrybotWorkflowArgs, err error, format string, args ...interface{}) error {
+func infraError(ctx restate.Context, input shared.CIWorkflowArgs, err error, format string, args ...interface{}) error {
 	fullErrorMsg := fmt.Sprintf("%s: %s", fmt.Sprintf(format, args...), err)
 	sklog.Error(fullErrorMsg)
 
@@ -274,7 +274,7 @@ func infraError(ctx restate.Context, input shared.TrybotWorkflowArgs, err error,
 	return skerr.Wrap(err)
 }
 
-func buildStatus(ctx context.Context, input shared.TrybotWorkflowArgs, state gitapi.State, link string, msg string) {
+func buildStatus(ctx context.Context, input shared.CIWorkflowArgs, state gitapi.State, link string, msg string) {
 	err := gitApi.SetStatus(ctx, input.SHA, state, link, msg, "CI")
 	if err != nil {
 		sklog.Errorf("Failed to set GitHub status: %s", err)
