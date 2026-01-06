@@ -6,7 +6,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"flag"
-	"fmt"
 	"net/http"
 	"os"
 
@@ -17,6 +16,7 @@ import (
 	"go.goldmine.build/go/common"
 	"go.goldmine.build/go/httputils"
 	"go.goldmine.build/go/profsrv"
+	"go.goldmine.build/go/skerr"
 	"go.goldmine.build/go/sklog"
 )
 
@@ -75,6 +75,16 @@ func HandlePush(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	wf := shared.CIWorkflowArgs{
+		PRNumber: 0,
+		Login:    push.Sender.Login,
+		SHA:      push.After,
+	}
+
+	if err := sendRestateCIRequest(wf); err != nil {
+		sklog.Errorf("Failed to send request to restate: %s", err)
+	}
+
 	b, err := json.MarshalIndent(push, "", "  ")
 	if err != nil {
 		sklog.Error(err)
@@ -85,10 +95,13 @@ func HandlePush(w http.ResponseWriter, r *http.Request) {
 func HandlePullRequest(w http.ResponseWriter, r *http.Request) {
 	sklog.Infof("Got push")
 	w.WriteHeader(200)
+
+	// Decode incoming pull request.
 	var pull events.PullRequest
 	err := json.NewDecoder(r.Body).Decode(&pull)
 	if err != nil {
 		sklog.Errorf("decoding pull request: %s", err)
+		return
 	}
 
 	wf := shared.CIWorkflowArgs{
@@ -96,40 +109,15 @@ func HandlePullRequest(w http.ResponseWriter, r *http.Request) {
 		Login:    pull.PullRequest.User.Login,
 		SHA:      pull.PullRequest.Head.Sha,
 	}
-	if err != nil {
-		sklog.Errorf("Failed to create/update pull request: %s", err)
-	}
 
+	if err := sendRestateCIRequest(wf); err != nil {
+		sklog.Errorf("Failed to send request to restate: %s", err)
+	}
+}
+
+func sendRestateCIRequest(wf shared.CIWorkflowArgs) error {
 	// Log the struct we are going to send to restate.
 	sklog.Infof("Workflow: %#v", wf)
-
-	idempotencyKey := fmt.Sprintf("PR-%d-%s", wf.PRNumber, wf.SHA)
-
-	requestURL := "http://restate-requests:8080/CI/RunAllBuildsAndTestsV1/send"
-
-	b, err := json.MarshalIndent(wf, "", "  ")
-	if err != nil {
-		sklog.Errorf("Failed to encode request body: %s", err)
-		return
-	}
-	sklog.Infof("Body: \n%s", string(b))
-	sklog.Infof("Idempotency: %s", idempotencyKey)
-	body := bytes.NewBuffer(b)
-
-	client := httputils.DefaultClientConfig().With2xxOnly().Client()
-	req, err := http.NewRequest("POST", requestURL, body)
-	if err != nil {
-		sklog.Errorf("Failed to build request object: %s", err)
-		return
-	}
-	req.Header.Add("idempotency-key", idempotencyKey)
-	req.Header.Add("Content-Type", "application/json")
-	resp, err := client.Do(req)
-	if err != nil {
-		sklog.Errorf("Failed to make request: %s", err)
-		return
-	}
-	sklog.Infof("Status: %q", resp.Status)
 
 	/*
 	   curl --include --request POST \
@@ -140,9 +128,30 @@ func HandlePullRequest(w http.ResponseWriter, r *http.Request) {
 	     --data '{  "login": "jcgregorio",  "patchset": 13,  "pr": 7, "sha": "01482eb651c1881437dc8f9e928677222943e1dc" }'
 	*/
 
+	requestURL := "http://restate-requests:8080/CI/RunAllBuildsAndTestsV1/send"
+
+	b, err := json.MarshalIndent(wf, "", "  ")
 	if err != nil {
-		sklog.Errorf("Failed to send request to restate: %s", err)
+		return skerr.Wrapf(err, "Failed to encode request body.")
 	}
+	sklog.Infof("Body: \n%s", string(b))
+	idempotencyKey := wf.IdempotencyKey()
+	sklog.Infof("Idempotency: %s", idempotencyKey)
+	body := bytes.NewBuffer(b)
+
+	client := httputils.DefaultClientConfig().With2xxOnly().Client()
+	req, err := http.NewRequest("POST", requestURL, body)
+	if err != nil {
+		return skerr.Wrapf(err, "Failed to build request object.")
+	}
+	req.Header.Add("idempotency-key", idempotencyKey)
+	req.Header.Add("Content-Type", "application/json")
+	resp, err := client.Do(req)
+	if err != nil {
+		return skerr.Wrapf(err, "Failed to make request.")
+	}
+	sklog.Infof("Status: %q", resp.Status)
+	return nil
 }
 
 func main() {

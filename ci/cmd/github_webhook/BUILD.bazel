@@ -11,6 +11,7 @@ go_library(
         "//go/common",
         "//go/httputils",
         "//go/profsrv",
+        "//go/skerr",
         "//go/sklog",
         "@com_github_ejholmes_hookshot//:hookshot",
         "@com_github_ejholmes_hookshot//events",
