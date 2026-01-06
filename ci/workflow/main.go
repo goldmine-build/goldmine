@@ -164,7 +164,7 @@ func (c CI) RunAllBuildsAndTestsV1(ctx restate.Context, input shared.CIWorkflowA
 func gitCommand(ctx restate.Context, input shared.CIWorkflowArgs, checkout *git.Checkout, args ...string) error {
 	_, err := checkout.Git(ctx, args...)
 	if err != nil {
-		return infraError(ctx, input, err, fmt.Sprintf("Failed running: git %s", strings.Join(args, " ")))
+		return infraError(ctx, input, err, "Failed running: git %s", strings.Join(args, " "))
 	}
 	return nil
 }
