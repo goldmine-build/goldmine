@@ -95,32 +95,26 @@ func (c CI) RunAllBuildsAndTestsV1(ctx restate.Context, input shared.CIWorkflowA
 	}
 
 	// Clean up any lingering files from the last run.
-	_, err = checkout.Git(ctx, "reset", "--hard", "origin/main")
-	if err != nil {
-		return infraError(ctx, input, err, "Failed to reset --hard origin/main")
+	if err = gitCommand(ctx, input, checkout, "reset", "--hard", "origin/main"); err != nil {
+		return err
 	}
 
 	// Check out either the PR or a commit on main.
 	if input.PRNumber > 0 {
-		refs := fmt.Sprintf("refs/pull/%d/head", input.PRNumber)
-		_, err = checkout.Git(ctx, "fetch", "origin", refs)
-		if err != nil {
-			return infraError(ctx, input, err, "Failed to pull ref: %s", refs)
+		if err = gitCommand(ctx, input, checkout, "fetch", "origin", fmt.Sprintf("refs/pull/%d/head", input.PRNumber)); err != nil {
+			return err
 		}
 
-		_, err = checkout.Git(ctx, "checkout", "FETCH_HEAD")
-		if err != nil {
-			return infraError(ctx, input, err, "Failed to checkout FETCH_HEAD")
+		if err = gitCommand(ctx, input, checkout, "checkout", "FETCH_HEAD"); err != nil {
+			return err
 		}
 	} else {
-		_, err = checkout.Git(ctx, "fetch", "origin", "refs/heads/main")
-		if err != nil {
-			return infraError(ctx, input, err, "Failed to pull ref: refs/heads/main")
+		if err = gitCommand(ctx, input, checkout, "fetch", "origin", "refs/heads/main"); err != nil {
+			return err
 		}
 
-		_, err = checkout.Git(ctx, "checkout", input.SHA)
-		if err != nil {
-			return infraError(ctx, input, err, "Failed to checkout git hash: %s", input.SHA)
+		if err = gitCommand(ctx, input, checkout, "checkout", input.SHA); err != nil {
+			return err
 		}
 	}
 
@@ -129,8 +123,54 @@ func (c CI) RunAllBuildsAndTestsV1(ctx restate.Context, input shared.CIWorkflowA
 		return skerr.Wrap(err)
 	}
 
-	sklog.Info("Starting build and test.")
-	cmd := exec.CommandContext(ctx, bazel, "test", "//golden/modules/...", "//perf/modules/...", "//go/...")
+	sklog.Info("Sanity Check")
+	err = runBazelCommand(ctx, input, "Sanity Check", bazel, "query", "//...")
+	if err != nil {
+		return err
+	}
+
+	sklog.Info("Build")
+	err = runBazelCommand(ctx, input, "Build", bazel, "build", "//golden/...", "//perf/...", "//go/...")
+	if err != nil {
+		return err
+	}
+
+	sklog.Info("Test")
+	err = runBazelCommand(ctx, input, "Test", bazel, "test", "//golden/modules/...", "//perf/modules/...", "//go/...")
+	if err != nil {
+		return err
+	}
+
+	// TODO Make this into a bazel command also?
+	sklog.Info("UploadGoldResults")
+	var cmd *exec.Cmd
+	if input.PRNumber > 0 {
+		cmd = exec.CommandContext(ctx, "./upload_to_gold/upload.sh", input.SHA, fmt.Sprintf("%d", input.PRNumber))
+	} else {
+		// Passing in an empty PR Number indicates this is on main and not in a PR.
+		cmd = exec.CommandContext(ctx, "./upload_to_gold/upload.sh", input.SHA)
+	}
+	if b, err := cmd.CombinedOutput(); err != nil {
+		sklog.Errorf("Failed to run upload.sh script: %s: %s", err, string(b))
+		return infraError(ctx, input, err, "Infrastructure error trying to upload to Gold.")
+	}
+	sklog.Info("UploadGoldResults Complete")
+
+	infraStatus(ctx, input, gitapi.Success, "Success.")
+
+	return nil
+}
+
+func gitCommand(ctx restate.Context, input shared.CIWorkflowArgs, checkout *git.Checkout, args ...string) error {
+	_, err := checkout.Git(ctx, args...)
+	if err != nil {
+		return infraError(ctx, input, err, fmt.Sprintf("Failed running: git %s", strings.Join(args, " ")))
+	}
+	return nil
+}
+
+func runBazelCommand(ctx restate.Context, input shared.CIWorkflowArgs, step string, bazel string, args ...string) error {
+	cmd := exec.CommandContext(ctx, bazel, args...)
 	// Point to the running emulators.
 	cmd.Env = os.Environ()
 	cmd.Env = append(cmd.Env, "COCKROACHDB_EMULATOR_HOST=localhost:8895", "PUBSUB_EMULATOR_HOST=localhost:8893")
@@ -141,7 +181,7 @@ func (c CI) RunAllBuildsAndTestsV1(ctx restate.Context, input shared.CIWorkflowA
 	}
 	err = cmd.Start()
 	if err != nil {
-		return infraError(ctx, input, err, "Infrastructure error starting build")
+		return infraError(ctx, input, err, "Infrastructure error on Start")
 	}
 
 	// Extract the link to the BuildBuddy run.
@@ -157,40 +197,23 @@ func (c CI) RunAllBuildsAndTestsV1(ctx restate.Context, input shared.CIWorkflowA
 			sklog.Errorf("reading stderr: %s", err)
 		}
 	}()
-	buildStatus(ctx, input, gitapi.Pending, link, "Running tests")
+	buildStatus(ctx, input, gitapi.Pending, link, step)
 
 	if err := cmd.Wait(); err != nil {
 		if exitError, ok := err.(*exec.ExitError); ok {
 			if slices.Contains(bazelExitCodesForNonInfraErrors, exitError.ProcessState.ExitCode()) {
 				// The build or one or more tests failed.
-				buildStatus(ctx, input, gitapi.Error, link, "Builds/Tests failed")
+				buildStatus(ctx, input, gitapi.Error, link, step)
 			} else {
 				// Something more fundamental broke.
-				return infraError(ctx, input, err, "Infrastructure error trying to build")
+				return infraError(ctx, input, err, "Infrastructure error while running")
 			}
 		} else {
-			return infraError(ctx, input, err, "Infrastructure I/O error trying to build")
+			return infraError(ctx, input, err, "Infrastructure I/O error while running")
 		}
 	} else {
-		buildStatus(ctx, input, gitapi.Success, link, "All Builds/Tests succeeded")
+		buildStatus(ctx, input, gitapi.Success, link, step)
 	}
-
-	// TODO Make this into a bazel command also?
-	sklog.Info("UploadGoldResults")
-	if input.PRNumber > 0 {
-		cmd = exec.CommandContext(ctx, "./upload_to_gold/upload.sh", input.SHA, fmt.Sprintf("%d", input.PRNumber))
-	} else {
-		// Passing in an empty PR Number indicates this is on main and not in a PR.
-		cmd = exec.CommandContext(ctx, "./upload_to_gold/upload.sh", input.SHA)
-	}
-	if b, err := cmd.CombinedOutput(); err != nil {
-		sklog.Errorf("Failed to run upload.sh script: %s: %s", err, string(b))
-		return infraError(ctx, input, err, "Infrastructure error trying to upload to Gold.")
-	}
-	sklog.Info("UploadGoldResults Complete")
-
-	infraStatus(ctx, input, gitapi.Success, "Success.")
-
 	return nil
 }
 
@@ -217,8 +240,8 @@ func main() {
 	}
 
 	go func() {
-		// TODO Don't bother trying to use Bazel for this, instead install cdb
-		// and gcloud cmd line tools in the container.
+		// TODO - There a slight race here with the very first job that this
+		// application accepts if this bazel command hasn't started already.
 
 		// Start emulators, but don't wait for the launch to complete.
 		emuCtx, cancel := context.WithTimeout(ctx, 5*time.Minute)
@@ -283,7 +306,7 @@ func buildStatus(ctx context.Context, input shared.CIWorkflowArgs, state gitapi.
 
 const bazelStreamingTargetPrefix = "INFO: Streaming build results to: "
 
-// TODO Use streaming output and pull the BuildBuddy URL from the output and write that back to the GitHub PR.
+// Use streaming output and pull the BuildBuddy URL from the output and write that back to the GitHub PR.
 // The line looks like:
 //
 //	INFO: Streaming build results to: https://app.buildbuddy.io/invocation/some-uuid-here
