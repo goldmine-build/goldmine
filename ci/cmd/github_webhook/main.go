@@ -4,7 +4,6 @@ package main
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -14,7 +13,7 @@ import (
 	"github.com/ejholmes/hookshot"
 	"github.com/ejholmes/hookshot/events"
 	"github.com/go-chi/chi/v5"
-	"go.goldmine.build/ci/go/triggers/github"
+	shared "go.goldmine.build/ci/go"
 	"go.goldmine.build/go/common"
 	"go.goldmine.build/go/httputils"
 	"go.goldmine.build/go/profsrv"
@@ -28,13 +27,6 @@ type ServerFlags struct {
 	HealthzPort string
 	Secret      string
 	Main        string
-
-	// Storage info need by PRConvert.
-	StorageCredentialsDir string
-	StorageEndpoint       string
-	StorageUseSSL         bool
-	StorageBucketName     string
-	StoragePRPath         string
 }
 
 // Flagset constructs a flag.FlagSet for the App.
@@ -47,18 +39,11 @@ func (s *ServerFlags) Flagset() *flag.FlagSet {
 	fs.StringVar(&s.Secret, "secret", "", "The file location of the github-webhook-secret.")
 	fs.StringVar(&s.Main, "main", "refs/heads/main", "The name of the main branch to follow.")
 
-	fs.StringVar(&s.StorageCredentialsDir, "store_cred_dir", "", "Directory that contains storage credentials in two files, 'key' and 'secret'.")
-	fs.StringVar(&s.StorageEndpoint, "store_endpoint", "", "Storage endpoint, such as play.min.io")
-	fs.BoolVar(&s.StorageUseSSL, "store_ssl", true, "Use SSL when connecting to --store_endpoint")
-	fs.StringVar(&s.StorageBucketName, "store_bucket", "", "Storage bucket name.")
-	fs.StringVar(&s.StoragePRPath, "store_pr_path", "", "Storage directory in the bucket that holds the Pull Request info.")
-
 	return fs
 }
 
 var (
-	flags     ServerFlags
-	prConvert *github.PRConvert
+	flags ServerFlags
 )
 
 func HandlePing(w http.ResponseWriter, r *http.Request) {
@@ -106,15 +91,11 @@ func HandlePullRequest(w http.ResponseWriter, r *http.Request) {
 		sklog.Errorf("decoding pull request: %s", err)
 	}
 
-	// Now trigger the Temporal workflow by passing in the prNumber,
-	// patchsetNumber, login, and sha. Well do the checking in the Workflow for
-	// login being a valid CI user, so that way errors here will be visible, as
-	// opposed to silently swallowing them.
-	wf, err := prConvert.WorkflowArgsFromPullRequest(context.Background(), github.Patchset{
+	wf := shared.TrybotWorkflowArgs{
 		PRNumber: pull.Number,
 		Login:    pull.PullRequest.User.Login,
 		SHA:      pull.PullRequest.Head.Sha,
-	})
+	}
 	if err != nil {
 		sklog.Errorf("Failed to create/update pull request: %s", err)
 	}
@@ -122,9 +103,8 @@ func HandlePullRequest(w http.ResponseWriter, r *http.Request) {
 	// Log the struct we are going to send to restate.
 	sklog.Infof("Workflow: %#v", wf)
 
-	idempotencyKey := fmt.Sprintf("PR-%d-%d-%s", wf.PRNumber, wf.PatchsetNumber, wf.SHA)
+	idempotencyKey := fmt.Sprintf("PR-%d-%s", wf.PRNumber, wf.SHA)
 
-	// Work around some weirdness in k3s dns resolution.
 	requestURL := "http://restate-requests:8080/CI/RunAllBuildsAndTestsV1/send"
 
 	b, err := json.MarshalIndent(wf, "", "  ")
@@ -172,18 +152,6 @@ func main() {
 		common.PrometheusOpt(&flags.PromPort),
 		common.FlagSetOpt((&flags).Flagset()),
 	)
-
-	var err error
-	prConvert, err = github.New(
-		flags.StorageCredentialsDir,
-		flags.StorageEndpoint,
-		flags.StorageUseSSL,
-		flags.StoragePRPath,
-		flags.StorageBucketName,
-	)
-	if err != nil {
-		sklog.Fatalf("Creating PRConvert: %s", err)
-	}
 
 	// Start pprof services.
 	profsrv.Start(flags.PprofPort)
