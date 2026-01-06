@@ -119,7 +119,7 @@ export const launchBrowser = (showBrowser?: boolean): Promise<Browser> => {
     //     https://chromium.googlesource.com/chromium/src/+/master/docs/linux/suid_sandbox_development.md
     //     for more information on developing with the SUID sandbox. If you want to live
     //     dangerously and need an immediate workaround, you can try using --no-sandbox.
-    args: ['--disable-dev-shm-usage', '--no-sandbox'],
+    args: ['--disable-dev-shm-usage', '--no-sandbox', '--disable-web-security'],
     headless: !showBrowser,
     env: {
       ...process.env, // Headful mode breaks without this line (e.g. "unable to open X display").
