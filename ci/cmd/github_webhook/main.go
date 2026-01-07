@@ -3,7 +3,7 @@
 package main
 
 import (
-	"context"
+	"bytes"
 	"encoding/json"
 	"flag"
 	"net/http"
@@ -12,10 +12,11 @@ import (
 	"github.com/ejholmes/hookshot"
 	"github.com/ejholmes/hookshot/events"
 	"github.com/go-chi/chi/v5"
-	"go.goldmine.build/ci/go/triggers/github"
+	shared "go.goldmine.build/ci/go"
 	"go.goldmine.build/go/common"
 	"go.goldmine.build/go/httputils"
 	"go.goldmine.build/go/profsrv"
+	"go.goldmine.build/go/skerr"
 	"go.goldmine.build/go/sklog"
 )
 
@@ -26,13 +27,6 @@ type ServerFlags struct {
 	HealthzPort string
 	Secret      string
 	Main        string
-
-	// Storage info need by PRConvert.
-	StorageCredentialsDir string
-	StorageEndpoint       string
-	StorageUseSSL         bool
-	StorageBucketName     string
-	StoragePRPath         string
 }
 
 // Flagset constructs a flag.FlagSet for the App.
@@ -45,18 +39,11 @@ func (s *ServerFlags) Flagset() *flag.FlagSet {
 	fs.StringVar(&s.Secret, "secret", "", "The file location of the github-webhook-secret.")
 	fs.StringVar(&s.Main, "main", "refs/heads/main", "The name of the main branch to follow.")
 
-	fs.StringVar(&s.StorageCredentialsDir, "store_cred_dir", "", "Directory that contains storage credentials in two files, 'key' and 'secret'.")
-	fs.StringVar(&s.StorageEndpoint, "store_endpoint", "", "Storage endpoint, such as play.min.io")
-	fs.BoolVar(&s.StorageUseSSL, "store_ssl", true, "Use SSL when connecting to --store_endpoint")
-	fs.StringVar(&s.StorageBucketName, "store_bucket", "", "Storage bucket name.")
-	fs.StringVar(&s.StoragePRPath, "store_pr_path", "", "Storage directory in the bucket that holds the Pull Request info.")
-
 	return fs
 }
 
 var (
-	flags     ServerFlags
-	prConvert *github.PRConvert
+	flags ServerFlags
 )
 
 func HandlePing(w http.ResponseWriter, r *http.Request) {
@@ -88,6 +75,16 @@ func HandlePush(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	wf := shared.CIWorkflowArgs{
+		PRNumber: 0,
+		Login:    push.Sender.Login,
+		SHA:      push.After,
+	}
+
+	if err := sendRestateCIRequest(wf); err != nil {
+		sklog.Errorf("Failed to send request to restate: %s", err)
+	}
+
 	b, err := json.MarshalIndent(push, "", "  ")
 	if err != nil {
 		sklog.Error(err)
@@ -98,33 +95,63 @@ func HandlePush(w http.ResponseWriter, r *http.Request) {
 func HandlePullRequest(w http.ResponseWriter, r *http.Request) {
 	sklog.Infof("Got push")
 	w.WriteHeader(200)
+
+	// Decode incoming pull request.
 	var pull events.PullRequest
 	err := json.NewDecoder(r.Body).Decode(&pull)
 	if err != nil {
 		sklog.Errorf("decoding pull request: %s", err)
+		return
 	}
 
-	// Now trigger the Temporal workflow by passing in the prNumber,
-	// patchsetNumber, login, and sha. Well do the checking in the Workflow for
-	// login being a valid CI user, so that way errors here will be visible, as
-	// opposed to silently swallowing them.
-	wf, err := prConvert.WorkflowArgsFromPullRequest(context.Background(), github.Patchset{
+	wf := shared.CIWorkflowArgs{
 		PRNumber: pull.Number,
 		Login:    pull.PullRequest.User.Login,
 		SHA:      pull.PullRequest.Head.Sha,
-	})
-	if err != nil {
-		sklog.Errorf("Failed to create/update pull request: %s", err)
 	}
 
-	// Just log for now until we have the workflow to trigger.
+	if err := sendRestateCIRequest(wf); err != nil {
+		sklog.Errorf("Failed to send request to restate: %s", err)
+	}
+}
+
+func sendRestateCIRequest(wf shared.CIWorkflowArgs) error {
+	// Log the struct we are going to send to restate.
 	sklog.Infof("Workflow: %#v", wf)
 
-	b, err := json.MarshalIndent(pull, "", "  ")
+	/*
+	   curl --include --request POST \
+	     --url http://127.0.0.1:8080/CI/RunAllBuildsAndTestsV1/send \
+	     --header 'Accept: application/json' \
+	     --header 'Content-Type: application/json' \
+	     --header 'idempotency-key: ' \
+	     --data '{  "login": "jcgregorio",  "patchset": 13,  "pr": 7, "sha": "01482eb651c1881437dc8f9e928677222943e1dc" }'
+	*/
+
+	requestURL := "http://restate-requests:8080/CI/RunAllBuildsAndTestsV1/send"
+
+	b, err := json.MarshalIndent(wf, "", "  ")
 	if err != nil {
-		sklog.Error(err)
+		return skerr.Wrapf(err, "Failed to encode request body.")
 	}
-	sklog.Infof("Pull: \n%s", string(b))
+	sklog.Infof("Body: \n%s", string(b))
+	idempotencyKey := wf.IdempotencyKey()
+	sklog.Infof("Idempotency: %s", idempotencyKey)
+	body := bytes.NewBuffer(b)
+
+	client := httputils.DefaultClientConfig().With2xxOnly().Client()
+	req, err := http.NewRequest("POST", requestURL, body)
+	if err != nil {
+		return skerr.Wrapf(err, "Failed to build request object.")
+	}
+	req.Header.Add("idempotency-key", idempotencyKey)
+	req.Header.Add("Content-Type", "application/json")
+	resp, err := client.Do(req)
+	if err != nil {
+		return skerr.Wrapf(err, "Failed to make request.")
+	}
+	sklog.Infof("Status: %q", resp.Status)
+	return nil
 }
 
 func main() {
@@ -134,18 +161,6 @@ func main() {
 		common.PrometheusOpt(&flags.PromPort),
 		common.FlagSetOpt((&flags).Flagset()),
 	)
-
-	var err error
-	prConvert, err = github.New(
-		flags.StorageCredentialsDir,
-		flags.StorageEndpoint,
-		flags.StorageUseSSL,
-		flags.StoragePRPath,
-		flags.StorageBucketName,
-	)
-	if err != nil {
-		sklog.Fatalf("Creating PRConvert: %s", err)
-	}
 
 	// Start pprof services.
 	profsrv.Start(flags.PprofPort)

@@ -62,6 +62,11 @@ python.toolchain(
 ####################################################################################################
 
 go_deps = use_extension("@gazelle//:extensions.bzl", "go_deps")
+go_deps.gazelle_default_attributes(
+    directives = [
+        "gazelle:proto disable",
+    ],
+)
 
 go_sdk = use_extension("@rules_go//go:extensions.bzl", "go_sdk")
 
@@ -110,6 +115,7 @@ use_repo(
     "com_github_pmezard_go_difflib",
     "com_github_prometheus_client_golang",
     "com_github_r3labs_sse_v2",
+    "com_github_restatedev_sdk_go",
     "com_github_sendgrid_sendgrid_go",
     "com_github_skia_dev_google_api_go_client",
     "com_github_skia_dev_protoc_gen_twirp_typescript",
@@ -187,8 +193,8 @@ oci.pull(
 )
 oci.pull(
     name = "base",
-    # docker pull ghcr.io/goldmine-build/base:2025-11-13T03_03_37Z-jcgregorio-dfefdcd-dirty
-    digest = "sha256:204ec4a20bfdd9f83fc4ca071f8160152d2917df7a5269bf7716728d6d1976f9",
+    # docker pull ghcr.io/goldmine-build/base:2026-01-05T00_14_41Z-jcgregorio-29058e1-dirty
+    digest = "sha256:f156b2a8fdbb6e82f31b29874cf62273f0098fb10dc654238097fc5edc080572",
     image = "ghcr.io/goldmine-build/base",
     platforms = [
         "linux/amd64",

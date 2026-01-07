@@ -106,6 +106,7 @@ func TestCheckout_IsDirty(t *testing.T) {
 	defer gb.Cleanup()
 
 	test := func(name string, expectDirty bool, fn func(*testing.T, *Checkout)) {
+
 		t.Run(name, func(t *testing.T) {
 			tmp, err := os.MkdirTemp("", "")
 			require.NoError(t, err)

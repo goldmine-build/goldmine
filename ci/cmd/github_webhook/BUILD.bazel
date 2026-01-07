@@ -7,7 +7,7 @@ go_library(
     importpath = "go.goldmine.build/ci/cmd/github_webhook",
     visibility = ["//visibility:private"],
     deps = [
-        "//ci/go/triggers/github:github_lib",
+        "//ci/go",
         "//go/common",
         "//go/httputils",
         "//go/profsrv",
@@ -16,8 +16,6 @@ go_library(
         "@com_github_ejholmes_hookshot//:hookshot",
         "@com_github_ejholmes_hookshot//events",
         "@com_github_go_chi_chi_v5//:chi",
-        "@com_github_minio_minio_go_v7//:minio-go",
-        "@com_github_minio_minio_go_v7//pkg/credentials",
     ],
 )
 
