@@ -8,6 +8,8 @@ import (
 	"flag"
 	"net/http"
 	"os"
+	"slices"
+	"strings"
 
 	"github.com/ejholmes/hookshot"
 	"github.com/ejholmes/hookshot/events"
@@ -21,12 +23,13 @@ import (
 )
 
 type ServerFlags struct {
-	Port        string
-	PromPort    string
-	PprofPort   string
-	HealthzPort string
-	Secret      string
-	Main        string
+	Port            string
+	PromPort        string
+	PprofPort       string
+	HealthzPort     string
+	Secret          string
+	Main            string
+	AllowedAccounts string
 }
 
 // Flagset constructs a flag.FlagSet for the App.
@@ -38,12 +41,14 @@ func (s *ServerFlags) Flagset() *flag.FlagSet {
 	fs.StringVar(&s.HealthzPort, "healthz_port", ":10000", "The port for health checks.")
 	fs.StringVar(&s.Secret, "secret", "", "The file location of the github-webhook-secret.")
 	fs.StringVar(&s.Main, "main", "refs/heads/main", "The name of the main branch to follow.")
+	fs.StringVar(&s.AllowedAccounts, "allowed_accounts", "jcgregorio", "Comma separated list of github accounts approved to run workflows.")
 
 	return fs
 }
 
 var (
-	flags ServerFlags
+	flags           ServerFlags
+	allowedAccounts []string
 )
 
 func HandlePing(w http.ResponseWriter, r *http.Request) {
@@ -110,6 +115,11 @@ func HandlePullRequest(w http.ResponseWriter, r *http.Request) {
 		SHA:      pull.PullRequest.Head.Sha,
 	}
 
+	if !slices.Contains(allowedAccounts, wf.Login) {
+		sklog.Errorf("%s is not in allowed list, not running workflow: %s", wf.Login, err)
+		return
+	}
+
 	if err := sendRestateCIRequest(wf); err != nil {
 		sklog.Errorf("Failed to send request to restate: %s", err)
 	}
@@ -161,6 +171,8 @@ func main() {
 		common.PrometheusOpt(&flags.PromPort),
 		common.FlagSetOpt((&flags).Flagset()),
 	)
+
+	allowedAccounts = strings.Split(flags.AllowedAccounts, ",")
 
 	// Start pprof services.
 	profsrv.Start(flags.PprofPort)
