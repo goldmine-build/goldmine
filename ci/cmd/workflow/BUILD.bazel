@@ -1,0 +1,34 @@
+load("@rules_go//go:def.bzl", "go_binary", "go_library")
+load("//bazel:app_container.bzl", "app_container")
+
+go_library(
+    name = "workflow_lib",
+    srcs = ["main.go"],
+    importpath = "go.goldmine.build/ci/cmd/workflow",
+    visibility = ["//visibility:private"],
+    deps = [
+        "//ci/go",
+        "//go/common",
+        "//go/git",
+        "//go/git/provider/providers/gitapi",
+        "//go/skerr",
+        "//go/sklog",
+        "@com_github_restatedev_sdk_go//:sdk-go",
+        "@com_github_restatedev_sdk_go//server",
+    ],
+)
+
+go_binary(
+    name = "workflow",
+    embed = [":workflow_lib"],
+    visibility = ["//visibility:public"],
+)
+
+app_container(
+    name = "ci_worker_container",
+    base = "@base",
+    cmd = [],
+    entrypoint = "/usr/local/bin/workflow",
+    exe = "//ci/cmd/workflow:workflow",
+    repository = "ghcr.io/goldmine-build/ci_workflow_server",
+)
