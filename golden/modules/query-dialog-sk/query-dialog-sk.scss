@@ -1,22 +1,31 @@
+@import '../../../infra-sk/themes';
 @import '../../../elements-sk/modules/styles/buttons';
+
 query-dialog-sk {
-  .content {
-    display: flex;
-    flex-direction: row;
-  }
+  color: var(--on-surface);
+  background-color: var(--surface);
 
-  .selection-summary {
-    min-width: 300px;
-    margin-left: 8px;
-  }
+  dialog {
+    color: var(--on-surface);
+    background-color: var(--surface);
+    .content {
+      display: flex;
+      flex-direction: row;
+    }
 
-  paramset-sk div {
-    display: block;
-  }
+    .selection-summary {
+      min-width: 300px;
+      margin-left: 8px;
+    }
 
-  .buttons {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
+    paramset-sk div {
+      display: block;
+    }
+
+    .buttons {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-end;
+    }
   }
 }

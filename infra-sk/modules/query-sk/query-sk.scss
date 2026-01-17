@@ -3,6 +3,9 @@
 @import '../../themes.scss';
 
 query-sk {
+  color: var(--on-surface);
+  background-color: var(--surface);
+  
   display: block;
 
   button {

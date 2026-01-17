@@ -7,7 +7,10 @@ sk_demo_page_server(
 
 sk_element(
     name = "query-dialog-sk",
-    sass_deps = ["//elements-sk/modules/styles:buttons_sass_lib"],
+    sass_deps = [
+        "//elements-sk/modules/styles:buttons_sass_lib",
+        "//infra-sk:themes_sass_lib",
+    ],
     sass_srcs = ["query-dialog-sk.scss"],
     sk_element_deps = [
         "//infra-sk/modules/paramset-sk",

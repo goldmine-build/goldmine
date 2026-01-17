@@ -7,7 +7,10 @@ sk_demo_page_server(
 
 sk_element(
     name = "filter-dialog-sk",
-    sass_deps = ["//elements-sk/modules/styles:buttons_sass_lib"],
+    sass_deps = [
+        "//elements-sk/modules/styles:buttons_sass_lib",
+        "//infra-sk:themes_sass_lib",
+    ],
     sass_srcs = ["filter-dialog-sk.scss"],
     sk_element_deps = [
         "//golden/modules/trace-filter-sk",
@@ -32,7 +35,10 @@ sk_element(
 sk_page(
     name = "filter-dialog-sk-demo",
     html_file = "filter-dialog-sk-demo.html",
-    sk_element_deps = [":filter-dialog-sk"],
+    sk_element_deps = [
+        ":filter-dialog-sk",
+        "//infra-sk/modules/theme-chooser-sk",
+    ],
     ts_deps = [
         "//infra-sk/modules:dom_ts_lib",
         "//infra-sk/modules:object_ts_lib",

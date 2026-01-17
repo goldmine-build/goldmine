@@ -3,6 +3,7 @@ import { $$ } from '../../../infra-sk/modules/dom';
 import { ParamSet, fromParamSet } from '../../../infra-sk/modules/query';
 import { deepCopy } from '../../../infra-sk/modules/object';
 import { FilterDialogSk, Filters } from './filter-dialog-sk';
+import '../../../infra-sk/modules/theme-chooser-sk/index'
 
 const paramSet: ParamSet = {
   'car make': ['chevrolet', 'dodge', 'ford', 'lincoln motor company'],
@@ -15,7 +16,7 @@ const paramSet: ParamSet = {
 const defaultValue: Filters = {
   diffConfig: {
     'car make': ['chevrolet', 'dodge', 'ford'],
-    color: ['blue'],
+    color: ['blue'], 
     year: ['2020', '2019'],
   },
   minRGBADelta: 0,
