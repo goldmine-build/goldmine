@@ -21,6 +21,13 @@ import '../../../elements-sk/modules/icons/check-circle-icon-sk';
 import '../../../elements-sk/modules/icons/help-icon-sk';
 
 export class DotsLegendSk extends ElementSk {
+  // Dot foreground color, default. Is overridden once connected.
+  private color = 'black';
+
+  // Dot background color, default. Is overridden once connected.
+  private bgColor = 'white';
+
+
   private static template = (el: DotsLegendSk) => html`
     ${el._digests
       .slice(0, MAX_UNIQUE_DIGESTS - 1)
@@ -33,7 +40,7 @@ export class DotsLegendSk extends ElementSk {
     digest: DigestStatus,
     index: number
   ) => html`
-    ${DotsLegendSk.dotTemplate(index)}
+    ${DotsLegendSk.dotTemplate(el, index)}
     <a target="_blank" class="digest" href="${el.digestDetailHref(index)}"
       >${digest.digest}</a
     >
@@ -60,21 +67,25 @@ export class DotsLegendSk extends ElementSk {
         MAX_UNIQUE_DIGESTS - 1
       );
     }
-    return DotsLegendSk.oneOfManyOtherDigestsTemplate(el.totalDigests);
+    return DotsLegendSk.oneOfManyOtherDigestsTemplate(el, el.totalDigests);
   };
 
-  private static oneOfManyOtherDigestsTemplate = (totalDigests: number) => html`
-    ${DotsLegendSk.dotTemplate(MAX_UNIQUE_DIGESTS - 1)}
+  private static oneOfManyOtherDigestsTemplate = (
+    el: DotsLegendSk,
+    totalDigests: number
+  ) => html`
+    ${DotsLegendSk.dotTemplate(el, MAX_UNIQUE_DIGESTS - 1)}
     <span class="one-of-many-other-digests">
       One of ${totalDigests - (MAX_UNIQUE_DIGESTS - 1)} other digests
       (${totalDigests} in total).
     </span>
   `;
 
-  private static dotTemplate = (index: number) => {
+  private static dotTemplate = (el: DotsLegendSk, index: number) => {
     const style =
-      `border-color: ${DOT_STROKE_COLORS[index]};` +
-      `background-color: ${DOT_FILL_COLORS[index]};`;
+      `border-color: ${el.getStrokeColor(index)};` +
+      `background-color: ${el.getDotFillColor(index)};`;
+
     return html`<div class="dot" style="${style}"></div>`;
   };
 
@@ -107,9 +118,23 @@ export class DotsLegendSk extends ElementSk {
     super(DotsLegendSk.template);
   }
 
-  connectedCallback() {
+  connectedCallback(): void {
     super.connectedCallback();
-    this._render();
+    this.render();
+  }
+
+  private getStrokeColor(c: number): string {
+    if (c === 0) {
+      return this.color;
+    }
+    return DOT_STROKE_COLORS[c];
+  }
+
+  private getDotFillColor(c: number): string {
+    if (c === 0) {
+      return this.color;
+    }
+    return this.bgColor;
   }
 
   /** Grouping. */
@@ -119,7 +144,7 @@ export class DotsLegendSk extends ElementSk {
 
   set grouping(grouping: Params) {
     this._grouping = grouping;
-    this._render();
+    this.render();
   }
 
   /** The digests to show. */
@@ -129,7 +154,7 @@ export class DotsLegendSk extends ElementSk {
 
   set digests(digests: DigestStatus[]) {
     this._digests = digests;
-    this._render();
+    this.render();
   }
 
   /** The changelist ID (or empty string if this is the master branch). */
@@ -139,7 +164,7 @@ export class DotsLegendSk extends ElementSk {
 
   set changeListID(id: string) {
     this._changeListID = id;
-    this._render();
+    this.render();
   }
 
   /** The Code Review System (e.g. "gerrit") if changeListID is set. */
@@ -149,6 +174,13 @@ export class DotsLegendSk extends ElementSk {
 
   set crs(c: string) {
     this._crs = c;
+    this.render();
+  }
+
+  render(): void {
+    const style = getComputedStyle(this);
+    this.bgColor = style.getPropertyValue('--background') || "white";
+    this.color = style.getPropertyValue('--on-background') || "black";
     this._render();
   }
 

@@ -50,3 +50,19 @@ newDotsLegendSk(
   '123456',
   'My-Test'
 );
+
+newDotsLegendSk(
+  '#some-digests-container-dark',
+  'some-digests',
+  someDigests,
+  '123456',
+  'My-Test'
+);
+
+newDotsLegendSk(
+  '#too-many-digests-container-dark',
+  'too-many-digests',
+  tooManyDigests,
+  '123456',
+  'My-Test'
+);

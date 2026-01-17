@@ -9,6 +9,7 @@ sk_element(
     name = "dots-legend-sk",
     sass_deps = [
         "//golden/modules:colors_sass_lib",
+        "//infra-sk:themes_sass_lib",
     ],
     sass_srcs = ["dots-legend-sk.scss"],
     sk_element_deps = [

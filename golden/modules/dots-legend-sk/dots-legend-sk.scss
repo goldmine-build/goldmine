@@ -1,3 +1,4 @@
+@import '../../../infra-sk/themes';
 @import '../colors';
 
 dots-legend-sk {
@@ -5,6 +6,8 @@ dots-legend-sk {
   grid-template-columns: auto auto auto auto;
   align-items: center;
   column-gap: 10px;
+  color: var(--on-surface);
+  background: var(--surface);
 
   div.dot {
     border-radius: 50%;
