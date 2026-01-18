@@ -79,6 +79,9 @@ def sk_demo_page_server(name, sk_page, static_assets = None, port = 8080):
 
     sh_binary(
         name = name,
+        env = {
+            "NO_COLOR": "1",
+        },
         srcs = [name + "_genrule"],
         data = [
             _demo_page_server,

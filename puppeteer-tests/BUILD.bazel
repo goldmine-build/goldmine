@@ -20,5 +20,6 @@ ts_library(
     visibility = ["//visibility:public"],
     deps = [
         "//:node_modules/puppeteer",
+        "//infra-sk/modules/theme-chooser-sk",
     ],
 )

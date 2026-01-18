@@ -80,4 +80,9 @@ mocks:
 presubmit:
 	$(BAZEL) run --config=mayberemote //cmd/presubmit -- --commit
 
+
+.PHONY: screenshots
+screenshots:
+	$(BAZEL) run //:puppeteer_screenshot_server
+
 include make/npm.mk

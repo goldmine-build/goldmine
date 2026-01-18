@@ -1,6 +1,7 @@
 import './index';
 import { DigestStatus } from '../rpc_types';
 import { DotsLegendSk } from './dots-legend-sk';
+import '../../../infra-sk/modules/theme-chooser-sk'
 
 const someDigests: DigestStatus[] = [
   { digest: 'ce0a9d2b546b25e00e39a33860cb72b6', status: 'untriaged' },

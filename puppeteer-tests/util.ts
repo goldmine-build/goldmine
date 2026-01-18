@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import puppeteer, { Page, Browser, ElementHandle } from 'puppeteer';
+import { ThemeChooserSk } from '../infra-sk/modules/theme-chooser-sk/theme-chooser-sk';
 
 // File inside $ENV_DIR containing the demo page server's TCP port. Only applies to Bazel tests
 // using the test_on_env rule.
@@ -101,7 +102,9 @@ const bazelRunfilesDir = () =>
  * This can be handy for debugging.
  */
 export const launchBrowser = (showBrowser?: boolean): Promise<Browser> => {
-  console.log("===============================================================");  
+  console.log(
+    '==============================================================='
+  );
   // Use the downloaded Chrome we get from the toolchain in @rules_browsers.
   const executablePath = process.env.CHROME_BIN;
   return puppeteer.launch({
@@ -138,6 +141,86 @@ export interface TestBed {
   page: Page;
   baseUrl: string;
 }
+
+/** ModeOption represents a single option of either lightmode or darkmode.
+ *
+ * All possible options used in tests are constructed in Modes.
+ *
+ * Currently just light and darkmode, but could be extended to other modes
+ * depending on <theme-chooser-sk> capabilities.
+ *
+ * Use like this:
+ *
+ *  Modes.forEach(async (mode: ModeOption) => {
+ *    it('some test', async () => {
+ *      await mode.setMode(testBed);  // Set the mode.
+ *      //
+ *      // ... Do element setup here.
+ *      //
+ *      await takeScreenshot(
+ *        elementUnderTest!,
+ *        '<appname>',
+ *        mode.name('element-under-test-sk')  // Append the mode name to the screenshot name.
+ *      );
+ *    }); *
+ *    it('another test that also is tested in darkmode/lightmode', async () => {
+ *      // ... see above
+ *    });
+ *  });
+ *
+ */
+export class ModeOption {
+  val: boolean;
+
+  constructor(val: boolean) {
+    this.val = val;
+  }
+
+  // Applies this mode to the current page under test.
+  async setMode(testBed: TestBed): Promise<void> {
+    await setDarkMode(testBed, this.val);
+  }
+
+  // Appends the mode name to the screenshot name.
+  name(screenshotName: string): string {
+    return screenshotName + (this.val ? '-darkmode' : '-lightmode');
+  }
+}
+
+// A list of all the modes that a page can be displayed in. Currently just
+// lightmode and darkmode.
+export const Modes: ModeOption[] = [
+  new ModeOption(true),
+  new ModeOption(false),
+];
+
+const _setDarkModeTrue = () => {
+  const ts = document.querySelector<ThemeChooserSk>('theme-chooser-sk');
+  if (ts != null) {
+    ts.darkmode = true;
+  }
+};
+
+const _setDarkModeFalse = () => {
+  const ts = document.querySelector<ThemeChooserSk>('theme-chooser-sk');
+  if (ts != null) {
+    ts.darkmode = false;
+  }
+};
+
+/**
+ * Sets darkmode on or off. ThemeChooserSk must be present on the demo page for
+ * this to work.
+ *
+ * @param testBed The TestBed in the puppeteer test.
+ * @param val True to turn on dark mode, False to turn it off.
+ */
+export const setDarkMode = async (
+  testBed: TestBed,
+  val: boolean
+): Promise<void> => {
+  await testBed.page.evaluate(val ? _setDarkModeTrue : _setDarkModeFalse);
+};
 
 /**
  * Returns the output directory where tests should e.g. save screenshots.
@@ -179,7 +262,10 @@ export function takeScreenshot(
   appName: string,
   testName: string
 ): Promise<Uint8Array | string> {
-  const pngPathNameWithoutExt = path.join(outputDir(), `${appName}_${testName}`);
+  const pngPathNameWithoutExt = path.join(
+    outputDir(),
+    `${appName}_${testName}`
+  );
   // const pngPath = path.join(outputDir(), `${appName}_${testName}.png`);
 
   // Typescript is unhappy about the type union due to the ElementHandle having a "this"
@@ -206,7 +292,9 @@ let testBed: Partial<TestBed>;
  *
  * When debugging, it can be handy to set showBrowser to true.
  */
-export async function loadCachedTestBed(showBrowser?: boolean): Promise<TestBed> {
+export async function loadCachedTestBed(
+  showBrowser?: boolean
+): Promise<TestBed> {
   if (testBed) {
     return testBed as TestBed;
   }
@@ -217,7 +305,8 @@ export async function loadCachedTestBed(showBrowser?: boolean): Promise<TestBed>
   if (!envDir)
     throw new Error('required environment variable ENV_DIR is unset');
   const port = parseInt(
-    fs.readFileSync(path.join(envDir, ENV_PORT_FILE_BASE_NAME), 'utf8'), 10
+    fs.readFileSync(path.join(envDir, ENV_PORT_FILE_BASE_NAME), 'utf8'),
+    10
   );
   newTestBed.baseUrl = `http://localhost:${port}`;
 
@@ -251,6 +340,7 @@ function setBeforeAfterHooks() {
   });
 
   afterEach(async () => {
+    await setDarkMode(testBed as TestBed, false);
     await testBed.page!.close();
   });
 

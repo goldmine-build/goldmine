@@ -36,18 +36,6 @@ describe('dots-legend-sk', () => {
       expect(dotsLegendSk.digests.length).to.equal(dotsLegendSk.totalDigests);
     });
 
-    it('renders dots correctly', async () => {
-      expect(
-        await dotsLegendSkPO.getDotBorderAndBackgroundColors()
-      ).to.deep.equal([
-        [DOT_STROKE_COLORS[0], DOT_FILL_COLORS[0]],
-        [DOT_STROKE_COLORS[1], DOT_FILL_COLORS[1]],
-        [DOT_STROKE_COLORS[2], DOT_FILL_COLORS[2]],
-        [DOT_STROKE_COLORS[3], DOT_FILL_COLORS[3]],
-        [DOT_STROKE_COLORS[4], DOT_FILL_COLORS[4]],
-      ]);
-    });
-
     it('renders digests correctly', async () => {
       expect(await dotsLegendSkPO.getDigests()).to.deep.equal([
         '00000000000000000000000000000000',
@@ -150,22 +138,6 @@ describe('dots-legend-sk', () => {
       dotsLegendSk.totalDigests = MAX_UNIQUE_DIGESTS;
     });
 
-    it('renders dots correctly', async () => {
-      expect(
-        await dotsLegendSkPO.getDotBorderAndBackgroundColors()
-      ).to.deep.equal([
-        [DOT_STROKE_COLORS[0], DOT_FILL_COLORS[0]],
-        [DOT_STROKE_COLORS[1], DOT_FILL_COLORS[1]],
-        [DOT_STROKE_COLORS[2], DOT_FILL_COLORS[2]],
-        [DOT_STROKE_COLORS[3], DOT_FILL_COLORS[3]],
-        [DOT_STROKE_COLORS[4], DOT_FILL_COLORS[4]],
-        [DOT_STROKE_COLORS[5], DOT_FILL_COLORS[5]],
-        [DOT_STROKE_COLORS[6], DOT_FILL_COLORS[6]],
-        [DOT_STROKE_COLORS[7], DOT_FILL_COLORS[7]],
-        [DOT_STROKE_COLORS[8], DOT_FILL_COLORS[8]],
-      ]);
-    });
-
     it('renders digests correctly', async () => {
       expect(await dotsLegendSkPO.getDigests()).to.deep.equal([
         '00000000000000000000000000000000',
@@ -233,22 +205,6 @@ describe('dots-legend-sk', () => {
       ];
 
       dotsLegendSk.totalDigests = 123;
-    });
-
-    it('renders dots correctly', async () => {
-      expect(
-        await dotsLegendSkPO.getDotBorderAndBackgroundColors()
-      ).to.deep.equal([
-        [DOT_STROKE_COLORS[0], DOT_FILL_COLORS[0]],
-        [DOT_STROKE_COLORS[1], DOT_FILL_COLORS[1]],
-        [DOT_STROKE_COLORS[2], DOT_FILL_COLORS[2]],
-        [DOT_STROKE_COLORS[3], DOT_FILL_COLORS[3]],
-        [DOT_STROKE_COLORS[4], DOT_FILL_COLORS[4]],
-        [DOT_STROKE_COLORS[5], DOT_FILL_COLORS[5]],
-        [DOT_STROKE_COLORS[6], DOT_FILL_COLORS[6]],
-        [DOT_STROKE_COLORS[7], DOT_FILL_COLORS[7]],
-        [DOT_STROKE_COLORS[8], DOT_FILL_COLORS[8]],
-      ]);
     });
 
     it('renders digests correctly', async () => {

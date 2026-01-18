@@ -35,7 +35,10 @@ sk_element(
 sk_page(
     name = "dots-legend-sk-demo",
     html_file = "dots-legend-sk-demo.html",
-    sk_element_deps = [":dots-legend-sk"],
+    sk_element_deps = [
+        ":dots-legend-sk",
+        "//infra-sk/modules/theme-chooser-sk",
+    ],
     ts_deps = ["//golden/modules:rpc_types_ts_lib"],
     ts_entry_point = "dots-legend-sk-demo.ts",
 )

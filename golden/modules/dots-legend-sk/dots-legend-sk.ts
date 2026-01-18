@@ -22,10 +22,10 @@ import '../../../elements-sk/modules/icons/help-icon-sk';
 
 export class DotsLegendSk extends ElementSk {
   // Dot foreground color, default. Is overridden once connected.
-  private color = 'black';
+  private color = 'rgb(0,0,0)';
 
   // Dot background color, default. Is overridden once connected.
-  private bgColor = 'white';
+  private bgColor = 'rgb(256,256,256)';
 
 
   private static template = (el: DotsLegendSk) => html`

@@ -93,4 +93,6 @@ export class ThemeChooserSk extends ElementSk {
 export const isDarkMode = (): boolean =>
   window.localStorage.getItem(DARKMODE_LOCALSTORAGE_KEY) === 'true';
 
+
+
 define('theme-chooser-sk', ThemeChooserSk);
