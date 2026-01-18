@@ -7,6 +7,7 @@ import {
   fakeNow,
   nonStandardCommits,
 } from './demo_data';
+import '../../../infra-sk/modules/theme-chooser-sk'
 import { testOnlySetSettings } from '../settings';
 
 Date.now = () => fakeNow;
