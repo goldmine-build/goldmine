@@ -33,7 +33,10 @@ sk_element(
 sk_page(
     name = "bulk-triage-sk-demo",
     html_file = "bulk-triage-sk-demo.html",
-    sk_element_deps = [":bulk-triage-sk"],
+    sk_element_deps = [
+        ":bulk-triage-sk",
+        "//infra-sk/modules/theme-chooser-sk",
+    ],
     ts_deps = [
         ":test_data_ts_lib",
         "//golden/modules:rpc_types_ts_lib",

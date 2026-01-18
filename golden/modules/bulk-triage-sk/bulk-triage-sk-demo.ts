@@ -5,6 +5,7 @@ import { deepCopy } from '../../../infra-sk/modules/object';
 import { bulkTriageDeltaInfos } from './test_data';
 import { BulkTriageSk } from './bulk-triage-sk';
 import { TriageResponse } from '../rpc_types';
+import '../../../infra-sk/modules/theme-chooser-sk'
 
 const handleTriaged = () => {
   const log = $$<HTMLPreElement>('#event_log')!;
