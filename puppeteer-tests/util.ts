@@ -194,6 +194,7 @@ export const Modes: ModeOption[] = [
   new ModeOption(false),
 ];
 
+// This function is run in the browser context to choose dark mode.
 const _setDarkModeTrue = () => {
   const ts = document.querySelector<ThemeChooserSk>('theme-chooser-sk');
   if (ts != null) {
@@ -201,6 +202,7 @@ const _setDarkModeTrue = () => {
   }
 };
 
+// This function is run in the browser context to choose light mode.
 const _setDarkModeFalse = () => {
   const ts = document.querySelector<ThemeChooserSk>('theme-chooser-sk');
   if (ts != null) {
