@@ -3,7 +3,9 @@ import { Page } from 'puppeteer';
 import {
   addEventListenersToPuppeteerPage,
   loadCachedTestBed,
-  takeScreenshot,
+  ModeOption,
+  Modes,
+  takeScreenshotWithMode,
   TestBed,
 } from '../../../puppeteer-tests/util';
 import { DiffPageSkPO } from './diff-page-sk_po';
@@ -29,13 +31,20 @@ describe('diff-page-sk', () => {
   });
 
   describe('screenshots', () => {
-    it('should show the default page', async () => {
-      await navigateTo(testBed.page, testBed.baseUrl, baseParams);
-      await testBed.page.setViewport({
-        width: 1300,
-        height: 700,
+    Modes.forEach(async (mode: ModeOption) => {
+      it('should show the default page', async () => {
+        await navigateTo(testBed.page, testBed.baseUrl, baseParams);
+        await testBed.page.setViewport({
+          width: 1300,
+          height: 700,
+        });
+        await takeScreenshotWithMode(
+          testBed.page,
+          'gold',
+          'diff-page-sk',
+          mode
+        );
       });
-      await takeScreenshot(testBed.page, 'gold', 'diff-page-sk');
     });
   });
 
