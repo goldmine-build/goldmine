@@ -1,7 +1,9 @@
 import { expect } from 'chai';
 import {
   loadCachedTestBed,
-  takeScreenshot,
+  ModeOption,
+  Modes,
+  takeScreenshotWithMode,
   TestBed,
 } from '../../../puppeteer-tests/util';
 
@@ -21,8 +23,15 @@ describe('gold-scaffold-sk', () => {
     expect(await testBed.page.$$('gold-scaffold-sk')).to.have.length(1);
   });
 
-  it('should take a screenshot', async () => {
-    await testBed.page.setViewport({ width: 1200, height: 600 });
-    await takeScreenshot(testBed.page, 'gold', 'gold-scaffold-sk');
+  Modes.forEach(async (mode: ModeOption) => {
+    it('should take a screenshot', async () => {
+      await testBed.page.setViewport({ width: 1200, height: 600 });
+      await takeScreenshotWithMode(
+        testBed.page,
+        'gold',
+        'gold-scaffold-sk',
+        mode
+      );
+    });
   });
 });
