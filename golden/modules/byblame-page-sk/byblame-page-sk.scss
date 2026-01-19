@@ -1,4 +1,11 @@
+@import '../../../infra-sk/themes.scss';
+
 byblame-page-sk {
+  display: inline-block;
+
+  color: var(--on-surface);
+  background: var(--surface);
+
   div.top-container {
     display: flex;
     justify-content: space-between;

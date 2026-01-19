@@ -7,6 +7,7 @@ import { delay } from '../demo_util';
 import { testOnlySetSettings } from '../settings';
 import { ByBlameResponse } from '../rpc_types';
 import { GoldScaffoldSk } from '../gold-scaffold-sk/gold-scaffold-sk';
+import '../../../infra-sk/modules/theme-chooser-sk';
 
 testOnlySetSettings({
   title: 'Skia Public',

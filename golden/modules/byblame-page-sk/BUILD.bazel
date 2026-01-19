@@ -30,6 +30,7 @@ sk_page(
     sk_element_deps = [
         "//golden/modules/gold-scaffold-sk",
         ":byblame-page-sk",
+        "//infra-sk/modules/theme-chooser-sk",
     ],
     ts_deps = [
         "//golden/modules:demo_util_ts_lib",

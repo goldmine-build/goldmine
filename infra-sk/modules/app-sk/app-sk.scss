@@ -27,14 +27,14 @@ $mobile-breakpoint: 600px;
 body {
   --sidebar-width: 200px;
   --sidebar-horiz-padding: 5px;
-  --sidebar-background-color: var(--surface-1dp, #000000);
-  --sidebar-border-color: var(--on-surface, #000000);
+  --sidebar-background-color: var(--surface-1dp);
+  --sidebar-border-color: var(--on-surface);
 
   --header-height: 50px;
-  --header-background-color: var(--surface, #000000);
-  --header-font-color: var(--primary, #ffffff);
+  --header-background-color: var(--surface);
+  --header-font-color: var(--primary);
   --header-horiz-padding: 16px;
-  --header-border-color: var(--primary, #ffffff);
+  --header-border-color: var(--primary);
 
   --content-horiz-padding: 5px;
   --content-vert-padding: 0px;
@@ -49,15 +49,18 @@ body {
 }
 
 app-sk {
-  color: var(--on-background, #000000);
-  fill: var(--on-background, #000000);
-  background: var(--background, #ffffff);
+  color: var(--on-surface);
+  fill: var(--on-surface);
+  background: var(--surface);
   display: grid;
   grid-template-columns: var(--sidebar-width) 1fr;
   grid-template-rows: var(--header-height) 1fr var(--footer-height);
 }
 
 app-sk > {
+  color: var(--on-surface);
+  background: var(--surface);
+
   header {
     background: var(--header-background-color);
     padding: 0 var(--header-horiz-padding);

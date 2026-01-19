@@ -2,7 +2,9 @@ import { expect } from 'chai';
 import {
   addEventListenersToPuppeteerPage,
   loadCachedTestBed,
-  takeScreenshot,
+  ModeOption,
+  Modes,
+  takeScreenshotWithMode,
   TestBed,
 } from '../../../puppeteer-tests/util';
 
@@ -27,21 +29,29 @@ describe('byblame-page-sk', () => {
     expect(await testBed.page.$$('byblame-page-sk')).to.have.length(1);
   });
 
-  it('should take a screenshot', async () => {
-    await testBed.page.setViewport({ width: 1200, height: 2700 });
-    await takeScreenshot(testBed.page, 'gold', 'byblame-page-sk');
-  });
+  Modes.forEach(async (mode: ModeOption) => {
+    it('should take a screenshot', async () => {
+      await testBed.page.setViewport({ width: 1200, height: 2700 });
+      await takeScreenshotWithMode(
+        testBed.page,
+        'gold',
+        'byblame-page-sk',
+        mode
+      );
+    });
 
-  it('limits the number of commits on the blamelist', async () => {
-    await testBed.page.setViewport({ width: 1200, height: 2300 });
-    // click on "svg"
-    await testBed.page.click('corpus-selector-sk > ul > li:nth-child(3)');
-    await expectSelectedCorpusToBe('svg');
-    await takeScreenshot(
-      testBed.page,
-      'gold',
-      'byblame-page-sk_limits-blamelist-commits'
-    );
+    it('limits the number of commits on the blamelist', async () => {
+      await testBed.page.setViewport({ width: 1200, height: 2300 });
+      // click on "svg"
+      await testBed.page.click('corpus-selector-sk > ul > li:nth-child(3)');
+      await expectSelectedCorpusToBe('svg');
+      await takeScreenshotWithMode(
+        testBed.page,
+        'gold',
+        'byblame-page-sk_limits-blamelist-commits',
+        mode
+      );
+    });
   });
 
   it('responds to forward and back browser buttons', async () => {

@@ -16,11 +16,15 @@ changelists-page-sk {
   thead th {
     font-weight: bold;
     text-align: left;
-    border: 1px solid var(--light-gray);
+    border: 1px solid var(--disabled);
+  }
+
+  tr {
+    background: var(--surface);
   }
 
   tr:hover {
-    background: var(--dark-white);
+    background: var(--surface-1dp);
   }
 
   td {
