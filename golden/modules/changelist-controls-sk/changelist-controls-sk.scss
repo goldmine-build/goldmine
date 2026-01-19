@@ -33,7 +33,7 @@ changelist-controls-sk {
 
     .radiogroup {
       display: flex;
-      border: 1px solid var(--light-gray);
+      background: var(--surface-2dp);
       border-radius: 5px;
       margin-left: 4px;
     }
@@ -44,13 +44,13 @@ changelist-controls-sk {
     flex-wrap: wrap;
 
     .tryjob {
-      border: 1px solid var(--gray);
+      border: 1px solid var(--surface-1dp);
       padding: 0.5em;
       border-radius: 5px;
       margin: 0.25em;
 
       a {
-        color: #000000;
+        color: var(--on-surface);
       }
     }
   }

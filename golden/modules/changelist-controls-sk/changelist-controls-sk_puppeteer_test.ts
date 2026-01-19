@@ -1,7 +1,9 @@
 import { expect } from 'chai';
 import {
   loadCachedTestBed,
-  takeScreenshot,
+  ModeOption,
+  Modes,
+  takeScreenshotWithMode,
   TestBed,
 } from '../../../puppeteer-tests/util';
 
@@ -21,8 +23,15 @@ describe('changelist-controls-sk', () => {
     expect(await testBed.page.$$('changelist-controls-sk')).to.have.length(1);
   });
 
-  it('should take a screenshot', async () => {
-    const controls = await testBed.page.$('.search_response');
-    await takeScreenshot(controls!, 'gold', 'changelist-controls-sk');
+  Modes.forEach(async (mode: ModeOption) => {
+    it('should take a screenshot', async () => {
+      const controls = await testBed.page.$('.search_response');
+      await takeScreenshotWithMode(
+        controls!,
+        'gold',
+        'changelist-controls-sk',
+        mode
+      );
+    });
   });
 });

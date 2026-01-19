@@ -1,9 +1,10 @@
+import './index';
+
 import { $$ } from '../../../infra-sk/modules/dom';
 import '../../../infra-sk/modules/theme-chooser-sk';
 import { isPuppeteerTest } from '../demo_util';
 import { commits, traces } from './demo_data';
 import { DotsSk } from './dots-sk';
-import './index';
 
 const logEventDetail = (e: Event) => {
   const detail = (e as CustomEvent).detail;
