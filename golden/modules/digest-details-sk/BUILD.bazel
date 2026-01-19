@@ -45,7 +45,10 @@ sk_element(
 sk_page(
     name = "digest-details-sk-demo",
     html_file = "digest-details-sk-demo.html",
-    sk_element_deps = [":digest-details-sk"],
+    sk_element_deps = [
+        ":digest-details-sk",
+        "//infra-sk/modules/theme-chooser-sk",
+    ],
     ts_deps = [
         ":test_data_ts_lib",
         "//golden/modules:demo_util_ts_lib",

@@ -1,22 +1,23 @@
-import './index';
 import fetchMock, { MockResponseObject } from 'fetch-mock';
 import { $$ } from '../../../infra-sk/modules/dom';
+import '../../../infra-sk/modules/theme-chooser-sk';
+import { delay } from '../demo_util';
+import { SearchResult, TriageResponse } from '../rpc_types';
+import { groupingsResponse } from '../search-page-sk/demo_data';
+import { testOnlySetSettings } from '../settings';
+import { DigestDetailsSk } from './digest-details-sk';
+import './index';
 import {
-  typicalDetails,
+  fakeNow,
   negativeOnly,
   noRefs,
+  noRefsDisallowTriaging,
   noRefsYet,
   noTraces,
   twoHundredCommits,
-  fakeNow,
+  typicalDetails,
   typicalDetailsDisallowTriaging,
-  noRefsDisallowTriaging,
 } from './test_data';
-import { delay } from '../demo_util';
-import { testOnlySetSettings } from '../settings';
-import { DigestDetailsSk } from './digest-details-sk';
-import { SearchResult, TriageResponse } from '../rpc_types';
-import { groupingsResponse } from '../search-page-sk/demo_data';
 
 Date.now = () => fakeNow;
 testOnlySetSettings({
