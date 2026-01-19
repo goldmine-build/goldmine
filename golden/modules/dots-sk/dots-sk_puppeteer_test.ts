@@ -3,7 +3,7 @@ import {
   loadCachedTestBed,
   ModeOption,
   Modes,
-  takeScreenshot,
+  takeScreenshotWithMode,
   TestBed,
 } from '../../../puppeteer-tests/util';
 
@@ -26,13 +26,11 @@ describe('dots-sk', () => {
   describe('screenshots', () => {
     Modes.forEach(async (mode: ModeOption) => {
       it('no highlighted traces', async () => {
-        await mode.setMode(testBed);
         await testBed.page.setViewport({ width: 300, height: 100 });
-        await takeScreenshot(testBed.page, 'gold', mode.name('dots-sk'));
+        await takeScreenshotWithMode(testBed.page, 'gold', 'dots-sk', mode);
       });
 
       it('one highlighted trace', async () => {
-        await mode.setMode(testBed);
         await testBed.page.setViewport({ width: 300, height: 100 });
 
         // Get canvas position.
@@ -44,10 +42,11 @@ describe('dots-sk', () => {
         // Hover over the leftmost dot of the first trace.
         await testBed.page.mouse.move(x + 10, y + 10);
 
-        await takeScreenshot(
+        await takeScreenshotWithMode(
           testBed.page,
           'gold',
-          mode.name('dots-sk_highlighted')
+          'dots-sk_highlighted',
+          mode
         );
       });
     });

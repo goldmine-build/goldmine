@@ -3,9 +3,8 @@ import {
   ModeOption,
   Modes,
   loadCachedTestBed,
-  setDarkMode,
-  takeScreenshot,
   TestBed,
+  takeScreenshotWithMode,
 } from '../../../puppeteer-tests/util';
 
 describe('dots-legend-sk', () => {
@@ -27,22 +26,22 @@ describe('dots-legend-sk', () => {
   describe('screenshots', () => {
     Modes.forEach(async (mode: ModeOption) => {
       it('some digests', async () => {
-        await mode.setMode(testBed);
         const dotsLegendSk = await testBed.page.$('#some-digests');
-        await takeScreenshot(
+        await takeScreenshotWithMode(
           dotsLegendSk!,
           'gold',
-          mode.name('dots-legend-sk')
+          'dots-legend-sk',
+          mode
         );
       });
 
       it('too many digests', async () => {
-        await mode.setMode(testBed);
         const dotsLegendSk = await testBed.page.$('#too-many-digests');
-        await takeScreenshot(
+        await takeScreenshotWithMode(
           dotsLegendSk!,
           'gold',
-          mode.name('dots-legend-sk_too-many-digests')
+          'dots-legend-sk_too-many-digests',
+          mode
         );
       });
     });

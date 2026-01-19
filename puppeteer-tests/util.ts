@@ -176,11 +176,6 @@ export class ModeOption {
     this.val = val;
   }
 
-  // Applies this mode to the current page under test.
-  async setMode(testBed: TestBed): Promise<void> {
-    await setDarkMode(testBed, this.val);
-  }
-
   // Appends the mode name to the screenshot name.
   name(screenshotName: string): string {
     return screenshotName + (this.val ? '-darkmode' : '-lightmode');
@@ -214,14 +209,14 @@ const _setDarkModeFalse = () => {
  * Sets darkmode on or off. ThemeChooserSk must be present on the demo page for
  * this to work.
  *
- * @param testBed The TestBed in the puppeteer test.
+ * @param page The Page in the puppeteer test.
  * @param val True to turn on dark mode, False to turn it off.
  */
-export const setDarkMode = async (
-  testBed: TestBed,
+export const setDarkModePage = async (
+  page: Page,
   val: boolean
 ): Promise<void> => {
-  await testBed.page.evaluate(val ? _setDarkModeTrue : _setDarkModeFalse);
+  await page.evaluate(val ? _setDarkModeTrue : _setDarkModeFalse);
 };
 
 /**
@@ -276,6 +271,16 @@ export function takeScreenshot(
   return (handle as Page).screenshot({ path: `${pngPathNameWithoutExt}.png` });
 }
 
+export async function takeScreenshotWithMode(
+  handle: Page | ElementHandle,
+  appName: string,
+  testName: string,
+  mode: ModeOption
+): Promise<Uint8Array | string> {
+  await setDarkModePage(handle as Page, mode.val);
+  return takeScreenshot(handle, appName, mode.name(testName));
+}
+
 let browser: Browser;
 let testBed: Partial<TestBed>;
 
@@ -324,8 +329,8 @@ export async function loadCachedTestBed(
   return testBed as TestBed;
 }
 
-// This sets up some handy helpers to load a new page and shut it down w/o having to expose
-// the puppeteer.Browser object to the callers.
+// This sets up some handy helpers to load a new page and shut it down w/o
+// having to expose the puppeteer.Browser object to the callers.
 function setBeforeAfterHooks() {
   beforeEach(async () => {
     testBed.page = await browser.newPage(); // Make page available to tests.
@@ -342,11 +347,13 @@ function setBeforeAfterHooks() {
   });
 
   afterEach(async () => {
-    await setDarkMode(testBed as TestBed, false);
+    // Always reset to light mode for tests that aren't fully darkmode capable.
+    await setDarkModePage((testBed as TestBed).page, false);
     await testBed.page!.close();
   });
 
-  // Shut down Puppeteer, otherwise tests will run forever, eventually timing out and failing.
+  // Shut down Puppeteer, otherwise tests will run forever, eventually timing
+  // out and failing.
   after(async () => {
     await browser.close();
   });

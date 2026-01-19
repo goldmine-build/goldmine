@@ -2,7 +2,9 @@ import { expect } from 'chai';
 import { ElementHandle } from 'puppeteer';
 import {
   loadCachedTestBed,
-  takeScreenshot,
+  ModeOption,
+  Modes,
+  takeScreenshotWithMode,
   TestBed,
 } from '../../../puppeteer-tests/util';
 import { BulkTriageSkPO } from './bulk-triage-sk_po';
@@ -29,49 +31,78 @@ describe('bulk-triage-sk', () => {
   });
 
   describe('screenshots', async () => {
-    it('should be closest by default', async () => {
-      await takeScreenshot(bulkTriageSk, 'gold', 'bulk-triage-sk_closest');
-    });
+    Modes.forEach(async (mode: ModeOption) => {
+      it('should be closest by default', async () => {
+        await takeScreenshotWithMode(
+          bulkTriageSk,
+          'gold',
+          'bulk-triage-sk_closest',
+          mode
+        );
+      });
 
-    it('should be negative', async () => {
-      await bulkTriageSkPO.clickUntriagedBtn();
-      await testBed.page.click('body'); // Remove focus from button.
-      await takeScreenshot(bulkTriageSk, 'gold', 'bulk-triage-sk_untriaged');
-    });
+      it('should be negative', async () => {
+        await bulkTriageSkPO.clickUntriagedBtn();
+        await testBed.page.click('body'); // Remove focus from button.
+        await takeScreenshotWithMode(
+          bulkTriageSk,
+          'gold',
+          'bulk-triage-sk_untriaged',
+          mode
+        );
+      });
 
-    it('should be negative', async () => {
-      await bulkTriageSkPO.clickNegativeBtn();
-      await testBed.page.click('body'); // Remove focus from button.
-      await takeScreenshot(bulkTriageSk, 'gold', 'bulk-triage-sk_negative');
-    });
+      it('should be negative', async () => {
+        await bulkTriageSkPO.clickNegativeBtn();
+        await testBed.page.click('body'); // Remove focus from button.
+        await takeScreenshotWithMode(
+          bulkTriageSk,
+          'gold',
+          'bulk-triage-sk_negative',
+          mode
+        );
+      });
 
-    it('should be positive', async () => {
-      await bulkTriageSkPO.clickPositiveBtn();
-      await testBed.page.click('body'); // Remove focus from button.
-      await takeScreenshot(bulkTriageSk, 'gold', 'bulk-triage-sk_positive');
-    });
+      it('should be positive', async () => {
+        await bulkTriageSkPO.clickPositiveBtn();
+        await testBed.page.click('body'); // Remove focus from button.
+        await takeScreenshotWithMode(
+          bulkTriageSk,
+          'gold',
+          'bulk-triage-sk_positive',
+          mode
+        );
+      });
 
-    it('should be positive, with button focused', async () => {
-      await bulkTriageSkPO.clickPositiveBtn();
-      await takeScreenshot(
-        bulkTriageSk,
-        'gold',
-        'bulk-triage-sk_positive-button-focused'
-      );
-    });
+      it('should be positive, with button focused', async () => {
+        await bulkTriageSkPO.clickPositiveBtn();
+        await takeScreenshotWithMode(
+          bulkTriageSk,
+          'gold',
+          'bulk-triage-sk_positive-button-focused',
+          mode
+        );
+      });
 
-    it('changes views when checkbox clicked', async () => {
-      await bulkTriageSkPO.clickTriageAllCheckbox();
-      await takeScreenshot(bulkTriageSk, 'gold', 'bulk-triage-sk_triage-all');
-    });
+      it('changes views when checkbox clicked', async () => {
+        await bulkTriageSkPO.clickTriageAllCheckbox();
+        await takeScreenshotWithMode(
+          bulkTriageSk,
+          'gold',
+          'bulk-triage-sk_triage-all',
+          mode
+        );
+      });
 
-    it('shows some extra information for changelists', async () => {
-      const bulkTriageSkWithCL = await testBed.page.$('#changelist');
-      await takeScreenshot(
-        bulkTriageSkWithCL!,
-        'gold',
-        'bulk-triage-sk_changelist'
-      );
+      it('shows some extra information for changelists', async () => {
+        const bulkTriageSkWithCL = await testBed.page.$('#changelist');
+        await takeScreenshotWithMode(
+          bulkTriageSkWithCL!,
+          'gold',
+          'bulk-triage-sk_changelist',
+          mode
+        );
+      });
     });
   });
 });
