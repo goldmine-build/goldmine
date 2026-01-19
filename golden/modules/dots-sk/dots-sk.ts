@@ -78,9 +78,9 @@ export class DotsSk extends ElementSk {
   // For capturing the last mousemove event, which is later processed in a timer.
   private lastMouseMove: MouseEvent | null = null;
 
-  private color = "black";
+  private color = 'black';
 
-  private bgColor = "white";
+  private bgColor = 'white';
 
   constructor() {
     super(DotsSk.template);
@@ -91,18 +91,21 @@ export class DotsSk extends ElementSk {
     this.onClick = this.onClick.bind(this);
   }
 
-  connectedCallback() {
+  connectedCallback(): void {
     super.connectedCallback();
     this._render();
     this.canvas = $$('canvas', this);
     this.canvas!.addEventListener('mousemove', this.onMouseMove);
     this.canvas!.addEventListener('mouseleave', this.onMouseLeave);
     this.canvas!.addEventListener('click', this.onClick);
+    document.addEventListener('theme-chooser-toggle', () => {
+      this.draw();
+    });
     this.ctx = this.canvas!.getContext('2d');
     this.draw();
   }
 
-  disconnectedCallback() {
+  disconnectedCallback(): void {
     this.canvas!.removeEventListener('mousemove', this.onMouseMove);
     this.canvas!.removeEventListener('mouseleave', this.onMouseLeave);
     this.canvas!.removeEventListener('click', this.onClick);
@@ -179,7 +182,7 @@ export class DotsSk extends ElementSk {
     const style = getComputedStyle(this);
     this.bgColor = style.getPropertyValue('--background');
     this.color = style.getPropertyValue('--on-background');
-    
+
     // First clear the canvas.
     this.ctx!.lineWidth = STROKE_WIDTH;
     this.ctx!.fillStyle = this.bgColor;
@@ -247,22 +250,21 @@ export class DotsSk extends ElementSk {
     if (c === 0) {
       return this.color;
     }
-    return getColorSafe( DOT_STROKE_COLORS, c)
+    return getColorSafe(DOT_STROKE_COLORS, c);
   }
 
   private getDotFillColor(c: number): string {
     if (c === 0) {
       return this.color;
-    } 
-    return this.bgColor
+    }
+    return this.bgColor;
   }
-
 
   private getFillColor(c: number): string {
     if (c === 0) {
       return this.color;
-    } 
-    return getColorSafe(DOT_FILL_COLORS, c)
+    }
+    return getColorSafe(DOT_FILL_COLORS, c);
   }
 
   /** Redraws just the circles for a single trace. */
