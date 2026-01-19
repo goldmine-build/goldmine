@@ -1,6 +1,7 @@
-import './index';
 import { $$ } from '../../../infra-sk/modules/dom';
+import '../../../infra-sk/modules/theme-chooser-sk';
 import { CorpusSelectorSk } from './corpus-selector-sk';
+import './index';
 import { TestCorpus, customTypeCorpora, stringCorpora } from './test_data';
 
 const handleCorpusSelected = (corpusName: string) => {
