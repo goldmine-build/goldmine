@@ -1,7 +1,9 @@
 import { expect } from 'chai';
 import {
   loadCachedTestBed,
-  takeScreenshot,
+  ModeOption,
+  Modes,
+  takeScreenshotWithMode,
   TestBed,
 } from '../../../puppeteer-tests/util';
 import { FilterDialogSkPO, NumericParamPO } from './filter-dialog-sk_po';
@@ -70,19 +72,27 @@ describe('filter-dialog-sk', () => {
   });
 
   describe('screenshots', () => {
-    it('should take a screenshot', async () => {
-      await openDialog();
-      await takeScreenshot(testBed.page, 'gold', 'filter-dialog-sk');
-    });
+    Modes.forEach(async (mode: ModeOption) => {
+      it('should take a screenshot', async () => {
+        await openDialog();
+        await takeScreenshotWithMode(
+          testBed.page,
+          'gold',
+          'filter-dialog-sk',
+          mode
+        );
+      });
 
-    it('should take a screenshot with the query dialog visible', async () => {
-      await openDialog();
-      await (await filterDialogSkPO.traceFilterSkPO).clickEditBtn();
-      await takeScreenshot(
-        testBed.page,
-        'gold',
-        'filter-dialog-sk_query-dialog-open'
-      );
+      it('should take a screenshot with the query dialog visible', async () => {
+        await openDialog();
+        await (await filterDialogSkPO.traceFilterSkPO).clickEditBtn();
+        await takeScreenshotWithMode(
+          testBed.page,
+          'gold',
+          'filter-dialog-sk_query-dialog-open',
+          mode
+        );
+      });
     });
   });
 
