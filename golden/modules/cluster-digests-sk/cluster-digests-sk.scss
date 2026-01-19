@@ -6,10 +6,11 @@ cluster-digests-sk {
   display: inline-flex;
 
   svg {
-    border: 1px solid grey;
+    border: 1px solid var(--on-surface);
 
     circle.node {
       stroke-width: 2px;
+      stroke: var(--on-surface);
       cursor: pointer;
 
       &.positive {

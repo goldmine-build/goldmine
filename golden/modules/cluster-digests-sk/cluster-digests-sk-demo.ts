@@ -1,10 +1,11 @@
-import './index';
 import { deepCopy } from '../../../infra-sk/modules/object';
+import '../../../infra-sk/modules/theme-chooser-sk';
 import { clusterDiffJSON } from '../cluster-page-sk/test_data';
 import {
   ClusterDiffNodeWithLabel,
   ClusterDigestsSk,
 } from './cluster-digests-sk';
+import './index';
 
 const clusterDigestsSk = new ClusterDigestsSk();
 document.body.querySelector('#cluster')!.appendChild(clusterDigestsSk);

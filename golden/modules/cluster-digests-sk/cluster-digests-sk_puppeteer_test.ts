@@ -4,12 +4,14 @@ import {
   addEventListenersToPuppeteerPage,
   EventName,
   loadCachedTestBed,
-  takeScreenshot,
+  ModeOption,
+  Modes,
+  takeScreenshotWithMode,
   TestBed,
 } from '../../../puppeteer-tests/util';
 import {
-  positiveDigest,
   negativeDigest,
+  positiveDigest,
   untriagedDigest,
 } from '../cluster-page-sk/test_data';
 import { ClusterDigestsSkPO } from './cluster-digests-sk_po';
@@ -45,67 +47,83 @@ describe('cluster-digests-sk', () => {
     expect(await testBed.page.$$('cluster-digests-sk')).to.have.length(1);
   });
 
-  it('should take a screenshot', async () => {
-    await takeScreenshot(clusterDigestsSk, 'gold', 'cluster-digests-sk');
-  });
+  Modes.forEach(async (mode: ModeOption) => {
+    it('should take a screenshot', async () => {
+      await takeScreenshotWithMode(
+        clusterDigestsSk,
+        'gold',
+        'cluster-digests-sk',
+        mode
+      );
+    });
 
-  it('should show digest labels', async () => {
-    const loaded = promiseFactory('layout-complete'); // Emitted when layout stabilizes.
-    await testBed.page.click('#labels');
-    await loaded;
+    it('should show digest labels', async () => {
+      const loaded = promiseFactory('layout-complete'); // Emitted when layout stabilizes.
+      await testBed.page.click('#labels');
+      await loaded;
 
-    await takeScreenshot(
-      clusterDigestsSk,
-      'gold',
-      'cluster-digests-sk_with_labels'
-    );
-  });
+      await takeScreenshotWithMode(
+        clusterDigestsSk,
+        'gold',
+        'cluster-digests-sk_with_labels',
+        mode
+      );
+    });
 
-  it('supports single digest selection via clicking', async () => {
-    await clickNodeAndExpectSelectionChanged(positiveDigest, [positiveDigest]);
+    it('supports single digest selection via clicking', async () => {
+      await clickNodeAndExpectSelectionChanged(positiveDigest, [
+        positiveDigest,
+      ]);
 
-    await takeScreenshot(
-      clusterDigestsSk,
-      'gold',
-      'cluster-digests-sk_one-positive-selected'
-    );
+      await takeScreenshotWithMode(
+        clusterDigestsSk,
+        'gold',
+        'cluster-digests-sk_one-positive-selected',
+        mode
+      );
 
-    await clickNodeAndExpectSelectionChanged(untriagedDigest, [
-      untriagedDigest,
-    ]);
+      await clickNodeAndExpectSelectionChanged(untriagedDigest, [
+        untriagedDigest,
+      ]);
 
-    await takeScreenshot(
-      clusterDigestsSk,
-      'gold',
-      'cluster-digests-sk_one-untriaged-selected'
-    );
-  });
+      await takeScreenshotWithMode(
+        clusterDigestsSk,
+        'gold',
+        'cluster-digests-sk_one-untriaged-selected',
+        mode
+      );
+    });
 
-  it('supports multiple digest selection via shift clicking', async () => {
-    await clickNodeAndExpectSelectionChanged(negativeDigest, [negativeDigest]);
+    it('supports multiple digest selection via shift clicking', async () => {
+      await clickNodeAndExpectSelectionChanged(negativeDigest, [
+        negativeDigest,
+      ]);
 
-    await shiftClickNodeAndExpectSelectionChanged(positiveDigest, [
-      negativeDigest,
-      positiveDigest,
-    ]);
+      await shiftClickNodeAndExpectSelectionChanged(positiveDigest, [
+        negativeDigest,
+        positiveDigest,
+      ]);
 
-    await takeScreenshot(
-      clusterDigestsSk,
-      'gold',
-      'cluster-digests-sk_two-digests-selected'
-    );
+      await takeScreenshotWithMode(
+        clusterDigestsSk,
+        'gold',
+        'cluster-digests-sk_two-digests-selected',
+        mode
+      );
 
-    await shiftClickNodeAndExpectSelectionChanged(untriagedDigest, [
-      negativeDigest,
-      positiveDigest,
-      untriagedDigest,
-    ]);
+      await shiftClickNodeAndExpectSelectionChanged(untriagedDigest, [
+        negativeDigest,
+        positiveDigest,
+        untriagedDigest,
+      ]);
 
-    await takeScreenshot(
-      clusterDigestsSk,
-      'gold',
-      'cluster-digests-sk_three-digests-selected'
-    );
+      await takeScreenshotWithMode(
+        clusterDigestsSk,
+        'gold',
+        'cluster-digests-sk_three-digests-selected',
+        mode
+      );
+    });
   });
 
   it('clears selection by clicking anywhere on the svg that is not on a node', async () => {
