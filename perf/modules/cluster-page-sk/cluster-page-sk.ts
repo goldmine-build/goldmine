@@ -7,43 +7,42 @@
  */
 import { html } from 'lit-html';
 import { define } from '../../../elements-sk/modules/define';
-import { fromObject, toParamSet } from '../../../infra-sk/modules/query';
-import { jsonOrThrow } from '../../../infra-sk/modules/jsonOrThrow';
-import { stateReflector } from '../../../infra-sk/modules/stateReflector';
-import { HintableObject } from '../../../infra-sk/modules/hintable';
 import { SpinnerSk } from '../../../elements-sk/modules/spinner-sk/spinner-sk';
-import { errorMessage } from '../errorMessage';
 import { ElementSk } from '../../../infra-sk/modules/ElementSk';
+import { HintableObject } from '../../../infra-sk/modules/hintable';
+import { jsonOrThrow } from '../../../infra-sk/modules/jsonOrThrow';
+import { fromObject, toParamSet } from '../../../infra-sk/modules/query';
+import { stateReflector } from '../../../infra-sk/modules/stateReflector';
+import { errorMessage } from '../errorMessage';
 
-import '../../../elements-sk/modules/spinner-sk';
 import '../../../elements-sk/modules/checkbox-sk';
+import '../../../elements-sk/modules/spinner-sk';
 
 import '../../../infra-sk/modules/paramset-sk';
-import '../../../infra-sk/modules/sort-sk';
 import '../../../infra-sk/modules/query-sk';
+import '../../../infra-sk/modules/sort-sk';
 
-import '../algo-select-sk';
-import '../cluster-summary2-sk';
-import '../commit-detail-picker-sk';
-import '../day-range-sk';
-import '../query-count-sk';
-import {
-  FrameResponse,
-  ParamSet,
-  RegressionDetectionRequest,
-  ClusterAlgo,
-  Commit,
-  FullSummary,
-  RegressionDetectionResponse,
-  progress,
-  SerializesToString,
-  ReadOnlyParamSet,
-} from '../json';
-import { AlgoSelectAlgoChangeEventDetail } from '../algo-select-sk/algo-select-sk';
 import { QuerySkQueryChangeEventDetail } from '../../../infra-sk/modules/query-sk/query-sk';
+import '../algo-select-sk';
+import { AlgoSelectAlgoChangeEventDetail } from '../algo-select-sk/algo-select-sk';
+import '../cluster-summary2-sk';
 import { ClusterSummary2SkOpenKeysEventDetail } from '../cluster-summary2-sk/cluster-summary2-sk';
 import { CommitDetailPanelSkCommitSelectedDetails } from '../commit-detail-panel-sk/commit-detail-panel-sk';
+import '../commit-detail-picker-sk';
+import '../day-range-sk';
+import {
+  ClusterAlgo,
+  Commit,
+  FrameResponse,
+  FullSummary,
+  ParamSet,
+  progress,
+  RegressionDetectionRequest,
+  RegressionDetectionResponse,
+  SerializesToString,
+} from '../json';
 import { messagesToErrorString, startRequest } from '../progress/progress';
+import '../query-count-sk';
 
 // The state that gets reflected to the URL.
 class State {

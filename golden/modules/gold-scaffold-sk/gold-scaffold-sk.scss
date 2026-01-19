@@ -6,8 +6,7 @@ gold-scaffold-sk {
 
   app-sk {
     --header-background-color: var(--gold);
-    --header-font-color: var(--on-primary, #ffffff);
-    --background: #ffffff;
+    --header-font-color: var(--on-primary);
 
     main {
       // Prevent the app-sk from stretching horizontally indefinitely (for example, dots-sk can

@@ -3,7 +3,9 @@ import { ElementHandle, Page } from 'puppeteer';
 import {
   addEventListenersToPuppeteerPage,
   loadCachedTestBed,
-  takeScreenshot,
+  ModeOption,
+  Modes,
+  takeScreenshotWithMode,
   TestBed,
 } from '../../../puppeteer-tests/util';
 import { DetailsPageSkPO } from './details-page-sk_po';
@@ -28,41 +30,50 @@ describe('details-page-sk', () => {
   });
 
   describe('screenshots', () => {
-    it('should show the default page', async () => {
-      await navigateTo(testBed.page, testBed.baseUrl, baseParams);
-      await testBed.page.setViewport({
-        width: 1300,
-        height: 700,
+    Modes.forEach(async (mode: ModeOption) => {
+      it('should show the default page', async () => {
+        await navigateTo(testBed.page, testBed.baseUrl, baseParams);
+        await testBed.page.setViewport({
+          width: 1300,
+          height: 700,
+        });
+        await takeScreenshotWithMode(
+          testBed.page,
+          'gold',
+          'details-page-sk',
+          mode
+        );
       });
-      await takeScreenshot(testBed.page, 'gold', 'details-page-sk');
-    });
 
-    it('should show the digest even if it is not in the index', async () => {
-      await navigateTo(testBed.page, testBed.baseUrl, baseParams);
-      await testBed.page.setViewport({
-        width: 1300,
-        height: 700,
+      it('should show the digest even if it is not in the index', async () => {
+        await navigateTo(testBed.page, testBed.baseUrl, baseParams);
+        await testBed.page.setViewport({
+          width: 1300,
+          height: 700,
+        });
+        await testBed.page.click('#simulate-not-found-in-index');
+        await takeScreenshotWithMode(
+          testBed.page,
+          'gold',
+          'details-page-sk_not-in-index',
+          mode
+        );
       });
-      await testBed.page.click('#simulate-not-found-in-index');
-      await takeScreenshot(
-        testBed.page,
-        'gold',
-        'details-page-sk_not-in-index'
-      );
-    });
 
-    it('should show a message if the backend had an error', async () => {
-      await navigateTo(testBed.page, testBed.baseUrl, baseParams);
-      await testBed.page.setViewport({
-        width: 1300,
-        height: 700,
+      it('should show a message if the backend had an error', async () => {
+        await navigateTo(testBed.page, testBed.baseUrl, baseParams);
+        await testBed.page.setViewport({
+          width: 1300,
+          height: 700,
+        });
+        await testBed.page.click('#simulate-rpc-error');
+        await takeScreenshotWithMode(
+          testBed.page,
+          'gold',
+          'details-page-sk_backend-error',
+          mode
+        );
       });
-      await testBed.page.click('#simulate-rpc-error');
-      await takeScreenshot(
-        testBed.page,
-        'gold',
-        'details-page-sk_backend-error'
-      );
     });
   });
 
