@@ -1,13 +1,13 @@
-import './index';
 import '../gold-scaffold-sk';
+import './index';
 
 import fetchMock from 'fetch-mock';
 import { deepCopy } from '../../../infra-sk/modules/object';
 import { delay } from '../demo_util';
-import { fakeNow, changelistSummaries_5, empty } from './test_data';
-import { testOnlySetSettings } from '../settings';
-import { exampleStatusData } from '../last-commit-sk/demo_data';
 import { GoldScaffoldSk } from '../gold-scaffold-sk/gold-scaffold-sk';
+import { exampleStatusData } from '../last-commit-sk/demo_data';
+import { testOnlySetSettings } from '../settings';
+import { changelistSummaries_5, empty, fakeNow } from './test_data';
 
 testOnlySetSettings({
   title: 'Skia Public',

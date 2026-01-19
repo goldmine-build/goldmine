@@ -17,11 +17,11 @@ import { define } from '../../../elements-sk/modules/define';
 import { errorMessage } from '../../../elements-sk/modules/errorMessage';
 import { SpinnerSk } from '../../../elements-sk/modules/spinner-sk/spinner-sk';
 import { ElementSk } from '../../../infra-sk/modules/ElementSk';
-import { title } from '../settings';
 import { FetchErrorEventDetail } from '../common';
+import { title } from '../settings';
 
-import '../../../infra-sk/modules/app-sk';
 import '../../../infra-sk/modules/alogin-sk';
+import '../../../infra-sk/modules/app-sk';
 
 import '../last-commit-sk';
 
@@ -37,6 +37,7 @@ import '../../../elements-sk/modules/icons/search-icon-sk';
 import '../../../elements-sk/modules/icons/sync-problem-icon-sk';
 import '../../../elements-sk/modules/icons/view-day-icon-sk';
 import '../../../elements-sk/modules/spinner-sk';
+import '../../../infra-sk/modules/theme-chooser-sk';
 
 /** Moves the elements in a NodeList or HTMLCollection as children of another element. */
 function move(from: HTMLCollection | NodeList, to: HTMLElement) {
@@ -54,6 +55,7 @@ export class GoldScaffoldSk extends ElementSk {
         <div class=spacer></div>
         <last-commit-sk></last-commit-sk>
         <alogin-sk ?testing_offline=${ele.testingOffline}></alogin-sk>
+        <theme-chooser-sk></theme-chooser-sk>
       </header>
 
       <aside>

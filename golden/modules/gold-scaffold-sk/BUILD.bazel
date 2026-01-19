@@ -28,6 +28,7 @@ sk_element(
         "//elements-sk/modules/icons/view-day-icon-sk",
         "//elements-sk/modules/spinner-sk",
         "//infra-sk/modules/alogin-sk",
+        "//infra-sk/modules/theme-chooser-sk",
     ],
     ts_deps = [
         "//golden/modules:common_ts_lib",
