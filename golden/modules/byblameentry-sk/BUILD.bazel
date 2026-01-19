@@ -3,7 +3,7 @@ load("//infra-sk:index.bzl", "karma_test", "sk_demo_page_server", "sk_element", 
 sk_element(
     name = "byblameentry-sk",
     sass_deps = [
-        "//elements-sk/modules:colors_sass_lib",
+        "//infra-sk:themes_sass_lib",
     ],
     sass_srcs = ["byblameentry-sk.scss"],
     ts_deps = [
@@ -25,7 +25,10 @@ sk_element(
 sk_page(
     name = "byblameentry-sk-demo",
     html_file = "byblameentry-sk-demo.html",
-    sk_element_deps = [":byblameentry-sk"],
+    sk_element_deps = [
+        ":byblameentry-sk",
+        "//infra-sk/modules/theme-chooser-sk",
+    ],
     ts_deps = [
         "//golden/modules:settings_ts_lib",
         ":test_data_ts_lib",

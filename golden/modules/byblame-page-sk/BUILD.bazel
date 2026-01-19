@@ -2,6 +2,7 @@ load("//infra-sk:index.bzl", "karma_test", "sk_demo_page_server", "sk_element", 
 
 sk_element(
     name = "byblame-page-sk",
+    sass_deps = ["//infra-sk:themes_sass_lib"],
     sass_srcs = ["byblame-page-sk.scss"],
     sk_element_deps = [
         "//golden/modules/byblameentry-sk",

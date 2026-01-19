@@ -1,7 +1,8 @@
-import './index';
-import { entry, fakeNow } from './test_data';
+import '../../../infra-sk/modules/theme-chooser-sk';
 import { testOnlySetSettings } from '../settings';
 import { ByBlameEntrySk } from './byblameentry-sk';
+import './index';
+import { entry, fakeNow } from './test_data';
 
 Date.now = () => fakeNow;
 testOnlySetSettings({

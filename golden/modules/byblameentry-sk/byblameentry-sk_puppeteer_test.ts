@@ -1,7 +1,9 @@
 import { expect } from 'chai';
 import {
   loadCachedTestBed,
-  takeScreenshot,
+  ModeOption,
+  Modes,
+  takeScreenshotWithMode,
   TestBed,
 } from '../../../puppeteer-tests/util';
 
@@ -21,8 +23,15 @@ describe('byblameentry-sk', () => {
     expect(await testBed.page.$$('byblameentry-sk')).to.have.length(1);
   });
 
-  it('should take a screenshot', async () => {
-    const byBlameEntry = await testBed.page.$('byblameentry-sk');
-    await takeScreenshot(byBlameEntry!, 'gold', 'byblameentry-sk');
+  Modes.forEach(async (mode: ModeOption) => {
+    it('should take a screenshot', async () => {
+      const byBlameEntry = await testBed.page.$('byblameentry-sk');
+      await takeScreenshotWithMode(
+        byBlameEntry!,
+        'gold',
+        'byblameentry-sk',
+        mode
+      );
+    });
   });
 });
