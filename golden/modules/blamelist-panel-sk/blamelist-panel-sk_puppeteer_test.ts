@@ -1,6 +1,8 @@
 import { expect } from 'chai';
 import {
   loadCachedTestBed,
+  ModeOption,
+  Modes,
   takeScreenshot,
   TestBed,
 } from '../../../puppeteer-tests/util';
@@ -16,52 +18,63 @@ describe('blamelist-panel-sk', () => {
   });
 
   describe('screenshots', async () => {
-    it('should show a single commit', async () => {
-      const blamelistPanelSk = await testBed.page.$('#single_commit');
-      await takeScreenshot(blamelistPanelSk!, 'gold', 'blamelist-panel-sk');
-      expect(await testBed.page.$$('#single_commit tr')).to.have.length(1);
-    });
+    Modes.forEach(async (mode: ModeOption) => {
+      it('should show a single commit', async () => {
+        await mode.setMode(testBed);
+        const blamelistPanelSk = await testBed.page.$('#single_commit');
+        await takeScreenshot(
+          blamelistPanelSk!,
+          'gold',
+          mode.name('blamelist-panel-sk')
+        );
+        expect(await testBed.page.$$('#single_commit tr')).to.have.length(1);
+      });
 
-    it('should show a single CL commit', async () => {
-      const blamelistPanelSk = await testBed.page.$('#single_cl_commit');
-      await takeScreenshot(
-        blamelistPanelSk!,
-        'gold',
-        'blamelist-panel-sk_cl-commit'
-      );
-      expect(await testBed.page.$$('#single_cl_commit tr')).to.have.length(1);
-    });
+      it('should show a single CL commit', async () => {
+        await mode.setMode(testBed);
+        const blamelistPanelSk = await testBed.page.$('#single_cl_commit');
+        await takeScreenshot(
+          blamelistPanelSk!,
+          'gold',
+          mode.name('blamelist-panel-sk_cl-commit')
+        );
+        expect(await testBed.page.$$('#single_cl_commit tr')).to.have.length(1);
+      });
 
-    it('should show some commits', async () => {
-      const blamelistPanelSk = await testBed.page.$('#some_commits');
-      await takeScreenshot(
-        blamelistPanelSk!,
-        'gold',
-        'blamelist-panel-sk_some-commits'
-      );
-      expect(await testBed.page.$$('#some_commits tr')).to.have.length(3);
-    });
+      it('should show some commits', async () => {
+        await mode.setMode(testBed);
+        const blamelistPanelSk = await testBed.page.$('#some_commits');
+        await takeScreenshot(
+          blamelistPanelSk!,
+          'gold',
+          mode.name('blamelist-panel-sk_some-commits')
+        );
+        expect(await testBed.page.$$('#some_commits tr')).to.have.length(3);
+      });
 
-    it('should truncate many commits', async () => {
-      const blamelistPanelSk = await testBed.page.$('#many_commits');
-      await takeScreenshot(
-        blamelistPanelSk!,
-        'gold',
-        'blamelist-panel-sk_many-commits'
-      );
-      expect(await testBed.page.$$('#many_commits tr')).to.have.length(15); // maxCommitsToDisplay
-    });
+      it('should truncate many commits', async () => {
+        await mode.setMode(testBed);
+        const blamelistPanelSk = await testBed.page.$('#many_commits');
+        await takeScreenshot(
+          blamelistPanelSk!,
+          'gold',
+          mode.name('blamelist-panel-sk_many-commits')
+        );
+        expect(await testBed.page.$$('#many_commits tr')).to.have.length(15); // maxCommitsToDisplay
+      });
 
-    it('should show non-standard commits', async () => {
-      const blamelistPanelSk = await testBed.page.$('#non_standard_commits');
-      await takeScreenshot(
-        blamelistPanelSk!,
-        'gold',
-        'blamelist-panel-sk_non-standard-commits'
-      );
-      expect(await testBed.page.$$('#non_standard_commits tr')).to.have.length(
-        2
-      );
+      it('should show non-standard commits', async () => {
+        await mode.setMode(testBed);
+        const blamelistPanelSk = await testBed.page.$('#non_standard_commits');
+        await takeScreenshot(
+          blamelistPanelSk!,
+          'gold',
+          mode.name('blamelist-panel-sk_non-standard-commits')
+        );
+        expect(
+          await testBed.page.$$('#non_standard_commits tr')
+        ).to.have.length(2);
+      });
     });
   });
 
