@@ -27,7 +27,10 @@ sk_element(
 sk_page(
     name = "edit-ignore-rule-sk-demo",
     html_file = "edit-ignore-rule-sk-demo.html",
-    sk_element_deps = [":edit-ignore-rule-sk"],
+    sk_element_deps = [
+        ":edit-ignore-rule-sk",
+        "//infra-sk/modules/theme-chooser-sk",
+    ],
     ts_deps = [
         "//golden/modules:shared_demo_data_ts_lib",
         ":edit-ignore-rule-sk_po_ts_lib",

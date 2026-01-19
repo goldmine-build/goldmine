@@ -198,7 +198,8 @@ to see how these styles apply to title bars and sidebars.
   }
 
   .input-like,
-  input {
+  input,
+  textarea {
     border: solid 1px var(--on-surface);
     color: solid 1px var(--on-surface);
     background: solid 1px var(--surface);

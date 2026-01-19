@@ -1,8 +1,9 @@
-import './index';
 import { $$ } from '../../../infra-sk/modules/dom';
+import '../../../infra-sk/modules/theme-chooser-sk';
 import { manyParams } from '../shared_demo_data';
 import { EditIgnoreRuleSk } from './edit-ignore-rule-sk';
 import { EditIgnoreRuleSkPO } from './edit-ignore-rule-sk_po';
+import './index';
 
 Date.now = () => Date.parse('2020-02-01T00:00:00Z');
 

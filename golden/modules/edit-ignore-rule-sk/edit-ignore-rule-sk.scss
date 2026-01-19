@@ -1,3 +1,5 @@
+@import '../../../infra-sk/themes.scss';
+
 edit-ignore-rule-sk {
   .columns {
     display: flex;
@@ -7,7 +9,8 @@ edit-ignore-rule-sk {
   }
 
   .error {
-    border: 1px solid red;
+    border: 1px solid var(--on-error-container);
+    background-color: var(--error-container);
   }
 
   #expires {
