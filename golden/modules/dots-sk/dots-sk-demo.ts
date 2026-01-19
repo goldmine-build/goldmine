@@ -2,7 +2,7 @@ import './index';
 import { $$ } from '../../../infra-sk/modules/dom';
 import { isPuppeteerTest } from '../demo_util';
 import { traces, commits } from './demo_data';
-import '../../../infra-sk/modules/theme-chooser-sk'
+import '../../../infra-sk/modules/theme-chooser-sk';
 import { DotsSk } from './dots-sk';
 
 const logEventDetail = (e: Event) => {
@@ -15,18 +15,12 @@ const logEventDetail = (e: Event) => {
   log.value = entry + log.value;
 };
 
-
-const darkModel = document.querySelector<DotsSk>('section.darkmode dots-sk')!;
-darkModel.commits = commits;
-darkModel.value = traces;
-
 const dotsSk = new DotsSk();
 dotsSk.value = traces;
 dotsSk.commits = commits;
 dotsSk.addEventListener('showblamelist', logEventDetail);
 dotsSk.addEventListener('hover', logEventDetail);
 $$('#container')!.appendChild(dotsSk);
-
 
 // Hide event log if we're within a Puppeteer test. We don't need the event log
 // to appear in any screenshots uploaded to Gold.
