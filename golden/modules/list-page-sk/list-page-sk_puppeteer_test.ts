@@ -3,7 +3,9 @@ import { Page } from 'puppeteer';
 import {
   addEventListenersToPuppeteerPage,
   loadCachedTestBed,
-  takeScreenshot,
+  ModeOption,
+  Modes,
+  takeScreenshotWithMode,
   TestBed,
 } from '../../../puppeteer-tests/util';
 
@@ -21,21 +23,33 @@ describe('list-page-sk', () => {
   });
 
   describe('screenshots', () => {
-    it('should show the default page', async () => {
-      await navigateTo(testBed.page, testBed.baseUrl);
-      await testBed.page.setViewport({ width: 1000, height: 1000 });
-      await takeScreenshot(testBed.page, 'gold', 'list-page-sk');
-    });
+    Modes.forEach(async (mode: ModeOption) => {
+      it('should show the default page', async () => {
+        await navigateTo(testBed.page, testBed.baseUrl);
+        await testBed.page.setViewport({ width: 1000, height: 1000 });
+        await takeScreenshotWithMode(
+          testBed.page,
+          'gold',
+          'list-page-sk',
+          mode
+        );
+      });
 
-    it('should show a query dialog', async () => {
-      await navigateTo(
-        testBed.page,
-        testBed.baseUrl,
-        '?corpus=skp&disregard_ignores=true&query=alpha_type%3DOpaque'
-      );
-      await testBed.page.setViewport({ width: 1000, height: 1000 });
-      await testBed.page.click('list-page-sk button.show_query_dialog');
-      await takeScreenshot(testBed.page, 'gold', 'list-page-sk_query-dialog');
+      it('should show a query dialog', async () => {
+        await navigateTo(
+          testBed.page,
+          testBed.baseUrl,
+          '?corpus=skp&disregard_ignores=true&query=alpha_type%3DOpaque'
+        );
+        await testBed.page.setViewport({ width: 1000, height: 1000 });
+        await testBed.page.click('list-page-sk button.show_query_dialog');
+        await takeScreenshotWithMode(
+          testBed.page,
+          'gold',
+          'list-page-sk_query-dialog',
+          mode
+        );
+      });
     });
   });
 
