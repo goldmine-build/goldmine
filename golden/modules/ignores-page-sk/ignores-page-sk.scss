@@ -24,18 +24,27 @@ ignores-page-sk {
   }
 
   th {
-    border-bottom: 2px solid black;
+    border-bottom: 2px solid var(--on-surface);
+  }
+
+  dialog[open] {
+    background: var(--surface);
+    color: var(--on-surface);
   }
 
   tr {
-    &.expired {
-      background-color: var(--light-error-red);
+    &.expired,
+    &.expired td,
+    &.expired a:link {
+      background: var(--error-container);
+      color: var(--on-error-container);
+      fill: var(--on-error-container);
     }
   }
 
   td {
-    border: 1px solid var(--dark-white);
-    border-bottom: 1px solid var(--light-gray);
+    border: 1px solid var(--on-surface);
+    border-bottom: 1px solid var(--on-surface);
     text-align: center;
     padding: 6px 2px;
 
