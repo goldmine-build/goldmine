@@ -2,6 +2,7 @@ import './index';
 
 import fetchMock from 'fetch-mock';
 import { $$ } from '../../../infra-sk/modules/dom';
+import '../../../infra-sk/modules/theme-chooser-sk';
 import { testOnlySetSettings } from '../settings';
 import { exampleStatusData } from './demo_data';
 

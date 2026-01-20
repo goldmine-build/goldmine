@@ -1,7 +1,9 @@
 import { expect } from 'chai';
 import {
   loadCachedTestBed,
-  takeScreenshot,
+  ModeOption,
+  Modes,
+  takeScreenshotWithMode,
   TestBed,
 } from '../../../puppeteer-tests/util';
 
@@ -21,9 +23,16 @@ describe('last-commit-sk', () => {
     expect(await testBed.page.$$('last-commit-sk')).to.have.length(1);
   });
 
-  it('takes a screenshot', async () => {
-    const lastCommitSk = await testBed.page.$('#container');
-    await takeScreenshot(lastCommitSk!, 'gold', 'last-commit-sk');
+  Modes.forEach(async (mode: ModeOption) => {
+    it('takes a screenshot', async () => {
+      const lastCommitSk = await testBed.page.$('#container');
+      await takeScreenshotWithMode(
+        lastCommitSk!,
+        'gold',
+        'last-commit-sk',
+        mode
+      );
+    });
   });
 
   it('has the correct link and text', async () => {
