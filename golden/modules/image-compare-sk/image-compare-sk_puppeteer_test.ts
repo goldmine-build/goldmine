@@ -1,7 +1,9 @@
 import { expect } from 'chai';
 import {
   loadCachedTestBed,
-  takeScreenshot,
+  ModeOption,
+  Modes,
+  takeScreenshotWithMode,
   TestBed,
 } from '../../../puppeteer-tests/util';
 import { ImageCompareSkPO } from './image-compare-sk_po';
@@ -23,54 +25,66 @@ describe('image-compare-sk', () => {
   });
 
   describe('screenshots', () => {
-    it('has the left and right image', async () => {
-      const imageCompareSk = await testBed.page.$('#normal');
-      await takeScreenshot(imageCompareSk!, 'gold', 'image-compare-sk');
-    });
+    Modes.forEach(async (mode: ModeOption) => {
+      it('has the left and right image', async () => {
+        const imageCompareSk = await testBed.page.$('#normal');
+        await takeScreenshotWithMode(
+          imageCompareSk!,
+          'gold',
+          'image-compare-sk',
+          mode
+        );
+      });
 
-    it('shows the multi-zoom-sk dialog when zoom button clicked', async () => {
-      await testBed.page.setViewport({ width: 1000, height: 800 });
-      await testBed.page.click('#normal button.zoom_btn');
-      await takeScreenshot(
-        testBed.page,
-        'gold',
-        'image-compare-sk_zoom-dialog'
-      );
-    });
+      it('shows the multi-zoom-sk dialog when zoom button clicked', async () => {
+        await testBed.page.setViewport({ width: 1000, height: 800 });
+        await testBed.page.click('#normal button.zoom_btn');
+        await takeScreenshotWithMode(
+          testBed.page,
+          'gold',
+          'image-compare-sk_zoom-dialog',
+          mode
+        );
+      });
 
-    it('has just the left image', async () => {
-      const imageCompareSk = await testBed.page.$('#no_right');
-      await takeScreenshot(
-        imageCompareSk!,
-        'gold',
-        'image-compare-sk_no-right'
-      );
-    });
+      it('has just the left image', async () => {
+        const imageCompareSk = await testBed.page.$('#no_right');
+        await takeScreenshotWithMode(
+          imageCompareSk!,
+          'gold',
+          'image-compare-sk_no-right',
+          mode
+        );
+      });
 
-    it('shows full size images', async () => {
-      const imageCompareSk = await testBed.page.$('#full_size_images');
-      await takeScreenshot(
-        imageCompareSk!,
-        'gold',
-        'image-compare-sk_full-size-images'
-      );
-    });
+      it('shows full size images', async () => {
+        const imageCompareSk = await testBed.page.$('#full_size_images');
+        await takeScreenshotWithMode(
+          imageCompareSk!,
+          'gold',
+          'image-compare-sk_full-size-images',
+          mode
+        );
+      });
 
-    it('zooms in and out of a specific image', async () => {
-      const imageCompareSk = await testBed.page.$('#normal');
-      const imageCompareSkPO = new ImageCompareSkPO(imageCompareSk!);
-      await imageCompareSkPO.clickImage(0);
-      await takeScreenshot(
-        imageCompareSk!,
-        'gold',
-        'image-compare-sk_image-zoomed-in'
-      );
-      await imageCompareSkPO.clickImage(0);
-      await takeScreenshot(
-        imageCompareSk!,
-        'gold',
-        'image-compare-sk_image-zoomed-out'
-      );
+      it('zooms in and out of a specific image', async () => {
+        const imageCompareSk = await testBed.page.$('#normal');
+        const imageCompareSkPO = new ImageCompareSkPO(imageCompareSk!);
+        await imageCompareSkPO.clickImage(0);
+        await takeScreenshotWithMode(
+          imageCompareSk!,
+          'gold',
+          'image-compare-sk_image-zoomed-in',
+          mode
+        );
+        await imageCompareSkPO.clickImage(0);
+        await takeScreenshotWithMode(
+          imageCompareSk!,
+          'gold',
+          'image-compare-sk_image-zoomed-out',
+          mode
+        );
+      });
     });
   });
 });

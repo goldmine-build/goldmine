@@ -34,7 +34,10 @@ sk_element(
 sk_page(
     name = "image-compare-sk-demo",
     html_file = "image-compare-sk-demo.html",
-    sk_element_deps = [":image-compare-sk"],
+    sk_element_deps = [
+        ":image-compare-sk",
+        "//infra-sk/modules/theme-chooser-sk",
+    ],
     ts_deps = ["//infra-sk/modules:dom_ts_lib"],
     ts_entry_point = "image-compare-sk-demo.ts",
 )
