@@ -1,5 +1,6 @@
-import './index';
 import { $$ } from '../../../infra-sk/modules/dom';
+import '../../../infra-sk/modules/theme-chooser-sk';
+import './index';
 import { TraceFilterSk } from './trace-filter-sk';
 
 const traceFilterSk = new TraceFilterSk();
