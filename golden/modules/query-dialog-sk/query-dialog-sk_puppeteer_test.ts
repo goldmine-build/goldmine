@@ -1,7 +1,9 @@
 import { expect } from 'chai';
 import {
   loadCachedTestBed,
-  takeScreenshot,
+  ModeOption,
+  Modes,
+  takeScreenshotWithMode,
   TestBed,
 } from '../../../puppeteer-tests/util';
 import { QueryDialogSkPO } from './query-dialog-sk_po';
@@ -27,26 +29,28 @@ describe('query-dialog-sk', () => {
     expect(await testBed.page.$$('query-dialog-sk')).to.have.length(1);
   });
 
+    Modes.forEach(async (mode: ModeOption) => {
+
   it('is initially empty', async () => {
     await testBed.page.click('#show-dialog');
-    await takeScreenshot(testBed.page, 'gold', 'query-dialog-sk_no-selection');
+    await takeScreenshotWithMode(testBed.page, 'gold', 'query-dialog-sk_no-selection', mode);
   });
 
   it('can select a key', async () => {
     await testBed.page.click('#show-dialog');
     await queryDialogSkPO.clickKey('car make');
-    await takeScreenshot(testBed.page, 'gold', 'query-dialog-sk_key-selected');
+    await takeScreenshotWithMode(testBed.page, 'gold', 'query-dialog-sk_key-selected', mode);
   });
 
   it('can select a key and a value', async () => {
     await testBed.page.click('#show-dialog');
     await queryDialogSkPO.clickKey('car make');
     await queryDialogSkPO.clickValue('chevrolet');
-    await takeScreenshot(
+    await takeScreenshotWithMode(
       testBed.page,
       'gold',
       'query-dialog-sk_key-and-value-selected'
-    );
+    , mode);
   });
 
   it('can select multiple values', async () => {
@@ -57,19 +61,20 @@ describe('query-dialog-sk', () => {
       used: ['yes', 'no'],
       year: ['2020', '2019', '2018', '2017'],
     });
-    await takeScreenshot(
+    await takeScreenshotWithMode(
       testBed.page,
       'gold',
       'query-dialog-sk_multiple-values-selected'
-    );
+    , mode);
   });
 
   it('can be opened with an initial non-empty selection', async () => {
     await testBed.page.click('#show-dialog-with-selection');
-    await takeScreenshot(
+    await takeScreenshotWithMode(
       testBed.page,
       'gold',
       'query-dialog-sk_nonempty-initial-selection'
-    );
+    , mode);
   });
+});
 });
