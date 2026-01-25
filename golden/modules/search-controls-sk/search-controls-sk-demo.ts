@@ -1,6 +1,7 @@
-import './index';
-import { ParamSet, fromParamSet } from '../../../infra-sk/modules/query';
 import { $$ } from '../../../infra-sk/modules/dom';
+import { ParamSet, fromParamSet } from '../../../infra-sk/modules/query';
+import '../../../infra-sk/modules/theme-chooser-sk';
+import './index';
 import { SearchControlsSk, SearchCriteria } from './search-controls-sk';
 
 const corpora = [

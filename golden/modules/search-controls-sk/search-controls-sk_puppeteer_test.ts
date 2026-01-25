@@ -1,7 +1,9 @@
 import { expect } from 'chai';
 import {
   loadCachedTestBed,
-  takeScreenshot,
+  ModeOption,
+  Modes,
+  takeScreenshotWithMode,
   TestBed,
 } from '../../../puppeteer-tests/util';
 
@@ -17,45 +19,60 @@ describe('search-controls-sk', () => {
     await testBed.page.setViewport({ width: 1200, height: 800 });
   });
 
-  it('should render the demo page', async () => {
-    // Smoke test.
-    expect(await testBed.page.$$('search-controls-sk')).to.have.length(1);
-  });
+  Modes.forEach(async (mode: ModeOption) => {
+    it('should render the demo page', async () => {
+      // Smoke test.
+      expect(await testBed.page.$$('search-controls-sk')).to.have.length(1);
+    });
 
-  it('shows an empty search criteria', async () => {
-    await testBed.page.click('button#clear');
-    await takeScreenshot(testBed.page, 'gold', 'search-controls-sk_empty');
-  });
+    it('shows an empty search criteria', async () => {
+      await testBed.page.click('button#clear');
+      await takeScreenshotWithMode(
+        testBed.page,
+        'gold',
+        'search-controls-sk_empty',
+        mode
+      );
+    });
 
-  it('shows a non-empty search criteria', async () => {
-    await takeScreenshot(testBed.page, 'gold', 'search-controls-sk');
-  });
+    it('shows a non-empty search criteria', async () => {
+      await takeScreenshotWithMode(
+        testBed.page,
+        'gold',
+        'search-controls-sk',
+        mode
+      );
+    });
 
-  it('shows the left-hand trace filter editor', async () => {
-    await testBed.page.click('.traces button.edit-query');
-    await takeScreenshot(
-      testBed.page,
-      'gold',
-      'search-controls-sk_left-hand-trace-filter-editor'
-    );
-  });
+    it('shows the left-hand trace filter editor', async () => {
+      await testBed.page.click('.traces button.edit-query');
+      await takeScreenshotWithMode(
+        testBed.page,
+        'gold',
+        'search-controls-sk_left-hand-trace-filter-editor',
+        mode
+      );
+    });
 
-  it('shows more filters', async () => {
-    await testBed.page.click('button.more-filters');
-    await takeScreenshot(
-      testBed.page,
-      'gold',
-      'search-controls-sk_more-filters'
-    );
-  });
+    it('shows more filters', async () => {
+      await testBed.page.click('button.more-filters');
+      await takeScreenshotWithMode(
+        testBed.page,
+        'gold',
+        'search-controls-sk_more-filters',
+        mode
+      );
+    });
 
-  it('shows the left-hand trace filter editor', async () => {
-    await testBed.page.click('button.more-filters');
-    await testBed.page.click('filter-dialog-sk button.edit-query');
-    await takeScreenshot(
-      testBed.page,
-      'gold',
-      'search-controls-sk_right-hand-trace-filter-editor'
-    );
+    it('shows the left-hand trace filter editor', async () => {
+      await testBed.page.click('button.more-filters');
+      await testBed.page.click('filter-dialog-sk button.edit-query');
+      await takeScreenshotWithMode(
+        testBed.page,
+        'gold',
+        'search-controls-sk_right-hand-trace-filter-editor',
+        mode
+      );
+    });
   });
 });
