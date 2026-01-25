@@ -199,8 +199,8 @@ to see how these styles apply to title bars and sidebars.
 
   dialog {
     border: solid 1px var(--on-surface);
-    color: solid 1px var(--on-surface);
-    background: solid var(--surface);
+    color: var(--on-surface);
+    background: var(--surface);
   }
 
   .input-like,

@@ -3,7 +3,9 @@ import {
   addEventListenersToPuppeteerPage,
   EventName,
   loadCachedTestBed,
-  takeScreenshot,
+  ModeOption,
+  Modes,
+  takeScreenshotWithMode,
   TestBed,
 } from '../../../puppeteer-tests/util';
 import { SearchPageSkPO } from './search-page-sk_po';
@@ -44,97 +46,121 @@ describe('search-page-sk', () => {
   });
 
   describe('screenshots', () => {
-    it('shows an empty results page', async () => {
-      await goToPage('?untriaged=false');
-      await takeScreenshot(testBed.page, 'gold', 'search-page-sk_empty');
-    });
+    Modes.forEach(async (mode: ModeOption) => {
+      it('shows an empty results page', async () => {
+        await goToPage('?untriaged=false');
+        await takeScreenshotWithMode(
+          testBed.page,
+          'gold',
+          'search-page-sk_empty',
+          mode
+        );
+      });
 
-    it('shows search results with no pagination', async () => {
-      // Demo page only mocks 3 results, which is below the default page limit of 50 results.
-      await goToPage('?untriaged=true&positive=true&negative=true');
-      await testBed.page.setViewport({ width: 1600, height: 2200 }); // Capture the entire page.
-      await takeScreenshot(
-        testBed.page,
-        'gold',
-        'search-page-sk_no-pagination'
-      );
-    });
+      it('shows search results with no pagination', async () => {
+        // Demo page only mocks 3 results, which is below the default page limit of 50 results.
+        await goToPage('?untriaged=true&positive=true&negative=true');
+        await testBed.page.setViewport({ width: 1600, height: 2200 }); // Capture the entire page.
+        await takeScreenshotWithMode(
+          testBed.page,
+          'gold',
+          'search-page-sk_no-pagination',
+          mode
+        );
+      });
 
-    it('shows search results with pagination', async () => {
-      // Demo page only mocks 3 results, so we limit the results to 2 per page to force pagination.
-      await goToPage('?untriaged=true&positive=true&negative=true&limit=2');
-      await testBed.page.setViewport({ width: 1600, height: 1700 }); // Capture the entire page.
-      await takeScreenshot(
-        testBed.page,
-        'gold',
-        'search-page-sk_with-pagination'
-      );
-    });
+      it('shows search results with pagination', async () => {
+        // Demo page only mocks 3 results, so we limit the results to 2 per page to force pagination.
+        await goToPage('?untriaged=true&positive=true&negative=true&limit=2');
+        await testBed.page.setViewport({ width: 1600, height: 1700 }); // Capture the entire page.
+        await takeScreenshotWithMode(
+          testBed.page,
+          'gold',
+          'search-page-sk_with-pagination',
+          mode
+        );
+      });
 
-    it('shows changelist controls', async () => {
-      await goToPage(
-        '?untriaged=true&positive=true&negative=true&crs=gerrit&issue=123456'
-      );
-      await takeScreenshot(
-        testBed.page,
-        'gold',
-        'search-page-sk_changelist-controls'
-      );
-    });
+      it('shows changelist controls', async () => {
+        await goToPage(
+          '?untriaged=true&positive=true&negative=true&crs=gerrit&issue=123456'
+        );
+        await takeScreenshotWithMode(
+          testBed.page,
+          'gold',
+          'search-page-sk_changelist-controls',
+          mode
+        );
+      });
 
-    it('shows the bulk triage dialog', async () => {
-      await goToPage('?untriaged=true&positive=true&negative=true');
-      await searchPageSkPO.clickBulkTriageBtn();
-      await takeScreenshot(testBed.page, 'gold', 'search-page-sk_bulk-triage');
-    });
+      it('shows the bulk triage dialog', async () => {
+        await goToPage('?untriaged=true&positive=true&negative=true');
+        await searchPageSkPO.clickBulkTriageBtn();
+        await takeScreenshotWithMode(
+          testBed.page,
+          'gold',
+          'search-page-sk_bulk-triage',
+          mode
+        );
+      });
 
-    it('shows the bulk triage dialog with a CL', async () => {
-      await goToPage(
-        '?untriaged=true&positive=true&negative=true&crs=gerrit&issue=123456'
-      );
-      await searchPageSkPO.clickBulkTriageBtn();
-      await takeScreenshot(
-        testBed.page,
-        'gold',
-        'search-page-sk_bulk-triage-with-cl'
-      );
-    });
+      it('shows the bulk triage dialog with a CL', async () => {
+        await goToPage(
+          '?untriaged=true&positive=true&negative=true&crs=gerrit&issue=123456'
+        );
+        await searchPageSkPO.clickBulkTriageBtn();
+        await takeScreenshotWithMode(
+          testBed.page,
+          'gold',
+          'search-page-sk_bulk-triage-with-cl',
+          mode
+        );
+      });
 
-    it('shows full size images', async () => {
-      await goToPage();
-      await searchPageSkPO.clickToggleFullSizeImagesBtn();
-      await takeScreenshot(
-        testBed.page,
-        'gold',
-        'search-page-sk_full-size-images'
-      );
-    });
+      it('shows full size images', async () => {
+        await goToPage();
+        await searchPageSkPO.clickToggleFullSizeImagesBtn();
+        await takeScreenshotWithMode(
+          testBed.page,
+          'gold',
+          'search-page-sk_full-size-images',
+          mode
+        );
+      });
 
-    it('toggles back to small size images', async () => {
-      await goToPage();
-      await searchPageSkPO.clickToggleFullSizeImagesBtn();
-      await searchPageSkPO.clickToggleFullSizeImagesBtn();
-      await takeScreenshot(
-        testBed.page,
-        'gold',
-        'search-page-sk_small-images-after-full-size-images'
-      );
-    });
+      it('toggles back to small size images', async () => {
+        await goToPage();
+        await searchPageSkPO.clickToggleFullSizeImagesBtn();
+        await searchPageSkPO.clickToggleFullSizeImagesBtn();
+        await takeScreenshotWithMode(
+          testBed.page,
+          'gold',
+          'search-page-sk_small-images-after-full-size-images',
+          mode
+        );
+      });
 
-    it('shows the help dialog', async () => {
-      await goToPage();
-      await searchPageSkPO.clickHelpBtn();
-      await takeScreenshot(testBed.page, 'gold', 'search-page-sk_help-dialog');
-    });
+      it('shows the help dialog', async () => {
+        await goToPage();
+        await searchPageSkPO.clickHelpBtn();
+        await takeScreenshotWithMode(
+          testBed.page,
+          'gold',
+          'search-page-sk_help-dialog',
+          mode
+        );
+      });
 
-    it('shows a selected digest', async () => {
-      await goToPage('?untriaged=true&positive=true&negative=true');
-      await searchPageSkPO.typeKey('j'); // Select the first search result.
-      await takeScreenshot(
-        testBed.page,
-        'gold',
-        'search-page-sk_first-search-result-selected'
-      );
+      it('shows a selected digest', async () => {
+        await goToPage('?untriaged=true&positive=true&negative=true');
+        await searchPageSkPO.typeKey('j'); // Select the first search result.
+        await takeScreenshotWithMode(
+          testBed.page,
+          'gold',
+          'search-page-sk_first-search-result-selected',
+          mode
+        );
+      });
     });
   });
 
