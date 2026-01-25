@@ -1,7 +1,8 @@
-import './index';
 import { html, render } from 'lit-html';
 import { repeat } from 'lit-html/directives/repeat';
 import { $$ } from '../../../infra-sk/modules/dom';
+import '../../../infra-sk/modules/theme-chooser-sk';
+import './index';
 import { SortToggleSk } from './sort-toggle-sk';
 
 interface DemoSortable {

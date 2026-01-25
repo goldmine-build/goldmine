@@ -27,7 +27,10 @@ sk_element(
 sk_page(
     name = "sort-toggle-sk-demo",
     html_file = "sort-toggle-sk-demo.html",
-    sk_element_deps = [":sort-toggle-sk"],
+    sk_element_deps = [
+        ":sort-toggle-sk",
+        "//infra-sk/modules/theme-chooser-sk",
+    ],
     ts_deps = [
         "//infra-sk/modules:dom_ts_lib",
         "//:node_modules/lit-html",
