@@ -1,7 +1,9 @@
 import { expect } from 'chai';
 import {
   loadCachedTestBed,
-  takeScreenshot,
+  ModeOption,
+  Modes,
+  takeScreenshotWithMode,
   TestBed,
 } from '../../../puppeteer-tests/util';
 
@@ -22,29 +24,31 @@ describe('multi-zoom-sk', () => {
   });
 
   describe('screenshots', () => {
+    Modes.forEach(async (mode: ModeOption) => {
     it('looks good when left and right are a normal size', async () => {
       const multiZoomSk = await testBed.page.$('#normal');
-      await takeScreenshot(multiZoomSk!, 'gold', 'multi-zoom-sk');
+      await takeScreenshotWithMode(multiZoomSk!, 'gold', 'multi-zoom-sk', mode);
     });
 
     it('shows two images of different size', async () => {
       const multiZoomSk = await testBed.page.$('#mismatch');
-      await takeScreenshot(multiZoomSk!, 'gold', 'multi-zoom-sk_mismatch');
+      await takeScreenshotWithMode(multiZoomSk!, 'gold', 'multi-zoom-sk_mismatch', mode);
     });
 
     it('works for two small base64 encoded images', async () => {
       const multiZoomSk = await testBed.page.$('#base64');
-      await takeScreenshot(multiZoomSk!, 'gold', 'multi-zoom-sk_base64-small');
+      await takeScreenshotWithMode(multiZoomSk!, 'gold', 'multi-zoom-sk_base64-small', mode);
     });
 
     it('is zoomed in with the grid on', async () => {
       const multiZoomSk = await testBed.page.$('#zoomed_grid');
-      await takeScreenshot(multiZoomSk!, 'gold', 'multi-zoom-sk_zoomed-grid');
+      await takeScreenshotWithMode(multiZoomSk!, 'gold', 'multi-zoom-sk_zoomed-grid', mode);
     });
 
     it('shows nth largest pixel', async () => {
       const multiZoomSk = await testBed.page.$('#base64_nthpixel');
-      await takeScreenshot(multiZoomSk!, 'gold', 'multi-zoom-sk_nth-pixel');
+      await takeScreenshotWithMode(multiZoomSk!, 'gold', 'multi-zoom-sk_nth-pixel', mode);
     });
+  });
   });
 });

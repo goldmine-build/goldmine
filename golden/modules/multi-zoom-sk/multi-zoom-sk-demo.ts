@@ -1,10 +1,11 @@
 import './index';
 
 import { $$ } from '../../../infra-sk/modules/dom';
+import '../../../infra-sk/modules/theme-chooser-sk';
 import { digestDiffImagePath, digestImagePath } from '../common';
-import { diff16x16, left16x16, right16x16 } from './test_data';
 import { isPuppeteerTest } from '../demo_util';
 import { MultiZoomSk } from './multi-zoom-sk';
+import { diff16x16, left16x16, right16x16 } from './test_data';
 
 const isPuppeteer = isPuppeteerTest();
 

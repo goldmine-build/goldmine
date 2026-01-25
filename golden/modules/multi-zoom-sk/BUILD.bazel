@@ -29,7 +29,10 @@ sk_element(
 sk_page(
     name = "multi-zoom-sk-demo",
     html_file = "multi-zoom-sk-demo.html",
-    sk_element_deps = [":multi-zoom-sk"],
+    sk_element_deps = [
+        ":multi-zoom-sk",
+        "//infra-sk/modules/theme-chooser-sk",
+    ],
     ts_deps = [
         ":test_data_ts_lib",
         "//golden/modules:common_ts_lib",
