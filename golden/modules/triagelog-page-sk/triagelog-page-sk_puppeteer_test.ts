@@ -1,7 +1,9 @@
 import {
   addEventListenersToPuppeteerPage,
   loadCachedTestBed,
-  takeScreenshot,
+  ModeOption,
+  Modes,
+  takeScreenshotWithMode,
   TestBed,
 } from '../../../puppeteer-tests/util';
 
@@ -20,8 +22,15 @@ describe('triagelog-page-sk', () => {
     await loaded;
   });
 
-  it('should take a screenshot', async () => {
-    await testBed.page.setViewport({ width: 1200, height: 1800 });
-    await takeScreenshot(testBed.page, 'gold', 'triagelog-page-sk');
+  Modes.forEach(async (mode: ModeOption) => {
+    it('should take a screenshot', async () => {
+      await testBed.page.setViewport({ width: 1200, height: 1800 });
+      await takeScreenshotWithMode(
+        testBed.page,
+        'gold',
+        'triagelog-page-sk',
+        mode
+      );
+    });
   });
 });
