@@ -1,7 +1,8 @@
-import './index';
+import '../../../infra-sk/modules/theme-chooser-sk';
 import { isPuppeteerTest } from '../demo_util';
-import { TriageSk } from './triage-sk';
 import { Label } from '../rpc_types';
+import './index';
+import { TriageSk } from './triage-sk';
 
 const log = (message: string) => {
   const log = document.querySelector<HTMLTextAreaElement>('#event-log')!;
